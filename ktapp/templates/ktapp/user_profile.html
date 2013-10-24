@@ -1,0 +1,19 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block headerh1 %}{{ user.username }}{% endblock %}
+
+{% block main %}
+
+<p>Be vagy jelentkezve.</p>
+
+<p><a href="{% url 'index' %}">vissza a nyitó oldalra</a></p>
+
+
+    <form action="{% url 'logout' %}" method="post">
+        {% csrf_token %}
+        <input type="submit" value="kijelentkezés" />
+    </form>
+
+{% endblock %}

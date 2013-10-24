@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}{% endblock %}</title>
+{% load staticfiles %}
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/style.css' %}" />
+    </head>
+    <body>
+
+        <header>
+            <h1>{% block headerh1 %}{% endblock %}</h1>
+        </header>
+
+        <section id="main">
+            {% block main %}{% endblock %}
+        </section>
+
+        <footer>
+            <p><hr /></p>
+            <p><img src="{% static 'ktapp/images/polokep.gif' %}" alt="Vapiti" style="width: 100px" /></p>
+        </footer>
+
+    </body>
+</html>

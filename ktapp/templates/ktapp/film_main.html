@@ -1,0 +1,42 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}{{ film.orig_title }} [{{ film.year }}] :: Kritikus Tömeg{% endblock %}
+
+{% block headerh1 %}{{ film.orig_title }} [{{ film.year }}]{% endblock %}
+
+{% block main %}
+
+{% if film.other_titles %}
+<h2>{{ film.other_titles|linebreaksbr }}</h2>
+{% endif %}
+
+{% if user.is_authenticated %}
+
+<p>Szerinted:
+
+{% for r in ratings %}
+
+{% if r == rating %}
+<b>{{ r }}</b>
+{% else %}
+
+    <form action="{% url 'vote' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="film_id" value="{{ film.pk }}" />
+        <input type="hidden" name="rating" value="{{ r }}" />
+        <input type="submit" value="{{r}}" />
+    </form>
+
+{% endif%}
+
+{% endfor %}
+</p>
+
+{% else %}
+
+<p>Ahhoz, hogy szavazz, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
+
+{% endif %}
+
+{% endblock %}
+

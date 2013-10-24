@@ -1,0 +1,29 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block headerh1 %}Üdv a Kritikus Tömegen!{% endblock %}
+
+{% block main %}
+
+{% if film_list %}
+    <p>Filmek listája:</p>
+    <ul>
+    {% for film in film_list %}
+        <li><a href="{% url 'film_main' film.id film.orig_title|urlencode %}">{{ film.orig_title }} [{{ film.year }}]</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>Nincs film az adatbázisban.</p>
+{% endif %}
+
+
+{% if user.is_authenticated %}
+    <p>Szia, {{ user.username }}.</p>
+    <p>Ha szeretnél kilépni, <a href="{% url 'user_profile' %}">ITT</a> teheted meg.</p>
+{% else %}
+    <p><a href="{% url 'login' %}">ITT</a> léphetsz be.</p>
+{% endif %}
+
+
+{% endblock %}
