@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 
 from ktapp.models import Film, Vote
 
@@ -26,6 +27,17 @@ def film_main(request, id, orig_title):
     })
 
 
-def vote(request):  # TODO: implement this
+@login_required
+def vote(request):
     film = get_object_or_404(Film, pk=request.POST["film_id"])
+    try:
+        rating = int(request.POST["rating"])
+    except ValueError:
+        rating = 0
+    if rating == 0:
+        Vote.objects.filter(film=film, user=request.user).delete()
+    elif 1 <= rating <= 5:
+        vote, created = Vote.objects.get_or_create(film=film, user=request.user, defaults={"rating": rating})
+        vote.rating = rating
+        vote.save()
     return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.orig_title)))

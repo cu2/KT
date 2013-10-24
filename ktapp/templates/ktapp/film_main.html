@@ -1,6 +1,6 @@
 {% extends "ktapp/layout.html" %}
 
-{% block title %}{{ film.orig_title }} [{{ film.year }}] :: Kritikus Tömeg{% endblock %}
+{% block title %}{{ film.orig_title }} [{{ film.year }}] - Kritikus Tömeg{% endblock %}
 
 {% block headerh1 %}{{ film.orig_title }} [{{ film.year }}]{% endblock %}
 
@@ -12,25 +12,39 @@
 
 {% if user.is_authenticated %}
 
-<p>Szerinted:
+<p>Szerinted:</p>
 
+<div>
 {% for r in ratings %}
 
 {% if r == rating %}
 <b>{{ r }}</b>
 {% else %}
 
-    <form action="{% url 'vote' %}" method="post">
+    <form action="{% url 'vote' %}" method="post" class="inline">
         {% csrf_token %}
         <input type="hidden" name="film_id" value="{{ film.pk }}" />
         <input type="hidden" name="rating" value="{{ r }}" />
         <input type="submit" value="{{r}}" />
     </form>
 
-{% endif%}
+{% endif %}
 
 {% endfor %}
-</p>
+</div>
+
+<div>
+{% if rating == 0 %}
+<b>Nem tudom.</b>
+{% else %}
+    <form action="{% url 'vote' %}" method="post" class="inline">
+        {% csrf_token %}
+        <input type="hidden" name="film_id" value="{{ film.pk }}" />
+        <input type="hidden" name="rating" value="0" />
+        <input type="submit" value="Nem tudom." />
+    </form>
+{% endif %}
+</div>
 
 {% else %}
 
@@ -39,4 +53,3 @@
 {% endif %}
 
 {% endblock %}
-
