@@ -1,7 +1,7 @@
 # Django settings for kt project.
 
 # import local (i.e. gitignored) settings:
-import settings_local
+import kt.settings_local
 
 import os
 
@@ -22,7 +22,7 @@ DATABASES = {
         'NAME': 'ktdb',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'ktadmin',
-        'PASSWORD': settings_local.DATABASE_DEFAULT_PASSWORD,
+        'PASSWORD': kt.settings_local.DATABASE_DEFAULT_PASSWORD,
         'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '',                      # Set to empty string for default.
     }
@@ -90,7 +90,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = settings_local.SECRET_KEY
+SECRET_KEY = kt.settings_local.SECRET_KEY
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
