@@ -2,13 +2,16 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 
 from ktapp.models import Film, Vote
 
 
 def index(request):
     film_list = Film.objects.all()
-    return render(request, "ktapp/index.html", {"film_list": film_list})
+    return render(request, "ktapp/index.html", {
+        "film_list": film_list,
+    })
 
 
 def film_main(request, id, orig_title):
@@ -41,3 +44,16 @@ def vote(request):
         vote.rating = rating
         vote.save()
     return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.orig_title)))
+
+
+def registration(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            return HttpResponseRedirect(reverse("index"))
+    else:
+        form = UserCreationForm()
+    return render(request, "ktapp/registration.html", {
+        'form': form,
+    })

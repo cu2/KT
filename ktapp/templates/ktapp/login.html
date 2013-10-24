@@ -1,20 +1,27 @@
 {% extends "ktapp/layout.html" %}
 
+{% block title %}Bejelentkezés - Kritikus Tömeg{% endblock %}
+
+{% block headerh1 %}Bejelentkezés{% endblock %}
+
 {% block main %}
 
-  {% if form.errors %}
-    <p class="error">Hibás név vagy jelszó!</p>
-  {% endif %}
+    {% if form.errors %}
+        <p class="error">Hibás név vagy jelszó!</p>
+    {% endif %}
 
-  <form action="" method="post">
-{% csrf_token %}
-    <label for="username">Név:</label>
-    <input type="text" name="username" value="" id="username">
-    <label for="password">Jelszó:</label>
-    <input type="password" name="password" value="" id="password">
-
-    <input type="submit" value="login" />
-    <input type="hidden" name="next" value="{{ next|escape }}" />
-  </form>
+    <form action="" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% url 'index' %}" />
+        <p>
+            <label for="username">Név:</label>
+            <input type="text" name="username" value="" id="username">
+        </p>
+        <p>
+            <label for="password">Jelszó:</label>
+            <input type="password" name="password" value="" id="password">
+        </p>
+        <p><input type="submit" value="login" /></p>
+    </form>
 
 {% endblock %}

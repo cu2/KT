@@ -2,19 +2,22 @@
 
 - users
     - login/logout
+    - registration
 
 - films
     - very basic data
 
+- votes
+
 # TODO
 
 - users
-    - registration
     - additional info: sex, year-of-birth, location
     - core membership
 
 - films
     - basic data
+    - average, votes
     - premier(s)
     - sequels and remakes
     - keywords
@@ -27,8 +30,6 @@
     - links
     - awards
     - analyses
-
-- votes
 
 - comments
     - for films

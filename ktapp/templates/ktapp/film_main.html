@@ -6,50 +6,40 @@
 
 {% block main %}
 
-{% if film.other_titles %}
-<h2>{{ film.other_titles|linebreaksbr }}</h2>
-{% endif %}
+    {% if film.other_titles %}
+        <h2>{{ film.other_titles|linebreaksbr }}</h2>
+    {% endif %}
 
-{% if user.is_authenticated %}
-
-<p>Szerinted:</p>
-
-<div>
-{% for r in ratings %}
-
-{% if r == rating %}
-<b>{{ r }}</b>
-{% else %}
-
-    <form action="{% url 'vote' %}" method="post" class="inline">
-        {% csrf_token %}
-        <input type="hidden" name="film_id" value="{{ film.pk }}" />
-        <input type="hidden" name="rating" value="{{ r }}" />
-        <input type="submit" value="{{r}}" />
-    </form>
-
-{% endif %}
-
-{% endfor %}
-</div>
-
-<div>
-{% if rating == 0 %}
-<b>Nem tudom.</b>
-{% else %}
-    <form action="{% url 'vote' %}" method="post" class="inline">
-        {% csrf_token %}
-        <input type="hidden" name="film_id" value="{{ film.pk }}" />
-        <input type="hidden" name="rating" value="0" />
-        <input type="submit" value="Nem tudom." />
-    </form>
-{% endif %}
-</div>
-
-{% else %}
-
-<p>Ahhoz, hogy szavazz, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
-
-{% endif %}
+    {% if user.is_authenticated %}
+        <p>Szerinted:</p>
+        <div>
+        {% for r in ratings %}
+            {% if r == rating %}
+                <b>{{ r }}</b>
+            {% else %}
+                <form action="{% url 'vote' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                    <input type="hidden" name="rating" value="{{ r }}" />
+                    <input type="submit" value="{{r}}" />
+                </form>
+            {% endif %}
+        {% endfor %}
+        </div>
+        <div>
+        {% if rating == 0 %}
+            <b>Nem tudom.</b>
+        {% else %}
+            <form action="{% url 'vote' %}" method="post" class="inline">
+                {% csrf_token %}
+                <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                <input type="hidden" name="rating" value="0" />
+                <input type="submit" value="Nem tudom." />
+            </form>
+        {% endif %}
+        </div>
+    {% else %}
+        <p>Ahhoz, hogy szavazz, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
+    {% endif %}
 
 {% endblock %}

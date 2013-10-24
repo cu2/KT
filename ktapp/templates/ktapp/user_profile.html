@@ -6,14 +6,11 @@
 
 {% block main %}
 
-<p>Be vagy jelentkezve.</p>
-
-<p><a href="{% url 'index' %}">vissza a nyitó oldalra</a></p>
-
+    <p>Be vagy jelentkezve.</p>
 
     <form action="{% url 'logout' %}" method="post">
         {% csrf_token %}
-        <input type="submit" value="kijelentkezés" />
+        <p><input type="submit" value="kijelentkezés" /></p>
     </form>
 
 {% endblock %}
