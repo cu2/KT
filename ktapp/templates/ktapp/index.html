@@ -10,7 +10,7 @@
         <p>Filmek listája:</p>
         <ul>
         {% for film in film_list %}
-            <li><a href="{% url 'film_main' film.id film.orig_title|urlencode %}">{{ film.orig_title }} [{{ film.year }}]</a></li>
+            <li><a href="{% url 'film_main' film.id film.orig_title|slugify %}">{{ film.orig_title }} [{{ film.year }}]</a></li>
         {% endfor %}
         </ul>
     {% else %}
