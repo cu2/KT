@@ -6,6 +6,7 @@ class Film(models.Model):
     orig_title = models.CharField(max_length=200)
     other_titles = models.TextField(blank=True)
     year = models.PositiveIntegerField(default=0)
+    plot_summary = models.TextField(blank=True)
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -23,3 +24,6 @@ class Vote(models.Model):
     
     def __unicode__(self):
         return self.film.orig_title + " + " + self.user.username+ " = " + unicode(self.rating)
+    
+    class Meta:
+        unique_together = ("film", "user")
