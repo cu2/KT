@@ -4,6 +4,12 @@ This project aims to rewrite Kritikus Tömeg from scratch. Readable code + open 
 
 ## Developer guide
 
+If you want to participate, here are some rules and guide.
+
+Even though KT is Hungarian, code (especially open source code) should always be English. Someday, somewhere (maybe) some Danish guys might decide to start *Kritisk masse* (or the Russians *Критическая масса*). If code is English, they only need to translate URLs and templates (and build a database) (and of course raise a community).
+
+For Hungarian communication and coordination use [this topic](...................) on KT.
+
 ### TODO
 
 See TODO.md
@@ -22,6 +28,8 @@ Otherwise follow PEP-8 and use pylint.
 
 #### Python 2.7
 
+Important: Python 3 *is* different.
+
 #### Django 1.5.4
 
 Linux, Mac OS X: `sudo pip install Django==1.5.4`
@@ -32,9 +40,24 @@ Windows: `pip install Django` (how to specify version?)
 
 #### South
 
+[South install guide](http://south.readthedocs.org/en/latest/installation.html)
+
+Whenever you change `models.py`, don't forget to
+
+- create a migration: `python manage.py schemamigration ktapp --auto`
+- and apply it: `python manage.py migrate ktapp`
+
+This way, not only your database schema will follow the change, but others can easily follow.
+
+For more details [read this tutorial](http://south.readthedocs.org/en/latest/tutorial/part1.html).
+
 #### MySQL
 
+Create a database:
+
 `create database ktdb default character set utf8 default collate utf8_hungarian_ci;`
+
+And an admin user that Django uses (locally):
 
 `grant all on ktdb.* to ktadmin@localhost identified by '';` (anything random, but same as kt/settings_local.py/DATABASES/default/PASSWORD)
 
@@ -44,7 +67,7 @@ Windows: `pip install Django` (how to specify version?)
 
 For development: Django
 
-`python manage.py runserver`
+`python manage.py runserver [<port>]`
 
 For production: Apache, Lighttpd, nginx...
 

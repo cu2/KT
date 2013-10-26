@@ -9,6 +9,7 @@
 
 - votes
 
+
 # TODO
 
 - users
@@ -44,3 +45,8 @@
 - polls
     - poll questions
     - poll comments
+
+
+# (FAR) FUTURE
+
+http://stackoverflow.com/questions/5530277/how-to-make-facebook-login-possible-in-django-app
