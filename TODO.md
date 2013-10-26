@@ -37,6 +37,9 @@
 
 - comments
     - for topics
+    - reply to
+    - move to (moved from)
+    - bb code
 
 - forum topics
 
