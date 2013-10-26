@@ -1,5 +1,5 @@
 from django.contrib import admin
-from ktapp.models import Film, Vote
+from ktapp.models import Film, Vote, Comment, Topic, Poll
 
 
 class FilmAdmin(admin.ModelAdmin):
@@ -9,3 +9,6 @@ class FilmAdmin(admin.ModelAdmin):
 
 admin.site.register(Film, FilmAdmin)
 # admin.site.register(Vote)
+admin.site.register(Comment)
+admin.site.register(Topic)
+admin.site.register(Poll)
