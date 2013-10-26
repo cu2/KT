@@ -8,7 +8,7 @@ If you want to participate, here are some rules and guide.
 
 Even though KT is Hungarian, code (especially open source code) should always be English. Someday, somewhere (maybe) some Danish guys might decide to start *Kritisk masse* (or the Russians *Критическая масса*). If code is English, they only need to translate URLs and templates (and build a database) (and of course raise a community).
 
-For Hungarian communication and coordination use [this topic](...................) on KT.
+For Hungarian communication and coordination use [this topic](http://kritikustomeg.org/forum.php?tid=187) on KT.
 
 ### TODO
 
