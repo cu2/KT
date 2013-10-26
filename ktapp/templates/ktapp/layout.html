@@ -4,12 +4,29 @@
         <meta charset="utf-8">
         <title>{% block title %}{% endblock %}</title>
 {% load staticfiles %}
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/style.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}" />
     </head>
     <body>
 
+        <nav id="topmenu" class="clearfix">
+            <div><a href="{% url 'index' %}"><img src="{% static 'ktapp/images/vapiti_ikon_24.png' %}" alt="Vapiti" /> Kritikus Tömeg</a></div>
+            <div>Pár menüpont...</div>
+            <div>Kereső</div>
+            {% if user.is_authenticated %}
+                <div><a href="{% url 'user_profile' %}">{{ user.username }}</a><br />
+                <form action="{% url 'logout' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <input type="submit" value="Kijelentkezés" />
+                </form></div>
+            {% else %}
+                <div><a href="{% url 'login' %}">Bejelentkezés</a><br />
+                <a href="{% url 'registration' %}">Regisztráció</a></div>
+            {% endif %}
+        </nav>
+
         <header>
-            <h1>{% block headerh1 %}{% endblock %}</h1>
+            {% block header %}{% endblock %}
         </header>
 
         <section id="main">
@@ -17,8 +34,13 @@
         </section>
 
         <footer>
-            <p><hr /></p>
-            <p><a href="{% url 'index' %}"><img src="{% static 'ktapp/images/polokep.gif' %}" alt="Vapiti" style="width: 100px" /></a></p>
+            <ul class="clearfix">
+                <li>Impresszum</li>
+                <li>Rulez</li>
+                <li>Gy.I.K.</li>
+                <li>Linkek</li>
+                <li>Facebook</li>
+            </ul>
         </footer>
 
     </body>

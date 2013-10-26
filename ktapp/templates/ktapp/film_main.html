@@ -2,13 +2,14 @@
 
 {% block title %}{{ film.orig_title }} [{{ film.year }}] - Kritikus Tömeg{% endblock %}
 
-{% block headerh1 %}{{ film.orig_title }} [{{ film.year }}]{% endblock %}
-
-{% block main %}
-
+{% block header %}
+    <h1>{{ film.orig_title }} [{{ film.year }}]</h1>
     {% if film.other_titles %}
         <h2>{{ film.other_titles|linebreaksbr }}</h2>
     {% endif %}
+{% endblock %}
+
+{% block main %}
 
     {% if film.plot_summary %}
         <p>{{ film.plot_summary|linebreaksbr }}</p>

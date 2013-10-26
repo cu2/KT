@@ -2,15 +2,10 @@
 
 {% block title %}{{ user.username }} - Kritikus Tömeg{% endblock %}
 
-{% block headerh1 %}{{ user.username }}{% endblock %}
+{% block header %}<h1>{{ user.username }}</h1>{% endblock %}
 
 {% block main %}
 
     <p>Be vagy jelentkezve.</p>
-
-    <form action="{% url 'logout' %}" method="post">
-        {% csrf_token %}
-        <p><input type="submit" value="kijelentkezés" /></p>
-    </form>
 
 {% endblock %}

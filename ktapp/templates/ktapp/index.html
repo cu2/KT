@@ -2,8 +2,6 @@
 
 {% block title %}Kritikus Tömeg{% endblock %}
 
-{% block headerh1 %}Üdv a Kritikus Tömegen!{% endblock %}
-
 {% block main %}
 
     {% if film_list %}
@@ -15,14 +13,6 @@
         </ul>
     {% else %}
         <p>Nincs film az adatbázisban.</p>
-    {% endif %}
-
-    {% if user.is_authenticated %}
-        <p>Szia, {{ user.username }}.</p>
-        <p>Ha szeretnél kilépni, <a href="{% url 'user_profile' %}">ITT</a> teheted meg.</p>
-    {% else %}
-        <p><a href="{% url 'login' %}">ITT</a> léphetsz be.</p>
-        <p>És <a href="{% url 'registration' %}">ITT</a> regisztrálhatsz.</p>
     {% endif %}
 
 {% endblock %}

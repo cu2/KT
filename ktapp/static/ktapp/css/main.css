@@ -1,0 +1,68 @@
+/* LAYOUT */
+
+#topmenu div {
+    float: left;
+    margin: 0 30px;
+}
+
+header {
+    padding: 0 10px;
+}
+
+#main {
+    padding: 0 10px;
+}
+
+footer {
+    margin-top: 50px;
+}
+footer ul {
+    list-style: none;
+}
+footer ul li {
+    float: left;
+    margin: 0 30px;
+}
+
+
+
+/* FONTS, COLORS, STYLE */
+
+body {
+    font-family: verdana, sans-serif;
+    font-size: 12pt;
+    background: rgb(228,222,195);
+}
+
+#topmenu {
+    background: rgb(218,211,184);
+}
+
+a {
+    text-decoration: none;
+    color: rgb(146,23,23);
+}
+
+
+
+/* MISC */
+
+.inline {
+    display: inline;
+}
+
+.clear {
+    clear: both;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: ' ';
+    display: table;
+}
+.clearfix:after {
+    clear: both;
+}
+.clearfix {
+    *zoom: 1;
+}
