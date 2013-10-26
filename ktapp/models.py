@@ -27,7 +27,7 @@ class Vote(models.Model):
         return self.film.orig_title + " + " + self.user.username+ " = " + unicode(self.rating)
     
     class Meta:
-        unique_together = ("film", "user")
+        unique_together = ["film", "user"]
 
 
 class Comment(models.Model):
@@ -45,11 +45,14 @@ class Comment(models.Model):
     poll = models.ForeignKey("Poll", blank=True, null=True)
     created_by = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
-    content = models.TextField(blank=True)
+    content = models.TextField()
     reply_to = models.ForeignKey("self", blank=True, null=True)
     
     def __unicode__(self):
         return self.content[:100]
+    
+    class Meta:
+        ordering = ["-created_at"]
 
 
 class Topic(models.Model):

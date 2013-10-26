@@ -5,9 +5,13 @@
     - registration
 
 - films
-    - very basic data
+    - basic data
+    - plot summary
 
 - votes
+
+- comments
+    - for films
 
 
 # TODO
@@ -17,7 +21,6 @@
     - core membership
 
 - films
-    - basic data
     - average, votes
     - premier(s)
     - sequels and remakes
@@ -33,7 +36,6 @@
     - analyses
 
 - comments
-    - for films
     - for topics
 
 - forum topics
@@ -43,8 +45,9 @@
     - directors
 
 - polls
-    - poll questions
-    - poll comments
+    - questions
+    - votes
+    - comments
 
 
 # (FAR) FUTURE

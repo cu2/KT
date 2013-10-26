@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django import forms
 
-from ktapp.models import Film, Vote
+from ktapp.models import Film, Vote, Comment, Topic, Poll
+from ktapp.forms import CommentForm
 
 
 def index(request):
@@ -23,10 +25,24 @@ def film_main(request, id, orig_title):
             rating = vote.rating
         except Vote.DoesNotExist:
             pass
+    comment_form = CommentForm(initial={
+        "domain": Comment.DOMAIN_FILM,
+        "film": film,
+        "topic": None,
+        "poll": None,
+        "reply_to": None,
+    })
+    comment_form.fields["domain"].widget = forms.HiddenInput()
+    comment_form.fields["film"].widget = forms.HiddenInput()
+    comment_form.fields["topic"].widget = forms.HiddenInput()
+    comment_form.fields["poll"].widget = forms.HiddenInput()
+    comment_form.fields["reply_to"].widget = forms.HiddenInput()
     return render(request, "ktapp/film_main.html", {
         "film": film,
         "rating": rating,
         "ratings": range(1, 6),
+        "comments": film.comment_set.all(),
+        "comment_form": comment_form,
     })
 
 
@@ -57,3 +73,29 @@ def registration(request):
     return render(request, "ktapp/registration.html", {
         'form': form,
     })
+
+
+@login_required
+def new_comment(request):  # TODO: extend with topic and poll comments
+    if request.POST["domain"] == Comment.DOMAIN_FILM:
+        film = get_object_or_404(Film, pk=request.POST["film"])
+    elif request.POST["domain"] == Comment.DOMAIN_TOPIC:
+        topic = get_object_or_404(Topic, pk=request.POST["topic"])
+    elif request.POST["domain"] == Comment.DOMAIN_POLL:
+        poll = get_object_or_404(Poll, pk=request.POST["poll"])
+    else:
+        raise Http404
+    if request.POST:
+        comment_form = CommentForm(data=request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.created_by = request.user
+            comment.save()
+    if request.POST["domain"] == Comment.DOMAIN_FILM:
+        return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.orig_title)))
+    elif request.POST["domain"] == Comment.DOMAIN_TOPIC:
+        return HttpResponseRedirect(reverse("index"))
+    elif request.POST["domain"] == Comment.DOMAIN_POLL:
+        return HttpResponseRedirect(reverse("index"))
+    else:
+        raise Http404

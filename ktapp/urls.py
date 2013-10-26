@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
     url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)$', views.film_main, name='film_main'),
     url(r'^szavaz$', views.vote, name='vote'),
+    url(r'^kommentel$', views.new_comment, name='new_comment'),
     url(r'^bejelentkezes/$', login, name='login', kwargs={'template_name': 'ktapp/login.html'}),
     url(r'^tag/$', login, name='user_profile', kwargs={'template_name': 'ktapp/user_profile.html'}),  # TODO: separate own profile and others
     url(r'^kijelentkezes/$', logout, name='logout', kwargs={'next_page': '/'}),

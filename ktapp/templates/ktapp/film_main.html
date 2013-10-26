@@ -10,8 +10,12 @@
         <h2>{{ film.other_titles|linebreaksbr }}</h2>
     {% endif %}
 
+    {% if film.plot_summary %}
+        <p>{{ film.plot_summary|linebreaksbr }}</p>
+    {% endif %}
+
+    <h2>Szerinted</h2>
     {% if user.is_authenticated %}
-        <p>Szerinted:</p>
         <div>
         {% for r in ratings %}
             {% if r == rating %}
@@ -39,7 +43,30 @@
         {% endif %}
         </div>
     {% else %}
-        <p>Ahhoz, hogy szavazz, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
+        <p>Ahhoz, hogy szavazhass, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
+    {% endif %}
+
+    <h2>Kommentek{% if comments %} ({{ comments.count }}){% endif %}</h2>
+    {% if user.is_authenticated %}
+        <form action="{% url 'new_comment' %}" method="post">
+            {% csrf_token %}
+            {% for hidden in comment_form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            {{ comment_form.content.errors }}
+            {{ comment_form.content }}
+            <p><input type="submit" value="Ez a véleményem!!!" /></p>
+        </form>
+    {% else %}
+        <p>Ahhoz, hogy kommentelhess, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
+    {% endif %}
+    {% if comments %}
+        {% for c in comments %}
+            <h3>{{ c.created_at }} {{ c.created_by }}</h3>
+            <p>{{ c.content }}</p>
+        {% endfor %}
+    {% else %}
+        <p>Nincsenek.</p>
     {% endif %}
 
 {% endblock %}
