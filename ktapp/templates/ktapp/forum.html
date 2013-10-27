@@ -1,0 +1,20 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}{{ topic.title }} - Fórum - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>{{ topic.title }}{% if comments %} ({{ comments.count }}){% endif %}</h1>
+{% endblock %}
+
+{% block main %}
+
+    {% include 'ktapp/new_comment_block.html' %}
+    {% if comments %}
+        {% for c in comments %}
+            {% include 'ktapp/comment_block.html' with comment=c %}
+        {% endfor %}
+    {% else %}
+        <p>Ez a topik üres.</p>
+    {% endif %}
+
+{% endblock %}

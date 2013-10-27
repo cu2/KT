@@ -12,6 +12,9 @@
 
 - comments
     - for films
+    - for topics
+
+- forum topics
 
 
 # TODO
@@ -36,12 +39,9 @@
     - analyses
 
 - comments
-    - for topics
     - reply to
     - move to (moved from)
     - bb code
-
-- forum topics
 
 - artists
     - actors and roles

@@ -10,9 +10,9 @@ from ktapp.forms import CommentForm
 
 
 def index(request):
-    film_list = Film.objects.all()
     return render(request, "ktapp/index.html", {
-        "film_list": film_list,
+        "film_list": Film.objects.all(),
+        "topic_list": Topic.objects.all(),
     })
 
 
@@ -78,11 +78,11 @@ def registration(request):
 @login_required
 def new_comment(request):  # TODO: extend with topic and poll comments
     if request.POST["domain"] == Comment.DOMAIN_FILM:
-        film = get_object_or_404(Film, pk=request.POST["film"])
+        domain = get_object_or_404(Film, pk=request.POST["film"])
     elif request.POST["domain"] == Comment.DOMAIN_TOPIC:
-        topic = get_object_or_404(Topic, pk=request.POST["topic"])
+        domain = get_object_or_404(Topic, pk=request.POST["topic"])
     elif request.POST["domain"] == Comment.DOMAIN_POLL:
-        poll = get_object_or_404(Poll, pk=request.POST["poll"])
+        domain = get_object_or_404(Poll, pk=request.POST["poll"])
     else:
         raise Http404
     if request.POST:
@@ -91,11 +91,36 @@ def new_comment(request):  # TODO: extend with topic and poll comments
             comment = comment_form.save(commit=False)
             comment.created_by = request.user
             comment.save()
+            if request.POST["domain"] == Comment.DOMAIN_TOPIC:
+                domain.number_of_comments = domain.comment_set.count()
+            domain.last_comment = comment
+            domain.save()
     if request.POST["domain"] == Comment.DOMAIN_FILM:
-        return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.orig_title)))
+        return HttpResponseRedirect(reverse("film_main", args=(domain.pk, domain.orig_title)))
     elif request.POST["domain"] == Comment.DOMAIN_TOPIC:
-        return HttpResponseRedirect(reverse("index"))
+        return HttpResponseRedirect(reverse("forum", args=(domain.pk, domain.title)))
     elif request.POST["domain"] == Comment.DOMAIN_POLL:
         return HttpResponseRedirect(reverse("index"))
     else:
         raise Http404
+
+
+def forum(request, id, title):
+    topic = get_object_or_404(Topic, pk=id)
+    comment_form = CommentForm(initial={
+        "domain": Comment.DOMAIN_TOPIC,
+        "film": None,
+        "topic": topic,
+        "poll": None,
+        "reply_to": None,
+    })
+    comment_form.fields["domain"].widget = forms.HiddenInput()
+    comment_form.fields["film"].widget = forms.HiddenInput()
+    comment_form.fields["topic"].widget = forms.HiddenInput()
+    comment_form.fields["poll"].widget = forms.HiddenInput()
+    comment_form.fields["reply_to"].widget = forms.HiddenInput()
+    return render(request, "ktapp/forum.html", {
+        "topic": topic,
+        "comments": topic.comment_set.all(),
+        "comment_form": comment_form,
+    })

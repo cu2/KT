@@ -48,23 +48,10 @@
     {% endif %}
 
     <h2>Kommentek{% if comments %} ({{ comments.count }}){% endif %}</h2>
-    {% if user.is_authenticated %}
-        <form action="{% url 'new_comment' %}" method="post">
-            {% csrf_token %}
-            {% for hidden in comment_form.hidden_fields %}
-                {{ hidden }}
-            {% endfor %}
-            {{ comment_form.content.errors }}
-            {{ comment_form.content }}
-            <p><input type="submit" value="Ez a véleményem!!!" /></p>
-        </form>
-    {% else %}
-        <p>Ahhoz, hogy kommentelhess, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
-    {% endif %}
+    {% include 'ktapp/new_comment_block.html' %}
     {% if comments %}
         {% for c in comments %}
-            <h3>{{ c.created_at }} {{ c.created_by }}</h3>
-            <p>{{ c.content }}</p>
+            {% include 'ktapp/comment_block.html' with comment=c %}
         {% endfor %}
     {% else %}
         <p>Nincsenek.</p>

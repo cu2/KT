@@ -15,4 +15,13 @@
         <p>Nincs film az adatbázisban.</p>
     {% endif %}
 
+    {% if topic_list %}
+        <p>Fórum topikok:</p>
+        <ul>
+        {% for topic in topic_list %}
+            <li><a href="{% url 'forum' topic.id topic.title|slugify %}">{{ topic.title }} ({{ topic.number_of_comments }}) {{ topic.last_comment.created_at }} {{ topic.last_comment.created_by }}</a></li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
 {% endblock %}
