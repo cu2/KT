@@ -33,6 +33,9 @@ body {
     font-size: 12pt;
     background: rgb(228,222,195);
 }
+p {
+    line-height: 1.6;
+}
 
 #topmenu {
     background: rgb(218,211,184);
