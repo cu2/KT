@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_delete
+from django.dispatch.dispatcher import receiver
 
 
 class Film(models.Model):
@@ -7,7 +9,8 @@ class Film(models.Model):
     other_titles = models.TextField(blank=True)
     year = models.PositiveIntegerField(default=0)
     plot_summary = models.TextField(blank=True)
-    last_comment = models.ForeignKey("Comment", blank=True, null=True, related_name="last_film_comment")
+    number_of_comments = models.PositiveIntegerField(default=0)
+    last_comment = models.ForeignKey("Comment", blank=True, null=True, related_name="last_film_comment", on_delete=models.SET_NULL)
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -46,13 +49,37 @@ class Comment(models.Model):
     created_by = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
-    reply_to = models.ForeignKey("self", blank=True, null=True)
+    reply_to = models.ForeignKey("self", blank=True, null=True, on_delete=models.SET_NULL)
     
     def __unicode__(self):
         return self.content[:100]
     
     class Meta:
         ordering = ["-created_at"]
+        get_latest_by = "created_at"
+    
+    def save(self, *args, **kwargs):
+        """Save comment and update domain object as well"""
+        super_kwargs = {key: value for key, value in kwargs.iteritems() if key != "domain"}
+        super(Comment, self).save(*args, **super_kwargs)
+        kwargs["domain"].number_of_comments = kwargs["domain"].comment_set.count()
+        kwargs["domain"].last_comment = kwargs["domain"].comment_set.latest()
+        kwargs["domain"].save()
+
+
+@receiver(post_delete, sender=Comment)
+def delete_comment(sender, instance, **kwargs):
+    if instance.domain == Comment.DOMAIN_FILM:
+        domain = instance.film
+    elif instance.domain == Comment.DOMAIN_TOPIC:
+        domain = instance.topic
+    elif instance.domain == Comment.DOMAIN_POLL:
+        domain = instance.poll
+    else:
+        return
+    domain.number_of_comments = domain.comment_set.count()
+    domain.last_comment = domain.comment_set.latest()
+    domain.save()
 
 
 class Topic(models.Model):
@@ -60,7 +87,7 @@ class Topic(models.Model):
     number_of_comments = models.PositiveIntegerField(default=0)
     created_by = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
-    last_comment = models.ForeignKey(Comment, blank=True, null=True, related_name="last_topic_comment")
+    last_comment = models.ForeignKey(Comment, blank=True, null=True, related_name="last_topic_comment", on_delete=models.SET_NULL)
     
     def __unicode__(self):
         return self.title

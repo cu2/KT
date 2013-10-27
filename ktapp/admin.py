@@ -7,8 +7,12 @@ class FilmAdmin(admin.ModelAdmin):
     search_fields = ['orig_title', 'other_titles', 'year']
 
 
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['content', 'created_by', 'created_at', 'domain', 'film', 'topic', 'poll']
+
+
 admin.site.register(Film, FilmAdmin)
 # admin.site.register(Vote)
-admin.site.register(Comment)
+admin.site.register(Comment, CommentAdmin)
 admin.site.register(Topic)
 admin.site.register(Poll)

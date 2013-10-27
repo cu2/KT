@@ -76,12 +76,13 @@ def registration(request):
 
 
 @login_required
-def new_comment(request):  # TODO: extend with topic and poll comments
-    if request.POST["domain"] == Comment.DOMAIN_FILM:
+def new_comment(request):  # TODO: extend with poll comments
+    domain_type = request.POST["domain"]
+    if domain_type == Comment.DOMAIN_FILM:
         domain = get_object_or_404(Film, pk=request.POST["film"])
-    elif request.POST["domain"] == Comment.DOMAIN_TOPIC:
+    elif domain_type == Comment.DOMAIN_TOPIC:
         domain = get_object_or_404(Topic, pk=request.POST["topic"])
-    elif request.POST["domain"] == Comment.DOMAIN_POLL:
+    elif domain_type == Comment.DOMAIN_POLL:
         domain = get_object_or_404(Poll, pk=request.POST["poll"])
     else:
         raise Http404
@@ -90,16 +91,12 @@ def new_comment(request):  # TODO: extend with topic and poll comments
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)
             comment.created_by = request.user
-            comment.save()
-            if request.POST["domain"] == Comment.DOMAIN_TOPIC:
-                domain.number_of_comments = domain.comment_set.count()
-            domain.last_comment = comment
-            domain.save()
-    if request.POST["domain"] == Comment.DOMAIN_FILM:
+            comment.save(domain=domain)  # Comment model updates domain object
+    if domain_type == Comment.DOMAIN_FILM:
         return HttpResponseRedirect(reverse("film_main", args=(domain.pk, domain.orig_title)))
-    elif request.POST["domain"] == Comment.DOMAIN_TOPIC:
+    elif domain_type == Comment.DOMAIN_TOPIC:
         return HttpResponseRedirect(reverse("forum", args=(domain.pk, domain.title)))
-    elif request.POST["domain"] == Comment.DOMAIN_POLL:
+    elif domain_type == Comment.DOMAIN_POLL:
         return HttpResponseRedirect(reverse("index"))
     else:
         raise Http404
