@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 
-from ktapp.models import Film, Vote, Comment, Topic, Poll
+from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship
 from ktapp.forms import CommentForm, QuoteForm
 
 
@@ -49,6 +49,24 @@ def film_main(request, id, orig_title):
         "comment_form": comment_form,
         "quotes": film.quote_set.all(),
         "quote_form": quote_form,
+        "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
+        "roles": film.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
+    })
+
+
+def artist(request, id, name):
+    artist = get_object_or_404(Artist, pk=id)
+    return render(request, "ktapp/artist.html", {
+        "artist": artist,
+        "directions": artist.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
+        "roles": artist.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
+    })
+
+
+def role(request, id, name):
+    role = get_object_or_404(FilmArtistRelationship, pk=id)
+    return render(request, "ktapp/role.html", {
+        "role": role,
     })
 
 

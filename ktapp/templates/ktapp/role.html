@@ -1,0 +1,15 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}{{ role.role_name }}{% if role.actor_subtype == "V" %} (hangja){% endif %}{% if role.actor_subtype == "D" %} (magyar hangja){% endif %} - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>{{ role.role_name }}{% if role.actor_subtype == "V" %} (hangja){% endif %}{% if role.actor_subtype == "D" %} (magyar hangja){% endif %}</h1>
+{% endblock %}
+
+{% block main %}
+    <h2><a href="{% url 'film_main' role.film.id role.film.orig_title|slugify %}">{{ role.film.orig_title }} [{{ role.film.year }}]</a></h2>
+    {% if role.film.other_titles %}
+        <h3>{{ role.film.other_titles|linebreaksbr }}</h3>
+    {% endif %}
+    <h2><a href="{% url 'artist' role.artist.id role.artist.name|slugify %}">{{ role.artist.name }}</a></h2>
+{% endblock %}

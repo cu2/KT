@@ -17,6 +17,11 @@
 
 - forum topics
 
+- artists
+    - name, gender
+    - actors and roles
+    - directors
+
 
 # TODO
 
@@ -42,10 +47,6 @@
     - reply to
     - move to (moved from)
     - bb code
-
-- artists
-    - actors and roles
-    - directors
 
 - polls
     - questions

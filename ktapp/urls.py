@@ -12,6 +12,8 @@ urlpatterns = patterns('',
     url(r'^szavaz$', views.vote, name='vote'),
     url(r'^kommentel$', views.new_comment, name='new_comment'),
     url(r'^uj_idezet$', views.new_quote, name='new_quote'),
+    url(r'^muvesz/(?P<id>\d+)/(?P<name>.*)$', views.artist, name='artist'),
+    url(r'^szereplo/(?P<id>\d+)/(?P<name>.*)$', views.role, name='role'),
     
     url(r'^forum/(?P<id>\d+)/(?P<title>.*)$', views.forum, name='forum'),
     

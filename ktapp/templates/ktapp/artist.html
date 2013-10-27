@@ -1,0 +1,32 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}{{ artist.name }} - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>{{ artist.name }}</h1>
+{% endblock %}
+
+{% block main %}
+
+    <h2>Színészként</h2>
+    <table>
+    {% for role in roles %}
+        <tr>
+            <td><a href="{% url 'role' role.id role.role_name|slugify %}">{{ role.role_name }}</a>{% if role.actor_subtype == "V" %} (hangja){% endif %}{% if role.actor_subtype == "D" %} (magyar hangja){% endif %}</td>
+            <td><a href="{% url 'film_main' role.film.id role.film.orig_title|slugify %}">{{ role.film.orig_title }}</a>{% if role.film.other_titles %}<br />{{ role.film.other_titles|linebreaksbr }}{% endif %}</td>
+            <td>{{ role.film.year }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+    <h2>Rendezőként</h2>
+    <table>
+    {% for direction in directions %}
+        <tr>
+            <td><a href="{% url 'film_main' direction.film.id direction.film.orig_title|slugify %}">{{ direction.film.orig_title }}</a>{% if direction.film.other_titles %}<br />{{ direction.film.other_titles|linebreaksbr }}{% endif %}</td>
+            <td>{{ direction.film.year }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}

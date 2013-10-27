@@ -11,6 +11,7 @@ class Film(models.Model):
     plot_summary = models.TextField(blank=True)
     number_of_comments = models.PositiveIntegerField(default=0)
     last_comment = models.ForeignKey("Comment", blank=True, null=True, related_name="last_film_comment", on_delete=models.SET_NULL)
+    artists = models.ManyToManyField("Artist", through="FilmArtistRelationship")
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -118,3 +119,48 @@ class FilmUserContent(models.Model):
 
 class Quote(FilmUserContent):
     content = models.TextField()
+
+
+class Artist(models.Model):
+    name = models.CharField(max_length=200)
+    GENDER_TYPE_MALE = "M"
+    GENDER_TYPE_FEMALE = "F"
+    GENDER_TYPE_UNKNOWN = "U"
+    GENDER_TYPES = [
+        (GENDER_TYPE_MALE, "Male"),
+        (GENDER_TYPE_FEMALE, "Female"),
+        (GENDER_TYPE_UNKNOWN, "Unknown"),
+    ]
+    gender = models.CharField(max_length=1, choices=GENDER_TYPES, default=GENDER_TYPE_UNKNOWN)
+    films = models.ManyToManyField(Film, through="FilmArtistRelationship")
+    
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ["name"]
+
+
+class FilmArtistRelationship(models.Model):
+    film = models.ForeignKey(Film)
+    artist = models.ForeignKey(Artist)
+    ROLE_TYPE_DIRECTOR = "D"
+    ROLE_TYPE_ACTOR = "A"
+    ROLE_TYPES = [
+        (ROLE_TYPE_DIRECTOR, "Director"),
+        (ROLE_TYPE_ACTOR, "Actor/actress"),
+    ]
+    ACTOR_SUBTYPE_FULL = "F"
+    ACTOR_SUBTYPE_VOICE = "V"
+    ACTOR_SUBTYPE_DUB = "D"
+    ACTOR_SUBTYPES = [
+        (ACTOR_SUBTYPE_FULL, "Full"),
+        (ACTOR_SUBTYPE_VOICE, "Voice"),
+        (ACTOR_SUBTYPE_DUB, "Dub"),
+    ]
+    role_type = models.CharField(max_length=1, choices=ROLE_TYPES, default=ROLE_TYPE_DIRECTOR)
+    actor_subtype = models.CharField(max_length=1, choices=ACTOR_SUBTYPES, default=ACTOR_SUBTYPE_FULL)
+    role_name = models.CharField(max_length=200, blank=True)
+    
+    def __unicode__(self):
+        return self.role_type + "[" + self.role_name + "]:" + unicode(self.film) + "/" + unicode(self.artist)
