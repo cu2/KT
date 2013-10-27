@@ -1,0 +1,31 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}{{ film.orig_title }} [{{ film.year }}] - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <div id="film_header">
+        <h1>{{ film.orig_title }} [{{ film.year }}]</h1>
+        {% if film.other_titles %}
+            <h2>{{ film.other_titles|linebreaksbr }}</h2>
+        {% endif %}
+        {% if directors %}
+            <h3>({% for director in directors %}<a href="{% url 'artist' director.id director.name|slugify %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block main %}
+
+    <nav id="tabs" class="clearfix">
+        <ul>
+            <li{% if active_tab == 'main' %} class="active_tab"{% endif %}><a href="{% url 'film_main' film.id film.orig_title|slugify %}">főoldal</a></li>
+            <li{% if active_tab == 'comments' %} class="active_tab"{% endif %}><a href="{% url 'film_comments' film.id film.orig_title|slugify %}">vélemények</a> ({{ film.number_of_comments }})</li>
+            <li{% if active_tab == 'quotes' %} class="active_tab"{% endif %}><a href="{% url 'film_quotes' film.id film.orig_title|slugify %}">idézetek</a></li>
+        </ul>
+    </nav>
+
+    <div id="film_main">
+        {% block film_main %}{% endblock %}
+    </div>
+
+{% endblock %}

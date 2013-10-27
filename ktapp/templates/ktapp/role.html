@@ -1,9 +1,9 @@
 {% extends "ktapp/layout.html" %}
 
-{% block title %}{{ role.role_name }}{% if role.actor_subtype == "V" %} (hangja){% endif %}{% if role.actor_subtype == "D" %} (magyar hangja){% endif %} - Kritikus Tömeg{% endblock %}
+{% block title %}{{ role.role_name }}{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %} - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{{ role.role_name }}{% if role.actor_subtype == "V" %} (hangja){% endif %}{% if role.actor_subtype == "D" %} (magyar hangja){% endif %}</h1>
+    <h1>{{ role.role_name }}{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</h1>
 {% endblock %}
 
 {% block main %}

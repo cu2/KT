@@ -6,7 +6,7 @@
             {% endfor %}
             {{ comment_form.content.errors }}
             {{ comment_form.content }}
-            <p><input type="submit" value="Ez a véleményem!!!" /></p>
+            <p class="center"><input type="submit" value="Ez a véleményem!!!" /></p>
         </form>
     {% else %}
         <p>Ahhoz, hogy kommentelhess, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>

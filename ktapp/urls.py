@@ -8,7 +8,10 @@ from ktapp import views
 urlpatterns = patterns('',
     url(r'^$', views.index, name='index'),
     
+    url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)/velemenyek$', views.film_comments, name='film_comments'),
+    url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)/idezetek$', views.film_quotes, name='film_quotes'),
     url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)$', views.film_main, name='film_main'),
+    
     url(r'^szavaz$', views.vote, name='vote'),
     url(r'^kommentel$', views.new_comment, name='new_comment'),
     url(r'^uj_idezet$', views.new_quote, name='new_quote'),

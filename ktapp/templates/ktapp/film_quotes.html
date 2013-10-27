@@ -1,0 +1,15 @@
+{% extends "ktapp/film_base.html" %}
+
+{% block film_main %}
+
+    <div id="film_centered">
+        {% include 'ktapp/new_quote_block.html' %}
+        {% for q in quotes %}
+            <h3>{{ q.created_at }} {{ q.created_by }}</h3>
+            <p>{{ q.content }}</p>
+        {% empty %}
+            <p>Nincsenek.</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}

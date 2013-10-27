@@ -12,7 +12,7 @@
     <table>
     {% for role in roles %}
         <tr>
-            <td><a href="{% url 'role' role.id role.role_name|slugify %}">{{ role.role_name }}</a>{% if role.actor_subtype == "V" %} (hangja){% endif %}{% if role.actor_subtype == "D" %} (magyar hangja){% endif %}</td>
+            <td><a href="{% url 'role' role.id role.role_name|slugify %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</td>
             <td><a href="{% url 'film_main' role.film.id role.film.orig_title|slugify %}">{{ role.film.orig_title }}</a>{% if role.film.other_titles %}<br />{{ role.film.other_titles|linebreaksbr }}{% endif %}</td>
             <td>{{ role.film.year }}</td>
         </tr>

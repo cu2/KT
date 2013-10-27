@@ -9,6 +9,14 @@
     </head>
     <body>
 
+        <header>
+            {% block header %}{% endblock %}
+        </header>
+
+        <section id="main">
+            {% block main %}{% endblock %}
+        </section>
+
         <nav id="topmenu" class="clearfix">
             <div><a href="{% url 'index' %}"><img src="{% static 'ktapp/images/vapiti_ikon_24.png' %}" alt="Vapiti" /> Kritikus Tömeg</a></div>
             <div>Pár menüpont...</div>
@@ -24,14 +32,6 @@
                 <a href="{% url 'registration' %}">Regisztráció</a></div>
             {% endif %}
         </nav>
-
-        <header>
-            {% block header %}{% endblock %}
-        </header>
-
-        <section id="main">
-            {% block main %}{% endblock %}
-        </section>
 
         <footer>
             <ul class="clearfix">

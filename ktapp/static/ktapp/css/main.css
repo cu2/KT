@@ -1,16 +1,56 @@
 /* LAYOUT */
 
+#topmenu {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
 #topmenu div {
     float: left;
     margin: 0 30px;
 }
 
 header {
+    margin-top: 50px;
     padding: 0 10px;
+}
+
+#tabs {
+    margin-bottom: 20px;
+}
+
+#tabs ul li {
+    float: left;
+    margin: 0 30px;
 }
 
 #main {
     padding: 0 10px;
+}
+
+#film_main_voting {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#film_centered {
+    margin: 0 auto;
+    width: 70%;
+}
+#film_centered textarea {
+    width: 100%;
+}
+
+#film_main_left {
+    float: left;
+    width: 57%;
+    margin-left: 1%;
+}
+#film_main_right {
+    float: right;
+    width: 39%;
+    margin-right: 1%;
 }
 
 footer {
@@ -28,27 +68,98 @@ footer ul li {
 
 /* FONTS, COLORS, STYLE */
 
+html {
+    overflow-y: scroll;
+    background: rgb(228,222,195);
+}
 body {
     font-family: verdana, sans-serif;
     font-size: 12pt;
-    background: rgb(228,222,195);
-}
-p {
-    line-height: 1.6;
 }
 
 #topmenu {
     background: rgb(218,211,184);
+    border-bottom: solid 1px rgb(128,128,128);
 }
 
+header {
+    text-align: center;
+}
+
+.active_tab {
+    font-weight: bold;
+}
+
+#film_header h1,
+#film_header h2,
+#film_header h3 {
+    margin: 0;
+}
+
+#film_ratings {
+    margin-bottom: 20px;
+}
+#film_ratings b,
+#film_ratings form {
+    margin: 0 20px;
+}
+
+
+.textblock {
+    background: rgb(249,244,218);
+}
+p {
+    line-height: 1.6;
+    margin-top: 0;
+}
 a {
     text-decoration: none;
     color: rgb(146,23,23);
 }
+input, select, textarea {
+    background: rgb(249,244,218);
+    border: solid 1px rgb(128,128,128);
+}
+input[type=submit] {
+    color: rgb(146,23,23);
+    border-radius: 10px;
+}
 
+
+/* TABLES */
+
+
+table {
+    border-collapse: separate;
+    border-spacing: 1px;
+    background: rgb(249,244,218);
+    font-size: 10pt;
+    text-align: left;
+    margin-bottom: 20px;
+}
+tr {
+    background: rgb(218,211,184);
+}
+tr.odd {
+    background: rgb(249,244,218);
+}
+th {
+    padding: 3px;
+    text-align: center;
+}
+td {
+    padding: 3px;
+}
+table.fullsize {
+    width: 100%;
+}
 
 
 /* MISC */
+
+.center {
+    text-align: center;
+}
 
 .inline {
     display: inline;

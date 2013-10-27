@@ -25,6 +25,25 @@ def film_main(request, id, orig_title):
             rating = vote.rating
         except Vote.DoesNotExist:
             pass
+    return render(request, "ktapp/film_main.html", {
+        "active_tab": "main",
+        "film": film,
+        "rating": rating,
+        "ratings": range(1, 6),
+        "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
+        "roles": film.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
+    })
+
+
+def film_comments(request, id, orig_title):
+    film = get_object_or_404(Film, pk=id)
+    rating = 0
+    if request.user.is_authenticated():
+        try:
+            vote = Vote.objects.get(film=film, user=request.user)
+            rating = vote.rating
+        except Vote.DoesNotExist:
+            pass
     comment_form = CommentForm(initial={
         "domain": Comment.DOMAIN_FILM,
         "film": film,
@@ -37,16 +56,36 @@ def film_main(request, id, orig_title):
     comment_form.fields["topic"].widget = forms.HiddenInput()
     comment_form.fields["poll"].widget = forms.HiddenInput()
     comment_form.fields["reply_to"].widget = forms.HiddenInput()
-    quote_form = QuoteForm(initial={
-        "film": film,
-    })
-    quote_form.fields["film"].widget = forms.HiddenInput()
-    return render(request, "ktapp/film_main.html", {
+    return render(request, "ktapp/film_comments.html", {
+        "active_tab": "comments",
         "film": film,
         "rating": rating,
         "ratings": range(1, 6),
         "comments": film.comment_set.all(),
         "comment_form": comment_form,
+        "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
+        "roles": film.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
+    })
+
+
+def film_quotes(request, id, orig_title):
+    film = get_object_or_404(Film, pk=id)
+    rating = 0
+    if request.user.is_authenticated():
+        try:
+            vote = Vote.objects.get(film=film, user=request.user)
+            rating = vote.rating
+        except Vote.DoesNotExist:
+            pass
+    quote_form = QuoteForm(initial={
+        "film": film,
+    })
+    quote_form.fields["film"].widget = forms.HiddenInput()
+    return render(request, "ktapp/film_quotes.html", {
+        "active_tab": "quotes",
+        "film": film,
+        "rating": rating,
+        "ratings": range(1, 6),
         "quotes": film.quote_set.all(),
         "quote_form": quote_form,
         "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
@@ -117,7 +156,7 @@ def new_comment(request):  # TODO: extend with poll comments
             comment.created_by = request.user
             comment.save(domain=domain)  # Comment model updates domain object
     if domain_type == Comment.DOMAIN_FILM:
-        return HttpResponseRedirect(reverse("film_main", args=(domain.pk, domain.orig_title)))
+        return HttpResponseRedirect(reverse("film_comments", args=(domain.pk, domain.orig_title)))
     elif domain_type == Comment.DOMAIN_TOPIC:
         return HttpResponseRedirect(reverse("forum", args=(domain.pk, domain.title)))
     elif domain_type == Comment.DOMAIN_POLL:
@@ -156,4 +195,4 @@ def new_quote(request):
             quote = quote_form.save(commit=False)
             quote.created_by = request.user
             quote.save()
-    return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.orig_title)))
+    return HttpResponseRedirect(reverse("film_quotes", args=(film.pk, film.orig_title)))
