@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 
 from ktapp.models import Film, Vote, Comment, Topic, Poll
-from ktapp.forms import CommentForm
+from ktapp.forms import CommentForm, QuoteForm
 
 
 def index(request):
@@ -37,12 +37,18 @@ def film_main(request, id, orig_title):
     comment_form.fields["topic"].widget = forms.HiddenInput()
     comment_form.fields["poll"].widget = forms.HiddenInput()
     comment_form.fields["reply_to"].widget = forms.HiddenInput()
+    quote_form = QuoteForm(initial={
+        "film": film,
+    })
+    quote_form.fields["film"].widget = forms.HiddenInput()
     return render(request, "ktapp/film_main.html", {
         "film": film,
         "rating": rating,
         "ratings": range(1, 6),
         "comments": film.comment_set.all(),
         "comment_form": comment_form,
+        "quotes": film.quote_set.all(),
+        "quote_form": quote_form,
     })
 
 
@@ -121,3 +127,15 @@ def forum(request, id, title):
         "comments": topic.comment_set.all(),
         "comment_form": comment_form,
     })
+
+
+@login_required
+def new_quote(request):
+    film = get_object_or_404(Film, pk=request.POST["film"])
+    if request.POST:
+        quote_form = QuoteForm(data=request.POST)
+        if quote_form.is_valid():
+            quote = quote_form.save(commit=False)
+            quote.created_by = request.user
+            quote.save()
+    return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.orig_title)))

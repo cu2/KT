@@ -1,0 +1,13 @@
+    {% if user.is_authenticated %}
+        <form action="{% url 'new_quote' %}" method="post">
+            {% csrf_token %}
+            {% for hidden in quote_form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            {{ quote_form.content.errors }}
+            {{ quote_form.content }}
+            <p><input type="submit" value="Ez hangzik el a filmben!!!" /></p>
+        </form>
+    {% else %}
+        <p>Ahhoz, hogy idézetet tudj beküldeni, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
+    {% endif %}

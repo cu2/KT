@@ -57,4 +57,15 @@
         <p>Nincsenek.</p>
     {% endif %}
 
+    <h2>Idézetek{% if quotes %} ({{ quotes.count }}){% endif %}</h2>
+    {% include 'ktapp/new_quote_block.html' %}
+    {% if quotes %}
+        {% for q in quotes %}
+            <h3>{{ q.created_at }} {{ q.created_by }}</h3>
+            <p>{{ q.content }}</p>
+        {% endfor %}
+    {% else %}
+        <p>Nincsenek.</p>
+    {% endif %}
+
 {% endblock %}

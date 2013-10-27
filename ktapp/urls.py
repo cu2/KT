@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)$', views.film_main, name='film_main'),
     url(r'^szavaz$', views.vote, name='vote'),
     url(r'^kommentel$', views.new_comment, name='new_comment'),
+    url(r'^uj_idezet$', views.new_quote, name='new_quote'),
     
     url(r'^forum/(?P<id>\d+)/(?P<title>.*)$', views.forum, name='forum'),
     

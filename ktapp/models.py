@@ -103,3 +103,18 @@ class Poll(models.Model):
     
     def __unicode__(self):
         return self.title
+
+
+class FilmUserContent(models.Model):
+    film = models.ForeignKey(Film, blank=True, null=True)
+    created_by = models.ForeignKey(User)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        abstract = True
+        ordering = ["-created_at"]
+        get_latest_by = "created_at"
+
+
+class Quote(FilmUserContent):
+    content = models.TextField()

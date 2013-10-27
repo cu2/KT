@@ -7,6 +7,7 @@
 - films
     - basic data
     - plot summary
+    - quotes
 
 - votes
 
@@ -32,7 +33,6 @@
         - genre
         - other
     - images
-    - quotes
     - trivia
     - links
     - awards
