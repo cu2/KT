@@ -21,6 +21,10 @@ class Film(models.Model):
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
     
+    def num_specific_rating(self, r):
+        if 1 <= r <= 5:
+            return getattr(self, "number_of_ratings_" + str(r))
+    
     def num_rating(self):
         return (self.number_of_ratings_1 +
                  self.number_of_ratings_2 +

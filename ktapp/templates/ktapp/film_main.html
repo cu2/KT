@@ -5,7 +5,7 @@
     <div id="film_main_voting">
         <h2>Szerinted milyen?</h2>
         {% if user.is_authenticated %}
-            <div id="film_ratings">
+            <div id="film_your_rating">
             {% for r in ratings %}
             {% cycle 'nézhetetlen' 'rossz' 'oké/elmegy' 'jó' 'zseniális' as named_rating silent %}
                 {% if r == rating %}
@@ -42,6 +42,18 @@
             {% if film.plot_summary %}
                 <p class="textblock">{{ film.plot_summary|linebreaksbr }}</p>
             {% endif %}
+            <ul id="film_votes">
+            {% for vote in votes reversed %}
+            {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
+                {% if vote %}
+                <li>{{ vote|length }} {{ named_rating }}:
+                    {% for voteuser in vote %}
+                        <a href="">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </li>
+                {% endif %}
+            {% endfor %}
+            </ul>
         </div>
         <div id="film_main_right">
             {% if roles %}

@@ -32,6 +32,7 @@ def film_main(request, id, orig_title):
         "ratings": range(1, 6),
         "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
         "roles": film.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
+        "votes": [film.vote_set.filter(rating=r) for r in range(1, 6)],
     })
 
 
