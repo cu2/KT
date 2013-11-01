@@ -4,12 +4,20 @@
 
 {% block header %}
     <div id="film_header">
-        <h1>{{ film.orig_title }} [{{ film.year }}]</h1>
-        {% if film.other_titles %}
-            <h2>{{ film.other_titles|linebreaksbr }}</h2>
-        {% endif %}
-        {% if directors %}
-            <h3>({% for director in directors %}<a href="{% url 'artist' director.id director.name|slugify %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
+        <div id="film_title">
+            <h1>{{ film.orig_title }} [{{ film.year }}]</h1>
+            {% if film.other_titles %}
+                <h2>{{ film.other_titles|linebreaksbr }}</h2>
+            {% endif %}
+            {% if directors %}
+                <h3>({% for director in directors %}<a href="{% url 'artist' director.id director.name|slugify %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
+            {% endif %}
+        </div>
+        {% if film.num_rating %}
+        <div id="film_rating">
+            <div id="film_rating_num">{{ film.num_rating }} szavazat<br />átlaga:</div>
+            <div id="film_rating_avg">{{ film.avg_rating|floatformat:2 }}</div>
+        </div>
         {% endif %}
     </div>
 {% endblock %}

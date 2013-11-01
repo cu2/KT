@@ -8,6 +8,7 @@
     - basic data
     - plot summary
     - quotes
+    - average
 
 - votes
 
@@ -30,7 +31,7 @@
     - core membership
 
 - films
-    - average, votes
+    - votes
     - premier(s)
     - sequels and remakes
     - keywords

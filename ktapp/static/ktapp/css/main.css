@@ -146,6 +146,26 @@ header {
     margin: 0;
 }
 
+#film_header {
+    position: relative;
+    min-height: 90px;
+}
+#film_rating {
+    position: absolute;
+    left: 50px; top: 10px;
+    padding: 10px;
+    background: rgb(249,244,218);
+    border-radius: 12px;
+}
+#film_rating_num {
+    font-size: 8pt;
+}
+#film_rating_avg {
+    margin-top: 5px;
+    font-size: 16pt;
+    font-weight: bold;
+}
+
 #film_ratings {
     margin-bottom: 20px;
 }

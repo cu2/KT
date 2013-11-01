@@ -8,7 +8,7 @@ class FilmArtistInline(admin.TabularInline):
 
 
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ['orig_title', 'other_titles', 'year', 'avg_rating']
+    list_display = ['orig_title', 'other_titles', 'year', 'avg_rating', 'num_rating']
     search_fields = ['orig_title', 'other_titles', 'year']
     fields = ['orig_title', 'other_titles', 'year', 'plot_summary']
     inlines = [FilmArtistInline]

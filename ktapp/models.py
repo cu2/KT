@@ -12,12 +12,31 @@ class Film(models.Model):
     number_of_comments = models.PositiveIntegerField(default=0)
     last_comment = models.ForeignKey("Comment", blank=True, null=True, related_name="last_film_comment", on_delete=models.SET_NULL)
     artists = models.ManyToManyField("Artist", through="FilmArtistRelationship")
+    number_of_ratings_1 = models.PositiveIntegerField(default=0)
+    number_of_ratings_2 = models.PositiveIntegerField(default=0)
+    number_of_ratings_3 = models.PositiveIntegerField(default=0)
+    number_of_ratings_4 = models.PositiveIntegerField(default=0)
+    number_of_ratings_5 = models.PositiveIntegerField(default=0)
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
     
+    def num_rating(self):
+        return (self.number_of_ratings_1 +
+                 self.number_of_ratings_2 +
+                 self.number_of_ratings_3 +
+                 self.number_of_ratings_4 +
+                 self.number_of_ratings_5)
+    num_rating.short_description = 'Number of ratings'
+    
     def avg_rating(self):
-        return 4.0  # TODO: implement this
+        if self.num_rating() == 0:
+            return None
+        return (1.0 * self.number_of_ratings_1 +
+                 2.0 * self.number_of_ratings_2 +
+                 3.0 * self.number_of_ratings_3 +
+                 4.0 * self.number_of_ratings_4 +
+                 5.0 * self.number_of_ratings_5) / self.num_rating()
     avg_rating.short_description = 'Average rating'
 
 
