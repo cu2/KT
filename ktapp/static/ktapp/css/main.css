@@ -1,4 +1,4 @@
-/* LAYOUT */
+/* GENERAL LAYOUT */
 
 #topmenu {
     position: fixed;
@@ -16,41 +16,8 @@ header {
     padding: 0 10px;
 }
 
-#tabs {
-    margin-bottom: 20px;
-}
-
-#tabs ul li {
-    float: left;
-    margin: 0 30px;
-}
-
 #main {
     padding: 0 10px;
-}
-
-#film_main_voting {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-#film_centered {
-    margin: 0 auto;
-    width: 70%;
-}
-#film_centered textarea {
-    width: 100%;
-}
-
-#film_main_left {
-    float: left;
-    width: 57%;
-    margin-left: 1%;
-}
-#film_main_right {
-    float: right;
-    width: 39%;
-    margin-right: 1%;
 }
 
 footer {
@@ -65,58 +32,8 @@ footer ul li {
 }
 
 
-.comment_block {
-    margin: 30px 0;
-}
-.comment_header {
-    float: left;
-    width: 20%;
-    background: rgb(218,211,184);
-}
-.comment_content {
-    float: right;
-    width: 80%;
-    background: rgb(249,244,218);
-}
-.comment_header h3 {
-    font-size: 10pt;
-    padding: 5px;
-    margin: 0;
-}
-.comment_content p {
-    padding: 5px;
-    margin: 0;
-}
 
-
-.comment_block_table {
-    width: 100%;
-    margin: 50px 0;
-}
-.comment_block_tr {
-    vertical-align: top;
-}
-.comment_header_td {
-    width: 200px;
-    background: rgb(218,211,184);
-}
-.comment_content_td {
-    background: rgb(249,244,218);
-}
-.comment_header_td h3 {
-    font-size: 10pt;
-    padding: 5px;
-    margin: 0;
-}
-.comment_content_td p {
-    font-size: 12pt;
-    padding: 2px 5px;
-    margin: 0;
-}
-
-
-
-/* FONTS, COLORS, STYLE */
+/* GENERAL FONTS, COLORS, STYLE */
 
 html {
     overflow-y: scroll;
@@ -134,44 +51,6 @@ body {
 
 header {
     text-align: center;
-}
-
-.active_tab {
-    font-weight: bold;
-}
-
-#film_header h1,
-#film_header h2,
-#film_header h3 {
-    margin: 0;
-}
-
-#film_header {
-    position: relative;
-    min-height: 90px;
-}
-#film_rating {
-    position: absolute;
-    left: 50px; top: 10px;
-    padding: 10px;
-    background: rgb(249,244,218);
-    border-radius: 12px;
-}
-#film_rating_num {
-    font-size: 8pt;
-}
-#film_rating_avg {
-    margin-top: 5px;
-    font-size: 16pt;
-    font-weight: bold;
-}
-
-#film_ratings {
-    margin-bottom: 20px;
-}
-#film_ratings b,
-#film_ratings form {
-    margin: 0 20px;
 }
 
 footer {
@@ -256,4 +135,147 @@ table.fullsize {
 }
 .clearfix {
     *zoom: 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* FILM LAYOUT */
+
+#tabs {
+    margin-bottom: 20px;
+}
+
+#tabs ul li {
+    float: left;
+    margin: 0 30px;
+}
+
+#film_main_voting {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#film_centered {
+    margin: 0 auto;
+    width: 70%;
+}
+#film_centered textarea {
+    width: 100%;
+}
+
+#film_main_left {
+    float: left;
+    width: 57%;
+    margin-left: 1%;
+}
+#film_main_right {
+    float: right;
+    width: 39%;
+    margin-right: 1%;
+}
+
+.comment_block {
+    margin: 30px 0;
+}
+.comment_header {
+    float: left;
+    width: 20%;
+    background: rgb(218,211,184);
+}
+.comment_content {
+    float: right;
+    width: 80%;
+    background: rgb(249,244,218);
+}
+.comment_header h3 {
+    font-size: 10pt;
+    padding: 5px;
+    margin: 0;
+}
+.comment_content p {
+    padding: 5px;
+    margin: 0;
+}
+
+
+.comment_block_table {
+    width: 100%;
+    margin: 50px 0;
+}
+.comment_block_tr {
+    vertical-align: top;
+}
+.comment_header_td {
+    width: 200px;
+    background: rgb(218,211,184);
+}
+.comment_content_td {
+    background: rgb(249,244,218);
+}
+.comment_header_td h3 {
+    font-size: 10pt;
+    padding: 5px;
+    margin: 0;
+}
+.comment_content_td p {
+    font-size: 12pt;
+    padding: 2px 5px;
+    margin: 0;
+}
+
+
+/* FILM FONTS, COLORS, STYLE */
+
+.active_tab {
+    font-weight: bold;
+}
+
+#film_header h1,
+#film_header h2,
+#film_header h3 {
+    margin: 0;
+}
+
+#film_header {
+    position: relative;
+    min-height: 90px;
+}
+#film_rating {
+    position: absolute;
+    left: 50px; top: 10px;
+    padding: 10px;
+    background: rgb(249,244,218);
+    border-radius: 12px;
+}
+#film_rating_num {
+    font-size: 8pt;
+}
+#film_rating_avg {
+    margin-top: 5px;
+    font-size: 16pt;
+    font-weight: bold;
+}
+
+#film_your_rating {
+    margin-bottom: 20px;
+}
+#film_your_rating b,
+#film_your_rating form {
+    margin: 0 20px;
+}
+#film_votes {
+    list-style: none;
+    padding: 0;
+}
+#film_votes li {
+    padding: 5px 0;
 }
