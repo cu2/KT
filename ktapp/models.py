@@ -44,6 +44,9 @@ class Film(models.Model):
                  4.0 * self.number_of_ratings_4 +
                  5.0 * self.number_of_ratings_5) / self.num_rating()
     avg_rating.short_description = 'Average rating'
+    
+    def directors(self):
+        return self.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR)
 
 
 class Vote(models.Model):

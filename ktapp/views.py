@@ -30,7 +30,6 @@ def film_main(request, id, orig_title):
         "film": film,
         "rating": rating,
         "ratings": range(1, 6),
-        "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
         "roles": film.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
         "votes": [film.vote_set.filter(rating=r) for r in range(1, 6)],
     })
@@ -60,7 +59,6 @@ def film_comments(request, id, orig_title):
     return render(request, "ktapp/film_comments.html", {
         "active_tab": "comments",
         "film": film,
-        "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
         "comments": film.comment_set.all(),
         "comment_form": comment_form,
     })
@@ -82,7 +80,6 @@ def film_quotes(request, id, orig_title):
     return render(request, "ktapp/film_quotes.html", {
         "active_tab": "quotes",
         "film": film,
-        "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
         "quotes": film.quote_set.all(),
         "quote_form": quote_form,
     })
@@ -104,7 +101,6 @@ def film_trivias(request, id, orig_title):
     return render(request, "ktapp/film_trivias.html", {
         "active_tab": "trivias",
         "film": film,
-        "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
         "trivias": film.trivia_set.all(),
         "trivia_form": trivia_form,
     })
