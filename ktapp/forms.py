@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from ktapp.models import Comment, Quote, Trivia
+from ktapp.models import Comment, Quote, Trivia, Review
 
 
 class CommentForm(ModelForm):
@@ -17,4 +17,10 @@ class QuoteForm(ModelForm):
 class TriviaForm(ModelForm):
     class Meta:
         model = Trivia
+        fields = ["film", "content"]
+
+
+class ReviewForm(ModelForm):
+    class Meta:
+        model = Review
         fields = ["film", "content"]

@@ -16,6 +16,7 @@
         - genre
         - major
         - other
+    - reviews
 
 - votes
 
@@ -38,12 +39,12 @@
     - core membership
 
 - films
+    - imdb, porthu, wikipedia, rotten tomatoes
     - premier(s)
     - sequels and remakes
     - images
-    - links
     - awards
-    - analyses
+    - links
 
 - comments
     - reply to

@@ -1,0 +1,13 @@
+    {% if user.is_authenticated %}
+        <form action="{% url 'new_review' %}" method="post">
+            {% csrf_token %}
+            {% for hidden in review_form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            {{ review_form.content.errors }}
+            {{ review_form.content }}
+            <p class="center"><input type="submit" value="Mehet." /></p>
+        </form>
+    {% else %}
+        <p>Ahhoz, hogy elemzést tudj beküldeni, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
+    {% endif %}

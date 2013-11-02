@@ -19,6 +19,7 @@ class Film(models.Model):
     number_of_ratings_5 = models.PositiveIntegerField(default=0)
     number_of_quotes = models.PositiveIntegerField(default=0)
     number_of_trivias = models.PositiveIntegerField(default=0)
+    number_of_reviews = models.PositiveIntegerField(default=0)
     keywords = models.ManyToManyField("Keyword", through="FilmKeywordRelationship")
     number_of_keywords = models.PositiveIntegerField(default=0)
     
@@ -180,6 +181,24 @@ class Trivia(FilmUserContent):
 @receiver(post_delete, sender=Trivia)
 def delete_trivia(sender, instance, **kwargs):
     instance.film.number_of_trivias = instance.film.trivia_set.count()
+    instance.film.save()
+
+
+class Review(FilmUserContent):
+    content = models.TextField()
+    
+    def save(self, *args, **kwargs):
+        super(Review, self).save(*args, **kwargs)
+        self.film.number_of_reviews = self.film.review_set.count()
+        self.film.save()
+    
+    def __unicode__(self):
+        return self.content[:50]
+
+
+@receiver(post_delete, sender=Review)
+def delete_review(sender, instance, **kwargs):
+    instance.film.number_of_reviews = instance.film.review_set.count()
     instance.film.save()
 
 

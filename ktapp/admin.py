@@ -1,5 +1,5 @@
 from django.contrib import admin
-from ktapp.models import Film, Vote, Comment, Topic, Poll, Quote, Trivia, \
+from ktapp.models import Film, Vote, Comment, Topic, Poll, Quote, Trivia, Review, \
     Artist, FilmArtistRelationship, Keyword, FilmKeywordRelationship
 
 
@@ -26,6 +26,10 @@ class FilmUserTextContentAdmin(admin.ModelAdmin):
     list_display = ['content', 'created_by', 'created_at', 'film']
 
 
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ['__unicode__', 'created_by', 'created_at', 'film']
+
+
 admin.site.register(Film, FilmAdmin)
 # admin.site.register(Vote)
 admin.site.register(Comment, CommentAdmin)
@@ -33,5 +37,6 @@ admin.site.register(Topic)
 admin.site.register(Poll)
 admin.site.register(Quote, FilmUserTextContentAdmin)
 admin.site.register(Trivia, FilmUserTextContentAdmin)
+admin.site.register(Review, ReviewAdmin)
 admin.site.register(Artist)
 admin.site.register(Keyword)

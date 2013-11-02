@@ -5,8 +5,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 
-from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword
-from ktapp.forms import CommentForm, QuoteForm, TriviaForm
+from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword, Review
+from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm
 
 
 def index(request):
@@ -85,6 +85,32 @@ def film_trivias(request, id, orig_title):
     })
 
 
+def film_reviews(request, id, orig_title):
+    film = get_object_or_404(Film, pk=id)
+    review_form = ReviewForm(initial={
+        "film": film,
+    })
+    review_form.fields["film"].widget = forms.HiddenInput()
+    return render(request, "ktapp/film_reviews.html", {
+        "active_tab": "reviews",
+        "film": film,
+        "reviews": film.review_set.all(),
+        "review_form": review_form,
+    })
+
+
+def film_review(request, id, orig_title, review_id):
+    film = get_object_or_404(Film, pk=id)
+    review = get_object_or_404(Review, pk=review_id)
+    if review.film != film:
+        raise Http404
+    return render(request, "ktapp/film_review.html", {
+        "active_tab": "reviews",
+        "film": film,
+        "review": review,
+    })
+
+
 def film_keywords(request, id, orig_title):
     film = get_object_or_404(Film, pk=id)
     return render(request, "ktapp/film_keywords.html", {
@@ -160,6 +186,18 @@ def new_trivia(request):
             trivia.created_by = request.user
             trivia.save()
     return HttpResponseRedirect(reverse("film_trivias", args=(film.pk, film.orig_title)))
+
+
+@login_required
+def new_review(request):
+    film = get_object_or_404(Film, pk=request.POST["film"])
+    if request.POST:
+        review_form = ReviewForm(data=request.POST)
+        if review_form.is_valid():
+            review = review_form.save(commit=False)
+            review.created_by = request.user
+            review.save()
+    return HttpResponseRedirect(reverse("film_reviews", args=(film.pk, film.orig_title)))
 
 
 def artist(request, id, name):
