@@ -37,13 +37,6 @@ def film_main(request, id, orig_title):
 
 def film_comments(request, id, orig_title):
     film = get_object_or_404(Film, pk=id)
-    rating = 0
-    if request.user.is_authenticated():
-        try:
-            vote = Vote.objects.get(film=film, user=request.user)
-            rating = vote.rating
-        except Vote.DoesNotExist:
-            pass
     comment_form = CommentForm(initial={
         "domain": Comment.DOMAIN_FILM,
         "film": film,
@@ -66,13 +59,6 @@ def film_comments(request, id, orig_title):
 
 def film_quotes(request, id, orig_title):
     film = get_object_or_404(Film, pk=id)
-    rating = 0
-    if request.user.is_authenticated():
-        try:
-            vote = Vote.objects.get(film=film, user=request.user)
-            rating = vote.rating
-        except Vote.DoesNotExist:
-            pass
     quote_form = QuoteForm(initial={
         "film": film,
     })
@@ -87,13 +73,6 @@ def film_quotes(request, id, orig_title):
 
 def film_trivias(request, id, orig_title):
     film = get_object_or_404(Film, pk=id)
-    rating = 0
-    if request.user.is_authenticated():
-        try:
-            vote = Vote.objects.get(film=film, user=request.user)
-            rating = vote.rating
-        except Vote.DoesNotExist:
-            pass
     trivia_form = TriviaForm(initial={
         "film": film,
     })
@@ -103,22 +82,6 @@ def film_trivias(request, id, orig_title):
         "film": film,
         "trivias": film.trivia_set.all(),
         "trivia_form": trivia_form,
-    })
-
-
-def artist(request, id, name):
-    artist = get_object_or_404(Artist, pk=id)
-    return render(request, "ktapp/artist.html", {
-        "artist": artist,
-        "directions": artist.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
-        "roles": artist.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
-    })
-
-
-def role(request, id, name):
-    role = get_object_or_404(FilmArtistRelationship, pk=id)
-    return render(request, "ktapp/role.html", {
-        "role": role,
     })
 
 
@@ -136,19 +99,6 @@ def vote(request):
         vote.rating = rating
         vote.save()
     return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.orig_title)))
-
-
-def registration(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            new_user = form.save()
-            return HttpResponseRedirect(reverse("index"))
-    else:
-        form = UserCreationForm()
-    return render(request, "ktapp/registration.html", {
-        'form': form,
-    })
 
 
 @login_required
@@ -178,27 +128,6 @@ def new_comment(request):  # TODO: extend with poll comments
         raise Http404
 
 
-def forum(request, id, title):
-    topic = get_object_or_404(Topic, pk=id)
-    comment_form = CommentForm(initial={
-        "domain": Comment.DOMAIN_TOPIC,
-        "film": None,
-        "topic": topic,
-        "poll": None,
-        "reply_to": None,
-    })
-    comment_form.fields["domain"].widget = forms.HiddenInput()
-    comment_form.fields["film"].widget = forms.HiddenInput()
-    comment_form.fields["topic"].widget = forms.HiddenInput()
-    comment_form.fields["poll"].widget = forms.HiddenInput()
-    comment_form.fields["reply_to"].widget = forms.HiddenInput()
-    return render(request, "ktapp/forum.html", {
-        "topic": topic,
-        "comments": topic.comment_set.all(),
-        "comment_form": comment_form,
-    })
-
-
 @login_required
 def new_quote(request):
     film = get_object_or_404(Film, pk=request.POST["film"])
@@ -221,3 +150,53 @@ def new_trivia(request):
             trivia.created_by = request.user
             trivia.save()
     return HttpResponseRedirect(reverse("film_trivias", args=(film.pk, film.orig_title)))
+
+
+def artist(request, id, name):
+    artist = get_object_or_404(Artist, pk=id)
+    return render(request, "ktapp/artist.html", {
+        "artist": artist,
+        "directions": artist.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
+        "roles": artist.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
+    })
+
+
+def role(request, id, name):
+    role = get_object_or_404(FilmArtistRelationship, pk=id)
+    return render(request, "ktapp/role.html", {
+        "role": role,
+    })
+
+
+def forum(request, id, title):
+    topic = get_object_or_404(Topic, pk=id)
+    comment_form = CommentForm(initial={
+        "domain": Comment.DOMAIN_TOPIC,
+        "film": None,
+        "topic": topic,
+        "poll": None,
+        "reply_to": None,
+    })
+    comment_form.fields["domain"].widget = forms.HiddenInput()
+    comment_form.fields["film"].widget = forms.HiddenInput()
+    comment_form.fields["topic"].widget = forms.HiddenInput()
+    comment_form.fields["poll"].widget = forms.HiddenInput()
+    comment_form.fields["reply_to"].widget = forms.HiddenInput()
+    return render(request, "ktapp/forum.html", {
+        "topic": topic,
+        "comments": topic.comment_set.all(),
+        "comment_form": comment_form,
+    })
+
+
+def registration(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            return HttpResponseRedirect(reverse("index"))
+    else:
+        form = UserCreationForm()
+    return render(request, "ktapp/registration.html", {
+        'form': form,
+    })
