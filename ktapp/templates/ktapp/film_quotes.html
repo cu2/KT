@@ -5,8 +5,7 @@
     <div id="film_centered">
         {% include 'ktapp/new_quote_block.html' %}
         {% for q in quotes %}
-            <h3>{{ q.created_at }} {{ q.created_by }}</h3>
-            <p>{{ q.content }}</p>
+            {% include 'ktapp/film_addon_block.html' with addon=q %}
         {% empty %}
             <p>Nincsenek.</p>
         {% endfor %}

@@ -307,3 +307,24 @@ table.fullsize {
 #film_votes li {
     padding: 5px 0;
 }
+
+
+.film_addon {
+    margin: 50px 0;
+}
+.film_addon_content {
+    background: rgb(249,244,218);
+}
+.film_addon_author {
+    background: rgb(218,211,184);
+}
+.film_addon_content p {
+    margin: 0;
+    padding: 5px;
+}
+.film_addon_author p {
+    margin: 0;
+    padding: 0 5px;
+    font-size: 8pt;
+    text-align: right;
+}
