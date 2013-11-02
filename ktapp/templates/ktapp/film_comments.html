@@ -6,8 +6,6 @@
         {% include 'ktapp/new_comment_block.html' %}
         {% for c in comments %}
             {% include 'ktapp/comment_block.html' with comment=c %}
-        {% empty %}
-            <p>Nincsenek.</p>
         {% endfor %}
     </div>
 

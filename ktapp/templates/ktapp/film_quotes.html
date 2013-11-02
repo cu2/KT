@@ -6,8 +6,6 @@
         {% include 'ktapp/new_quote_block.html' %}
         {% for q in quotes %}
             {% include 'ktapp/film_addon_block.html' with addon=q %}
-        {% empty %}
-            <p>Nincsenek.</p>
         {% endfor %}
     </div>
 
