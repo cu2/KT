@@ -32,7 +32,7 @@
             <li style="width: 12%">elemzések</li>
             <li style="width: 15%"{% if active_tab == 'comments' %} class="active_tab"{% endif %}><a href="{% url 'film_comments' film.id film.orig_title|slugify %}"{% if not film.number_of_comments %} class="inactive_action"{% endif %}>vélemények</a>{% if film.number_of_comments %}<span class="tab_count"> ({{ film.number_of_comments }})</span>{% endif %}</li>
             <li style="width: 11%"{% if active_tab == 'quotes' %} class="active_tab"{% endif %}><a href="{% url 'film_quotes' film.id film.orig_title|slugify %}"{% if not film.number_of_quotes %} class="inactive_action"{% endif %}>idézetek</a>{% if film.number_of_quotes %}<span class="tab_count"> ({{ film.number_of_quotes }})</span>{% endif %}</li>
-            <li style="width: 14%">érdekességek</li>
+            <li style="width: 14%"{% if active_tab == 'trivias' %} class="active_tab"{% endif %}><a href="{% url 'film_trivias' film.id film.orig_title|slugify %}"{% if not film.number_of_trivias %} class="inactive_action"{% endif %}>érdekességek</a>{% if film.number_of_trivias %}<span class="tab_count"> ({{ film.number_of_trivias }})</span>{% endif %}</li>
             <li style="width: 14%">kulcsszavak</li>
             <li style="width: 9%">linkek</li>
         </ul>

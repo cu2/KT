@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 
 from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship
-from ktapp.forms import CommentForm, QuoteForm
+from ktapp.forms import CommentForm, QuoteForm, TriviaForm
 
 
 def index(request):
@@ -60,12 +60,9 @@ def film_comments(request, id, orig_title):
     return render(request, "ktapp/film_comments.html", {
         "active_tab": "comments",
         "film": film,
-        "rating": rating,
-        "ratings": range(1, 6),
+        "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
         "comments": film.comment_set.all(),
         "comment_form": comment_form,
-        "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
-        "roles": film.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
     })
 
 
@@ -85,12 +82,31 @@ def film_quotes(request, id, orig_title):
     return render(request, "ktapp/film_quotes.html", {
         "active_tab": "quotes",
         "film": film,
-        "rating": rating,
-        "ratings": range(1, 6),
+        "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
         "quotes": film.quote_set.all(),
         "quote_form": quote_form,
+    })
+
+
+def film_trivias(request, id, orig_title):
+    film = get_object_or_404(Film, pk=id)
+    rating = 0
+    if request.user.is_authenticated():
+        try:
+            vote = Vote.objects.get(film=film, user=request.user)
+            rating = vote.rating
+        except Vote.DoesNotExist:
+            pass
+    trivia_form = TriviaForm(initial={
+        "film": film,
+    })
+    trivia_form.fields["film"].widget = forms.HiddenInput()
+    return render(request, "ktapp/film_trivias.html", {
+        "active_tab": "trivias",
+        "film": film,
         "directors": film.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
-        "roles": film.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
+        "trivias": film.trivia_set.all(),
+        "trivia_form": trivia_form,
     })
 
 
@@ -197,3 +213,15 @@ def new_quote(request):
             quote.created_by = request.user
             quote.save()
     return HttpResponseRedirect(reverse("film_quotes", args=(film.pk, film.orig_title)))
+
+
+@login_required
+def new_trivia(request):
+    film = get_object_or_404(Film, pk=request.POST["film"])
+    if request.POST:
+        trivia_form = TriviaForm(data=request.POST)
+        if trivia_form.is_valid():
+            trivia = trivia_form.save(commit=False)
+            trivia.created_by = request.user
+            trivia.save()
+    return HttpResponseRedirect(reverse("film_trivias", args=(film.pk, film.orig_title)))

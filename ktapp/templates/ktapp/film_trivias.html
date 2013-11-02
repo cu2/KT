@@ -1,0 +1,14 @@
+{% extends "ktapp/film_base.html" %}
+
+{% block film_main %}
+
+    <div id="film_centered">
+        {% include 'ktapp/new_trivia_block.html' %}
+        {% for t in trivias %}
+            {% include 'ktapp/film_addon_block.html' with addon=t %}
+        {% empty %}
+            <p>Nincsenek.</p>
+        {% endfor %}
+    </div>
+
+{% endblock %}

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from ktapp.models import Film, Vote, Comment, Topic, Poll, Quote, Artist, FilmArtistRelationship
+from ktapp.models import Film, Vote, Comment, Topic, Poll, Quote, Trivia, Artist, FilmArtistRelationship
 
 
 
@@ -28,4 +28,5 @@ admin.site.register(Comment, CommentAdmin)
 admin.site.register(Topic)
 admin.site.register(Poll)
 admin.site.register(Quote, FilmUserTextContentAdmin)
+admin.site.register(Trivia, FilmUserTextContentAdmin)
 admin.site.register(Artist)

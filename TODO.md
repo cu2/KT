@@ -10,6 +10,7 @@
     - quotes
     - average
     - votes
+    - trivia
 
 - votes
 
@@ -39,7 +40,6 @@
         - genre
         - other
     - images
-    - trivia
     - links
     - awards
     - analyses

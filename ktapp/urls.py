@@ -10,11 +10,14 @@ urlpatterns = patterns('',
     
     url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)/velemenyek$', views.film_comments, name='film_comments'),
     url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)/idezetek$', views.film_quotes, name='film_quotes'),
+    url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)/erdekessegek$', views.film_trivias, name='film_trivias'),
     url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)$', views.film_main, name='film_main'),
     
     url(r'^szavaz$', views.vote, name='vote'),
     url(r'^kommentel$', views.new_comment, name='new_comment'),
     url(r'^uj_idezet$', views.new_quote, name='new_quote'),
+    url(r'^uj_erdekesseg$', views.new_trivia, name='new_trivia'),
+    
     url(r'^muvesz/(?P<id>\d+)/(?P<name>.*)$', views.artist, name='artist'),
     url(r'^szereplo/(?P<id>\d+)/(?P<name>.*)$', views.role, name='role'),
     
