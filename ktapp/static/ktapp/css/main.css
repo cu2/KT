@@ -4,11 +4,44 @@
     position: fixed;
     top: 0;
     width: 100%;
+    padding-top: 11px;
+    height: 32px;
+    font-size: 11pt;
+    overflow: hidden;
+    transition: height 0.3s;
+    -webkit-transition: height 0.3s;
+}
+#topmenu:hover {
+    height: 220px;
+}
+#topmenu_left {
+    float: left;
+    margin: 0 10px;
+}
+#topmenu_left ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+#topmenu_left ul li {
+    float: left;
+    padding: 0 12px 0 0;
+}
+#topmenu_left ul li:last-child {
+    padding: 0;
+}
+#topmenu_left ul.submenu {
+    margin-top: 7px;
+}
+#topmenu_left ul.submenu li {
+    clear: both;
+    margin-top: 5px;
+    font-size: 9pt;
 }
 
-#topmenu div {
-    float: left;
-    margin: 0 30px;
+#topmenu_right {
+    float: right;
+    margin: 0 10px;
 }
 
 header {
@@ -21,14 +54,19 @@ header {
 }
 
 footer {
-    margin-top: 50px;
+    margin: 50px 0 20px;
 }
 footer ul {
+    width: 80%;
+    margin: 0 auto;
+    padding: 0;
     list-style: none;
 }
 footer ul li {
+    margin-top: 20px;
+    text-align: center;
+    width: 14%;
     float: left;
-    margin: 0 30px;
 }
 
 
@@ -55,6 +93,9 @@ header {
 
 footer {
     font-size: 8pt;
+}
+footer ul {
+    border-top: solid 1px rgb(128,128,128);
 }
 
 
@@ -89,6 +130,7 @@ a {
 input, select, textarea {
     background: rgb(249,244,218);
     border: solid 1px rgb(128,128,128);
+    border-radius: 3px;
 }
 input[type=submit] {
     color: rgb(146,23,23);
@@ -103,6 +145,21 @@ input.small_button {
     font-size: 8pt;
     border-radius: 10px;
     padding: 1px 10px;
+}
+#login_menu ul.submenu {
+    margin-top: 4px;
+}
+#login_menu #login_username {
+    width: 100px;
+    font-size: 11pt;
+}
+#login_menu #login_password {
+    width: 80px;
+    font-size: 11pt;
+}
+#topmenu_right input {
+    width: 120px;
+    font-size: 11pt;
 }
 
 /* TABLES */
@@ -138,6 +195,10 @@ table.fullsize {
 
 .center {
     text-align: center;
+}
+
+.hidden {
+    display: none;
 }
 
 .inline {

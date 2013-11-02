@@ -6,6 +6,13 @@
 
 {% block main %}
 
-    <p>Be vagy jelentkezve.</p>
+    {% if user.is_authenticated %}
+        <p>Be vagy jelentkezve.</p>
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Kijelentkezés" />
+        </form>
+    {% else %}
+    {% endif %}
 
 {% endblock %}

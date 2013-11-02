@@ -18,19 +18,105 @@
         </section>
 
         <nav id="topmenu" class="clearfix">
-            <div><a href="{% url 'index' %}"><img src="{% static 'ktapp/images/vapiti_ikon_24.png' %}" alt="Vapiti" /> Kritikus Tömeg</a></div>
-            <div>Pár menüpont...</div>
-            <div>Kereső</div>
-            {% if user.is_authenticated %}
-                <div><a href="{% url 'user_profile' %}">{{ user.username }}</a><br />
-                <form action="{% url 'logout' %}" method="post" class="inline">
-                    {% csrf_token %}
-                    <input type="submit" value="Kijelentkezés" class="small_button" />
-                </form></div>
-            {% else %}
-                <div><a href="{% url 'login' %}">Bejelentkezés</a><br />
-                <a href="{% url 'registration' %}">Regisztráció</a></div>
-            {% endif %}
+            <div id="topmenu_left">
+                <ul>
+                    <li><a href="{% url 'index' %}">KT</a></li>
+                    <li>Filmek<br />
+                        <ul class="submenu">
+                            <li>Böngészés</li>
+                            <li>Várakozó</li>
+                            <li>Friss filmek</li>
+                            <li>Bemutatók</li>
+                            <li>Hiányzik!</li>
+                        </ul>
+                    </li>
+                    <li>Toplisták<br />
+                        <ul class="submenu">
+                            <li>Topfilmek</li>
+                            <li>Országonként</li>
+                            <li>Műfajonként</li>
+                            <li>Egyéni listák</li>
+                            <li>Toprendezők</li>
+                            <li>Topkívánságok</li>
+                            <li>Topországok</li>
+                        </ul>
+                    </li>
+                    <li>Tartalmak<br />
+                        <ul class="submenu">
+                            <li>Képek</li>
+                            <li>Idézetek</li>
+                            <li>Elemzések</li>
+                            <li>Érdekességek</li>
+                            <li>Kulcsszavak</li>
+                            <li>Portrék</li>
+                            <li>Díjak</li>
+                        </ul>
+                    </li>
+                    <li>Közösség<br />
+                        <ul class="submenu">
+                            <li>Fórum</li>
+                            <li>Beszólások</li>
+                            <li>JÁTÉK</li>
+                            <li>Mindenki</li>
+                            <li>Jófejek</li>
+                            <li>Hasonlók</li>
+                            <li>Tapasztaltak</li>
+                        </ul>
+                    </li>
+                    <li>Ajánlók<br />
+                        <ul class="submenu">
+                            <li>Kedvenceid</li>
+                            <li>Emberi</li>
+                            <li>Gépi</li>
+                            <li>Tévés</li>
+                        </ul>
+                    </li>
+                    <li>Közkérdések<br />
+                        <ul class="submenu">
+                            <li>Leendő</li>
+                            <li>Aktív</li>
+                            <li>Lefutott</li>
+                        </ul>
+                    </li>
+                    <li>Vapiti<br />
+                        <ul class="submenu">
+                            <li>Arany</li>
+                            <li>Ezüst</li>
+                        </ul>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li>[<a href="{% url 'user_profile' %}">{{ user.username }}</a>]<br />
+                        <ul class="submenu">
+                            <li>(szerk)</li>
+                            <li>Beállítások</li>
+                            <li>---</li>
+                            <li><form action="{% url 'logout' %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <input type="submit" value="Kijelentkezés" class="small_button" />
+                            </form></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <form action="{% url 'login' %}" method="post" class="inline"><li id="login_menu">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{% url 'index' %}" />
+                            <input type="text" name="username" value="" id="login_username" placeholder="név" tabindex="2" />
+                            <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
+                        <br />
+                        <ul class="submenu">
+                            <li><input type="submit" value="Bejelentkezés" class="small_button" /></li>
+                            <li>---</li>
+                            <li><a href="{% url 'registration' %}">Regisztráció</a></li>
+                        </ul>
+                    </li></form>
+                    {% endif %}
+                </ul>
+            </div>
+            <div id="topmenu_right">
+                <form class="inline">
+                    <input type="text" placeholder="Keresés..." tabindex="1" />
+                </form>
+            </div>
         </nav>
 
         <footer>
@@ -40,6 +126,8 @@
                 <li>Gy.I.K.</li>
                 <li>Linkek</li>
                 <li>Facebook</li>
+                <li>Kassza</li>
+                <li>Üzenet a szerk-nek</li>
             </ul>
         </footer>
 
