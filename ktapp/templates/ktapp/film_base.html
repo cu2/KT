@@ -12,6 +12,16 @@
             {% if film.directors %}
                 <h3>({% for director in film.directors %}<a href="{% url 'artist' director.id director.name|slugify %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
             {% endif %}
+            {% if film.countries or film.genres %}
+                <p>
+                    {% for country in film.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
+                    {% if film.genres %}
+                        {% for genre in film.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                    {% else %}
+                        film
+                    {% endif %}
+                </p>
+            {% endif %}
         </div>
         {% if film.num_rating %}
         <div id="film_rating">

@@ -19,6 +19,7 @@ class Film(models.Model):
     number_of_ratings_5 = models.PositiveIntegerField(default=0)
     number_of_quotes = models.PositiveIntegerField(default=0)
     number_of_trivias = models.PositiveIntegerField(default=0)
+    keywords = models.ManyToManyField("Keyword", through="FilmKeywordRelationship")
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -47,6 +48,12 @@ class Film(models.Model):
     
     def directors(self):
         return self.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR)
+    
+    def countries(self):
+        return self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_NATIONALITY)
+    
+    def genres(self):
+        return self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE)
 
 
 class Vote(models.Model):
@@ -218,3 +225,33 @@ class FilmArtistRelationship(models.Model):
     
     def __unicode__(self):
         return self.role_type + "[" + self.role_name + "]:" + unicode(self.film) + "/" + unicode(self.artist)
+
+
+class Keyword(models.Model):
+    name = models.CharField(max_length=200)
+    KEYWORD_TYPE_NATIONALITY = "N"
+    KEYWORD_TYPE_GENRE = "G"
+    KEYWORD_TYPE_MAJOR = "M"
+    KEYWORD_TYPE_OTHER = "O"
+    KEYWORD_TYPES = [
+        (KEYWORD_TYPE_NATIONALITY, "Nationality"),
+        (KEYWORD_TYPE_GENRE, "Genre"),
+        (KEYWORD_TYPE_MAJOR, "Major"),
+        (KEYWORD_TYPE_OTHER, "Other"),
+    ]
+    keyword_type = models.CharField(max_length=1, choices=KEYWORD_TYPES, default=KEYWORD_TYPE_OTHER)
+    films = models.ManyToManyField(Film, through="FilmKeywordRelationship")
+    
+    def __unicode__(self):
+        return self.keyword_type + ":" + self.name
+    
+    class Meta:
+        ordering = ["keyword_type", "name"]
+
+
+class FilmKeywordRelationship(models.Model):
+    film = models.ForeignKey(Film)
+    keyword = models.ForeignKey(Keyword)
+    
+    def __unicode__(self):
+        return unicode(self.film) + "/" + unicode(self.keyword)
