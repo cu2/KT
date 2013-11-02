@@ -20,6 +20,7 @@ class Film(models.Model):
     number_of_quotes = models.PositiveIntegerField(default=0)
     number_of_trivias = models.PositiveIntegerField(default=0)
     keywords = models.ManyToManyField("Keyword", through="FilmKeywordRelationship")
+    number_of_keywords = models.PositiveIntegerField(default=0)
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -50,7 +51,7 @@ class Film(models.Model):
         return self.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR)
     
     def countries(self):
-        return self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_NATIONALITY)
+        return self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_COUNTRY)
     
     def genres(self):
         return self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE)
@@ -229,12 +230,12 @@ class FilmArtistRelationship(models.Model):
 
 class Keyword(models.Model):
     name = models.CharField(max_length=200)
-    KEYWORD_TYPE_NATIONALITY = "N"
+    KEYWORD_TYPE_COUNTRY = "C"
     KEYWORD_TYPE_GENRE = "G"
     KEYWORD_TYPE_MAJOR = "M"
     KEYWORD_TYPE_OTHER = "O"
     KEYWORD_TYPES = [
-        (KEYWORD_TYPE_NATIONALITY, "Nationality"),
+        (KEYWORD_TYPE_COUNTRY, "Country"),
         (KEYWORD_TYPE_GENRE, "Genre"),
         (KEYWORD_TYPE_MAJOR, "Major"),
         (KEYWORD_TYPE_OTHER, "Other"),
@@ -255,3 +256,14 @@ class FilmKeywordRelationship(models.Model):
     
     def __unicode__(self):
         return unicode(self.film) + "/" + unicode(self.keyword)
+    
+    def save(self, *args, **kwargs):
+        super(FilmKeywordRelationship, self).save(*args, **kwargs)
+        self.film.number_of_keywords = self.film.keyword_set.count()
+        self.film.save()
+
+
+@receiver(post_delete, sender=FilmKeywordRelationship)
+def delete_filmkeyword(sender, instance, **kwargs):
+    instance.film.number_of_keywords = instance.film.keyword_set.count()
+    instance.film.save()

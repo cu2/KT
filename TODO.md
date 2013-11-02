@@ -11,6 +11,11 @@
     - average
     - votes
     - trivia
+    - keywords
+        - country
+        - genre
+        - major
+        - other
 
 - votes
 
@@ -35,10 +40,6 @@
 - films
     - premier(s)
     - sequels and remakes
-    - keywords
-        - nationality
-        - genre
-        - other
     - images
     - links
     - awards

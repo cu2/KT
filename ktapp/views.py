@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 
-from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship
+from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword
 from ktapp.forms import CommentForm, QuoteForm, TriviaForm
 
 
@@ -82,6 +82,16 @@ def film_trivias(request, id, orig_title):
         "film": film,
         "trivias": film.trivia_set.all(),
         "trivia_form": trivia_form,
+    })
+
+
+def film_keywords(request, id, orig_title):
+    film = get_object_or_404(Film, pk=id)
+    return render(request, "ktapp/film_keywords.html", {
+        "active_tab": "keywords",
+        "film": film,
+        "major_keywords": film.keyword_set.filter(keyword_type=Keyword.KEYWORD_TYPE_MAJOR),
+        "other_keywords": film.keyword_set.filter(keyword_type=Keyword.KEYWORD_TYPE_OTHER),
     })
 
 
