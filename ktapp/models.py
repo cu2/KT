@@ -17,6 +17,7 @@ class Film(models.Model):
     number_of_ratings_3 = models.PositiveIntegerField(default=0)
     number_of_ratings_4 = models.PositiveIntegerField(default=0)
     number_of_ratings_5 = models.PositiveIntegerField(default=0)
+    number_of_quotes = models.PositiveIntegerField(default=0)
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -142,6 +143,17 @@ class FilmUserContent(models.Model):
 
 class Quote(FilmUserContent):
     content = models.TextField()
+    
+    def save(self, *args, **kwargs):
+        super(Quote, self).save(*args, **kwargs)
+        self.film.number_of_quotes = self.film.quote_set.count()
+        self.film.save()
+
+
+@receiver(post_delete, sender=Quote)
+def delete_quote(sender, instance, **kwargs):
+    instance.film.number_of_quotes = instance.film.quote_set.count()
+    instance.film.save()
 
 
 class Artist(models.Model):
