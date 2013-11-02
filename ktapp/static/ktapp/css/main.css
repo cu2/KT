@@ -71,6 +71,9 @@ a {
     text-decoration: none;
     color: rgb(146,23,23);
 }
+.inactive_action {
+    color: rgb(201,156,138) !important;
+}
 input, select, textarea {
     background: rgb(249,244,218);
     border: solid 1px rgb(128,128,128);
@@ -80,7 +83,15 @@ input[type=submit] {
     border-radius: 12px;
     padding: 1px 12px;
 }
-
+input.inactive_action {
+    background: rgb(239,233,207);
+    border: solid 1px rgb(178,175,161);
+}
+input.small_button {
+    font-size: 8pt;
+    border-radius: 10px;
+    padding: 1px 10px;
+}
 
 /* TABLES */
 
@@ -151,12 +162,29 @@ table.fullsize {
 /* FILM LAYOUT */
 
 #tabs {
-    margin-bottom: 20px;
+    margin: 20px -10px;
 }
 
+#tabs ul {
+    margin: 0;
+    padding: 0 0 0 1%;
+}
 #tabs ul li {
+    text-align: center;
     float: left;
-    margin: 0 30px;
+    margin: 0;
+    padding: 3px 0;
+    font-size: 11pt;
+    border-color: rgb(128,128,128);
+    border-width: 1px;
+    border-style: none none solid none;
+}
+.active_tab {
+    border-style: solid solid none solid !important;
+}
+.tab_count {
+    font-size: 8pt;
+    font-weight: normal;
 }
 
 #film_main_voting {
@@ -252,7 +280,7 @@ table.fullsize {
 #film_rating {
     position: absolute;
     left: 50px; top: 10px;
-    padding: 10px;
+    padding: 8px 16px;
     background: rgb(249,244,218);
     border-radius: 12px;
 }

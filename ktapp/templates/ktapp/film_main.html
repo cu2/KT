@@ -15,7 +15,7 @@
                         {% csrf_token %}
                         <input type="hidden" name="film_id" value="{{ film.pk }}" />
                         <input type="hidden" name="rating" value="{{ r }}" />
-                        <input type="submit" value="{{ named_rating }}" />
+                        <input type="submit" value="{{ named_rating }}"{% if rating %} class="inactive_action"{% endif %} />
                     </form>
                 {% endif %}
             {% endfor %}
@@ -28,7 +28,7 @@
                     {% csrf_token %}
                     <input type="hidden" name="film_id" value="{{ film.pk }}" />
                     <input type="hidden" name="rating" value="0" />
-                    <input type="submit" value="Nem tudom." />
+                    <input type="submit" value="Nem tudom." class="small_button inactive_action" />
                 </form>
             {% endif %}
             </div>
