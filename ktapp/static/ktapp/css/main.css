@@ -1,8 +1,43 @@
 /* GENERAL LAYOUT */
 
-#topmenu {
+#toptopmenu {
     position: fixed;
+    z-index: 10;
     top: 0;
+    width: 100%;
+    padding-top: 11px;
+    height: 32px;
+    font-size: 11pt;
+    overflow: hidden;
+}
+#toptopmenu_left {
+    float: left;
+    margin: 0 10px;
+}
+#toptopmenu_left ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+#toptopmenu_left ul li {
+    float: left;
+    padding: 0 40px 0 0;
+}
+#toptopmenu_left ul li:last-child {
+    padding: 0;
+}
+
+#toptopmenu_right {
+    float: right;
+    margin: 0 10px;
+}
+
+
+
+#topmenu {
+/*    position: absolute;*/
+    position: fixed;
+    top: 45px;
     width: 100%;
     padding-top: 11px;
     height: 32px;
@@ -25,7 +60,7 @@
 }
 #topmenu_left ul li {
     float: left;
-    padding: 0 12px 0 0;
+    padding: 0 20px 0 0;
 }
 #topmenu_left ul li:last-child {
     padding: 0;
@@ -45,7 +80,7 @@
 }
 
 header {
-    margin-top: 50px;
+    margin-top: 100px;
     padding: 0 10px;
 }
 
@@ -82,9 +117,15 @@ body {
     font-size: 12pt;
 }
 
+#toptopmenu {
+    background: rgb(218,211,184);
+    border-bottom: solid 1px rgb(128,128,128);
+    border-top: solid 1px rgb(228,222,195);
+}
 #topmenu {
     background: rgb(218,211,184);
     border-bottom: solid 1px rgb(128,128,128);
+    border-top: solid 1px rgb(228,222,195);
 }
 
 header {
@@ -131,6 +172,7 @@ input, select, textarea {
     background: rgb(249,244,218);
     border: solid 1px rgb(128,128,128);
     border-radius: 3px;
+    margin-bottom: 20px;
 }
 input[type=submit] {
     color: rgb(146,23,23);
@@ -146,19 +188,20 @@ input.small_button {
     border-radius: 10px;
     padding: 1px 10px;
 }
-#login_menu ul.submenu {
-    margin-top: 4px;
+#toptopmenu input.small_button {
+    font-size: 9pt;
+    border-radius: 10px;
+    padding: 1px 10px;
 }
 #login_menu #login_username {
-    width: 100px;
+    width: 120px;
     font-size: 11pt;
 }
 #login_menu #login_password {
     width: 80px;
     font-size: 11pt;
 }
-#topmenu_right input {
-    width: 120px;
+#toptopmenu_right input {
     font-size: 11pt;
 }
 
@@ -284,33 +327,9 @@ table.fullsize {
     margin-right: 1%;
 }
 
-.comment_block {
-    margin: 30px 0;
-}
-.comment_header {
-    float: left;
-    width: 20%;
-    background: rgb(218,211,184);
-}
-.comment_content {
-    float: right;
-    width: 80%;
-    background: rgb(249,244,218);
-}
-.comment_header h3 {
-    font-size: 10pt;
-    padding: 5px;
-    margin: 0;
-}
-.comment_content p {
-    padding: 5px;
-    margin: 0;
-}
-
-
 .comment_block_table {
     width: 100%;
-    margin: 50px 0;
+    margin: 25px 0 50px 0;
 }
 .comment_block_tr {
     vertical-align: top;
@@ -345,6 +364,16 @@ table.fullsize {
 #film_header h3 {
     margin: 0;
 }
+#film_header h1 {
+    font-size: 16pt;
+}
+#film_header h2 {
+    font-size: 12pt;
+}
+#film_header h3 {
+    font-weight: normal;
+    font-style: italic;
+}
 
 #film_header {
     position: relative;
@@ -366,8 +395,8 @@ table.fullsize {
     font-weight: bold;
 }
 
-#film_your_rating {
-    margin-bottom: 20px;
+.no_bottom {
+    margin-bottom: 0px;
 }
 #film_your_rating b,
 #film_your_rating form {
@@ -383,7 +412,7 @@ table.fullsize {
 
 
 .film_addon {
-    margin: 50px 0;
+    margin: 25px 0 50px 0;
 }
 .film_addon_content {
     background: rgb(249,244,218);

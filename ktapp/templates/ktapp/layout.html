@@ -17,10 +17,39 @@
             {% block main %}{% endblock %}
         </section>
 
+        <nav id="toptopmenu" class="clearfix">
+            <div id="toptopmenu_left">
+                <ul>
+                    <li><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
+                    {% if user.is_authenticated %}
+                    <li>[<a href="{% url 'user_profile' %}">{{ user.username }}</a>]</li>
+                    <li>(szerk)</li>
+                    <li>Beállítások</li>
+                    <li><form action="{% url 'logout' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="submit" value="Kijelentkezés" class="small_button" />
+                    </form></li>
+                    {% else %}
+                    <li id="login_menu"><form action="{% url 'login' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{% url 'index' %}" />
+                        <input type="text" name="username" value="" id="login_username" placeholder="név" tabindex="2" />
+                        <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
+                        <input type="submit" value="Bejelentkezés" class="small_button" />
+                    </form></li>
+                    <li><a href="{% url 'registration' %}">Regisztráció</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div id="toptopmenu_right">
+                <form class="inline">
+                    <input type="text" placeholder="Keresés..." tabindex="1" />
+                </form>
+            </div>
+        </nav>
         <nav id="topmenu" class="clearfix">
             <div id="topmenu_left">
                 <ul>
-                    <li><a href="{% url 'index' %}">KT</a></li>
                     <li>Filmek<br />
                         <ul class="submenu">
                             <li>Böngészés</li>
@@ -84,38 +113,7 @@
                             <li>Ezüst</li>
                         </ul>
                     </li>
-                    {% if user.is_authenticated %}
-                    <li>[<a href="{% url 'user_profile' %}">{{ user.username }}</a>]<br />
-                        <ul class="submenu">
-                            <li>(szerk)</li>
-                            <li>Beállítások</li>
-                            <li>---</li>
-                            <li><form action="{% url 'logout' %}" method="post" class="inline">
-                                {% csrf_token %}
-                                <input type="submit" value="Kijelentkezés" class="small_button" />
-                            </form></li>
-                        </ul>
-                    </li>
-                    {% else %}
-                    <form action="{% url 'login' %}" method="post" class="inline"><li id="login_menu">
-                            {% csrf_token %}
-                            <input type="hidden" name="next" value="{% url 'index' %}" />
-                            <input type="text" name="username" value="" id="login_username" placeholder="név" tabindex="2" />
-                            <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
-                        <br />
-                        <ul class="submenu">
-                            <li><input type="submit" value="Bejelentkezés" class="small_button" /></li>
-                            <li>---</li>
-                            <li><a href="{% url 'registration' %}">Regisztráció</a></li>
-                        </ul>
-                    </li></form>
-                    {% endif %}
                 </ul>
-            </div>
-            <div id="topmenu_right">
-                <form class="inline">
-                    <input type="text" placeholder="Keresés..." tabindex="1" />
-                </form>
             </div>
         </nav>
 

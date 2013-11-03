@@ -1,14 +1,3 @@
-{% comment %}
-<div class="comment_block clearfix">
-    <div class="comment_header">
-        <h3 title="{{ comment.created_at|date:"Y-m-d H:i:s" }}">{{ comment.created_by }}<br />{{ comment.created_at|timesince }}</h3>
-    </div>
-    <div class="comment_content">
-        <p>{{ comment.content }}</p>
-    </div>
-</div>
-{% endcomment %}
-
 <table class="comment_block_table"><tr class="comment_block_tr">
     <td class="comment_header_td">
         <h3 title="{{ comment.created_at|date:"Y-m-d H:i:s" }}">{{ comment.created_by }}<br />{{ comment.created_at|timesince }}</h3>
