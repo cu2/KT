@@ -19,6 +19,7 @@
     - reviews
     - imdb, porthu, wikipedia, rotten tomatoes, imdb rating
     - awards
+    - links
 
 - votes
 
@@ -48,7 +49,6 @@
     - premier(s)
     - sequels and remakes
     - images
-    - links
 
 - comments
     - reply to

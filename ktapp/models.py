@@ -29,6 +29,7 @@ class Film(models.Model):
     imdb_rating = models.PositiveSmallIntegerField(null=True,blank=True)
     imdb_rating_refreshed_at = models.DateTimeField(null=True,blank=True)
     number_of_awards = models.PositiveIntegerField(default=0)
+    number_of_links = models.PositiveIntegerField(default=0)
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -232,6 +233,49 @@ class Award(models.Model):
 @receiver(post_delete, sender=Award)
 def delete_award(sender, instance, **kwargs):
     instance.film.number_of_awards = instance.film.award_set.count()
+    instance.film.save()
+
+
+class LinkSite(models.Model):
+    name = models.CharField(max_length=250)
+    url = models.CharField(max_length=250)
+    
+    def __unicode__(self):
+        return self.name
+
+
+class Link(models.Model):
+    name = models.CharField(max_length=250)
+    url = models.CharField(max_length=250)
+    film = models.ForeignKey(Film)
+    linksite = models.ForeignKey(LinkSite, blank=True, null=True)
+    created_by = models.ForeignKey(User)
+    created_at = models.DateTimeField(auto_now_add=True)
+    LINK_TYPE_OFFICIAL = "O"
+    LINK_TYPE_REVIEWS = "R"
+    LINK_TYPE_INTERVIEWS = "I"
+    LINK_TYPE_OTHER = "-"
+    LINK_TYPES = [
+        (LINK_TYPE_OFFICIAL, "Official pages"),
+        (LINK_TYPE_REVIEWS, "Reviews"),
+        (LINK_TYPE_INTERVIEWS, "Interviews"),
+        (LINK_TYPE_OTHER, "Other pages"),
+    ]
+    link_type = models.CharField(max_length=1, choices=LINK_TYPES, default=LINK_TYPE_OTHER)
+    lead = models.TextField(blank=True)
+    
+    def save(self, *args, **kwargs):
+        super(Link, self).save(*args, **kwargs)
+        self.film.number_of_links = self.film.link_set.count()
+        self.film.save()
+    
+    def __unicode__(self):
+        return self.name
+
+
+@receiver(post_delete, sender=Link)
+def delete_link(sender, instance, **kwargs):
+    instance.film.number_of_links = instance.film.link_set.count()
     instance.film.save()
 
 

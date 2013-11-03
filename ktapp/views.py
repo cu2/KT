@@ -120,6 +120,15 @@ def film_awards(request, id, orig_title):
     })
 
 
+def film_links(request, id, orig_title):
+    film = get_object_or_404(Film, pk=id)
+    return render(request, "ktapp/film_links.html", {
+        "active_tab": "links",
+        "film": film,
+        "links": film.link_set.all(),
+    })
+
+
 def film_keywords(request, id, orig_title):
     film = get_object_or_404(Film, pk=id)
     return render(request, "ktapp/film_keywords.html", {

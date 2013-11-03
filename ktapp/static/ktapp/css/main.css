@@ -270,7 +270,10 @@ table.fullsize {
     *zoom: 1;
 }
 
-
+ul.nobullet {
+    list-style: none;
+    padding: 0;
+}
 
 
 

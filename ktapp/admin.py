@@ -1,6 +1,7 @@
 from django.contrib import admin
 from ktapp.models import Film, Vote, Comment, Topic, Poll, Quote, Trivia, Review, \
-    Artist, FilmArtistRelationship, Keyword, FilmKeywordRelationship, Award
+    Artist, FilmArtistRelationship, Keyword, FilmKeywordRelationship, Award, \
+    Link, LinkSite
 
 
 class FilmArtistInline(admin.TabularInline):
@@ -35,6 +36,10 @@ class AwardAdmin(admin.ModelAdmin):
     list_display = ['name', 'year', 'category', 'film', 'artist']
 
 
+class LinkAdmin(admin.ModelAdmin):
+    list_display = ['name', 'url', 'film']
+
+
 admin.site.register(Film, FilmAdmin)
 # admin.site.register(Vote)
 admin.site.register(Comment, CommentAdmin)
@@ -46,3 +51,5 @@ admin.site.register(Review, ReviewAdmin)
 admin.site.register(Artist)
 admin.site.register(Keyword)
 admin.site.register(Award, AwardAdmin)
+admin.site.register(Link, LinkAdmin)
+admin.site.register(LinkSite)
