@@ -5,7 +5,7 @@ from django.dispatch.dispatcher import receiver
 
 
 class Film(models.Model):
-    orig_title = models.CharField(max_length=200)
+    orig_title = models.CharField(max_length=250)
     other_titles = models.TextField(blank=True)
     year = models.PositiveIntegerField(default=0)
     plot_summary = models.TextField(blank=True)
@@ -24,8 +24,8 @@ class Film(models.Model):
     number_of_keywords = models.PositiveIntegerField(default=0)
     imdb_link = models.CharField(max_length=16, blank=True)
     porthu_link = models.CharField(max_length=16, blank=True)
-    wikipedia_link_en = models.CharField(max_length=200, blank=True)
-    wikipedia_link_hu = models.CharField(max_length=200, blank=True)
+    wikipedia_link_en = models.CharField(max_length=250, blank=True)
+    wikipedia_link_hu = models.CharField(max_length=250, blank=True)
     imdb_rating = models.PositiveSmallIntegerField(blank=True, null=True)
     imdb_rating_refreshed_at = models.DateTimeField(blank=True, null=True)
     number_of_awards = models.PositiveIntegerField(default=0)
@@ -79,7 +79,7 @@ class Film(models.Model):
 
 
 class PremierType(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=250)
     
     def __unicode__(self):
         return self.name
@@ -160,7 +160,7 @@ def delete_comment(sender, instance, **kwargs):
 
 
 class Topic(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=250)
     number_of_comments = models.PositiveIntegerField(default=0)
     created_by = models.ForeignKey(User)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -174,7 +174,7 @@ class Topic(models.Model):
 
 
 class Poll(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=250)
     # NOTE: this is just a placeholder now (for Comment)
     # TODO: extend later with real content
     
@@ -308,7 +308,7 @@ def delete_link(sender, instance, **kwargs):
 
 
 class Artist(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=250)
     GENDER_TYPE_MALE = "M"
     GENDER_TYPE_FEMALE = "F"
     GENDER_TYPE_UNKNOWN = "U"
@@ -346,14 +346,14 @@ class FilmArtistRelationship(models.Model):
     ]
     role_type = models.CharField(max_length=1, choices=ROLE_TYPES, default=ROLE_TYPE_DIRECTOR)
     actor_subtype = models.CharField(max_length=1, choices=ACTOR_SUBTYPES, default=ACTOR_SUBTYPE_FULL)
-    role_name = models.CharField(max_length=200, blank=True)
+    role_name = models.CharField(max_length=250, blank=True)
     
     def __unicode__(self):
         return self.role_type + "[" + self.role_name + "]:" + unicode(self.film) + "/" + unicode(self.artist)
 
 
 class Keyword(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=250)
     KEYWORD_TYPE_COUNTRY = "C"
     KEYWORD_TYPE_GENRE = "G"
     KEYWORD_TYPE_MAJOR = "M"
