@@ -22,6 +22,11 @@
                     {% endif %}
                 </p>
             {% endif %}
+            {% if film.all_sequels %}
+                {% for seq in film.all_sequels %}
+                <p class="sequels"><span class="sequel_title">{{ seq }}{% if seq.sequel_type = 'A' %} adaptációk{% endif %}</span>: {% for f in seq.all_films %}{% if f == film %}<b>{% else %}<a href="{% url 'film_main' f.id f.orig_title|slugify %}">{% endif %}{{ f.orig_title }}{% if f == film %}</b>{% else %}</a>{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                {% endfor %}
+            {% endif %}
         </div>
         {% if film.num_rating %}
         <div id="film_rating">

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from ktapp.models import Film, Vote, Comment, Topic, Poll, Quote, Trivia, Review, \
     Artist, FilmArtistRelationship, Keyword, FilmKeywordRelationship, Award, \
-    Link, LinkSite
+    Link, LinkSite, Sequel, FilmSequelRelationship
 
 
 class FilmArtistInline(admin.TabularInline):
@@ -12,12 +12,16 @@ class FilmKeywordInline(admin.TabularInline):
     model = FilmKeywordRelationship
 
 
+class FilmSequelInline(admin.TabularInline):
+    model = FilmSequelRelationship
+
+
 class FilmAdmin(admin.ModelAdmin):
     list_display = ['orig_title', 'other_titles', 'year', 'avg_rating', 'num_rating']
     search_fields = ['orig_title', 'other_titles', 'year']
     fields = ['orig_title', 'other_titles', 'year', 'plot_summary',
               'imdb_link', 'porthu_link', 'wikipedia_link_en', 'wikipedia_link_hu']
-    inlines = [FilmArtistInline, FilmKeywordInline]
+    inlines = [FilmArtistInline, FilmKeywordInline, FilmSequelInline]
 
 
 class CommentAdmin(admin.ModelAdmin):
@@ -53,3 +57,4 @@ admin.site.register(Keyword)
 admin.site.register(Award, AwardAdmin)
 admin.site.register(Link, LinkAdmin)
 admin.site.register(LinkSite)
+admin.site.register(Sequel)

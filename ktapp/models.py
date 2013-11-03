@@ -30,6 +30,7 @@ class Film(models.Model):
     imdb_rating_refreshed_at = models.DateTimeField(null=True,blank=True)
     number_of_awards = models.PositiveIntegerField(default=0)
     number_of_links = models.PositiveIntegerField(default=0)
+    sequels = models.ManyToManyField("Sequel", through="FilmSequelRelationship")
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -67,6 +68,12 @@ class Film(models.Model):
     
     def imdb_real_rating(self):
         return self.imdb_rating / 10.0
+    
+    def all_sequels(self):
+        return self.sequels.all()
+    
+    def sequel_sequels(self):
+        return self.sequels.filter(filmsequelrelationship__sequel__sequel_type=Sequel.SEQUEL_TYPE_SEQUEL)
 
 
 class Vote(models.Model):
@@ -363,3 +370,38 @@ class FilmKeywordRelationship(models.Model):
 def delete_filmkeyword(sender, instance, **kwargs):
     instance.film.number_of_keywords = instance.film.keyword_set.count()
     instance.film.save()
+
+
+class Sequel(models.Model):
+    name = models.CharField(max_length=250)
+    SEQUEL_TYPE_SEQUEL = "S"
+    SEQUEL_TYPE_REMAKE = "R"
+    SEQUEL_TYPE_ADAPTATION = "A"
+    SEQUEL_TYPES = [
+        (SEQUEL_TYPE_SEQUEL, "Sequel"),
+        (SEQUEL_TYPE_REMAKE, "Remake"),
+        (SEQUEL_TYPE_ADAPTATION, "Adaptation"),
+    ]
+    sequel_type = models.CharField(max_length=1, choices=SEQUEL_TYPES, default=SEQUEL_TYPE_SEQUEL)
+    films = models.ManyToManyField(Film, through="FilmSequelRelationship")
+    
+    def __unicode__(self):
+        return self.name
+    
+    class Meta:
+        ordering = ["sequel_type", "name"]
+    
+    def all_films(self):
+        return self.films.all()
+
+
+class FilmSequelRelationship(models.Model):
+    film = models.ForeignKey(Film)
+    sequel = models.ForeignKey(Sequel)
+    serial_number = models.PositiveSmallIntegerField(default=0)
+    
+    def __unicode__(self):
+        return unicode(self.film) + "/" + unicode(self.sequel)
+    
+    class Meta:
+        ordering = ["serial_number"]

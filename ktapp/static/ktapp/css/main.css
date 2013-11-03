@@ -370,7 +370,8 @@ ul.nobullet {
 
 #film_header h1,
 #film_header h2,
-#film_header h3 {
+#film_header h3,
+#film_header p {
     margin: 0;
 }
 #film_header h1 {
@@ -388,6 +389,11 @@ ul.nobullet {
     position: relative;
     min-height: 90px;
 }
+
+.sequels {
+    font-size: 10pt;
+}
+
 #film_rating {
     position: absolute;
     left: 50px; top: 10px;
@@ -430,7 +436,6 @@ ul.nobullet {
 #film_votes li {
     padding: 5px 0;
 }
-
 
 .film_addon {
     margin: 25px 0 50px 0;
