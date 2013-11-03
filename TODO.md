@@ -21,6 +21,7 @@
     - awards
     - links
     - sequels, remakes, adaptations
+    - premier(s)
 
 - votes
 
@@ -47,7 +48,7 @@
     - password reset
 
 - films
-    - premier(s)
+    - tv
     - images
 
 - comments

@@ -26,11 +26,13 @@ class Film(models.Model):
     porthu_link = models.CharField(max_length=16, blank=True)
     wikipedia_link_en = models.CharField(max_length=200, blank=True)
     wikipedia_link_hu = models.CharField(max_length=200, blank=True)
-    imdb_rating = models.PositiveSmallIntegerField(null=True,blank=True)
-    imdb_rating_refreshed_at = models.DateTimeField(null=True,blank=True)
+    imdb_rating = models.PositiveSmallIntegerField(blank=True, null=True)
+    imdb_rating_refreshed_at = models.DateTimeField(blank=True, null=True)
     number_of_awards = models.PositiveIntegerField(default=0)
     number_of_links = models.PositiveIntegerField(default=0)
     sequels = models.ManyToManyField("Sequel", through="FilmSequelRelationship")
+    main_premier = models.DateField(blank=True, null=True)
+    main_premier_year = models.PositiveIntegerField(blank=True, null=True)
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -72,8 +74,27 @@ class Film(models.Model):
     def all_sequels(self):
         return self.sequels.all()
     
-    def sequel_sequels(self):
-        return self.sequels.filter(filmsequelrelationship__sequel__sequel_type=Sequel.SEQUEL_TYPE_SEQUEL)
+    def other_premiers(self):
+        return Premier.objects.filter(film=self)
+
+
+class PremierType(models.Model):
+    name = models.CharField(max_length=200)
+    
+    def __unicode__(self):
+        return self.name
+
+
+class Premier(models.Model):
+    film = models.ForeignKey(Film)
+    when = models.DateField()
+    premier_type = models.ForeignKey(PremierType, blank=True, null=True)
+    
+    def __unicode__(self):
+        return self.film.orig_title + ": " + unicode(self.when)+ " [" + unicode(self.premier_type) + "]"
+    
+    class Meta:
+        ordering = ["when", "premier_type", "film"]
 
 
 class Vote(models.Model):

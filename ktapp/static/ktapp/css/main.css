@@ -411,7 +411,7 @@ ul.nobullet {
 }
 #film_misc_info {
     position: absolute;
-    right: 0; top: 5px;
+    right: 0; top: 0px;
 }
 #film_misc_info ul {
     list-style: none;
@@ -420,9 +420,16 @@ ul.nobullet {
     text-align: left;
     font-size: 10pt;
 }
+#film_misc_info ul li {
+    margin-top: 3px;
+}
 #film_misc_info ul li span {
     display: inline-block;
-    width: 80px;
+    width: 90px;
+}
+.premiers {
+    font-size: 8pt;
+    line-height: 1.5;
 }
 
 #film_your_rating b,

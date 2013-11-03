@@ -54,8 +54,18 @@
                     <span><a href="{{ film.wikipedia_link_hu }}">Wikipédia</a></span>
                     {% endif %}
                 </li>
-                <li>
-                    Bemutató(k)
+                <li class="premiers">
+                    {% if film.main_premier %}
+                    Bemutató: {{ film.main_premier|date:"Y-m-d" }}
+                    {% elif film.main_premier_year %}
+                    Bemutató: {{ film.main_premier_year }}
+                    {% endif %}
+                    {% if film.other_premiers %}
+                    <br />További bemutatók:
+                    {% for p in film.other_premiers %}
+                    <br />{{ p.premier_type }}: {{ p.when|date:"Y-m-d" }}
+                    {% endfor %}
+                    {% endif %}
                 </li>
                 <li>
                     Tévé
