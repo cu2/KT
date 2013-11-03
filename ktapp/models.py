@@ -28,6 +28,7 @@ class Film(models.Model):
     wikipedia_link_hu = models.CharField(max_length=200, blank=True)
     imdb_rating = models.PositiveSmallIntegerField(null=True,blank=True)
     imdb_rating_refreshed_at = models.DateTimeField(null=True,blank=True)
+    number_of_awards = models.PositiveIntegerField(default=0)
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -208,6 +209,29 @@ class Review(FilmUserContent):
 @receiver(post_delete, sender=Review)
 def delete_review(sender, instance, **kwargs):
     instance.film.number_of_reviews = instance.film.review_set.count()
+    instance.film.save()
+
+
+class Award(models.Model):
+    film = models.ForeignKey(Film)
+    artist = models.ForeignKey("Artist", blank=True, null=True)
+    name = models.CharField(max_length=250)
+    year = models.CharField(max_length=20)
+    category = models.CharField(max_length=250)
+    note = models.CharField(max_length=250, blank=True)
+    
+    def save(self, *args, **kwargs):
+        super(Award, self).save(*args, **kwargs)
+        self.film.number_of_awards = self.film.award_set.count()
+        self.film.save()
+    
+    def __unicode__(self):
+        return self.name + " / " + self.category
+
+
+@receiver(post_delete, sender=Award)
+def delete_award(sender, instance, **kwargs):
+    instance.film.number_of_awards = instance.film.award_set.count()
     instance.film.save()
 
 

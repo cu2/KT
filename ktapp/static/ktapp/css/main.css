@@ -205,8 +205,9 @@ input.small_button {
     font-size: 11pt;
 }
 
-/* TABLES */
 
+
+/* TABLES */
 
 table {
     border-collapse: separate;
@@ -232,6 +233,7 @@ td {
 table.fullsize {
     width: 100%;
 }
+
 
 
 /* MISC */

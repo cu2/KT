@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)/kulcsszavak$', views.film_keywords, name='film_keywords'),
     url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)/elemzesek$', views.film_reviews, name='film_reviews'),
     url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)/elemzes/(?P<review_id>\d+)$', views.film_review, name='film_review'),
+    url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)/dijak$', views.film_awards, name='film_awards'),
     url(r'^film/(?P<id>\d+)/(?P<orig_title>.*)$', views.film_main, name='film_main'),
     
     url(r'^szavaz$', views.vote, name='vote'),

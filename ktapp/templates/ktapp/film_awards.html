@@ -1,0 +1,28 @@
+{% extends "ktapp/film_base.html" %}
+
+{% block film_main %}
+
+    <div id="film_centered">
+        {% if awards %}
+        <table class="fullsize">
+            <tr class="header_tr">
+                <th>Díj</th>
+                <th>Év</th>
+                <th>Kategória</th>
+                <th>Művész</th>
+                <th>Megjegyzés</th>
+            </tr>
+        {% for a in awards %}
+            <tr class="{% cycle 'odd' '' %}">
+                <td>{{ a.name }}</td>
+                <td>{{ a.year }}</td>
+                <td>{{ a.category }}</td>
+                <td>{% if a.artist %}<a href="{% url 'artist' a.artist.id a.artist.name|slugify %}">{{ a.artist.name }}</a>{% endif %}</td>
+                <td>{{ a.note }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+
+{% endblock %}
