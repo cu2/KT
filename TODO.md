@@ -24,7 +24,8 @@
     - for films
     - for topics
 
-- forum topics
+- forum
+    - topics
 
 - artists
     - name, gender
@@ -37,6 +38,9 @@
 - users
     - additional info: sex, year-of-birth, location
     - core membership
+    - favourite users
+    - modal login/signup
+    - password reset
 
 - films
     - imdb, porthu, wikipedia, rotten tomatoes
@@ -55,6 +59,18 @@
     - questions
     - votes
     - comments
+
+- main page
+
+- forum
+    - list of forum topics
+    - latest comments
+
+- film lists
+    - premiers
+    - tv
+
+- toplists
 
 
 # (FAR) FUTURE

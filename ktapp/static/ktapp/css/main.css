@@ -396,7 +396,7 @@ table.fullsize {
 }
 
 .no_bottom {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 #film_your_rating b,
 #film_your_rating form {
