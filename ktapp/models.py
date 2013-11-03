@@ -22,6 +22,12 @@ class Film(models.Model):
     number_of_reviews = models.PositiveIntegerField(default=0)
     keywords = models.ManyToManyField("Keyword", through="FilmKeywordRelationship")
     number_of_keywords = models.PositiveIntegerField(default=0)
+    imdb_link = models.CharField(max_length=16, blank=True)
+    porthu_link = models.CharField(max_length=16, blank=True)
+    wikipedia_link_en = models.CharField(max_length=200, blank=True)
+    wikipedia_link_hu = models.CharField(max_length=200, blank=True)
+    imdb_rating = models.PositiveSmallIntegerField(null=True,blank=True)
+    imdb_rating_refreshed_at = models.DateTimeField(null=True,blank=True)
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
@@ -56,6 +62,9 @@ class Film(models.Model):
     
     def genres(self):
         return self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE)
+    
+    def imdb_real_rating(self):
+        return self.imdb_rating / 10.0
 
 
 class Vote(models.Model):

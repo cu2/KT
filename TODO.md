@@ -17,6 +17,7 @@
         - major
         - other
     - reviews
+    - imdb, porthu, wikipedia, rotten tomatoes, imdb rating
 
 - votes
 
@@ -43,7 +44,6 @@
     - password reset
 
 - films
-    - imdb, porthu, wikipedia, rotten tomatoes
     - premier(s)
     - sequels and remakes
     - images

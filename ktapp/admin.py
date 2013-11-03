@@ -14,7 +14,8 @@ class FilmKeywordInline(admin.TabularInline):
 class FilmAdmin(admin.ModelAdmin):
     list_display = ['orig_title', 'other_titles', 'year', 'avg_rating', 'num_rating']
     search_fields = ['orig_title', 'other_titles', 'year']
-    fields = ['orig_title', 'other_titles', 'year', 'plot_summary']
+    fields = ['orig_title', 'other_titles', 'year', 'plot_summary',
+              'imdb_link', 'porthu_link', 'wikipedia_link_en', 'wikipedia_link_hu']
     inlines = [FilmArtistInline, FilmKeywordInline]
 
 

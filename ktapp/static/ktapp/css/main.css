@@ -248,6 +248,10 @@ table.fullsize {
     display: inline;
 }
 
+.no_bottom {
+    margin-bottom: 0;
+}
+
 .clear {
     clear: both;
 }
@@ -394,10 +398,22 @@ table.fullsize {
     font-size: 16pt;
     font-weight: bold;
 }
-
-.no_bottom {
-    margin-bottom: 0;
+#film_misc_info {
+    position: absolute;
+    right: 0; top: 5px;
 }
+#film_misc_info ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+    font-size: 10pt;
+}
+#film_misc_info ul li span {
+    display: inline-block;
+    width: 80px;
+}
+
 #film_your_rating b,
 #film_your_rating form {
     margin: 0 20px;
