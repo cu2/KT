@@ -8,7 +8,7 @@
             <div class="film_addon">
                 <div class="film_addon_content">
                     <p>{{ r.content|truncatechars:400|linebreaksbr }}</p>
-                    <p><a href="{% url 'film_review' film.id film.orig_title|slugify r.id %}">Tovább...</a></p>
+                    <p><a href="{% url 'film_review' film.id film.film_slug r.id %}">Tovább...</a></p>
                 </div>
                 <div class="film_addon_author">
                     <p>{{ r.created_at|date:"Y-m-d" }} {{ r.created_by }}</p>

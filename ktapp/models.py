@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
+from django.template.defaultfilters import slugify
 
 
 class Film(models.Model):
@@ -36,6 +37,13 @@ class Film(models.Model):
     
     def __unicode__(self):
         return self.orig_title + " [" + unicode(self.year) + "]"
+    
+    @property
+    def film_slug(self):
+        if self.other_titles:
+            return slugify(self.orig_title) + "-" + slugify(self.other_titles) + "-" + slugify(self.year)
+        else:
+            return slugify(self.orig_title) + "-" + slugify(self.year)
     
     def num_specific_rating(self, r):
         if 1 <= r <= 5:

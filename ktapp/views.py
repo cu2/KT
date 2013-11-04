@@ -4,6 +4,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from django.template.defaultfilters import slugify
 
 from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword, Review
 from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm
@@ -16,7 +17,7 @@ def index(request):
     })
 
 
-def film_main(request, id, orig_title):
+def film_main(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
     rating = 0
     if request.user.is_authenticated():
@@ -35,7 +36,7 @@ def film_main(request, id, orig_title):
     })
 
 
-def film_comments(request, id, orig_title):
+def film_comments(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
     comment_form = CommentForm(initial={
         "domain": Comment.DOMAIN_FILM,
@@ -57,7 +58,7 @@ def film_comments(request, id, orig_title):
     })
 
 
-def film_quotes(request, id, orig_title):
+def film_quotes(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
     quote_form = QuoteForm(initial={
         "film": film,
@@ -71,7 +72,7 @@ def film_quotes(request, id, orig_title):
     })
 
 
-def film_trivias(request, id, orig_title):
+def film_trivias(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
     trivia_form = TriviaForm(initial={
         "film": film,
@@ -85,7 +86,7 @@ def film_trivias(request, id, orig_title):
     })
 
 
-def film_reviews(request, id, orig_title):
+def film_reviews(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
     review_form = ReviewForm(initial={
         "film": film,
@@ -99,7 +100,7 @@ def film_reviews(request, id, orig_title):
     })
 
 
-def film_review(request, id, orig_title, review_id):
+def film_review(request, id, film_slug, review_id):
     film = get_object_or_404(Film, pk=id)
     review = get_object_or_404(Review, pk=review_id)
     if review.film != film:
@@ -111,7 +112,7 @@ def film_review(request, id, orig_title, review_id):
     })
 
 
-def film_awards(request, id, orig_title):
+def film_awards(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
     return render(request, "ktapp/film_awards.html", {
         "active_tab": "awards",
@@ -120,7 +121,7 @@ def film_awards(request, id, orig_title):
     })
 
 
-def film_links(request, id, orig_title):
+def film_links(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
     return render(request, "ktapp/film_links.html", {
         "active_tab": "links",
@@ -129,7 +130,7 @@ def film_links(request, id, orig_title):
     })
 
 
-def film_keywords(request, id, orig_title):
+def film_keywords(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
     return render(request, "ktapp/film_keywords.html", {
         "active_tab": "keywords",
@@ -152,7 +153,7 @@ def vote(request):
         vote, created = Vote.objects.get_or_create(film=film, user=request.user, defaults={"rating": rating})
         vote.rating = rating
         vote.save()
-    return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.orig_title)))
+    return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.film_slug)))
 
 
 @login_required
@@ -173,9 +174,9 @@ def new_comment(request):  # TODO: extend with poll comments
             comment.created_by = request.user
             comment.save(domain=domain)  # Comment model updates domain object
     if domain_type == Comment.DOMAIN_FILM:
-        return HttpResponseRedirect(reverse("film_comments", args=(domain.pk, domain.orig_title)))
+        return HttpResponseRedirect(reverse("film_comments", args=(domain.pk, domain.film_slug)))
     elif domain_type == Comment.DOMAIN_TOPIC:
-        return HttpResponseRedirect(reverse("forum", args=(domain.pk, domain.title)))
+        return HttpResponseRedirect(reverse("forum", args=(domain.pk, slugify(domain.title))))
     elif domain_type == Comment.DOMAIN_POLL:
         return HttpResponseRedirect(reverse("index"))
     else:
@@ -191,7 +192,7 @@ def new_quote(request):
             quote = quote_form.save(commit=False)
             quote.created_by = request.user
             quote.save()
-    return HttpResponseRedirect(reverse("film_quotes", args=(film.pk, film.orig_title)))
+    return HttpResponseRedirect(reverse("film_quotes", args=(film.pk, film.film_slug)))
 
 
 @login_required
@@ -203,7 +204,7 @@ def new_trivia(request):
             trivia = trivia_form.save(commit=False)
             trivia.created_by = request.user
             trivia.save()
-    return HttpResponseRedirect(reverse("film_trivias", args=(film.pk, film.orig_title)))
+    return HttpResponseRedirect(reverse("film_trivias", args=(film.pk, film.film_slug)))
 
 
 @login_required
@@ -215,10 +216,10 @@ def new_review(request):
             review = review_form.save(commit=False)
             review.created_by = request.user
             review.save()
-    return HttpResponseRedirect(reverse("film_reviews", args=(film.pk, film.orig_title)))
+    return HttpResponseRedirect(reverse("film_reviews", args=(film.pk, film.film_slug)))
 
 
-def artist(request, id, name):
+def artist(request, id, name_slug):
     artist = get_object_or_404(Artist, pk=id)
     return render(request, "ktapp/artist.html", {
         "artist": artist,
@@ -227,14 +228,14 @@ def artist(request, id, name):
     })
 
 
-def role(request, id, name):
+def role(request, id, name_slug):
     role = get_object_or_404(FilmArtistRelationship, pk=id)
     return render(request, "ktapp/role.html", {
         "role": role,
     })
 
 
-def forum(request, id, title):
+def forum(request, id, title_slug):
     topic = get_object_or_404(Topic, pk=id)
     comment_form = CommentForm(initial={
         "domain": Comment.DOMAIN_TOPIC,
