@@ -55,6 +55,8 @@
     - reply to
     - move to (moved from)
     - bb code
+    - paging
+    - permalink
 
 - polls
     - questions

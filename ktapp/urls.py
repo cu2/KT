@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.conf.urls import patterns, url
+from django.conf.urls.static import static
 from django.contrib.auth.views import login, logout
 
 from ktapp import views
@@ -16,6 +18,7 @@ urlpatterns = patterns('',
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/elemzes/(?P<review_id>\d+)$', views.film_review, name='film_review'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/dijak$', views.film_awards, name='film_awards'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/linkek$', views.film_links, name='film_links'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/kepek$', views.film_pictures, name='film_pictures'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)$', views.film_main, name='film_main'),
     
     url(r'^szavaz$', views.vote, name='vote'),
@@ -34,3 +37,7 @@ urlpatterns = patterns('',
     url(r'^kijelentkezes/$', logout, name='logout', kwargs={'next_page': '/'}),
     url(r'^regisztracio/$', views.registration, name='registration'),
 )
+
+
+if settings.DEBUG:  # in production webserver should serve these
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

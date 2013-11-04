@@ -80,7 +80,7 @@
     <nav id="tabs" class="clearfix">
         <ul>
             <li style="width: 7%"{% if active_tab == 'main' %} class="active_tab"{% endif %}><a href="{% url 'film_main' film.id film.film_slug %}">főoldal</a></li>
-            <li style="width: 9%">képek</li>
+            <li style="width: 9%"{% if active_tab == 'pictures' %} class="active_tab"{% endif %}><a href="{% url 'film_pictures' film.id film.film_slug %}"{% if not film.number_of_pictures %} class="inactive_action"{% endif %}>képek</a>{% if film.number_of_pictures %}<span class="tab_count"> ({{ film.number_of_pictures }})</span>{% endif %}</li>
             <li style="width: 8%"{% if active_tab == 'awards' %} class="active_tab"{% endif %}><a href="{% url 'film_awards' film.id film.film_slug %}"{% if not film.number_of_awards %} class="inactive_action"{% endif %}>díjak</a>{% if film.number_of_awards %}<span class="tab_count"> ({{ film.number_of_awards }})</span>{% endif %}</li>
             <li style="width: 12%"{% if active_tab == 'reviews' %} class="active_tab"{% endif %}><a href="{% url 'film_reviews' film.id film.film_slug %}"{% if not film.number_of_reviews %} class="inactive_action"{% endif %}>elemzések</a>{% if film.number_of_reviews %}<span class="tab_count"> ({{ film.number_of_reviews }})</span>{% endif %}</li>
             <li style="width: 15%"{% if active_tab == 'comments' %} class="active_tab"{% endif %}><a href="{% url 'film_comments' film.id film.film_slug %}"{% if not film.number_of_comments %} class="inactive_action"{% endif %}>vélemények</a>{% if film.number_of_comments %}<span class="tab_count"> ({{ film.number_of_comments }})</span>{% endif %}</li>

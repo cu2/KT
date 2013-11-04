@@ -4,6 +4,8 @@ from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.template.defaultfilters import slugify
 
+from kt import settings
+
 
 class Film(models.Model):
     orig_title = models.CharField(max_length=250)
@@ -31,6 +33,7 @@ class Film(models.Model):
     imdb_rating_refreshed_at = models.DateTimeField(blank=True, null=True)
     number_of_awards = models.PositiveIntegerField(default=0)
     number_of_links = models.PositiveIntegerField(default=0)
+    number_of_pictures = models.PositiveIntegerField(default=0)
     sequels = models.ManyToManyField("Sequel", through="FilmSequelRelationship")
     main_premier = models.DateField(blank=True, null=True)
     main_premier_year = models.PositiveIntegerField(blank=True, null=True)
@@ -434,3 +437,55 @@ class FilmSequelRelationship(models.Model):
     
     class Meta:
         ordering = ["serial_number"]
+
+
+class Picture(models.Model):
+    img = models.ImageField(upload_to="pix", height_field="height", width_field="width")
+    width = models.PositiveIntegerField(default=0, editable=False)
+    height = models.PositiveIntegerField(default=0, editable=False)
+    created_by = models.ForeignKey(User)
+    created_at = models.DateTimeField(auto_now_add=True)
+    source_url = models.CharField(max_length=250, blank=True)
+    PICTURE_TYPE_POSTER = "P"
+    PICTURE_TYPE_DVD = "D"
+    PICTURE_TYPE_SCREENSHOT = "S"
+    PICTURE_TYPE_OTHER = "O"
+    PICTURE_TYPES = [
+        (PICTURE_TYPE_POSTER, "Poster"),
+        (PICTURE_TYPE_DVD, "DVD"),
+        (PICTURE_TYPE_SCREENSHOT, "Screenshot"),
+        (PICTURE_TYPE_OTHER, "Other"),
+    ]
+    picture_type = models.CharField(max_length=1, choices=PICTURE_TYPES, default=PICTURE_TYPE_OTHER)
+    film = models.ForeignKey(Film)
+    artists = models.ManyToManyField(Artist, blank=True)
+    
+    def save(self, *args, **kwargs):  # TODO: generate thumbnails and random filenames
+        super(Picture, self).save(*args, **kwargs)
+        self.film.number_of_pictures = self.film.picture_set.count()
+        self.film.save()
+    
+    def __unicode__(self):
+        return unicode(self.img)
+    
+    @property
+    def display_url_original(self):
+        return settings.MEDIA_URL + unicode(self.img)
+    
+    @property
+    def width_original(self):
+        return unicode(self.width)
+    
+    @property
+    def display_url_min(self):
+        return settings.MEDIA_URL + unicode(self.img)
+    
+    @property
+    def width_min(self):
+        return unicode(self.width / 10)
+
+
+@receiver(post_delete, sender=Picture)
+def delete_picture(sender, instance, **kwargs):
+    instance.film.number_of_pictures = instance.film.picture_set.count()
+    instance.film.save()

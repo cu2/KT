@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 
 from ktapp.models import Film, Vote, Comment, Topic, Poll, Quote, Trivia, Review, \
     Artist, FilmArtistRelationship, Keyword, FilmKeywordRelationship, Award, \
-    Link, LinkSite, Sequel, FilmSequelRelationship, Premier, PremierType
+    Link, LinkSite, Sequel, FilmSequelRelationship, Premier, PremierType, Picture
 
 
 class FilmArtistInline(admin.TabularInline):
@@ -54,6 +54,10 @@ class LinkAdmin(admin.ModelAdmin):
     list_display = ['name', 'url', 'film']
 
 
+class PictureAdmin(admin.ModelAdmin):
+    list_display = ['img', 'width', 'height', 'film', 'picture_type']
+
+
 admin.site.register(Film, FilmAdmin)
 # admin.site.register(Vote)
 admin.site.register(Comment, CommentAdmin)
@@ -70,3 +74,4 @@ admin.site.register(LinkSite)
 admin.site.register(Sequel)
 admin.site.register(Premier)
 admin.site.register(PremierType)
+admin.site.register(Picture, PictureAdmin)

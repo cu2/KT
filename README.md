@@ -63,6 +63,10 @@ And an admin user that Django uses (locally):
 
 `flush privileges;`
 
+#### Python Imaging Library
+
+Required for image upload.
+
 #### Webserver
 
 For development: Django

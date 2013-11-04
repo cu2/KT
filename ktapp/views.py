@@ -130,6 +130,15 @@ def film_links(request, id, film_slug):
     })
 
 
+def film_pictures(request, id, film_slug):
+    film = get_object_or_404(Film, pk=id)
+    return render(request, "ktapp/film_pictures.html", {
+        "active_tab": "pictures",
+        "film": film,
+        "pictures": film.picture_set.all(),
+    })
+
+
 def film_keywords(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
     return render(request, "ktapp/film_keywords.html", {
