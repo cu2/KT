@@ -26,6 +26,7 @@ urlpatterns = patterns('',
     url(r'^uj_idezet$', views.new_quote, name='new_quote'),
     url(r'^uj_erdekesseg$', views.new_trivia, name='new_trivia'),
     url(r'^uj_elemzes$', views.new_review, name='new_review'),
+    url(r'^uj_kep$', views.new_picture, name='new_picture'),
     
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>.*)$', views.artist, name='artist'),
     url(r'^szereplo/(?P<id>\d+)/(?P<name_slug>.*)$', views.role, name='role'),

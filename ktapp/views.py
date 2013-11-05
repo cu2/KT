@@ -7,7 +7,7 @@ from django import forms
 from django.template.defaultfilters import slugify
 
 from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword, Review
-from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm
+from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm, PictureUploadForm
 
 
 def index(request):
@@ -132,10 +132,15 @@ def film_links(request, id, film_slug):
 
 def film_pictures(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
+    upload_form = PictureUploadForm(initial={
+        "film": film,
+    })
+    upload_form.fields["film"].widget = forms.HiddenInput()
     return render(request, "ktapp/film_pictures.html", {
         "active_tab": "pictures",
         "film": film,
         "pictures": film.picture_set.all(),
+        "upload_form": upload_form,
     })
 
 
@@ -226,6 +231,18 @@ def new_review(request):
             review.created_by = request.user
             review.save()
     return HttpResponseRedirect(reverse("film_reviews", args=(film.pk, film.film_slug)))
+
+
+@login_required
+def new_picture(request):
+    film = get_object_or_404(Film, pk=request.POST["film"])
+    if request.POST:
+        upload_form = PictureUploadForm(request.POST, request.FILES)
+        if upload_form.is_valid():
+            picture = upload_form.save(commit=False)
+            picture.created_by = request.user
+            picture.save()
+    return HttpResponseRedirect(reverse("film_pictures", args=(film.pk, film.film_slug)))
 
 
 def artist(request, id, name_slug):

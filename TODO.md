@@ -49,7 +49,7 @@
 
 - films
     - tv
-    - images
+    - pictures
 
 - comments
     - reply to
@@ -74,6 +74,11 @@
     - tv
 
 - toplists
+
+
+# TODO FOR BIG DATA
+
+- picture upload: artist selection
 
 
 # (FAR) FUTURE

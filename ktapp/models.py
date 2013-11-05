@@ -1,3 +1,8 @@
+import os
+import random
+import string
+from datetime import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_delete
@@ -438,9 +443,17 @@ class FilmSequelRelationship(models.Model):
     class Meta:
         ordering = ["serial_number"]
 
-
+    
 class Picture(models.Model):
-    img = models.ImageField(upload_to="pix", height_field="height", width_field="width")
+    
+    def get_picture_upload_name(instance, filename):
+        file_root, file_ext = os.path.splitext(filename)
+        yearmonth = datetime.now().strftime("%Y%m")
+        random_chunk = "".join((random.choice(string.ascii_lowercase) for _ in range(8)))
+        return "".join(["pix/orig/", yearmonth,
+                         "/p_", unicode(instance.film.id), "_", random_chunk, file_ext])
+    
+    img = models.ImageField(upload_to=get_picture_upload_name, height_field="height", width_field="width")
     width = models.PositiveIntegerField(default=0, editable=False)
     height = models.PositiveIntegerField(default=0, editable=False)
     created_by = models.ForeignKey(User)
@@ -460,7 +473,7 @@ class Picture(models.Model):
     film = models.ForeignKey(Film)
     artists = models.ManyToManyField(Artist, blank=True)
     
-    def save(self, *args, **kwargs):  # TODO: generate thumbnails and random filenames
+    def save(self, *args, **kwargs):  # TODO: generate thumbnails
         super(Picture, self).save(*args, **kwargs)
         self.film.number_of_pictures = self.film.picture_set.count()
         self.film.save()
@@ -482,7 +495,7 @@ class Picture(models.Model):
     
     @property
     def width_min(self):
-        return unicode(self.width / 10)
+        return 100
 
 
 @receiver(post_delete, sender=Picture)
