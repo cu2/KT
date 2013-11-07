@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.template.defaultfilters import slugify
 
-from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword, Review
+from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword, Review, Picture
 from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm, PictureUploadForm
 
 
@@ -130,8 +130,53 @@ def film_links(request, id, film_slug):
     })
 
 
+def get_next_picture(pictures, picture):
+    found_this = False
+    next_picture = None
+    for pic in pictures:
+        if found_this:
+            next_picture = pic
+            break
+        if pic == picture:
+            found_this = True
+    if next_picture is None:
+        next_picture = pictures[0]
+    return next_picture
+
+
 def film_pictures(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
+    pictures = film.picture_set.all()
+    upload_form = PictureUploadForm(initial={
+        "film": film,
+    })
+    upload_form.fields["film"].widget = forms.HiddenInput()
+    if pictures.count() == 1:
+        next_picture = get_next_picture(pictures, pictures[0])
+        return render(request, "ktapp/film_pictures.html", {
+            "active_tab": "pictures",
+            "film": film,
+            "pictures": pictures,
+            "upload_form": upload_form,
+            "picture": pictures[0],
+            "next_picture": next_picture,
+        })
+    else:
+        return render(request, "ktapp/film_pictures.html", {
+            "active_tab": "pictures",
+            "film": film,
+            "pictures": pictures,
+            "upload_form": upload_form,
+        })
+
+
+def film_picture(request, id, film_slug, picture_id):
+    film = get_object_or_404(Film, pk=id)
+    picture = get_object_or_404(Picture, pk=picture_id)
+    if picture.film != film:
+        raise Http404
+    pictures = film.picture_set.all()
+    next_picture = get_next_picture(pictures, picture)
     upload_form = PictureUploadForm(initial={
         "film": film,
     })
@@ -139,8 +184,10 @@ def film_pictures(request, id, film_slug):
     return render(request, "ktapp/film_pictures.html", {
         "active_tab": "pictures",
         "film": film,
-        "pictures": film.picture_set.all(),
+        "pictures": pictures,
         "upload_form": upload_form,
+        "picture": picture,
+        "next_picture": next_picture,
     })
 
 

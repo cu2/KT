@@ -35,7 +35,6 @@
 
 
 #topmenu {
-/*    position: absolute;*/
     position: fixed;
     top: 45px;
     width: 100%;
@@ -66,7 +65,7 @@
     padding: 0;
 }
 #topmenu_left ul.submenu {
-    margin-top: 7px;
+    margin-top: 8px;
 }
 #topmenu_left ul.submenu li {
     clear: both;
@@ -104,6 +103,12 @@ footer ul li {
     float: left;
 }
 
+.jumptarget_wrapper {
+    position: relative;
+}
+.jumptarget {
+    position: absolute; top: -100px; /* must match fixed headers: toptopmenu and topmenu */
+}
 
 
 /* GENERAL FONTS, COLORS, STYLE */
@@ -208,6 +213,9 @@ input.small_button {
 .thumbnail {
     border: solid 1px rgb(0,0,0);
     margin: 5px;
+}
+.picture {
+    border: solid 1px rgb(0,0,0);
 }
 
 

@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/dijak$', views.film_awards, name='film_awards'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/linkek$', views.film_links, name='film_links'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/kepek$', views.film_pictures, name='film_pictures'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/kepek/(?P<picture_id>\d+)$', views.film_picture, name='film_picture'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)$', views.film_main, name='film_main'),
     
     url(r'^szavaz$', views.vote, name='vote'),

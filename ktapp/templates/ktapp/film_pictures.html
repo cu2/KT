@@ -4,9 +4,15 @@
 {% block film_main %}
 
     <div id="film_centered">
+        {% if picture %}
+        <p class="center jumptarget_wrapper">
+            <a href="{% url 'film_picture' film.id film.film_slug next_picture.id %}#pix"><img src="{{ picture.get_display_url_mid }}" style="width: {{ picture.get_width_mid }}px; height: {{ picture.get_height_mid }}px" class="picture" /></a>
+            <a name="pix" class="jumptarget"></a>
+        </p>
+        {% endif %}
         <p>
         {% for picture in pictures %}
-            <img src="{{ picture.get_display_url_min }}" style="width: {{ picture.get_width_min }}px; height: {{ picture.get_height_min }}px" class="thumbnail" />
+            <a href="{% url 'film_picture' film.id film.film_slug picture.id %}#pix"><img src="{{ picture.get_display_url_min }}" style="width: {{ picture.get_width_min }}px; height: {{ picture.get_height_min }}px" class="thumbnail" /></a>
         {% endfor %}
         </p>
         {% if user.is_authenticated %}
