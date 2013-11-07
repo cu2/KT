@@ -4,6 +4,11 @@
 {% block film_main %}
 
     <div id="film_centered">
+        <p>
+        {% for picture in pictures %}
+            <img src="{{ picture.get_display_url_min }}" style="width: {{ picture.get_width_min }}px; height: {{ picture.get_height_min }}px" class="thumbnail" />
+        {% endfor %}
+        </p>
         {% if user.is_authenticated %}
             <form action="{% url 'new_picture' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -21,11 +26,6 @@
         {% else %}
             <p>Ahhoz, hogy képet tudj feltölteni, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
         {% endif %}
-        <p>
-        {% for picture in pictures %}
-            <img src="{{ picture.display_url_min }}" style="width: {{ picture.width_min }}px" />
-        {% endfor %}
-        </p>
     </div>
 
 {% endblock %}

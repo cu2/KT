@@ -205,6 +205,11 @@ input.small_button {
     font-size: 11pt;
 }
 
+.thumbnail {
+    border: solid 1px rgb(0,0,0);
+    margin: 5px;
+}
+
 
 
 /* TABLES */

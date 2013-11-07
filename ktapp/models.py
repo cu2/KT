@@ -2,6 +2,7 @@ import os
 import random
 import string
 from datetime import datetime
+from PIL import Image
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -446,12 +447,12 @@ class FilmSequelRelationship(models.Model):
     
 class Picture(models.Model):
     
-    def get_picture_upload_name(instance, filename):
+    def get_picture_upload_name(self, filename):
         file_root, file_ext = os.path.splitext(filename)
         yearmonth = datetime.now().strftime("%Y%m")
         random_chunk = "".join((random.choice(string.ascii_lowercase) for _ in range(8)))
         return "".join(["pix/orig/", yearmonth,
-                         "/p_", unicode(instance.film.id), "_", random_chunk, file_ext])
+                         "/p_", unicode(self.film.id), "_", random_chunk, file_ext])
     
     img = models.ImageField(upload_to=get_picture_upload_name, height_field="height", width_field="width")
     width = models.PositiveIntegerField(default=0, editable=False)
@@ -473,32 +474,94 @@ class Picture(models.Model):
     film = models.ForeignKey(Film)
     artists = models.ManyToManyField(Artist, blank=True)
     
-    def save(self, *args, **kwargs):  # TODO: generate thumbnails
+    THUMBNAIL_SIZES = {
+        "min": (120, 120),
+        "mid": (720, 480),
+    }
+    
+    def get_thumbnail_filename(self, thumbnail_type):
+        path, filename = os.path.split(unicode(self.img))
+        file_root, file_ext = os.path.splitext(filename)
+        yearmonth = path[-6:]
+        filedir = settings.MEDIA_ROOT + "pix/" + thumbnail_type + "/" + yearmonth
+        filename = filedir + "/" + file_root + ".png"
+        url = settings.MEDIA_URL + "pix/" + thumbnail_type + "/" + yearmonth + "/" + file_root + ".png"
+        return filedir, filename, url
+    
+    def generate_thumbnail(self, thumbnail_type, maxwidth, maxheight=None):
+        if maxheight is None:
+            maxheight = maxwidth
+        infilename = settings.MEDIA_ROOT + unicode(self.img)
+        outfiledir, outfilename, _ = self.get_thumbnail_filename(thumbnail_type)
+        if not os.path.exists(outfiledir):
+            os.makedirs(outfiledir)
+        img = Image.open(infilename)
+        img.thumbnail((maxwidth, maxheight), Image.ANTIALIAS)
+        img.save(outfilename)
+    
+    def save(self, *args, **kwargs):
         super(Picture, self).save(*args, **kwargs)
         self.film.number_of_pictures = self.film.picture_set.count()
         self.film.save()
+        self.generate_thumbnail("min", *self.THUMBNAIL_SIZES["min"])
+        self.generate_thumbnail("mid", *self.THUMBNAIL_SIZES["mid"])
     
     def __unicode__(self):
         return unicode(self.img)
     
-    @property
-    def display_url_original(self):
-        return settings.MEDIA_URL + unicode(self.img)
+    def get_display_url(self, thumbnail_type):
+        if thumbnail_type == "orig":
+            return settings.MEDIA_URL + unicode(self.img)
+        _, _, url = self.get_thumbnail_filename(thumbnail_type)
+        return url
     
-    @property
-    def width_original(self):
-        return unicode(self.width)
+    def get_width(self, thumbnail_type):
+        if thumbnail_type == "orig":
+            return self.width
+        if self.width * self.THUMBNAIL_SIZES[thumbnail_type][1] > self.height * self.THUMBNAIL_SIZES[thumbnail_type][0]:
+            return self.THUMBNAIL_SIZES[thumbnail_type][0]
+        else:
+            return int(round(1.0 * self.width / self.height * self.THUMBNAIL_SIZES[thumbnail_type][1]))
     
-    @property
-    def display_url_min(self):
-        return settings.MEDIA_URL + unicode(self.img)
+    def get_height(self, thumbnail_type):
+        if thumbnail_type == "orig":
+            return self.height
+        if self.width * self.THUMBNAIL_SIZES[thumbnail_type][1] > self.height * self.THUMBNAIL_SIZES[thumbnail_type][0]:
+            return int(round(1.0 * self.height / self.width * self.THUMBNAIL_SIZES[thumbnail_type][0]))
+        else:
+            return self.THUMBNAIL_SIZES[thumbnail_type][1]
     
-    @property
-    def width_min(self):
-        return 100
+    # TODO: implement this in a better way (these are shortcuts for template)
+    def get_display_url_min(self):
+        return self.get_display_url("min")
+    def get_display_url_mid(self):
+        return self.get_display_url("mid")
+    def get_width_min(self):
+        return self.get_width("min")
+    def get_width_mid(self):
+        return self.get_width("mid")
+    def get_height_min(self):
+        return self.get_height("min")
+    def get_height_mid(self):
+        return self.get_height("mid")
 
 
 @receiver(post_delete, sender=Picture)
 def delete_picture(sender, instance, **kwargs):
+    """Update number_of_pictures and delete files"""
     instance.film.number_of_pictures = instance.film.picture_set.count()
     instance.film.save()
+    try:
+        os.remove(settings.MEDIA_ROOT + unicode(instance.img))
+    except OSError:
+        pass
+    _, filename, _ = instance.get_thumbnail_filename("min")
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
+    _, filename, _ = instance.get_thumbnail_filename("mid")
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
