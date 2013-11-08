@@ -436,7 +436,7 @@ class Sequel(models.Model):
 class FilmSequelRelationship(models.Model):
     film = models.ForeignKey(Film)
     sequel = models.ForeignKey(Sequel)
-    serial_number = models.PositiveSmallIntegerField(default=0)
+    serial_number = models.PositiveSmallIntegerField(default=0)  # TODO: auto number and renumber, when necessary
     
     def __unicode__(self):
         return unicode(self.film) + "/" + unicode(self.sequel)
