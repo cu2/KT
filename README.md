@@ -75,7 +75,7 @@ For development: Django
 
 For production: Apache, Lighttpd, nginx...
 
-#### `kt/settings_local.py`
+#### kt/settings_local.py
 
 This file is not in the public repo, because it contains secrets:
 
