@@ -13,7 +13,7 @@
                 <th>Megjegyzés</th>
             </tr>
         {% for a in awards %}
-            <tr class="{% cycle 'odd' '' %}">
+            <tr class="{% cycle '' 'odd' %}">
                 <td>{{ a.name }}</td>
                 <td>{{ a.year }}</td>
                 <td>{{ a.category }}</td>

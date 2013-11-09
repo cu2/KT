@@ -32,6 +32,7 @@
 
 - forum
     - topics
+    - list of forum topics
 
 - artists
     - name, gender
@@ -86,7 +87,6 @@
     - toplists
 
 - forum
-    - list of forum topics
     - latest comments
 
 - film lists

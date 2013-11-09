@@ -110,6 +110,12 @@ footer ul li {
     position: absolute; top: -100px; /* must match fixed headers: toptopmenu and topmenu */
 }
 
+.centered_content {
+    margin: 0 auto;
+    width: 70%;
+}
+
+
 
 /* GENERAL FONTS, COLORS, STYLE */
 
@@ -231,10 +237,13 @@ table {
     margin-bottom: 20px;
 }
 tr {
-    background: rgb(218,211,184);
+    background: rgb(228,222,195);
 }
 tr.odd {
     background: rgb(249,244,218);
+}
+tr.header_tr {
+    background: rgb(218,211,184);
 }
 th {
     padding: 3px;

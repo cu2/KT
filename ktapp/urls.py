@@ -33,6 +33,7 @@ urlpatterns = patterns('',
     url(r'^szereplo/(?P<id>\d+)/(?P<name_slug>.*)$', views.role, name='role'),
     
     url(r'^forum/(?P<id>\d+)/(?P<title_slug>.*)$', views.forum, name='forum'),
+    url(r'^forum$', views.list_of_topics, name='list_of_topics'),
     
     url(r'^bejelentkezes/$', login, name='login', kwargs={'template_name': 'ktapp/login.html'}),
     url(r'^tag/$', login, name='user_profile', kwargs={'template_name': 'ktapp/user_profile.html'}),  # TODO: separate own profile and others

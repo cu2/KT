@@ -313,6 +313,12 @@ def role(request, id, name_slug):
     })
 
 
+def list_of_topics(request):
+    return render(request, "ktapp/list_of_topics.html", {
+        "topics": Topic.objects.all(),
+    })
+
+
 def forum(request, id, title_slug):
     topic = get_object_or_404(Topic, pk=id)
     comment_form = CommentForm(initial={
