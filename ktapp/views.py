@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
@@ -130,7 +132,7 @@ def film_links(request, id, film_slug):
     })
 
 
-def get_next_picture(pictures, picture):
+def _get_next_picture(pictures, picture):
     found_this = False
     next_picture = None
     for pic in pictures:
@@ -144,6 +146,16 @@ def get_next_picture(pictures, picture):
     return next_picture
 
 
+def _get_selected_picture_details(film, picture, next_picture):
+    return {
+        "picture": picture,
+        "next_picture": next_picture,
+        "pic_height": Picture.THUMBNAIL_SIZES["mid"][1],
+        "artists": picture.artists.all(),
+        "film_title_article": "az" if film.orig_title[:1].lower() in u"aáeéiíoóöőuúüű" else "a",
+    }
+
+
 def film_pictures(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
     pictures = film.picture_set.all()
@@ -151,24 +163,16 @@ def film_pictures(request, id, film_slug):
         "film": film,
     })
     upload_form.fields["film"].widget = forms.HiddenInput()
+    context = {
+        "active_tab": "pictures",
+        "film": film,
+        "pictures": pictures,
+        "upload_form": upload_form,
+    }
     if pictures.count() == 1:
-        next_picture = get_next_picture(pictures, pictures[0])
-        return render(request, "ktapp/film_pictures.html", {
-            "active_tab": "pictures",
-            "film": film,
-            "pictures": pictures,
-            "upload_form": upload_form,
-            "picture": pictures[0],
-            "next_picture": next_picture,
-            "pic_height": Picture.THUMBNAIL_SIZES["mid"][1],
-        })
-    else:
-        return render(request, "ktapp/film_pictures.html", {
-            "active_tab": "pictures",
-            "film": film,
-            "pictures": pictures,
-            "upload_form": upload_form,
-        })
+        next_picture = _get_next_picture(pictures, pictures[0])
+        context.update(_get_selected_picture_details(film, pictures[0], next_picture))
+    return render(request, "ktapp/film_pictures.html", context)
 
 
 def film_picture(request, id, film_slug, picture_id):
@@ -177,20 +181,19 @@ def film_picture(request, id, film_slug, picture_id):
     if picture.film != film:
         raise Http404
     pictures = film.picture_set.all()
-    next_picture = get_next_picture(pictures, picture)
+    next_picture = _get_next_picture(pictures, picture)
     upload_form = PictureUploadForm(initial={
         "film": film,
     })
     upload_form.fields["film"].widget = forms.HiddenInput()
-    return render(request, "ktapp/film_pictures.html", {
+    context = {
         "active_tab": "pictures",
         "film": film,
         "pictures": pictures,
         "upload_form": upload_form,
-        "picture": picture,
-        "next_picture": next_picture,
-        "pic_height": Picture.THUMBNAIL_SIZES["mid"][1],
-    })
+    }
+    context.update(_get_selected_picture_details(film, picture, next_picture))
+    return render(request, "ktapp/film_pictures.html", context)
 
 
 def film_keywords(request, id, film_slug):
