@@ -160,6 +160,7 @@ def film_pictures(request, id, film_slug):
             "upload_form": upload_form,
             "picture": pictures[0],
             "next_picture": next_picture,
+            "pic_height": Picture.THUMBNAIL_SIZES["mid"][1],
         })
     else:
         return render(request, "ktapp/film_pictures.html", {
@@ -188,6 +189,7 @@ def film_picture(request, id, film_slug, picture_id):
         "upload_form": upload_form,
         "picture": picture,
         "next_picture": next_picture,
+        "pic_height": Picture.THUMBNAIL_SIZES["mid"][1],
     })
 
 

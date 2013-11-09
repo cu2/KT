@@ -5,7 +5,7 @@
 
     <div id="film_centered">
         {% if picture %}
-        <p class="center jumptarget_wrapper">
+        <p class="center jumptarget_wrapper" style="height: {{ pic_height|add:5 }}px">
             <a href="{% url 'film_picture' film.id film.film_slug next_picture.id %}#pix"><img src="{{ picture.get_display_url_mid }}" style="width: {{ picture.get_width_mid }}px; height: {{ picture.get_height_mid }}px" class="picture" /></a>
             <a name="pix" class="jumptarget"></a>
         </p>
