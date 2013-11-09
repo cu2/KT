@@ -22,6 +22,7 @@
     - links
     - sequels, remakes, adaptations
     - premier(s)
+    - pictures
 
 - votes
 
@@ -48,8 +49,13 @@
     - password reset
 
 - films
+    - wishlist actions
     - tv
-    - pictures
+    - toplists
+
+- artists
+    - list of films acted in/directed
+    - time-rating chart for directors
 
 - comments
     - reply to
@@ -58,12 +64,26 @@
     - paging
     - permalink
 
+- quotes
+    - reference to actors
+    - latest quotes list
+    - quote search
+
 - polls
     - questions
     - votes
     - comments
 
 - main page
+    - unlogged version
+    - logged in version
+    - personalization
+
+- main page widgets
+    - premiers
+    - latest comments (buzz)
+    - latest contents (quotes, trivia...)
+    - toplists
 
 - forum
     - list of forum topics
@@ -74,6 +94,16 @@
     - tv
 
 - toplists
+    - user
+
+- keywords
+    - list films for selected keyword
+    - list keywords for selected keyword
+    - list films and keywords for multiple keywords
+
+- vapiti
+    - voting system
+    - results pages
 
 
 # TODO FOR BIG DATA
