@@ -1,0 +1,14 @@
+<table class="fullsize">
+    <tr class="header_tr">
+        <th>Szerep</th>
+        <th>Film</th>
+        <th>Év</th>
+    </tr>
+{% for role in roles %}
+    <tr class="{% cycle '' 'odd' %}">
+        <td><a href="{% url 'role' role.id role.role_name|slugify %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</td>
+        <td><a href="{% url 'film_main' role.film.id role.film.film_slug %}">{{ role.film.orig_title }}</a>{% if role.film.other_titles %}<br />{{ role.film.other_titles|linebreaksbr }}{% endif %}</td>
+        <td class="center">{{ role.film.year }}</td>
+    </tr>
+{% endfor %}
+</table>

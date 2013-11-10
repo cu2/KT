@@ -8,6 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
+from django.db.models import Sum
 
 from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword, Review, Picture
 from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm, PictureUploadForm, TopicForm
@@ -300,10 +301,32 @@ def new_picture(request):
 
 def artist(request, id, name_slug):
     artist = get_object_or_404(Artist, pk=id)
+    directions = artist.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR)
+    if directions:
+        director_votes = directions.aggregate(nr1=Sum('film__number_of_ratings_1'),
+                                              nr2=Sum('film__number_of_ratings_2'),
+                                              nr3=Sum('film__number_of_ratings_3'),
+                                              nr4=Sum('film__number_of_ratings_4'),
+                                              nr5=Sum('film__number_of_ratings_5'))
+        director_vote_count = director_votes.get("nr1", 0) + director_votes.get("nr2", 0) + director_votes.get("nr3", 0) + director_votes.get("nr4", 0) + director_votes.get("nr5", 0)
+    else:
+        director_vote_count = 0
+    roles = artist.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR)
+    if roles:
+        actor_votes = roles.aggregate(nr1=Sum('film__number_of_ratings_1'),
+                                      nr2=Sum('film__number_of_ratings_2'),
+                                      nr3=Sum('film__number_of_ratings_3'),
+                                      nr4=Sum('film__number_of_ratings_4'),
+                                      nr5=Sum('film__number_of_ratings_5'))
+        actor_vote_count = actor_votes.get("nr1", 0) + actor_votes.get("nr2", 0) + actor_votes.get("nr3", 0) + actor_votes.get("nr4", 0) + actor_votes.get("nr5", 0)
+    else:
+        actor_vote_count = 0
     return render(request, "ktapp/artist.html", {
         "artist": artist,
-        "directions": artist.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR),
-        "roles": artist.filmartistrelationship_set.filter(role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR),
+        "directions": directions,
+        "roles": roles,
+        "director_vote_count": director_vote_count,
+        "actor_vote_count": actor_vote_count,
     })
 
 

@@ -7,26 +7,24 @@
 {% endblock %}
 
 {% block main %}
+<div class="centered_content">
 
-    <h2>Színészként</h2>
-    <table>
-    {% for role in roles %}
-        <tr>
-            <td><a href="{% url 'role' role.id role.role_name|slugify %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</td>
-            <td><a href="{% url 'film_main' role.film.id role.film.film_slug %}">{{ role.film.orig_title }}</a>{% if role.film.other_titles %}<br />{{ role.film.other_titles|linebreaksbr }}{% endif %}</td>
-            <td>{{ role.film.year }}</td>
-        </tr>
-    {% endfor %}
-    </table>
-
+{% if directions and director_vote_count >= actor_vote_count %}
     <h2>Rendezőként</h2>
-    <table>
-    {% for direction in directions %}
-        <tr>
-            <td><a href="{% url 'film_main' direction.film.id direction.film.film_slug %}">{{ direction.film.orig_title }}</a>{% if direction.film.other_titles %}<br />{{ direction.film.other_titles|linebreaksbr }}{% endif %}</td>
-            <td>{{ direction.film.year }}</td>
-        </tr>
-    {% endfor %}
-    </table>
+    {% include 'ktapp/tables/directions.html' with directions=directions %}
+{% endif %}
+{% if roles %}
+    <h2>Színészként</h2>
+    {% include 'ktapp/tables/roles.html' with roles=roles %}
+{% endif %}
+{% if directions and actor_vote_count > director_vote_count %}
+    <h2>Rendezőként</h2>
+    {% include 'ktapp/tables/directions.html' with directions=directions %}
+{% endif %}
 
+
+
+    <h2>Díjak</h2>
+
+</div>
 {% endblock %}

@@ -40,6 +40,7 @@
     - name, gender
     - actors and roles
     - directors
+    - list of films acted in/directed
 
 
 # TODO
@@ -60,7 +61,7 @@
     - toplists
 
 - artists
-    - list of films acted in/directed
+    - list of awards
     - time-rating chart for directors
 
 - comments

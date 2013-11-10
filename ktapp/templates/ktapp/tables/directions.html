@@ -1,0 +1,12 @@
+<table class="fullsize">
+    <tr class="header_tr">
+        <th>Film</th>
+        <th>Év</th>
+    </tr>
+{% for direction in directions %}
+    <tr class="{% cycle '' 'odd' %}">
+        <td><a href="{% url 'film_main' direction.film.id direction.film.film_slug %}">{{ direction.film.orig_title }}</a>{% if direction.film.other_titles %}<br />{{ direction.film.other_titles|linebreaksbr }}{% endif %}</td>
+        <td class="center">{{ direction.film.year }}</td>
+    </tr>
+{% endfor %}
+</table>
