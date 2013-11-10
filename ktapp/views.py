@@ -10,7 +10,8 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 from django.db.models import Sum
 
-from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword, Review, Picture
+from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, \
+    Keyword, Review, Picture, Award
 from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm, PictureUploadForm, TopicForm
 
 
@@ -327,6 +328,7 @@ def artist(request, id, name_slug):
         "roles": roles,
         "director_vote_count": director_vote_count,
         "actor_vote_count": actor_vote_count,
+        "awards": Award.objects.filter(artist=artist),
     })
 
 

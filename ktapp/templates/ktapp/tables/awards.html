@@ -1,0 +1,28 @@
+<table class="fullsize">
+    <tr class="header_tr">
+        <th>Díj</th>
+        <th>Év</th>
+        <th>Kategória</th>
+        {% if show_film %}
+        <th>Szerep</th>
+        <th>Film</th>
+        {% else %}
+        <th>Művész</th>
+        {% endif %}
+        <th>Megjegyzés</th>
+    </tr>
+{% for a in awards %}
+    <tr class="{% cycle '' 'odd' %}">
+        <td>{{ a.name }}</td>
+        <td>{{ a.year }}</td>
+        <td>{{ a.category }}</td>
+        {% if show_film %}
+        <td>???</td>
+        <td><a href="{% url 'film_main' a.film.id a.film.film_slug %}">{{ a.film.orig_title }}</a></td>
+        {% else %}
+        <td>{% if a.artist %}<a href="{% url 'artist' a.artist.id a.artist.name|slugify %}">{{ a.artist.name }}</a>{% endif %}</td>
+        {% endif %}
+        <td>{{ a.note }}</td>
+    </tr>
+{% endfor %}
+</table>

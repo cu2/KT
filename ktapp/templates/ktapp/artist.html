@@ -22,9 +22,10 @@
     {% include 'ktapp/tables/directions.html' with directions=directions %}
 {% endif %}
 
-
-
+    {% if awards %}
     <h2>Díjak</h2>
+    {% include 'ktapp/tables/awards.html' with awards=awards show_film=True %}
+    {% endif %}
 
 </div>
 {% endblock %}

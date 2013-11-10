@@ -41,6 +41,7 @@
     - actors and roles
     - directors
     - list of films acted in/directed
+    - list of awards
 
 
 # TODO
@@ -61,7 +62,6 @@
     - toplists
 
 - artists
-    - list of awards
     - time-rating chart for directors
 
 - comments
