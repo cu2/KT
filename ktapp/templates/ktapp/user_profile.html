@@ -1,18 +1,9 @@
 {% extends "ktapp/layout.html" %}
 
-{% block title %}{{ user.username }} - Kritikus Tömeg{% endblock %}
+{% block title %}{{ selected_user.username }} - Kritikus Tömeg{% endblock %}
 
-{% block header %}<h1>{{ user.username }}</h1>{% endblock %}
+{% block header %}<h1>{{ selected_user.username }}</h1>{% endblock %}
 
 {% block main %}
-
-    {% if user.is_authenticated %}
-        <p>Be vagy jelentkezve.</p>
-        <form action="{% url 'logout' %}" method="post">
-            {% csrf_token %}
-            <input type="submit" value="Kijelentkezés" />
-        </form>
-    {% else %}
-    {% endif %}
-
+    <p>Regisztrált: {{ selected_user.date_joined|date:"Y-m-d H:i:s" }}</p>
 {% endblock %}

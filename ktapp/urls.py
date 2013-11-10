@@ -37,8 +37,9 @@ urlpatterns = patterns('',
     url(r'^uj_topik$', views.new_topic, name='new_topic'),
     url(r'^legfrissebb_kommentek$', views.latest_comments, name='latest_comments'),
     
+    url(r'^tag/(?P<id>\d+)/(?P<name_slug>.*)$', views.user_profile, name='user_profile'),
+    url(r'^en/$', login, name='user_profile_own', kwargs={'template_name': 'ktapp/user_profile_own.html'}),
     url(r'^bejelentkezes/$', login, name='login', kwargs={'template_name': 'ktapp/login.html'}),
-    url(r'^tag/$', login, name='user_profile', kwargs={'template_name': 'ktapp/user_profile.html'}),  # TODO: separate own profile and others
     url(r'^kijelentkezes/$', logout, name='logout', kwargs={'next_page': '/'}),
     url(r'^regisztracio/$', views.registration, name='registration'),
 )

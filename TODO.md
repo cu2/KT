@@ -3,6 +3,7 @@
 - users
     - login/logout
     - registration
+    - user profile page (minimal)
 
 - films
     - basic data
@@ -44,11 +45,14 @@
 # TODO
 
 - users
+    - user profile page (full)
     - additional info: sex, year-of-birth, location
     - core membership
     - favourite users
     - modal login/signup
     - password reset
+
+- private messages
 
 - films
     - wishlist actions

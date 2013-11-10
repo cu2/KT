@@ -22,7 +22,7 @@
                 <ul>
                     <li><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
                     {% if user.is_authenticated %}
-                    <li>[<a href="{% url 'user_profile' %}">{{ user.username }}</a>]</li>
+                    <li>[<a href="{% url 'user_profile_own' %}">{{ user.username }}</a>]</li>
                     <li>(szerk)</li>
                     <li>Beállítások</li>
                     <li><form action="{% url 'logout' %}" method="post" class="inline">

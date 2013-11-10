@@ -3,6 +3,6 @@
         <p>{{ addon.content|linebreaksbr }}</p>
     </div>
     <div class="film_addon_author">
-        <p>{{ addon.created_by }}</p>
+        <p><a href="{% url 'user_profile' addon.created_by.id addon.created_by.username|slugify %}">{{ addon.created_by }}</a></p>
     </div>
 </div>

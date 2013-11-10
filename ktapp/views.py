@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.template.defaultfilters import slugify
+from django.contrib.auth.models import User
 
 from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword, Review, Picture
 from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm, PictureUploadForm, TopicForm
@@ -373,4 +374,13 @@ def registration(request):
         form = UserCreationForm()
     return render(request, "ktapp/registration.html", {
         'form': form,
+    })
+
+
+def user_profile(request, id, name_slug):
+    selected_user = get_object_or_404(User, pk=id)
+    if selected_user == request.user:
+        return HttpResponseRedirect(reverse("user_profile_own"))
+    return render(request, "ktapp/user_profile.html", {
+        "selected_user": selected_user,
     })

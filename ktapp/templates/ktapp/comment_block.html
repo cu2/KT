@@ -12,7 +12,7 @@
     {% endif %}
     <tr class="comment_block_tr">
         <td class="comment_header_td">
-            <h3><a href="">{{ comment.created_by }}</a><br />{{ comment.created_at|date:"Y-m-d H:i:s" }}</h3>
+            <h3><a href="{% url 'user_profile' comment.created_by.id comment.created_by.username|slugify %}">{{ comment.created_by }}</a><br />{{ comment.created_at|date:"Y-m-d H:i:s" }}</h3>
         </td>
         <td class="comment_content_td">
             <p>{{ comment.content|linebreaksbr }}</p>

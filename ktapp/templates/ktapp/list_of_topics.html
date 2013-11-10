@@ -22,7 +22,7 @@
         <tr class="{% cycle '' 'odd' %}">
             <td><a href="{% url 'forum' t.id t.title|slugify %}">{{ t.title }}</a></td>
             <td class="center">{{ t.number_of_comments }}</td>
-            <td>{% if t.last_comment %}{{ t.last_comment.created_at|date:"Y-m-d H:i:s" }} <a href="">{{ t.last_comment.created_by }}</a>{% endif %}</td>
+            <td>{% if t.last_comment %}{{ t.last_comment.created_at|date:"Y-m-d H:i:s" }} <a href="{% url 'user_profile' t.last_comment.created_by.id t.last_comment.created_by.username|slugify %}">{{ t.last_comment.created_by.username }}</a>{% endif %}</td>
         </tr>
     {% endfor %}
     </table>

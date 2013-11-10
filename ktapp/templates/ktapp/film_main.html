@@ -48,7 +48,7 @@
                 {% if vote %}
                 <li>{{ vote|length }} {{ named_rating }}:
                     {% for voteuser in vote %}
-                        <a href="">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
+                        <a href="{% url 'user_profile' voteuser.user.id voteuser.user.username|slugify %}">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
                     {% endfor %}
                 </li>
                 {% endif %}
