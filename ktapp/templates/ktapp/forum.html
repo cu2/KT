@@ -10,10 +10,10 @@
 {% block main %}
 <div class="centered_content">
 
-    {% include 'ktapp/new_comment_block.html' %}
+    {% include 'ktapp/blocks/new_comment_block.html' %}
     {% if comments %}
         {% for c in comments %}
-            {% include 'ktapp/comment_block.html' with comment=c %}
+            {% include 'ktapp/blocks/comment_block.html' with comment=c %}
         {% endfor %}
     {% endif %}
 

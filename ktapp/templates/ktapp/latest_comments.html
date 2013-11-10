@@ -11,7 +11,7 @@
 
     {% if comments %}
         {% for c in comments %}
-            {% include 'ktapp/comment_block.html' with comment=c %}
+            {% include 'ktapp/blocks/comment_block.html' with comment=c %}
         {% endfor %}
     {% endif %}
 

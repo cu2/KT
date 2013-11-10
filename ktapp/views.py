@@ -31,7 +31,7 @@ def film_main(request, id, film_slug):
             rating = vote.rating
         except Vote.DoesNotExist:
             pass
-    return render(request, "ktapp/film_main.html", {
+    return render(request, "ktapp/film_subpages/film_main.html", {
         "active_tab": "main",
         "film": film,
         "rating": rating,
@@ -55,7 +55,7 @@ def film_comments(request, id, film_slug):
     comment_form.fields["topic"].widget = forms.HiddenInput()
     comment_form.fields["poll"].widget = forms.HiddenInput()
     comment_form.fields["reply_to"].widget = forms.HiddenInput()
-    return render(request, "ktapp/film_comments.html", {
+    return render(request, "ktapp/film_subpages/film_comments.html", {
         "active_tab": "comments",
         "film": film,
         "comments": film.comment_set.all(),
@@ -69,7 +69,7 @@ def film_quotes(request, id, film_slug):
         "film": film,
     })
     quote_form.fields["film"].widget = forms.HiddenInput()
-    return render(request, "ktapp/film_quotes.html", {
+    return render(request, "ktapp/film_subpages/film_quotes.html", {
         "active_tab": "quotes",
         "film": film,
         "quotes": film.quote_set.all(),
@@ -83,7 +83,7 @@ def film_trivias(request, id, film_slug):
         "film": film,
     })
     trivia_form.fields["film"].widget = forms.HiddenInput()
-    return render(request, "ktapp/film_trivias.html", {
+    return render(request, "ktapp/film_subpages/film_trivias.html", {
         "active_tab": "trivias",
         "film": film,
         "trivias": film.trivia_set.all(),
@@ -97,7 +97,7 @@ def film_reviews(request, id, film_slug):
         "film": film,
     })
     review_form.fields["film"].widget = forms.HiddenInput()
-    return render(request, "ktapp/film_reviews.html", {
+    return render(request, "ktapp/film_subpages/film_reviews.html", {
         "active_tab": "reviews",
         "film": film,
         "reviews": film.review_set.all(),
@@ -110,7 +110,7 @@ def film_review(request, id, film_slug, review_id):
     review = get_object_or_404(Review, pk=review_id)
     if review.film != film:
         raise Http404
-    return render(request, "ktapp/film_review.html", {
+    return render(request, "ktapp/film_subpages/film_review.html", {
         "active_tab": "reviews",
         "film": film,
         "review": review,
@@ -119,7 +119,7 @@ def film_review(request, id, film_slug, review_id):
 
 def film_awards(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
-    return render(request, "ktapp/film_awards.html", {
+    return render(request, "ktapp/film_subpages/film_awards.html", {
         "active_tab": "awards",
         "film": film,
         "awards": film.award_set.all(),
@@ -128,7 +128,7 @@ def film_awards(request, id, film_slug):
 
 def film_links(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
-    return render(request, "ktapp/film_links.html", {
+    return render(request, "ktapp/film_subpages/film_links.html", {
         "active_tab": "links",
         "film": film,
         "links": film.link_set.all(),
@@ -175,7 +175,7 @@ def film_pictures(request, id, film_slug):
     if pictures.count() == 1:
         next_picture = _get_next_picture(pictures, pictures[0])
         context.update(_get_selected_picture_details(film, pictures[0], next_picture))
-    return render(request, "ktapp/film_pictures.html", context)
+    return render(request, "ktapp/film_subpages/film_pictures.html", context)
 
 
 def film_picture(request, id, film_slug, picture_id):
@@ -196,12 +196,12 @@ def film_picture(request, id, film_slug, picture_id):
         "upload_form": upload_form,
     }
     context.update(_get_selected_picture_details(film, picture, next_picture))
-    return render(request, "ktapp/film_pictures.html", context)
+    return render(request, "ktapp/film_subpages/film_pictures.html", context)
 
 
 def film_keywords(request, id, film_slug):
     film = get_object_or_404(Film, pk=id)
-    return render(request, "ktapp/film_keywords.html", {
+    return render(request, "ktapp/film_subpages/film_keywords.html", {
         "active_tab": "keywords",
         "film": film,
         "major_keywords": film.keyword_set.filter(keyword_type=Keyword.KEYWORD_TYPE_MAJOR),
