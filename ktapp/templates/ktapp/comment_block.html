@@ -1,8 +1,21 @@
-<table class="comment_block_table"><tr class="comment_block_tr">
-    <td class="comment_header_td">
-        <h3>{{ comment.created_by }}<br />{{ comment.created_at|date:"Y-m-d H:i:s" }}</h3>
-    </td>
-    <td class="comment_content_td">
-        <p>{{ comment.content|linebreaksbr }}</p>
-    </td>
-</tr></table>
+<table class="comment_block_table">
+    {% if show_comment_source %}
+    <tr class="comment_block_tr"><th colspan="2">
+        {% if comment.domain == 'F' %}
+            <a href="{% url 'film_comments' comment.film.id comment.film.film_slug %}">{{ comment.film.orig_title }}</a>
+        {% elif comment.domain == 'T' %}
+            [<a href="{% url 'forum' comment.topic.id comment.topic.title|slugify %}">{{ comment.topic }}</a>]
+        {% elif comment.domain == 'P' %}
+            {{ comment.poll }}
+        {% endif %}
+    </th></tr>
+    {% endif %}
+    <tr class="comment_block_tr">
+        <td class="comment_header_td">
+            <h3><a href="">{{ comment.created_by }}</a><br />{{ comment.created_at|date:"Y-m-d H:i:s" }}</h3>
+        </td>
+        <td class="comment_content_td">
+            <p>{{ comment.content|linebreaksbr }}</p>
+        </td>
+    </tr>
+</table>

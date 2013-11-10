@@ -9,7 +9,7 @@
 {% block main %}
 <div class="centered_content">
 
-    <p>Ha egy konkrét filmről akarsz valamit mondani, azt megteheted ott. Ha egyéb témáról szeretnél beszélgetni, arra való ez a fórum. A legfrissebb hozzászólásokat <a href="">itt találod</a>.</p>
+    <p>Ha egy konkrét filmről akarsz valamit mondani, azt megteheted ott. Ha egyéb témáról szeretnél beszélgetni, arra való ez a fórum. A legfrissebb hozzászólásokat <a href="{% url 'latest_comments' %}">itt találod</a>.</p>
 
     {% if topics %}
     <table class="fullsize">

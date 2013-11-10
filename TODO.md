@@ -33,6 +33,7 @@
 - forum
     - topics
     - list of forum topics
+    - latest comments
 
 - artists
     - name, gender
@@ -85,9 +86,6 @@
     - latest comments (buzz)
     - latest contents (quotes, trivia...)
     - toplists
-
-- forum
-    - latest comments
 
 - film lists
     - premiers

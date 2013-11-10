@@ -370,6 +370,12 @@ ul.nobullet {
 .comment_block_tr {
     vertical-align: top;
 }
+.comment_block_tr th {
+    text-align: left;
+    font-size: 10pt;
+    padding: 5px;
+    margin: 0;
+}
 .comment_header_td {
     width: 200px;
     background: rgb(218,211,184);

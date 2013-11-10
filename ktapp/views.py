@@ -344,6 +344,13 @@ def forum(request, id, title_slug):
     })
 
 
+def latest_comments(request):
+    return render(request, "ktapp/latest_comments.html", {
+        "comments": Comment.objects.all()[:100],
+        "show_comment_source": True,
+    })
+
+
 @login_required
 def new_topic(request):
     if request.POST:

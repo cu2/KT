@@ -1,16 +1,14 @@
 {% extends "ktapp/layout.html" %}
 
-{% block title %}{{ topic.title }} - Fórum - Kritikus Tömeg{% endblock %}
+{% block title %}Legfrissebb kommentek - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{{ topic.title }}</h1>
-    <p class="title_comment">(<a href="{% url 'list_of_topics' %}">vissza a topikok listájához</a>)</p>
+    <h1>Legfrissebb kommentek</h1>
 {% endblock %}
 
 {% block main %}
 <div class="centered_content">
 
-    {% include 'ktapp/new_comment_block.html' %}
     {% if comments %}
         {% for c in comments %}
             {% include 'ktapp/comment_block.html' with comment=c %}
