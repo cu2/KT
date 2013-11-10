@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block main %}
+<div class="centered_content">
 
     {% include 'ktapp/new_comment_block.html' %}
     {% if comments %}
@@ -17,4 +18,5 @@
         {% endfor %}
     {% endif %}
 
+</div>
 {% endblock %}

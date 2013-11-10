@@ -190,6 +190,9 @@ input, select, textarea {
     border-radius: 3px;
     margin-bottom: 20px;
 }
+textarea {
+    width: 100%;
+}
 input[type=submit] {
     color: rgb(146,23,23);
     border-radius: 12px;
@@ -347,9 +350,6 @@ ul.nobullet {
 #film_centered {
     margin: 0 auto;
     width: 70%;
-}
-#film_centered textarea {
-    width: 100%;
 }
 
 #film_main_left {

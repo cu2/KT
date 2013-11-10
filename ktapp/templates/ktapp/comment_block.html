@@ -1,6 +1,6 @@
 <table class="comment_block_table"><tr class="comment_block_tr">
     <td class="comment_header_td">
-        <h3 title="{{ comment.created_at|date:"Y-m-d H:i:s" }}">{{ comment.created_by }}<br />{{ comment.created_at|timesince }}</h3>
+        <h3>{{ comment.created_by }}<br />{{ comment.created_at|date:"Y-m-d H:i:s" }}</h3>
     </td>
     <td class="comment_content_td">
         <p>{{ comment.content|linebreaksbr }}</p>
