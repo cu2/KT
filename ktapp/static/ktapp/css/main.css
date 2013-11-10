@@ -164,6 +164,11 @@ h3 {
     font-weight: bold;
 }
 
+.title_comment {
+    margin-top: -17px;
+    font-size: 9pt;
+}
+
 .textblock {
     background: rgb(249,244,218);
     padding: 2px 5px;

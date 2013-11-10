@@ -3,18 +3,18 @@
 {% block title %}{{ topic.title }} - Fórum - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{{ topic.title }}{% if comments %} ({{ comments.count }}){% endif %}</h1>
+    <h1>{{ topic.title }}</h1>
+    <p class="title_comment">(<a href="{% url 'list_of_topics' %}">vissza a topikok listájához</a>)</p>
 {% endblock %}
 
 {% block main %}
 
     {% include 'ktapp/new_comment_block.html' %}
     {% if comments %}
+        <p>{{ comments.count }} komment:</p>
         {% for c in comments %}
             {% include 'ktapp/comment_block.html' with comment=c %}
         {% endfor %}
-    {% else %}
-        <p>Ez a topik üres.</p>
     {% endif %}
 
 {% endblock %}

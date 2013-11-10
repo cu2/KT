@@ -1,5 +1,5 @@
 from django.forms import Form, ModelForm, ImageField
-from ktapp.models import Comment, Quote, Trivia, Review, Picture
+from ktapp.models import Comment, Quote, Trivia, Review, Picture, Topic
 
 
 class CommentForm(ModelForm):
@@ -32,5 +32,7 @@ class PictureUploadForm(ModelForm):
         fields = ["film", "img", "picture_type", "source_url", "artists"]
 
 
-class ImageUploadForm(Form):
-    image = ImageField()
+class TopicForm(ModelForm):
+    class Meta:
+        model = Topic
+        fields = ["title"]

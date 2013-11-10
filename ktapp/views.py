@@ -9,7 +9,7 @@ from django import forms
 from django.template.defaultfilters import slugify
 
 from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, Keyword, Review, Picture
-from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm, PictureUploadForm
+from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm, PictureUploadForm, TopicForm
 
 
 def index(request):
@@ -316,11 +316,15 @@ def role(request, id, name_slug):
 def list_of_topics(request):
     return render(request, "ktapp/list_of_topics.html", {
         "topics": Topic.objects.all(),
+        "topic_form": TopicForm(),
     })
 
 
 def forum(request, id, title_slug):
-    topic = get_object_or_404(Topic, pk=id)
+    try:
+        topic = Topic.objects.get(pk=id)
+    except Topic.DoesNotExist:
+        return HttpResponseRedirect(reverse("list_of_topics"))
     comment_form = CommentForm(initial={
         "domain": Comment.DOMAIN_TOPIC,
         "film": None,
@@ -338,6 +342,18 @@ def forum(request, id, title_slug):
         "comments": topic.comment_set.all(),
         "comment_form": comment_form,
     })
+
+
+@login_required
+def new_topic(request):
+    if request.POST:
+        topic_form = TopicForm(data=request.POST)
+        if topic_form.is_valid():
+            topic = topic_form.save(commit=False)
+            topic.created_by = request.user
+            topic.save()
+            return HttpResponseRedirect(reverse("forum", args=(topic.pk, slugify(topic.title))))
+    return HttpResponseRedirect(reverse("list_of_topics"))
 
 
 def registration(request):

@@ -8,6 +8,9 @@
 
 {% block main %}
 <div class="centered_content">
+
+    <p>Ha egy konkrét filmről akarsz valamit mondani, azt megteheted ott. Ha egyéb témáról szeretnél beszélgetni, arra való ez a fórum. A legfrissebb hozzászólásokat <a href="">itt találod</a>.</p>
+
     {% if topics %}
     <table class="fullsize">
         <tr class="header_tr">
@@ -24,5 +27,19 @@
     {% endfor %}
     </table>
     {% endif %}
+
+    {% if user.is_authenticated %}
+        <h2>Új topik létrehozása</h2>
+        <form action="{% url 'new_topic' %}" method="post">
+            {% csrf_token %}
+            {% for hidden in comment_form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+            {{ topic_form.title.errors }}
+            {{ topic_form.title }}
+            <p class="center"><input type="submit" value="Mehet." /></p>
+        </form>
+    {% endif %}
+
 </div>
 {% endblock %}
