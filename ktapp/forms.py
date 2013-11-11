@@ -1,4 +1,4 @@
-from django.forms import Form, ModelForm, ImageField
+from django.forms import ModelForm
 from ktapp.models import Comment, Quote, Trivia, Review, Picture, Topic
 
 
