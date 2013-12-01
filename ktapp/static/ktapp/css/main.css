@@ -388,6 +388,7 @@ ul.nobullet {
     font-size: 10pt;
     padding: 5px;
     margin: 0;
+    line-height: 1.6;
 }
 .comment_content_td p {
     font-size: 12pt;

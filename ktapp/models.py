@@ -126,6 +126,15 @@ class Vote(models.Model):
     class Meta:
         unique_together = ["film", "user"]
 
+    def save(self, *args, **kwargs):
+        super(Vote, self).save(*args, **kwargs)
+        self.film.comment_set.filter(created_by=self.user).update(rating=self.rating)
+
+
+@receiver(post_delete, sender=Vote)
+def delete_vote(sender, instance, **kwargs):
+    instance.film.comment_set.filter(created_by=instance.user).update(rating=None)
+
 
 class Comment(models.Model):
     DOMAIN_FILM = "F"
@@ -144,6 +153,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
     reply_to = models.ForeignKey("self", blank=True, null=True, on_delete=models.SET_NULL)
+    rating = models.PositiveSmallIntegerField(blank=True, null=True)  # cache for film comments
     
     def __unicode__(self):
         return self.content[:100]
