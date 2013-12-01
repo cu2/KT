@@ -5,6 +5,14 @@
 {% block main %}
 
     {% if film_list %}
+        <p>
+        {% for film in premier_list %}
+            <a href="{% url 'film_main' film.id film.film_slug %}" style="float: left; width: 160px; height: 210px">
+                <img src="http://kritikustomeg.org/pix/mid/p7557557510345.jpg" alt="{{ film.orig_title }} [{{ film.year }}]" class="picture" style="display: inline-block; width: 150px; height: 200px" />
+            </a>
+        {% endfor %}
+        </p>
+        <br class="clear" />
         <p>Filmek listája:</p>
         <ul>
         {% for film in film_list %}

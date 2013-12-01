@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import copy
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
@@ -16,8 +17,14 @@ from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm, PictureU
 
 
 def index(request):
+    film_list = Film.objects.all()
+    premier_list = []
+    for _ in range(6):
+        for film in film_list:
+            premier_list.append(film)
     return render(request, "ktapp/index.html", {
-        "film_list": Film.objects.all(),
+        "film_list": film_list,
+        "premier_list": premier_list,
         "topic_list": Topic.objects.all(),
     })
 
