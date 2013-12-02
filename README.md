@@ -59,7 +59,7 @@ Create a database:
 
 And an admin user that Django uses (locally):
 
-`grant all on ktdb.* to ktadmin@localhost identified by '';` (anything random, but same as kt/settings_local.py/DATABASES/default/PASSWORD)
+`grant all on ktdb.* to ktadmin@localhost identified by '';` (anything random, but same as kt/settings_local.py/DATABASE_DEFAULT_PASSWORD)
 
 `flush privileges;`
 
