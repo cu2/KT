@@ -30,11 +30,15 @@ Otherwise follow PEP-8 and use pylint.
 
 Important: Python 3 *is* different.
 
+Note: you should/could use [virtualenv](http://www.virtualenv.org/en/latest/).
+
+#### MySQLdb library
+
+`pip install MySQL-python`
+
 #### Django 1.5.4
 
-Linux, Mac OS X: `sudo pip install Django==1.5.4`
-
-Windows: `pip install Django` (how to specify version?)
+`pip install Django`
 
 (Get `pip` from [here](http://www.pip-installer.org/en/latest/))
 
