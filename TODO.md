@@ -1,4 +1,72 @@
-# DONE
+# MODELS
+
+## DONE
+
+- users
+- films
+- premiers
+- votes
+- comments
+- topics
+- polls
+- quotes
+- trivias
+- reviews
+- awards
+- linksites
+- links
+- artists
+- roles
+- keywords
+- sequels
+- pictures
+
+
+## TODO
+
+- users: full profile
+- private messages
+- wishlists
+- tv
+- user toplists
+- quotes: reference to actors
+- poll questions
+- poll votes
+- poll comments
+
+
+
+# API VIEWS
+
+## DONE
+
+- films
+- keywords
+- artists
+- sequels
+- users
+
+
+## TODO
+
+- films:
+    - comments
+    - roles
+    - keywords
+    - quotes
+    - ...
+- topics:
+    - comments
+- comments
+- keywords
+- quotes
+- ...
+- users: full profile
+
+
+# WEB VIEWS
+
+## DONE
 
 - users
     - login/logout
@@ -44,7 +112,10 @@
     - list of awards
 
 
-# TODO
+## TODO
+
+- class based (?)
+- refactor to use only API
 
 - users
     - user profile page (full)
@@ -109,11 +180,12 @@
     - results pages
 
 
-# TODO FOR BIG DATA
+
+# MISC
+
+## DONE
+
+## TODO
 
 - picture upload: artist selection
-
-
-# (FAR) FUTURE
-
-http://stackoverflow.com/questions/5530277/how-to-make-facebook-login-possible-in-django-app
+- http://stackoverflow.com/questions/5530277/how-to-make-facebook-login-possible-in-django-app
