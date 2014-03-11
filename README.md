@@ -2,6 +2,7 @@
 
 This project aims to rewrite Kritikus Tömeg from scratch. Readable code + open source = community driven development (hopefully).
 
+
 ## Developer guide
 
 If you want to participate, here are some rules and guide.
@@ -20,31 +21,15 @@ Most importantly:
 
 - use only space for indentation (4 of them per level)
 - lines should end with `LF` (`\n`, `\x0A`)
-- everything (code, templates, database) is unicode, utf-8 (collation: utf8_hungarian_ci)
+- everything (code, templates, database) is unicode, `utf-8` (collation: `utf8_hungarian_ci`)
 
 Otherwise follow PEP-8 and use pylint.
 
 ### Install guide
 
-#### Python 2.7
+See below.
 
-Important: Python 3 *is* different.
-
-Note: you should/could use [virtualenv](http://www.virtualenv.org/en/latest/).
-
-#### MySQLdb library
-
-`pip install MySQL-python`
-
-#### Django 1.5.4
-
-`pip install Django`
-
-(Get `pip` from [here](http://www.pip-installer.org/en/latest/))
-
-#### South
-
-[South install guide](http://south.readthedocs.org/en/latest/installation.html)
+### Database changes
 
 Whenever you change `models.py`, don't forget to
 
@@ -55,7 +40,34 @@ This way, not only your database schema will follow the change, but others can e
 
 For more details [read this tutorial](http://south.readthedocs.org/en/latest/tutorial/part1.html).
 
-#### MySQL
+
+
+## Install guide
+
+### Python 2.7
+
+Important: Python 3 *is* different.
+
+### Virtualenv
+
+Install [virtualenv](http://www.virtualenv.org/en/latest/).
+
+Create a virtualenv in `kt`:
+
+    cd /path/to/kt/
+    virtualenv venv
+
+Activate it:
+
+`. venv/bin/activate`
+
+Install all requirements:
+
+`pip install -r requirements.txt`
+
+### MySQL
+
+Install [MySQL](http://dev.mysql.com/downloads/mysql/).
 
 Create a database:
 
@@ -63,28 +75,29 @@ Create a database:
 
 And an admin user that Django uses (locally):
 
-`grant all on ktdb.* to ktadmin@localhost identified by '';` (anything random, but same as kt/settings_local.py/DATABASE_DEFAULT_PASSWORD)
+    grant all on ktdb.* to ktadmin@localhost identified by '<something>';
+    flush privileges;
 
-`flush privileges;`
+where `<something>` = anything random, but same as `kt/settings_local.py/DATABASE_DEFAULT_PASSWORD`.
 
-#### Python Imaging Library
+Initialize your database (mostly empty tables):
 
-Required for image upload.
+    python manage.py syncdb
+    python manage.py migrate
 
-#### Webserver
+### Webserver
 
-For development: Django
+For development Django's built-in server is fine:
 
 `python manage.py runserver [<port>]`
 
-For production: Apache, Lighttpd, nginx...
+For production: use Apache, Lighttpd, nginx...
 
-#### kt/settings_local.py
+### kt/settings_local.py
 
 This file is not in the public repo, because it contains secrets:
 
-`DATABASE_DEFAULT_PASSWORD = ''`
-
-`SECRET_KEY = ''`
+    DATABASE_DEFAULT_PASSWORD = ''
+    SECRET_KEY = ''
 
 Don't forget to create this file and fill in the secrets with some random stuff.
