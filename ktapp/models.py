@@ -5,12 +5,26 @@ from datetime import datetime
 from PIL import Image
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.template.defaultfilters import slugify
 
 from kt import settings
+
+
+class KTUser(AbstractUser):
+    GENDER_TYPE_MALE = "M"
+    GENDER_TYPE_FEMALE = "F"
+    GENDER_TYPE_UNKNOWN = "U"
+    GENDER_TYPES = [
+        (GENDER_TYPE_MALE, "Male"),
+        (GENDER_TYPE_FEMALE, "Female"),
+        (GENDER_TYPE_UNKNOWN, "Unknown"),
+    ]
+    gender = models.CharField(max_length=1, choices=GENDER_TYPES, default=GENDER_TYPE_UNKNOWN)
+    location = models.CharField(max_length=250, blank=True, null=True)
+    year_of_birth = models.PositiveIntegerField(default=0)
 
 
 class Film(models.Model):
@@ -60,20 +74,20 @@ class Film(models.Model):
     
     def num_rating(self):
         return (self.number_of_ratings_1 +
-                 self.number_of_ratings_2 +
-                 self.number_of_ratings_3 +
-                 self.number_of_ratings_4 +
-                 self.number_of_ratings_5)
+                self.number_of_ratings_2 +
+                self.number_of_ratings_3 +
+                self.number_of_ratings_4 +
+                self.number_of_ratings_5)
     num_rating.short_description = 'Number of ratings'
     
     def avg_rating(self):
         if self.num_rating() == 0:
             return None
         return (1.0 * self.number_of_ratings_1 +
-                 2.0 * self.number_of_ratings_2 +
-                 3.0 * self.number_of_ratings_3 +
-                 4.0 * self.number_of_ratings_4 +
-                 5.0 * self.number_of_ratings_5) / self.num_rating()
+                2.0 * self.number_of_ratings_2 +
+                3.0 * self.number_of_ratings_3 +
+                4.0 * self.number_of_ratings_4 +
+                5.0 * self.number_of_ratings_5) / self.num_rating()
     avg_rating.short_description = 'Average rating'
     
     def directors(self):
@@ -108,7 +122,7 @@ class Premier(models.Model):
     premier_type = models.ForeignKey(PremierType, blank=True, null=True)
     
     def __unicode__(self):
-        return self.film.orig_title + ": " + unicode(self.when)+ " [" + unicode(self.premier_type) + "]"
+        return self.film.orig_title + ": " + unicode(self.when) + " [" + unicode(self.premier_type) + "]"
     
     class Meta:
         ordering = ["when", "premier_type", "film"]
@@ -116,12 +130,12 @@ class Premier(models.Model):
 
 class Vote(models.Model):
     film = models.ForeignKey(Film)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(KTUser)
     rating = models.PositiveSmallIntegerField()
     when = models.DateTimeField(auto_now=True, auto_now_add=True)
     
     def __unicode__(self):
-        return self.film.orig_title + " + " + self.user.username+ " = " + unicode(self.rating)
+        return self.film.orig_title + " + " + self.user.username + " = " + unicode(self.rating)
     
     class Meta:
         unique_together = ["film", "user"]
@@ -149,7 +163,7 @@ class Comment(models.Model):
     film = models.ForeignKey(Film, blank=True, null=True)
     topic = models.ForeignKey("Topic", blank=True, null=True)
     poll = models.ForeignKey("Poll", blank=True, null=True)
-    created_by = models.ForeignKey(User)
+    created_by = models.ForeignKey(KTUser)
     created_at = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
     reply_to = models.ForeignKey("self", blank=True, null=True, on_delete=models.SET_NULL)
@@ -189,7 +203,7 @@ def delete_comment(sender, instance, **kwargs):
 class Topic(models.Model):
     title = models.CharField(max_length=250)
     number_of_comments = models.PositiveIntegerField(default=0)
-    created_by = models.ForeignKey(User)
+    created_by = models.ForeignKey(KTUser)
     created_at = models.DateTimeField(auto_now_add=True)
     last_comment = models.ForeignKey(Comment, blank=True, null=True, related_name="last_topic_comment", on_delete=models.SET_NULL)
     
@@ -211,7 +225,7 @@ class Poll(models.Model):
 
 class FilmUserContent(models.Model):
     film = models.ForeignKey(Film, blank=True, null=True)
-    created_by = models.ForeignKey(User)
+    created_by = models.ForeignKey(KTUser)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
@@ -304,7 +318,7 @@ class Link(models.Model):
     url = models.CharField(max_length=250)
     film = models.ForeignKey(Film)
     linksite = models.ForeignKey(LinkSite, blank=True, null=True)
-    created_by = models.ForeignKey(User)
+    created_by = models.ForeignKey(KTUser)
     created_at = models.DateTimeField(auto_now_add=True)
     LINK_TYPE_OFFICIAL = "O"
     LINK_TYPE_REVIEWS = "R"
@@ -462,12 +476,12 @@ class Picture(models.Model):
         yearmonth = datetime.now().strftime("%Y%m")
         random_chunk = "".join((random.choice(string.ascii_lowercase) for _ in range(8)))
         return "".join(["pix/orig/", yearmonth,
-                         "/p_", unicode(self.film.id), "_", random_chunk, file_ext])
+                        "/p_", unicode(self.film.id), "_", random_chunk, file_ext])
     
     img = models.ImageField(upload_to=get_picture_upload_name, height_field="height", width_field="width")
     width = models.PositiveIntegerField(default=0, editable=False)
     height = models.PositiveIntegerField(default=0, editable=False)
-    created_by = models.ForeignKey(User)
+    created_by = models.ForeignKey(KTUser)
     created_at = models.DateTimeField(auto_now_add=True)
     source_url = models.CharField(max_length=250, blank=True)
     PICTURE_TYPE_POSTER = "P"
@@ -544,14 +558,19 @@ class Picture(models.Model):
     # TODO: implement this in a better way (these are shortcuts for template)
     def get_display_url_min(self):
         return self.get_display_url("min")
+
     def get_display_url_mid(self):
         return self.get_display_url("mid")
+
     def get_width_min(self):
         return self.get_width("min")
+
     def get_width_mid(self):
         return self.get_width("mid")
+
     def get_height_min(self):
         return self.get_height("min")
+
     def get_height_mid(self):
         return self.get_height("mid")
 

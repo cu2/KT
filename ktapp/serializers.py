@@ -1,11 +1,12 @@
 from rest_framework import serializers
+
 from ktapp import models
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        model = models.User
-        fields = ('url', 'username', 'password',)
+        model = models.KTUser
+        fields = ('url', 'username', 'password', 'gender', 'location', 'year_of_birth',)
         write_only_fields = ('password',)
 
 

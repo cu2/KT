@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from rest_framework import viewsets
 
 from ktapp import models
@@ -6,7 +5,7 @@ from ktapp import serializers
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    model = User
+    model = models.KTUser
     serializer_class = serializers.UserSerializer
 
 

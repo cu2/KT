@@ -170,3 +170,4 @@ LOGGING = {
     }
 }
 
+AUTH_USER_MODEL = 'ktapp.KTUser'

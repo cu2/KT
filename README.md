@@ -85,6 +85,11 @@ Initialize your database (mostly empty tables):
     python manage.py syncdb
     python manage.py migrate
 
+Create a superuser to be able to access admin (`localhost:8000/admin/`):
+
+    python manage.py createsuperuser
+
+
 ### Webserver
 
 For development Django's built-in server is fine:

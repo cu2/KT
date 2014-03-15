@@ -20,11 +20,11 @@
 - keywords
 - sequels
 - pictures
+- users: full profile
 
 
 ## TODO
 
-- users: full profile
 - private messages
 - wishlists
 - tv

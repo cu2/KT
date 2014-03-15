@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import copy
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
@@ -8,11 +7,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.template.defaultfilters import slugify
-from django.contrib.auth.models import User
 from django.db.models import Sum
 
 from ktapp.models import Film, Vote, Comment, Topic, Poll, Artist, FilmArtistRelationship, \
-    Keyword, Review, Picture, Award
+    Keyword, Review, Picture, Award, KTUser
 from ktapp.forms import CommentForm, QuoteForm, TriviaForm, ReviewForm, PictureUploadForm, TopicForm
 
 
@@ -410,7 +408,7 @@ def registration(request):
 
 
 def user_profile(request, id, name_slug):
-    selected_user = get_object_or_404(User, pk=id)
+    selected_user = get_object_or_404(KTUser, pk=id)
     if selected_user == request.user:
         return HttpResponseRedirect(reverse("user_profile_own"))
     return render(request, "ktapp/user_profile.html", {
