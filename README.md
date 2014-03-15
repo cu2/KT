@@ -31,10 +31,13 @@ See below.
 
 ### Database changes
 
-Whenever you change `models.py`, don't forget to
+Whenever you change `models.py`, don't forget to create a migration:
 
-- create a migration: `python manage.py schemamigration ktapp --auto`
-- and apply it: `python manage.py migrate ktapp`
+    python manage.py schemamigration ktapp --auto
+
+and apply it:
+
+    python manage.py migrate ktapp
 
 This way, not only your database schema will follow the change, but others can easily follow.
 
@@ -59,11 +62,11 @@ Create a virtualenv in `kt`:
 
 Activate it:
 
-`. venv/bin/activate`
+    . venv/bin/activate
 
 Install all requirements:
 
-`pip install -r requirements.txt`
+    pip install -r requirements.txt
 
 ### MySQL
 
@@ -71,7 +74,7 @@ Install [MySQL](http://dev.mysql.com/downloads/mysql/).
 
 Create a database:
 
-`create database ktdb default character set utf8 default collate utf8_hungarian_ci;`
+    create database ktdb default character set utf8 default collate utf8_hungarian_ci;
 
 And an admin user that Django uses (locally):
 
@@ -85,7 +88,7 @@ Initialize your database (mostly empty tables):
     python manage.py syncdb
     python manage.py migrate
 
-Create a superuser to be able to access admin (`localhost:8000/admin/`):
+Create a superuser to be able to access admin (`http://localhost:<port>/admin/`):
 
     python manage.py createsuperuser
 
@@ -94,7 +97,7 @@ Create a superuser to be able to access admin (`localhost:8000/admin/`):
 
 For development Django's built-in server is fine:
 
-`python manage.py runserver [<port>]`
+    python manage.py runserver [<port>]
 
 For production: use Apache, Lighttpd, nginx...
 
