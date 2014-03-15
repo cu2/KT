@@ -76,7 +76,7 @@ Create a database:
 
     create database ktdb default character set utf8 default collate utf8_hungarian_ci;
 
-And an admin user that Django uses (locally):
+Add an admin user that Django uses (locally):
 
     grant all on ktdb.* to ktadmin@localhost identified by '<something>';
     flush privileges;
@@ -99,7 +99,7 @@ For development Django's built-in server is fine:
 
     python manage.py runserver [<port>]
 
-For production: use Apache, Lighttpd, nginx...
+For production use Apache, Lighttpd, nginx...
 
 ### kt/settings_local.py
 
