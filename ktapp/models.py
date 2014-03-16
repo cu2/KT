@@ -621,3 +621,19 @@ class Wishlist(models.Model):
         (WISH_TYPE_NO, 'No'),
     ]
     wish_type = models.CharField(max_length=1, choices=WISH_TYPES, default=WISH_TYPE_YES)
+
+
+class TVChannel(models.Model):
+    name = models.CharField(max_length=250)
+    active = models.BooleanField(default=True)
+
+    def __unicode__(self):
+        return self.name
+
+
+class TVFilm(models.Model):
+    film = models.ForeignKey(Film, blank=True, null=True)
+    channel = models.ForeignKey(TVChannel, blank=True, null=True)
+    when = models.DateTimeField(blank=True, null=True)
+    created_by = models.ForeignKey(KTUser, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)

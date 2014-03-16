@@ -23,11 +23,11 @@
 - users: full profile
 - private messages
 - wishlists
+- tv
 
 
 ## TODO
 
-- tv
 - user toplists
 - quotes: reference to actors
 - poll questions
