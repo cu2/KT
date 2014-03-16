@@ -72,6 +72,7 @@ admin.site.register(models.Sequel)
 admin.site.register(models.Premier)
 admin.site.register(models.PremierType)
 admin.site.register(models.Picture, PictureAdmin)
+admin.site.register(models.Wishlist)
 
 # these probably shouldn't be in admin:
 # admin.site.register(models.Message)

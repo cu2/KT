@@ -22,11 +22,11 @@
 - pictures
 - users: full profile
 - private messages
+- wishlists
 
 
 ## TODO
 
-- wishlists
 - tv
 - user toplists
 - quotes: reference to actors

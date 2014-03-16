@@ -608,3 +608,16 @@ class Message(models.Model):
         index_together = [
             ['owned_by', 'sent_at'],
         ]
+
+
+class Wishlist(models.Model):
+    film = models.ForeignKey(Film, blank=True, null=True)
+    wished_by = models.ForeignKey(KTUser, blank=True, null=True)
+    wished_at = models.DateTimeField(auto_now_add=True)
+    WISH_TYPE_YES = 'Y'
+    WISH_TYPE_NO = 'N'
+    WISH_TYPES = [
+        (WISH_TYPE_YES, 'Yes'),
+        (WISH_TYPE_NO, 'No'),
+    ]
+    wish_type = models.CharField(max_length=1, choices=WISH_TYPES, default=WISH_TYPE_YES)
