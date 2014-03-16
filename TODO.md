@@ -24,12 +24,12 @@
 - private messages
 - wishlists
 - tv
+- user toplists
 
 
 ## TODO
 
-- user toplists
-- quotes: reference to actors
+- quotes: reference to actors (roles)
 - poll questions
 - poll votes
 - poll comments

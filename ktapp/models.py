@@ -637,3 +637,33 @@ class TVFilm(models.Model):
     when = models.DateTimeField(blank=True, null=True)
     created_by = models.ForeignKey(KTUser, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class UserToplist(models.Model):
+    title = models.CharField(max_length=250)
+    created_by = models.ForeignKey(KTUser, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    ordered = models.BooleanField(default=True)
+    quality = models.BooleanField(default=True)  # if all items have comments, show up more often
+    number_of_items = models.PositiveSmallIntegerField()
+    TOPLIST_TYPE_FILM = 'F'
+    TOPLIST_TYPE_DIRECTOR = 'D'
+    TOPLIST_TYPE_ACTOR = 'A'
+    TOPLIST_TYPES = [
+        (TOPLIST_TYPE_FILM, 'Film'),
+        (TOPLIST_TYPE_DIRECTOR, 'Director'),
+        (TOPLIST_TYPE_ACTOR, 'Actor'),
+    ]
+    toplist_type = models.CharField(max_length=1, choices=TOPLIST_TYPES, default=TOPLIST_TYPE_FILM)
+
+    def __unicode__(self):
+        return self.title
+
+
+class UserToplistItem(models.Model):
+    usertoplist = models.ForeignKey(UserToplist)
+    serial_number = models.PositiveSmallIntegerField(default=0)  # TODO: auto number and renumber, when necessary
+    film = models.ForeignKey(Film, blank=True, null=True)
+    director = models.ForeignKey(Artist, blank=True, null=True, related_name='director_usertoplist')
+    actor = models.ForeignKey(Artist, blank=True, null=True, related_name='actor_usertoplist')
+    comment = models.TextField()

@@ -75,6 +75,8 @@ admin.site.register(models.Picture, PictureAdmin)
 admin.site.register(models.Wishlist)
 admin.site.register(models.TVChannel)
 admin.site.register(models.TVFilm)
+admin.site.register(models.UserToplist)
+admin.site.register(models.UserToplistItem)
 
 # these probably shouldn't be in admin:
 # admin.site.register(models.Message)
