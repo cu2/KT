@@ -14,13 +14,13 @@ from kt import settings
 
 
 class KTUser(AbstractUser):
-    GENDER_TYPE_MALE = "M"
-    GENDER_TYPE_FEMALE = "F"
-    GENDER_TYPE_UNKNOWN = "U"
+    GENDER_TYPE_MALE = 'M'
+    GENDER_TYPE_FEMALE = 'F'
+    GENDER_TYPE_UNKNOWN = 'U'
     GENDER_TYPES = [
-        (GENDER_TYPE_MALE, "Male"),
-        (GENDER_TYPE_FEMALE, "Female"),
-        (GENDER_TYPE_UNKNOWN, "Unknown"),
+        (GENDER_TYPE_MALE, 'Male'),
+        (GENDER_TYPE_FEMALE, 'Female'),
+        (GENDER_TYPE_UNKNOWN, 'Unknown'),
     ]
     gender = models.CharField(max_length=1, choices=GENDER_TYPES, default=GENDER_TYPE_UNKNOWN)
     location = models.CharField(max_length=250, blank=True, null=True)
@@ -33,8 +33,8 @@ class Film(models.Model):
     year = models.PositiveIntegerField(default=0)
     plot_summary = models.TextField(blank=True)
     number_of_comments = models.PositiveIntegerField(default=0)
-    last_comment = models.ForeignKey("Comment", blank=True, null=True, related_name="last_film_comment", on_delete=models.SET_NULL)
-    artists = models.ManyToManyField("Artist", through="FilmArtistRelationship")
+    last_comment = models.ForeignKey('Comment', blank=True, null=True, related_name='last_film_comment', on_delete=models.SET_NULL)
+    artists = models.ManyToManyField('Artist', through='FilmArtistRelationship')
     number_of_ratings_1 = models.PositiveIntegerField(default=0)
     number_of_ratings_2 = models.PositiveIntegerField(default=0)
     number_of_ratings_3 = models.PositiveIntegerField(default=0)
@@ -43,7 +43,7 @@ class Film(models.Model):
     number_of_quotes = models.PositiveIntegerField(default=0)
     number_of_trivias = models.PositiveIntegerField(default=0)
     number_of_reviews = models.PositiveIntegerField(default=0)
-    keywords = models.ManyToManyField("Keyword", through="FilmKeywordRelationship")
+    keywords = models.ManyToManyField('Keyword', through='FilmKeywordRelationship')
     number_of_keywords = models.PositiveIntegerField(default=0)
     imdb_link = models.CharField(max_length=16, blank=True)
     porthu_link = models.CharField(max_length=16, blank=True)
@@ -54,23 +54,23 @@ class Film(models.Model):
     number_of_awards = models.PositiveIntegerField(default=0)
     number_of_links = models.PositiveIntegerField(default=0)
     number_of_pictures = models.PositiveIntegerField(default=0)
-    sequels = models.ManyToManyField("Sequel", through="FilmSequelRelationship")
+    sequels = models.ManyToManyField('Sequel', through='FilmSequelRelationship')
     main_premier = models.DateField(blank=True, null=True)
     main_premier_year = models.PositiveIntegerField(blank=True, null=True)
     
     def __unicode__(self):
-        return self.orig_title + " [" + unicode(self.year) + "]"
+        return self.orig_title + ' [' + unicode(self.year) + ']'
     
     @property
     def film_slug(self):
         if self.other_titles:
-            return slugify(self.orig_title) + "-" + slugify(self.other_titles) + "-" + slugify(self.year)
+            return slugify(self.orig_title) + '-' + slugify(self.other_titles) + '-' + slugify(self.year)
         else:
-            return slugify(self.orig_title) + "-" + slugify(self.year)
+            return slugify(self.orig_title) + '-' + slugify(self.year)
     
     def num_specific_rating(self, r):
         if 1 <= r <= 5:
-            return getattr(self, "number_of_ratings_" + str(r))
+            return getattr(self, 'number_of_ratings_' + str(r))
     
     def num_rating(self):
         return (self.number_of_ratings_1 +
@@ -122,10 +122,10 @@ class Premier(models.Model):
     premier_type = models.ForeignKey(PremierType, blank=True, null=True)
     
     def __unicode__(self):
-        return self.film.orig_title + ": " + unicode(self.when) + " [" + unicode(self.premier_type) + "]"
+        return self.film.orig_title + ': ' + unicode(self.when) + ' [' + unicode(self.premier_type) + ']'
     
     class Meta:
-        ordering = ["when", "premier_type", "film"]
+        ordering = ['when', 'premier_type', 'film']
 
 
 class Vote(models.Model):
@@ -135,10 +135,10 @@ class Vote(models.Model):
     when = models.DateTimeField(auto_now=True, auto_now_add=True)
     
     def __unicode__(self):
-        return self.film.orig_title + " + " + self.user.username + " = " + unicode(self.rating)
+        return self.film.orig_title + ' + ' + self.user.username + ' = ' + unicode(self.rating)
     
     class Meta:
-        unique_together = ["film", "user"]
+        unique_together = ['film', 'user']
 
     def save(self, *args, **kwargs):
         super(Vote, self).save(*args, **kwargs)
@@ -151,38 +151,38 @@ def delete_vote(sender, instance, **kwargs):
 
 
 class Comment(models.Model):
-    DOMAIN_FILM = "F"
-    DOMAIN_TOPIC = "T"
-    DOMAIN_POLL = "P"
+    DOMAIN_FILM = 'F'
+    DOMAIN_TOPIC = 'T'
+    DOMAIN_POLL = 'P'
     DOMAINS = [
-        (DOMAIN_FILM, "Film"),
-        (DOMAIN_TOPIC, "Topic"),
-        (DOMAIN_POLL, "Poll"),
+        (DOMAIN_FILM, 'Film'),
+        (DOMAIN_TOPIC, 'Topic'),
+        (DOMAIN_POLL, 'Poll'),
     ]
     domain = models.CharField(max_length=1, choices=DOMAINS, default=DOMAIN_FILM)
     film = models.ForeignKey(Film, blank=True, null=True)
-    topic = models.ForeignKey("Topic", blank=True, null=True)
-    poll = models.ForeignKey("Poll", blank=True, null=True)
+    topic = models.ForeignKey('Topic', blank=True, null=True)
+    poll = models.ForeignKey('Poll', blank=True, null=True)
     created_by = models.ForeignKey(KTUser)
     created_at = models.DateTimeField(auto_now_add=True)
     content = models.TextField()
-    reply_to = models.ForeignKey("self", blank=True, null=True, on_delete=models.SET_NULL)
+    reply_to = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL)
     rating = models.PositiveSmallIntegerField(blank=True, null=True)  # cache for film comments
     
     def __unicode__(self):
         return self.content[:100]
     
     class Meta:
-        ordering = ["-created_at"]
-        get_latest_by = "created_at"
+        ordering = ['-created_at']
+        get_latest_by = 'created_at'
     
     def save(self, *args, **kwargs):
         """Save comment and update domain object as well"""
-        super_kwargs = {key: value for key, value in kwargs.iteritems() if key != "domain"}
+        super_kwargs = {key: value for key, value in kwargs.iteritems() if key != 'domain'}
         super(Comment, self).save(*args, **super_kwargs)
-        kwargs["domain"].number_of_comments = kwargs["domain"].comment_set.count()
-        kwargs["domain"].last_comment = kwargs["domain"].comment_set.latest()
-        kwargs["domain"].save()
+        kwargs['domain'].number_of_comments = kwargs['domain'].comment_set.count()
+        kwargs['domain'].last_comment = kwargs['domain'].comment_set.latest()
+        kwargs['domain'].save()
 
 
 @receiver(post_delete, sender=Comment)
@@ -205,13 +205,13 @@ class Topic(models.Model):
     number_of_comments = models.PositiveIntegerField(default=0)
     created_by = models.ForeignKey(KTUser)
     created_at = models.DateTimeField(auto_now_add=True)
-    last_comment = models.ForeignKey(Comment, blank=True, null=True, related_name="last_topic_comment", on_delete=models.SET_NULL)
+    last_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='last_topic_comment', on_delete=models.SET_NULL)
     
     def __unicode__(self):
         return self.title
     
     class Meta:
-        ordering = ["-last_comment"]
+        ordering = ['-last_comment']
 
 
 class Poll(models.Model):
@@ -225,13 +225,13 @@ class Poll(models.Model):
 
 class FilmUserContent(models.Model):
     film = models.ForeignKey(Film, blank=True, null=True)
-    created_by = models.ForeignKey(KTUser)
+    created_by = models.ForeignKey(KTUser, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         abstract = True
-        ordering = ["-created_at"]
-        get_latest_by = "created_at"
+        ordering = ['-created_at']
+        get_latest_by = 'created_at'
 
 
 class Quote(FilmUserContent):
@@ -284,7 +284,7 @@ def delete_review(sender, instance, **kwargs):
 
 class Award(models.Model):
     film = models.ForeignKey(Film)
-    artist = models.ForeignKey("Artist", blank=True, null=True)
+    artist = models.ForeignKey('Artist', blank=True, null=True)
     name = models.CharField(max_length=250)
     year = models.CharField(max_length=20)
     category = models.CharField(max_length=250)
@@ -296,7 +296,7 @@ class Award(models.Model):
         self.film.save()
     
     def __unicode__(self):
-        return self.name + " / " + self.category
+        return self.name + ' / ' + self.category
 
 
 @receiver(post_delete, sender=Award)
@@ -320,15 +320,15 @@ class Link(models.Model):
     linksite = models.ForeignKey(LinkSite, blank=True, null=True)
     created_by = models.ForeignKey(KTUser)
     created_at = models.DateTimeField(auto_now_add=True)
-    LINK_TYPE_OFFICIAL = "O"
-    LINK_TYPE_REVIEWS = "R"
-    LINK_TYPE_INTERVIEWS = "I"
-    LINK_TYPE_OTHER = "-"
+    LINK_TYPE_OFFICIAL = 'O'
+    LINK_TYPE_REVIEWS = 'R'
+    LINK_TYPE_INTERVIEWS = 'I'
+    LINK_TYPE_OTHER = '-'
     LINK_TYPES = [
-        (LINK_TYPE_OFFICIAL, "Official pages"),
-        (LINK_TYPE_REVIEWS, "Reviews"),
-        (LINK_TYPE_INTERVIEWS, "Interviews"),
-        (LINK_TYPE_OTHER, "Other pages"),
+        (LINK_TYPE_OFFICIAL, 'Official pages'),
+        (LINK_TYPE_REVIEWS, 'Reviews'),
+        (LINK_TYPE_INTERVIEWS, 'Interviews'),
+        (LINK_TYPE_OTHER, 'Other pages'),
     ]
     link_type = models.CharField(max_length=1, choices=LINK_TYPES, default=LINK_TYPE_OTHER)
     lead = models.TextField(blank=True)
@@ -350,69 +350,69 @@ def delete_link(sender, instance, **kwargs):
 
 class Artist(models.Model):
     name = models.CharField(max_length=250)
-    GENDER_TYPE_MALE = "M"
-    GENDER_TYPE_FEMALE = "F"
-    GENDER_TYPE_UNKNOWN = "U"
+    GENDER_TYPE_MALE = 'M'
+    GENDER_TYPE_FEMALE = 'F'
+    GENDER_TYPE_UNKNOWN = 'U'
     GENDER_TYPES = [
-        (GENDER_TYPE_MALE, "Male"),
-        (GENDER_TYPE_FEMALE, "Female"),
-        (GENDER_TYPE_UNKNOWN, "Unknown"),
+        (GENDER_TYPE_MALE, 'Male'),
+        (GENDER_TYPE_FEMALE, 'Female'),
+        (GENDER_TYPE_UNKNOWN, 'Unknown'),
     ]
     gender = models.CharField(max_length=1, choices=GENDER_TYPES, default=GENDER_TYPE_UNKNOWN)
-    films = models.ManyToManyField(Film, through="FilmArtistRelationship")
+    films = models.ManyToManyField(Film, through='FilmArtistRelationship')
     
     def __unicode__(self):
         return self.name
     
     class Meta:
-        ordering = ["name"]
+        ordering = ['name']
 
 
 class FilmArtistRelationship(models.Model):
     film = models.ForeignKey(Film)
     artist = models.ForeignKey(Artist)
-    ROLE_TYPE_DIRECTOR = "D"
-    ROLE_TYPE_ACTOR = "A"
+    ROLE_TYPE_DIRECTOR = 'D'
+    ROLE_TYPE_ACTOR = 'A'
     ROLE_TYPES = [
-        (ROLE_TYPE_DIRECTOR, "Director"),
-        (ROLE_TYPE_ACTOR, "Actor/actress"),
+        (ROLE_TYPE_DIRECTOR, 'Director'),
+        (ROLE_TYPE_ACTOR, 'Actor/actress'),
     ]
-    ACTOR_SUBTYPE_FULL = "F"
-    ACTOR_SUBTYPE_VOICE = "V"
-    ACTOR_SUBTYPE_DUB = "D"
+    ACTOR_SUBTYPE_FULL = 'F'
+    ACTOR_SUBTYPE_VOICE = 'V'
+    ACTOR_SUBTYPE_DUB = 'D'
     ACTOR_SUBTYPES = [
-        (ACTOR_SUBTYPE_FULL, "Full"),
-        (ACTOR_SUBTYPE_VOICE, "Voice"),
-        (ACTOR_SUBTYPE_DUB, "Dub"),
+        (ACTOR_SUBTYPE_FULL, 'Full'),
+        (ACTOR_SUBTYPE_VOICE, 'Voice'),
+        (ACTOR_SUBTYPE_DUB, 'Dub'),
     ]
     role_type = models.CharField(max_length=1, choices=ROLE_TYPES, default=ROLE_TYPE_DIRECTOR)
     actor_subtype = models.CharField(max_length=1, choices=ACTOR_SUBTYPES, default=ACTOR_SUBTYPE_FULL)
     role_name = models.CharField(max_length=250, blank=True)
     
     def __unicode__(self):
-        return self.role_type + "[" + self.role_name + "]:" + unicode(self.film) + "/" + unicode(self.artist)
+        return self.role_type + '[' + self.role_name + ']:' + unicode(self.film) + '/' + unicode(self.artist)
 
 
 class Keyword(models.Model):
     name = models.CharField(max_length=250)
-    KEYWORD_TYPE_COUNTRY = "C"
-    KEYWORD_TYPE_GENRE = "G"
-    KEYWORD_TYPE_MAJOR = "M"
-    KEYWORD_TYPE_OTHER = "O"
+    KEYWORD_TYPE_COUNTRY = 'C'
+    KEYWORD_TYPE_GENRE = 'G'
+    KEYWORD_TYPE_MAJOR = 'M'
+    KEYWORD_TYPE_OTHER = 'O'
     KEYWORD_TYPES = [
-        (KEYWORD_TYPE_COUNTRY, "Country"),
-        (KEYWORD_TYPE_GENRE, "Genre"),
-        (KEYWORD_TYPE_MAJOR, "Major"),
-        (KEYWORD_TYPE_OTHER, "Other"),
+        (KEYWORD_TYPE_COUNTRY, 'Country'),
+        (KEYWORD_TYPE_GENRE, 'Genre'),
+        (KEYWORD_TYPE_MAJOR, 'Major'),
+        (KEYWORD_TYPE_OTHER, 'Other'),
     ]
     keyword_type = models.CharField(max_length=1, choices=KEYWORD_TYPES, default=KEYWORD_TYPE_OTHER)
-    films = models.ManyToManyField(Film, through="FilmKeywordRelationship")
+    films = models.ManyToManyField(Film, through='FilmKeywordRelationship')
     
     def __unicode__(self):
-        return self.keyword_type + ":" + self.name
+        return self.keyword_type + ':' + self.name
     
     class Meta:
-        ordering = ["keyword_type", "name"]
+        ordering = ['keyword_type', 'name']
 
 
 class FilmKeywordRelationship(models.Model):
@@ -420,7 +420,7 @@ class FilmKeywordRelationship(models.Model):
     keyword = models.ForeignKey(Keyword)
     
     def __unicode__(self):
-        return unicode(self.film) + "/" + unicode(self.keyword)
+        return unicode(self.film) + '/' + unicode(self.keyword)
     
     def save(self, *args, **kwargs):
         super(FilmKeywordRelationship, self).save(*args, **kwargs)
@@ -436,22 +436,22 @@ def delete_filmkeyword(sender, instance, **kwargs):
 
 class Sequel(models.Model):
     name = models.CharField(max_length=250)
-    SEQUEL_TYPE_SEQUEL = "S"
-    SEQUEL_TYPE_REMAKE = "R"
-    SEQUEL_TYPE_ADAPTATION = "A"
+    SEQUEL_TYPE_SEQUEL = 'S'
+    SEQUEL_TYPE_REMAKE = 'R'
+    SEQUEL_TYPE_ADAPTATION = 'A'
     SEQUEL_TYPES = [
-        (SEQUEL_TYPE_SEQUEL, "Sequel"),
-        (SEQUEL_TYPE_REMAKE, "Remake"),
-        (SEQUEL_TYPE_ADAPTATION, "Adaptation"),
+        (SEQUEL_TYPE_SEQUEL, 'Sequel'),
+        (SEQUEL_TYPE_REMAKE, 'Remake'),
+        (SEQUEL_TYPE_ADAPTATION, 'Adaptation'),
     ]
     sequel_type = models.CharField(max_length=1, choices=SEQUEL_TYPES, default=SEQUEL_TYPE_SEQUEL)
-    films = models.ManyToManyField(Film, through="FilmSequelRelationship")
+    films = models.ManyToManyField(Film, through='FilmSequelRelationship')
     
     def __unicode__(self):
         return self.name
     
     class Meta:
-        ordering = ["sequel_type", "name"]
+        ordering = ['sequel_type', 'name']
     
     def all_films(self):
         return self.films.all()
@@ -463,53 +463,53 @@ class FilmSequelRelationship(models.Model):
     serial_number = models.PositiveSmallIntegerField(default=0)  # TODO: auto number and renumber, when necessary
     
     def __unicode__(self):
-        return unicode(self.film) + "/" + unicode(self.sequel)
+        return unicode(self.film) + '/' + unicode(self.sequel)
     
     class Meta:
-        ordering = ["serial_number"]
+        ordering = ['serial_number']
 
     
 class Picture(models.Model):
     
     def get_picture_upload_name(self, filename):
         file_root, file_ext = os.path.splitext(filename)
-        yearmonth = datetime.now().strftime("%Y%m")
-        random_chunk = "".join((random.choice(string.ascii_lowercase) for _ in range(8)))
-        return "".join(["pix/orig/", yearmonth,
-                        "/p_", unicode(self.film.id), "_", random_chunk, file_ext])
+        yearmonth = datetime.now().strftime('%Y%m')
+        random_chunk = ''.join((random.choice(string.ascii_lowercase) for _ in range(8)))
+        return ''.join(['pix/orig/', yearmonth,
+                        '/p_', unicode(self.film.id), '_', random_chunk, file_ext])
     
-    img = models.ImageField(upload_to=get_picture_upload_name, height_field="height", width_field="width")
+    img = models.ImageField(upload_to=get_picture_upload_name, height_field='height', width_field='width')
     width = models.PositiveIntegerField(default=0, editable=False)
     height = models.PositiveIntegerField(default=0, editable=False)
     created_by = models.ForeignKey(KTUser)
     created_at = models.DateTimeField(auto_now_add=True)
     source_url = models.CharField(max_length=250, blank=True)
-    PICTURE_TYPE_POSTER = "P"
-    PICTURE_TYPE_DVD = "D"
-    PICTURE_TYPE_SCREENSHOT = "S"
-    PICTURE_TYPE_OTHER = "O"
+    PICTURE_TYPE_POSTER = 'P'
+    PICTURE_TYPE_DVD = 'D'
+    PICTURE_TYPE_SCREENSHOT = 'S'
+    PICTURE_TYPE_OTHER = 'O'
     PICTURE_TYPES = [
-        (PICTURE_TYPE_POSTER, "Poster"),
-        (PICTURE_TYPE_DVD, "DVD"),
-        (PICTURE_TYPE_SCREENSHOT, "Screenshot"),
-        (PICTURE_TYPE_OTHER, "Other"),
+        (PICTURE_TYPE_POSTER, 'Poster'),
+        (PICTURE_TYPE_DVD, 'DVD'),
+        (PICTURE_TYPE_SCREENSHOT, 'Screenshot'),
+        (PICTURE_TYPE_OTHER, 'Other'),
     ]
     picture_type = models.CharField(max_length=1, choices=PICTURE_TYPES, default=PICTURE_TYPE_OTHER)
     film = models.ForeignKey(Film)
     artists = models.ManyToManyField(Artist, blank=True)
     
     THUMBNAIL_SIZES = {
-        "min": (120, 120),
-        "mid": (720, 480),
+        'min': (120, 120),
+        'mid': (720, 480),
     }
     
     def get_thumbnail_filename(self, thumbnail_type):
         path, filename = os.path.split(unicode(self.img))
         file_root, file_ext = os.path.splitext(filename)
         yearmonth = path[-6:]
-        filedir = settings.MEDIA_ROOT + "pix/" + thumbnail_type + "/" + yearmonth
-        filename = filedir + "/" + file_root + ".png"
-        url = settings.MEDIA_URL + "pix/" + thumbnail_type + "/" + yearmonth + "/" + file_root + ".png"
+        filedir = settings.MEDIA_ROOT + 'pix/' + thumbnail_type + '/' + yearmonth
+        filename = filedir + '/' + file_root + '.png'
+        url = settings.MEDIA_URL + 'pix/' + thumbnail_type + '/' + yearmonth + '/' + file_root + '.png'
         return filedir, filename, url
     
     def generate_thumbnail(self, thumbnail_type, maxwidth, maxheight=None):
@@ -527,20 +527,20 @@ class Picture(models.Model):
         super(Picture, self).save(*args, **kwargs)
         self.film.number_of_pictures = self.film.picture_set.count()
         self.film.save()
-        self.generate_thumbnail("min", *self.THUMBNAIL_SIZES["min"])
-        self.generate_thumbnail("mid", *self.THUMBNAIL_SIZES["mid"])
+        self.generate_thumbnail('min', *self.THUMBNAIL_SIZES['min'])
+        self.generate_thumbnail('mid', *self.THUMBNAIL_SIZES['mid'])
     
     def __unicode__(self):
         return unicode(self.img)
     
     def get_display_url(self, thumbnail_type):
-        if thumbnail_type == "orig":
+        if thumbnail_type == 'orig':
             return settings.MEDIA_URL + unicode(self.img)
         _, _, url = self.get_thumbnail_filename(thumbnail_type)
         return url
     
     def get_width(self, thumbnail_type):
-        if thumbnail_type == "orig":
+        if thumbnail_type == 'orig':
             return self.width
         if self.width * self.THUMBNAIL_SIZES[thumbnail_type][1] > self.height * self.THUMBNAIL_SIZES[thumbnail_type][0]:
             return self.THUMBNAIL_SIZES[thumbnail_type][0]
@@ -548,7 +548,7 @@ class Picture(models.Model):
             return int(round(1.0 * self.width / self.height * self.THUMBNAIL_SIZES[thumbnail_type][1]))
     
     def get_height(self, thumbnail_type):
-        if thumbnail_type == "orig":
+        if thumbnail_type == 'orig':
             return self.height
         if self.width * self.THUMBNAIL_SIZES[thumbnail_type][1] > self.height * self.THUMBNAIL_SIZES[thumbnail_type][0]:
             return int(round(1.0 * self.height / self.width * self.THUMBNAIL_SIZES[thumbnail_type][0]))
@@ -557,22 +557,22 @@ class Picture(models.Model):
     
     # TODO: implement this in a better way (these are shortcuts for template)
     def get_display_url_min(self):
-        return self.get_display_url("min")
+        return self.get_display_url('min')
 
     def get_display_url_mid(self):
-        return self.get_display_url("mid")
+        return self.get_display_url('mid')
 
     def get_width_min(self):
-        return self.get_width("min")
+        return self.get_width('min')
 
     def get_width_mid(self):
-        return self.get_width("mid")
+        return self.get_width('mid')
 
     def get_height_min(self):
-        return self.get_height("min")
+        return self.get_height('min')
 
     def get_height_mid(self):
-        return self.get_height("mid")
+        return self.get_height('mid')
 
 
 @receiver(post_delete, sender=Picture)
@@ -584,13 +584,27 @@ def delete_picture(sender, instance, **kwargs):
         os.remove(settings.MEDIA_ROOT + unicode(instance.img))
     except OSError:
         pass
-    _, filename, _ = instance.get_thumbnail_filename("min")
+    _, filename, _ = instance.get_thumbnail_filename('min')
     try:
         os.remove(filename)
     except OSError:
         pass
-    _, filename, _ = instance.get_thumbnail_filename("mid")
+    _, filename, _ = instance.get_thumbnail_filename('mid')
     try:
         os.remove(filename)
     except OSError:
         pass
+
+
+class Message(models.Model):
+    sent_by = models.ForeignKey(KTUser, blank=True, null=True, related_name='sent_message', on_delete=models.SET_NULL)
+    sent_at = models.DateTimeField(auto_now_add=True)
+    content = models.TextField()
+    owned_by = models.ForeignKey(KTUser, blank=True, null=True, related_name='owned_message', on_delete=models.SET_NULL)
+    sent_to = models.ManyToManyField(KTUser, blank=True, null=True, related_name='received_message')
+    private = models.BooleanField(default=True)  # private = only one recipient
+
+    class Meta:
+        index_together = [
+            ['owned_by', 'sent_at'],
+        ]

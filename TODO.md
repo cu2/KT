@@ -21,11 +21,11 @@
 - sequels
 - pictures
 - users: full profile
+- private messages
 
 
 ## TODO
 
-- private messages
 - wishlists
 - tv
 - user toplists

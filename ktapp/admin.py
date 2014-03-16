@@ -1,25 +1,23 @@
 from django.contrib import admin
 from django.core.urlresolvers import reverse
 
-from ktapp.models import Film, Vote, Comment, Topic, Poll, Quote, Trivia, Review, \
-    Artist, FilmArtistRelationship, Keyword, FilmKeywordRelationship, Award, \
-    Link, LinkSite, Sequel, FilmSequelRelationship, Premier, PremierType, Picture
+from ktapp import models
 
 
 class FilmArtistInline(admin.TabularInline):
-    model = FilmArtistRelationship
+    model = models.FilmArtistRelationship
 
 
 class FilmKeywordInline(admin.TabularInline):
-    model = FilmKeywordRelationship
+    model = models.FilmKeywordRelationship
 
 
 class FilmSequelInline(admin.TabularInline):
-    model = FilmSequelRelationship
+    model = models.FilmSequelRelationship
 
 
 class FilmPremierInline(admin.TabularInline):
-    model = Premier
+    model = models.Premier
 
 
 class FilmAdmin(admin.ModelAdmin):
@@ -58,20 +56,23 @@ class PictureAdmin(admin.ModelAdmin):
     list_display = ['img', 'width', 'height', 'film', 'picture_type']
 
 
-admin.site.register(Film, FilmAdmin)
-# admin.site.register(Vote)
-admin.site.register(Comment, CommentAdmin)
-admin.site.register(Topic)
-admin.site.register(Poll)
-admin.site.register(Quote, FilmUserTextContentAdmin)
-admin.site.register(Trivia, FilmUserTextContentAdmin)
-admin.site.register(Review, ReviewAdmin)
-admin.site.register(Artist)
-admin.site.register(Keyword)
-admin.site.register(Award, AwardAdmin)
-admin.site.register(Link, LinkAdmin)
-admin.site.register(LinkSite)
-admin.site.register(Sequel)
-admin.site.register(Premier)
-admin.site.register(PremierType)
-admin.site.register(Picture, PictureAdmin)
+admin.site.register(models.Film, FilmAdmin)
+admin.site.register(models.Comment, CommentAdmin)
+admin.site.register(models.Topic)
+admin.site.register(models.Poll)
+admin.site.register(models.Quote, FilmUserTextContentAdmin)
+admin.site.register(models.Trivia, FilmUserTextContentAdmin)
+admin.site.register(models.Review, ReviewAdmin)
+admin.site.register(models.Artist)
+admin.site.register(models.Keyword)
+admin.site.register(models.Award, AwardAdmin)
+admin.site.register(models.Link, LinkAdmin)
+admin.site.register(models.LinkSite)
+admin.site.register(models.Sequel)
+admin.site.register(models.Premier)
+admin.site.register(models.PremierType)
+admin.site.register(models.Picture, PictureAdmin)
+
+# these probably shouldn't be in admin:
+# admin.site.register(models.Message)
+# admin.site.register(models.Vote)
