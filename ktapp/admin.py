@@ -56,10 +56,16 @@ class PictureAdmin(admin.ModelAdmin):
     list_display = ['img', 'width', 'height', 'film', 'picture_type']
 
 
+class PollChoiceAdmin(admin.ModelAdmin):
+    list_display = ['poll', 'serial_number', 'choice', 'number_of_votes']
+
+
 admin.site.register(models.Film, FilmAdmin)
 admin.site.register(models.Comment, CommentAdmin)
 admin.site.register(models.Topic)
 admin.site.register(models.Poll)
+admin.site.register(models.PollChoice, PollChoiceAdmin)
+admin.site.register(models.PollVote)
 admin.site.register(models.Quote, FilmUserTextContentAdmin)
 admin.site.register(models.Trivia, FilmUserTextContentAdmin)
 admin.site.register(models.Review, ReviewAdmin)

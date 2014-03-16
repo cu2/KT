@@ -25,14 +25,12 @@
 - wishlists
 - tv
 - user toplists
-
-
-## TODO
-
-- quotes: reference to actors (roles)
 - poll questions
+- poll choices
 - poll votes
 - poll comments
+
+## TODO
 
 
 
@@ -60,6 +58,7 @@
 - comments
 - keywords
 - quotes
+- quotes: reference to actors (roles)
 - ...
 - users: full profile
 

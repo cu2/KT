@@ -216,11 +216,57 @@ class Topic(models.Model):
 
 class Poll(models.Model):
     title = models.CharField(max_length=250)
-    # NOTE: this is just a placeholder now (for Comment)
-    # TODO: extend later with real content
-    
+    created_by = models.ForeignKey(KTUser, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    nominated_by = models.CharField(max_length=250, blank=True, null=True)
+    open_from = models.DateTimeField(blank=True, null=True)
+    open_until = models.DateTimeField(blank=True, null=True)
+    STATE_WAITING_FOR_APPROVAL = 'W'
+    STATE_APPROVED = 'A'
+    STATE_OPEN = 'O'
+    STATE_CLOSED = 'C'
+    STATES = [
+        (STATE_WAITING_FOR_APPROVAL, 'Waiting for approval'),
+        (STATE_APPROVED, 'Approved'),
+        (STATE_OPEN, 'Open'),
+        (STATE_CLOSED, 'Closed'),
+    ]
+    state = models.CharField(max_length=1, choices=STATES, default=STATE_WAITING_FOR_APPROVAL)
+    number_of_comments = models.PositiveIntegerField(default=0)
+    number_of_votes = models.PositiveIntegerField(default=0)
+    number_of_people = models.PositiveIntegerField(default=0)
+
     def __unicode__(self):
         return self.title
+
+
+class PollChoice(models.Model):
+    poll = models.ForeignKey(Poll)
+    choice = models.CharField(max_length=250)
+    serial_number = models.PositiveSmallIntegerField(default=0)  # TODO: auto number and renumber, when necessary
+    number_of_votes = models.PositiveIntegerField(default=0)
+
+    def __unicode__(self):
+        return self.choice
+
+    class Meta:
+        ordering = ['poll', 'serial_number']
+
+
+class PollVote(models.Model):
+    user = models.ForeignKey(KTUser, blank=True, null=True)
+    pollchoice = models.ForeignKey(PollChoice)
+
+    class Meta:
+        unique_together = ['user', 'pollchoice']
+
+    def __unicode__(self):
+        return u'{}:{}'.format(self.user, self.pollchoice)
+
+    def save(self, *args, **kwargs):
+        super(PollVote, self).save(*args, **kwargs)
+        self.pollchoice.number_of_votes = self.pollchoice.pollvote_set.count()
+        self.pollchoice.save()
 
 
 class FilmUserContent(models.Model):
