@@ -1,6 +1,8 @@
-# Django secret settings
 kt/settings_local.py
 media/
+.idea/
+*.iml
+
 
 ### Template from https://github.com/github/gitignore/blob/master/Python.gitignore
 *.py[cod]

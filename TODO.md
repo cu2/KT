@@ -34,35 +34,6 @@
 
 
 
-# API VIEWS
-
-## DONE
-
-- films
-- keywords
-- artists
-- sequels
-- users
-
-
-## TODO
-
-- films:
-    - comments
-    - roles
-    - keywords
-    - quotes
-    - ...
-- topics:
-    - comments
-- comments
-- keywords
-- quotes
-- quotes: reference to actors (roles)
-- ...
-- users: full profile
-
-
 # WEB VIEWS
 
 ## DONE
@@ -112,9 +83,6 @@
 
 
 ## TODO
-
-- class based (?)
-- refactor to use only API
 
 - users
     - user profile page (full)
@@ -177,6 +145,37 @@
 - vapiti
     - voting system
     - results pages
+
+
+
+# API VIEWS
+
+## DONE
+
+- films
+- keywords
+- artists
+- sequels
+
+
+## TODO
+
+- users (public view)
+- authentication
+- films:
+    - comments
+    - roles
+    - keywords
+    - quotes
+    - ...
+- topics:
+    - comments
+- comments
+- keywords
+- quotes
+- quotes: reference to actors (roles)
+- ...
+- users: full profile
 
 
 
