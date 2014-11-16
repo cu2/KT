@@ -26,6 +26,9 @@ class KTUser(AbstractUser):
     location = models.CharField(max_length=250, blank=True, null=True)
     year_of_birth = models.PositiveIntegerField(default=0)
 
+    def votes(self):
+        return self.vote_set.all()
+
 
 class Film(models.Model):
     orig_title = models.CharField(max_length=250)

@@ -156,11 +156,11 @@
 - keywords
 - artists
 - sequels
+- users (public view)
 
 
 ## TODO
 
-- users (public view)
 - authentication
 - films:
     - comments

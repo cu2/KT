@@ -4,10 +4,25 @@ from ktapp import models
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    votes_url = serializers.HyperlinkedIdentityField(view_name='ktuser-votes', lookup_field='pk')
+
     class Meta:
         model = models.KTUser
-        fields = ('url', 'username', 'password', 'gender', 'location', 'year_of_birth',)
-        write_only_fields = ('password',)
+        fields = ('url', 'username', 'votes_url')
+
+
+class UserVoteSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = models.Vote
+        fields = ('film', 'rating')
+
+
+class UserWithVotesSerializer(serializers.HyperlinkedModelSerializer):
+    votes = UserVoteSerializer(many=True, source='votes')
+
+    class Meta:
+        model = models.KTUser
+        fields = ('url', 'username', 'votes')
 
 
 class KeywordSerializer(serializers.HyperlinkedModelSerializer):
