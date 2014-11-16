@@ -187,5 +187,7 @@
 
 ## TODO
 
+- migrate database
+- migrate pictures
 - picture upload: artist selection
 - http://stackoverflow.com/questions/5530277/how-to-make-facebook-login-possible-in-django-app

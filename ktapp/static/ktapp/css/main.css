@@ -46,8 +46,12 @@
     -webkit-transition: height 0.3s;
     box-shadow: 0 3px 8px rgba(109,106,92,0.5);
 }
-#topmenu:hover {
-    height: 220px;
+#topmenu_toggler {
+    position: absolute;
+    left: 0; top: 0; z-index: 10;
+    width: 100%;
+    height: 32px;
+    cursor: pointer;
 }
 #topmenu_left {
     float: left;
