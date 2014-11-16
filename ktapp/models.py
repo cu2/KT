@@ -25,6 +25,7 @@ class KTUser(AbstractUser):
     gender = models.CharField(max_length=1, choices=GENDER_TYPES, default=GENDER_TYPE_UNKNOWN)
     location = models.CharField(max_length=250, blank=True, null=True)
     year_of_birth = models.PositiveIntegerField(default=0)
+    is_admin = models.BooleanField(default=False)
 
     def votes(self):
         return self.vote_set.all()

@@ -1,7 +1,10 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import Group
 from django.core.urlresolvers import reverse
 
 from ktapp import models
+from ktapp import forms as kt_forms
 
 
 class FilmArtistInline(admin.TabularInline):
@@ -60,6 +63,29 @@ class PollChoiceAdmin(admin.ModelAdmin):
     list_display = ['poll', 'serial_number', 'choice', 'number_of_votes']
 
 
+class KTUserAdmin(UserAdmin):
+    form = kt_forms.UserChangeForm
+    add_form = kt_forms.UserCreationForm
+
+    list_display = ('username', 'email', 'gender', 'location', 'year_of_birth', 'is_admin')
+    list_filter = ('is_admin',)
+    fieldsets = (
+        (None, {'fields': ('username', 'email', 'password')}),
+        ('Personal info', {'fields': ('gender', 'location', 'year_of_birth')}),
+        ('Permissions', {'fields': ('is_admin',)}),
+        ('Important dates', {'fields': ('last_login',)}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'gender', 'location', 'year_of_birth', 'password1', 'password2')
+        }),
+    )
+    search_fields = ('username', 'email')
+    ordering = ('username',)
+    filter_horizontal = ()
+
+
 admin.site.register(models.Film, FilmAdmin)
 admin.site.register(models.Comment, CommentAdmin)
 admin.site.register(models.Topic)
@@ -83,6 +109,9 @@ admin.site.register(models.TVChannel)
 admin.site.register(models.TVFilm)
 admin.site.register(models.UserToplist)
 admin.site.register(models.UserToplistItem)
+
+admin.site.register(models.KTUser, KTUserAdmin)
+admin.site.unregister(Group)
 
 # these probably shouldn't be in admin:
 # admin.site.register(models.Message)

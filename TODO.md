@@ -42,6 +42,7 @@
     - login/logout
     - registration
     - user profile page (minimal)
+    - additional info: sex, year-of-birth, location
 
 - films
     - basic data
@@ -86,11 +87,11 @@
 
 - users
     - user profile page (full)
-    - additional info: sex, year-of-birth, location
     - core membership
     - favourite users
     - modal login/signup
     - password reset
+    - hungarian signup form
 
 - private messages
 
@@ -103,6 +104,7 @@
     - time-rating chart for directors
 
 - comments
+    - cache rating
     - reply to
     - move to (moved from)
     - bb code
