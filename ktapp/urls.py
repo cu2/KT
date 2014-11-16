@@ -16,7 +16,8 @@ router.register(r'keywords', api_views.KeywordViewSet)
 router.register(r'artists', api_views.ArtistViewSet)
 router.register(r'sequels', api_views.SequelViewSet)
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 )
@@ -24,7 +25,8 @@ urlpatterns = patterns('',
 
 # Web urls (should be Hungarian SEO compliant)
 
-urlpatterns += patterns('',
+urlpatterns += patterns(
+    '',
     url(r'^$', web_views.index, name='index'),
 
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/velemenyek$', web_views.film_comments, name='film_comments'),
