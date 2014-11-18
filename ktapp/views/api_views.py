@@ -23,6 +23,9 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class FilmViewSet(viewsets.ReadOnlyModelViewSet):
     model = models.Film
     serializer_class = serializers.FilmSerializer
+    paginate_by = 10
+    paginate_by_param = 'page_size'
+    max_paginate_by = 100
 
 
 class KeywordViewSet(viewsets.ReadOnlyModelViewSet):
