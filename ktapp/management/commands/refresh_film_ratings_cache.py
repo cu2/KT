@@ -4,7 +4,7 @@ from django.db import connection, transaction
 
 class Command(BaseCommand):
     help = "Refresh film ratings cache"
-    
+
     def handle(self, *args, **options):  # TODO: filter down to core users
         cursor = connection.cursor()
         sql = """

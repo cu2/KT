@@ -13,11 +13,10 @@ from ktapp import forms as kt_forms
 
 
 def index(request):
-    film_list = models.Film.objects.all()
+    film_list = models.Film.objects.all()[:16]
     premier_list = []
-    for _ in range(6):
-        for film in film_list:
-            premier_list.append(film)
+    for film in film_list:
+        premier_list.append(film)
     return render(request, "ktapp/index.html", {
         "film_list": film_list,
         "premier_list": premier_list,
