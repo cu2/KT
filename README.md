@@ -1,6 +1,6 @@
 # Kritikus Tömeg
 
-This project aims to rewrite Kritikus Tömeg from scratch. Readable code + open source = community driven development (hopefully).
+This project aims to rewrite [Kritikus Tömeg](http://kritikustomeg.org/) from scratch. Readable code + open source = community driven development (hopefully).
 
 
 ## Developer guide
@@ -33,15 +33,15 @@ See below.
 
 Whenever you change `models.py`, don't forget to create a migration:
 
-    python manage.py schemamigration ktapp --auto
+    python manage.py makemigrations
 
 and apply it:
 
-    python manage.py migrate ktapp
+    python manage.py migrate
 
 This way, not only your database schema will follow the change, but others can easily follow.
 
-For more details [read this tutorial](http://south.readthedocs.org/en/latest/tutorial/part1.html).
+For more details read [the documentation of Django Migrations](https://docs.djangoproject.com/en/1.7/topics/migrations/).
 
 
 
