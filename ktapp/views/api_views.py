@@ -7,7 +7,7 @@ from ktapp import serializers
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    model = models.KTUser
+    queryset = models.KTUser.objects.all()
     serializer_class = serializers.UserSerializer
 
     @detail_route(methods=['get'])
@@ -21,7 +21,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class FilmViewSet(viewsets.ReadOnlyModelViewSet):
-    model = models.Film
+    queryset = models.Film.objects.all()
     serializer_class = serializers.FilmSerializer
     paginate_by = 10
     paginate_by_param = 'page_size'
@@ -29,15 +29,15 @@ class FilmViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class KeywordViewSet(viewsets.ReadOnlyModelViewSet):
-    model = models.Keyword
+    queryset = models.Keyword.objects.all()
     serializer_class = serializers.KeywordSerializer
 
 
 class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
-    model = models.Artist
+    queryset = models.Artist.objects.all()
     serializer_class = serializers.ArtistSerializer
 
 
 class SequelViewSet(viewsets.ReadOnlyModelViewSet):
-    model = models.Sequel
+    queryset = models.Sequel.objects.all()
     serializer_class = serializers.SequelSerializer

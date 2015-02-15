@@ -18,7 +18,7 @@ class UserVoteSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class UserWithVotesSerializer(serializers.HyperlinkedModelSerializer):
-    votes = UserVoteSerializer(many=True, source='votes')
+    votes = UserVoteSerializer(many=True)
 
     class Meta:
         model = models.KTUser
@@ -59,12 +59,10 @@ class ShortSequelSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class FilmSerializer(serializers.HyperlinkedModelSerializer):
-    directors = ShortArtistSerializer(many=True, source='directors')
-    countries = ShortKeywordSerializer(many=True, source='countries')
-    genres = ShortKeywordSerializer(many=True, source='genres')
-    sequels = ShortSequelSerializer(many=True, source='sequels')
-    num_rating = serializers.IntegerField(source='num_rating')
-    avg_rating = serializers.IntegerField(source='avg_rating')
+    directors = ShortArtistSerializer(many=True)
+    countries = ShortKeywordSerializer(many=True)
+    genres = ShortKeywordSerializer(many=True)
+    sequels = ShortSequelSerializer(many=True)
 
     class Meta:
         model = models.Film

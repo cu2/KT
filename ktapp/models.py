@@ -519,14 +519,15 @@ class FilmSequelRelationship(models.Model):
         ordering = ['serial_number']
 
 
-class Picture(models.Model):
+def get_picture_upload_name(instance, filename):
+    file_root, file_ext = os.path.splitext(filename)
+    yearmonth = datetime.now().strftime('%Y%m')
+    random_chunk = ''.join((random.choice(string.ascii_lowercase) for _ in range(8)))
+    return ''.join(['pix/orig/', yearmonth,
+                    '/p_', unicode(instance.film.id), '_', random_chunk, file_ext])
 
-    def get_picture_upload_name(self, filename):
-        file_root, file_ext = os.path.splitext(filename)
-        yearmonth = datetime.now().strftime('%Y%m')
-        random_chunk = ''.join((random.choice(string.ascii_lowercase) for _ in range(8)))
-        return ''.join(['pix/orig/', yearmonth,
-                        '/p_', unicode(self.film.id), '_', random_chunk, file_ext])
+
+class Picture(models.Model):
 
     img = models.ImageField(upload_to=get_picture_upload_name, height_field='height', width_field='width')
     width = models.PositiveIntegerField(default=0, editable=False)

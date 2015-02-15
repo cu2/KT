@@ -126,15 +126,12 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-#     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.admin',
-    'django.contrib.admindocs',
-    'south',
     'rest_framework',
     'ktapp',
 )
@@ -171,3 +168,5 @@ LOGGING = {
 }
 
 AUTH_USER_MODEL = 'ktapp.KTUser'
+
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
