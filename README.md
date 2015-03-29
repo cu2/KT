@@ -13,7 +13,7 @@ For Hungarian communication and coordination use [this topic](http://kritikustom
 
 ### TODO
 
-See TODO.md
+See [issues on GitHub](https://github.com/cu2/KT/issues).
 
 ### Coding style
 
