@@ -23,7 +23,7 @@
                     <li><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
                     {% if user.is_authenticated %}
                     <li>[<a href="{% url 'user_profile_own' %}">{{ user.username }}</a>]</li>
-                    {% if user.is_admin %}
+                    {% if user.is_staff %}
                     <li>(<a href="/admin/">szerk</a>)</li>
                     {% endif %}
                     <li>Beállítások</li>

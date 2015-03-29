@@ -5,7 +5,8 @@ from datetime import datetime
 from PIL import Image
 
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
+from django.core.mail import send_mail
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.template.defaultfilters import slugify
@@ -13,7 +14,12 @@ from django.template.defaultfilters import slugify
 from kt import settings
 
 
-class KTUser(AbstractUser):
+class KTUser(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(max_length=64, unique=True)
+    email = models.EmailField(blank=True, unique=True)
+    is_staff = models.BooleanField(default=False)  # admin
+    is_active = models.BooleanField(default=True)  # delete
+    date_joined = models.DateTimeField(auto_now_add=True)
     GENDER_TYPE_MALE = 'M'
     GENDER_TYPE_FEMALE = 'F'
     GENDER_TYPE_UNKNOWN = 'U'
@@ -25,7 +31,22 @@ class KTUser(AbstractUser):
     gender = models.CharField(max_length=1, choices=GENDER_TYPES, default=GENDER_TYPE_UNKNOWN)
     location = models.CharField(max_length=250, blank=True, null=True)
     year_of_birth = models.PositiveIntegerField(default=0)
-    is_admin = models.BooleanField(default=False)
+    public_gender = models.BooleanField(default=False)
+    public_location = models.BooleanField(default=False)
+    public_year_of_birth = models.BooleanField(default=False)
+
+    objects = UserManager()
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
+
+    def get_full_name(self):
+        return self.username
+
+    def get_short_name(self):
+        return self.username
+
+    def email_user(self, subject, message, from_email=None, **kwargs):
+        send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def votes(self):
         return self.vote_set.all()
@@ -200,7 +221,10 @@ def delete_comment(sender, instance, **kwargs):
     else:
         return
     domain.number_of_comments = domain.comment_set.count()
-    domain.last_comment = domain.comment_set.latest()
+    if domain.number_of_comments > 0:
+        domain.last_comment = domain.comment_set.latest()
+    else:
+        domain.last_comment = None
     domain.save()
 
 
@@ -465,7 +489,7 @@ class Keyword(models.Model):
         ordering = ['keyword_type', 'name']
 
 
-class FilmKeywordRelationship(models.Model):
+class FilmKeywordRelationship(models.Model):  # TODO: remove autoinc id, primary key = (film, keyword)
     film = models.ForeignKey(Film)
     keyword = models.ForeignKey(Keyword)
 

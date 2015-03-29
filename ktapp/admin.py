@@ -67,12 +67,12 @@ class KTUserAdmin(UserAdmin):
     form = kt_forms.UserChangeForm
     add_form = kt_forms.UserCreationForm
 
-    list_display = ('username', 'email', 'gender', 'location', 'year_of_birth', 'is_admin')
-    list_filter = ('is_admin',)
+    list_display = ('username', 'email', 'gender', 'location', 'year_of_birth', 'is_staff')
+    list_filter = ('is_staff',)
     fieldsets = (
         (None, {'fields': ('username', 'email', 'password')}),
         ('Personal info', {'fields': ('gender', 'location', 'year_of_birth')}),
-        ('Permissions', {'fields': ('is_admin',)}),
+        ('Permissions', {'fields': ('is_staff',)}),
         ('Important dates', {'fields': ('last_login',)}),
     )
     add_fieldsets = (

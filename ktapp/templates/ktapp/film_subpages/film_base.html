@@ -31,7 +31,7 @@
         {% if film.num_rating %}
         <div id="film_rating">
             <div id="film_rating_num">{{ film.num_rating }} szavazat<br />átlaga:</div>
-            <div id="film_rating_avg">{{ film.avg_rating|floatformat:2 }}</div>
+            <div id="film_rating_avg">{{ film.avg_rating|floatformat:1 }}</div>
         </div>
         {% endif %}
         <div id="film_misc_info">
@@ -41,7 +41,7 @@
                     <span>{% if film.porthu_link %}<a href="http://www.port.hu/pls/fi/films.film_page?i_where=2&i_film_id={{ film.porthu_link }}&i_city_id=-1&i_county_id=1">PORT.hu</a>{% endif %}</span>
                 </li>
                 <li>
-                    <span>{% if film.imdb_link %}<a href="http://uk.rottentomatoes.com/alias?type=imdbid&s={{ film.imdb_link|slice:'2:' }}">RT</a>{% endif %}</span>
+                    <span>{% if film.imdb_link %}<a href="http://www.rottentomatoes.com/alias?type=imdbid&s={{ film.imdb_link|slice:'2:' }}">RT</a>{% endif %}</span>
                     <span><a href="http://www.youtube.com/results?search_query={{ film.orig_title|urlencode }}+trailer&search=Search">YouTube</a></span>
                 </li>
                 <li>
