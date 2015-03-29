@@ -1,9 +1,35 @@
 {% extends "ktapp/layout.html" %}
+{% load kt_extras %}
 
 {% block title %}{{ selected_user.username }} - Kritikus Tömeg{% endblock %}
 
 {% block header %}<h1>{{ selected_user.username }}</h1>{% endblock %}
 
 {% block main %}
-    <p>Regisztrált: {{ selected_user.date_joined|date:"Y-m-d H:i:s" }}</p>
+    <h2>Alap adatai</h2>
+    <p>
+        Neme: {% if selected_user.public_gender %}{{ selected_user.gender }}{% else %}?{% endif %}<br />
+        Születési éve: {% if selected_user.public_location %}{{ selected_user.location }}{% else %}?{% endif %}<br />
+        Lakhelye: {% if selected_user.public_year_of_birth %}{{ selected_user.year_of_birth }}{% else %}?{% endif %}<br />
+        Regisztrált: {{ selected_user.date_joined|date:"Y. F d." }}
+    </p>
+
+    <h2>Utolsó szavazatai</h2>
+    <table>
+        <tr class="header_tr">
+            <th>Film</th>
+            <th>Szavazat</th>
+            <th>Mikor</th>
+            <th>Átlag</th>
+        </tr>
+    {% for vote in last_votes %}
+        <tr class="{% cycle '' 'odd' %}">
+            <td>{{ vote.film|film_url_html }}</td>
+            <td class="center">{{ vote.rating }}</td>
+            <td class="center">{{ vote.when|date:"Y-m-d" }}</td>
+            <td class="center">{{ vote.film|film_rating_html }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
 {% endblock %}

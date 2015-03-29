@@ -37,7 +37,7 @@
         <div id="film_misc_info">
             <ul>
                 <li>
-                    <span>{% if film.imdb_link %}<a href="http://www.imdb.com/title/{{ film.imdb_link }}/">IMDb</a> {{ film.imdb_real_rating|floatformat:1 }}{% endif %}</span>
+                    <span>{% if film.imdb_link %}<a href="http://www.imdb.com/title/{{ film.imdb_link }}/">IMDb</a>{% if film.imdb_real_rating %} {{ film.imdb_real_rating|floatformat:1 }}{% endif %}{% endif %}</span>
                     <span>{% if film.porthu_link %}<a href="http://www.port.hu/pls/fi/films.film_page?i_where=2&i_film_id={{ film.porthu_link }}&i_city_id=-1&i_county_id=1">PORT.hu</a>{% endif %}</span>
                 </li>
                 <li>

@@ -125,7 +125,10 @@ class Film(models.Model):
         return self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE)
 
     def imdb_real_rating(self):
-        return self.imdb_rating / 10.0
+        try:
+            return self.imdb_rating / 10.0
+        except TypeError:
+            return None
 
     def all_sequels(self):
         return self.sequels.all()

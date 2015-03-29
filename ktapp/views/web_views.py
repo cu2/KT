@@ -407,7 +407,8 @@ def registration(request):
 def user_profile(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
     if selected_user == request.user:
-        return HttpResponseRedirect(reverse("user_profile_own"))
-    return render(request, "ktapp/user_profile.html", {
-        "selected_user": selected_user,
+        return HttpResponseRedirect(reverse('user_profile_own'))
+    return render(request, 'ktapp/user_profile.html', {
+        'selected_user': selected_user,
+        'last_votes': selected_user.votes().order_by('-when')[:20],
     })
