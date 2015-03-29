@@ -489,12 +489,15 @@ class Keyword(models.Model):
         ordering = ['keyword_type', 'name']
 
 
-class FilmKeywordRelationship(models.Model):  # TODO: remove autoinc id, primary key = (film, keyword)
+class FilmKeywordRelationship(models.Model):
     film = models.ForeignKey(Film)
     keyword = models.ForeignKey(Keyword)
 
     def __unicode__(self):
         return unicode(self.film) + '/' + unicode(self.keyword)
+
+    class Meta:
+        unique_together = ['film', 'keyword']
 
     def save(self, *args, **kwargs):
         super(FilmKeywordRelationship, self).save(*args, **kwargs)
