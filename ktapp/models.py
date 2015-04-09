@@ -175,7 +175,10 @@ class Vote(models.Model):
 
 @receiver(post_delete, sender=Vote)
 def delete_vote(sender, instance, **kwargs):
-    instance.film.comment_set.filter(created_by=instance.user).update(rating=None)
+    try:
+        instance.film.comment_set.filter(created_by=instance.user).update(rating=None)
+    except Film.DoesNotExist:
+        pass
 
 
 class Comment(models.Model):
