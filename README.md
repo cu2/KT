@@ -1,6 +1,6 @@
 # Kritikus Tömeg
 
-This project aims to rewrite [Kritikus Tömeg](http://kritikustomeg.org/) from scratch. Readable code + open source = community driven development (hopefully).
+This project aims to rewrite [Kritikus Tömeg](http://kritikustomeg.org/), a Hungarian movie site, database, recommendation engine from scratch. Partly to have readable, open source code and community driven development, mostly to be able to rethink the whole idea (see [UX docs](docs/ux_plan.md)).
 
 
 ## Developer guide
