@@ -117,7 +117,7 @@
     - What other roles (s)he had? Where did I see him/her?
     - Who directed X?
     - What else did (s)he direct? What have I seen?
-    - Who won the Oscards in X?
+    - Who won the Oscars in X?
     - What exactly did Gandalf say to Pippin about death?
 - If yes:
     - Which ones?
