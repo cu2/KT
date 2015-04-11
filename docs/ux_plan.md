@@ -7,17 +7,15 @@ Purpose: who and how uses/could use KT?
 
 - Interviews
     - what to ask? see [Questions for exploring personas and use cases](persona_interview_questions.md)
-    - Skpye? live?
+    - Skype? Hangouts? live?
     - notes? record it?
     - who to ask?
         - KT users
-            - active on forum (generally)
-            - actively comments on films
-            - lot of votes per week
-            - regular votes, but no comments
-            - 1 vote/week
-            - 1 vote/month
-            - never votes or comments, just reads stuff on KT regularly
+            - lot of comments and votes
+            - lot of votes, few comments
+            - lot of comments, few votes
+            - just listens
+            - ex active user
         - new users
             - friends, family, colleagues
             - relevant FB groups
