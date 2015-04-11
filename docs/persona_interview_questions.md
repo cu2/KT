@@ -1,5 +1,8 @@
 # Questions for exploring personas and use cases
 
+- When was the interview?
+- How long did it take?
+
 
 ## Basic demographic data
 
