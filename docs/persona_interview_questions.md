@@ -126,3 +126,9 @@
     - Do you usually succeed in getting an answer?
     - If yes: how? (getting an answer vs trying to get one)
     - If not: why not? what (else) do you do?
+
+
+## Retro
+
+- Is there anything else you would like to add?
+- How would you improve this interview? What else would you ask? What would you skip?
