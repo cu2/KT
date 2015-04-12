@@ -115,6 +115,7 @@
     - Who was that actor who played X in Y?
     - How does (s)he look like?
     - What other roles (s)he had? Where did I see him/her?
+    - What's his/her bio?
     - Who directed X?
     - What else did (s)he direct? What have I seen?
     - Who won the Oscars in X?
