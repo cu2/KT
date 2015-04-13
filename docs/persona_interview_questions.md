@@ -31,6 +31,7 @@
     - download
     - dvd renting
     - dvd/blueray collection
+    - is there some special media not listed?
 
 
 ## Per media
