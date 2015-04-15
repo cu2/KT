@@ -5,7 +5,7 @@
 
 Purpose: who and how uses/could use KT?
 
-- Interviews
+- Interviews (see [here](interviews/))
     - what to ask? see [Questions for exploring personas and use cases](persona_interview_questions.md)
     - Skype? Hangouts? live?
     - notes? record it?
@@ -19,10 +19,10 @@ Purpose: who and how uses/could use KT?
         - new users
             - friends, family, colleagues
             - relevant FB groups
-- Questionnaire
+- Survey
     - only questions that yield answers I can learn from
     - only questions that yield answers that help building a better KT
-    - predefined choices where possible?
+    - predefined choices where possible? "on a scale of 1-7 how much do you agree with the following?"
     - for KT users
         - who to ask?
             - everyone?
@@ -33,7 +33,7 @@ Purpose: who and how uses/could use KT?
             - relevant FB groups
         - what to ask?
 - Personas
-- Use cases
+- Use cases (see possible use cases [here](use_cases.md))
 
 
 ## Core functions
@@ -51,7 +51,7 @@ Purpose: who and how uses/could use KT?
             - trailers
         - content editing:
             - by admin
-            - crowdsourcing
+            - by crowdsourcing
     - other:
         - content:
             - awards
@@ -66,6 +66,7 @@ Purpose: who and how uses/could use KT?
 
 - pages and functions
 - navigation
+- usability tests for current KT and competitors?
 
 
 ## Wireframes
@@ -73,8 +74,6 @@ Purpose: who and how uses/could use KT?
 
 ## Usability testing
 
-- competitors?
-- current KT?
 - typical tasks
     - sign up, login, logout, change password
     - look at home page and tell what the site is about
