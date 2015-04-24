@@ -1,7 +1,7 @@
 # KT user #1
 
 - When was the interview? 2015-04-18
-- How long did it take? 10:43-12:11
+- How long did it take? 88 minutes
 
 
 ## Basic demographic data
