@@ -3,12 +3,28 @@
 
 ## Personas and use cases
 
-Purpose: who and how uses/could use KT?
+Purpose: to answer these questions:
 
+- who and how uses/could use KT?
+- what values KT provides for and what emotions it generates in users?
+
+Method: create personas and use cases
+
+- personas should be human, not just sets of properties
+- use cases should be stories/parts of stories, not just sets of features
+
+The more preconceptions you have for the interviews and/or survey, the more info you'll get. But the more you'll get, the more and better preconceptions you'll get. So iterate.
+
+- First version of personas and use cases
+    - personas: I had none
+    - [use cases](use_cases_v1.md)
 - Interviews (see [here](interviews/))
     - what to ask? see [Questions for exploring personas and use cases](persona_interview_questions.md)
-    - Skype? Hangouts? live?
+    - Skype? Hangouts? live? email?
+        - email: it's easy to do, but hard to interpret (you can't ask back a lot of times) and control (the subject can easily misunderstand what you asked, and you can't correct her on the spot)
+        - live: it can be scary and frustrating (if you have social skill issues), but you can get more out of it, especially if you're able to jump between the questions
     - notes? record it?
+        - probably it's easier to let the conversation flow, if you don't have to take notes, just record it (but I never tried)
     - who to ask?
         - KT users
             - lot of comments and votes
@@ -19,10 +35,13 @@ Purpose: who and how uses/could use KT?
         - new users
             - friends, family, colleagues
             - relevant FB groups
+- Second version of personas and use cases
+    - personas
+    - use cases
 - Survey
     - only questions that yield answers I can learn from
     - only questions that yield answers that help building a better KT
-    - predefined choices where possible? "on a scale of 1-7 how much do you agree with the following?"
+    - predefined choices where possible: Likert scale
     - for KT users
         - who to ask?
             - everyone?
@@ -32,8 +51,9 @@ Purpose: who and how uses/could use KT?
             - friends, family, colleagues
             - relevant FB groups
         - what to ask?
-- Personas
-- Use cases (see possible use cases [here](use_cases.md))
+- Third version of personas and use cases
+    - personas
+    - use cases
 
 
 ## Core functions
