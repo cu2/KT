@@ -1,8 +1,5 @@
 # Use cases
 
-
-## Possible use cases
-
 General aspects for choosing what to watch:
 
 - filter by mood, style, genre
@@ -64,6 +61,3 @@ General aspects for choosing what to watch:
 - What else did (s)he direct? What have I seen?
 - Who won the Oscards in X?
 - What exactly did Gandalf say to Pippin about death?
-
-
-## Actual use cases from interviews
