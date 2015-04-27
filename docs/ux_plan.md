@@ -10,8 +10,8 @@ Purpose: to answer these questions:
 
 Method: create personas and use cases
 
-- personas should be human, not just sets of properties
-- use cases should be stories/parts of stories, not just sets of features
+- persona should be a human, not just a set of properties
+- use case should be a story/part of a story, not just a set of features
 
 The more preconceptions you have for the interviews and/or survey, the more info you'll get. But the more you'll get, the more and better preconceptions you'll get. So iterate.
 
@@ -36,12 +36,12 @@ The more preconceptions you have for the interviews and/or survey, the more info
             - friends, family, colleagues
             - relevant FB groups
 - Second version of personas and use cases
-    - personas
+    - [personas](personas_v2.md)
     - use cases
 - Survey
     - only questions that yield answers I can learn from
     - only questions that yield answers that help building a better KT
-    - predefined choices where possible: Likert scale
+    - predefined choices where possible: [Likert scale](http://en.wikipedia.org/wiki/Likert_scale)
     - for KT users
         - who to ask?
             - everyone?
