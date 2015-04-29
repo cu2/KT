@@ -37,7 +37,7 @@ The more preconceptions you have for the interviews and/or survey, the more info
             - relevant FB groups
 - Second version of personas and use cases
     - [personas](personas_v2.md)
-    - use cases
+    - [use cases](use_cases_v2.md)
 - Survey
     - only questions that yield answers I can learn from
     - only questions that yield answers that help building a better KT
