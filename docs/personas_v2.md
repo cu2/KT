@@ -2,6 +2,9 @@
 
 Personas are named after film directors to be more memorable and easier to identify with.
 
+Related documents:
+    - [use cases](use_cases_v2.md)
+    - [persona matrix](https://docs.google.com/spreadsheets/d/1MQLYhMIrHgpRXV3eS9elp-Ncf2NSJ1lLInfGBwpTNyc/edit?usp=sharing)
 
 ## Leni the up-and-coming
 

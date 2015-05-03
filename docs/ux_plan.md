@@ -38,6 +38,9 @@ The more preconceptions you have for the interviews and/or survey, the more info
 - Second version of personas and use cases
     - [personas](personas_v2.md)
     - [use cases](use_cases_v2.md)
+    - [persona matrix](https://docs.google.com/spreadsheets/d/1MQLYhMIrHgpRXV3eS9elp-Ncf2NSJ1lLInfGBwpTNyc/edit?usp=sharing)
+- Second round of interviews
+    - [questions](persona_interview_questions_v2.md)
 - Survey
     - only questions that yield answers I can learn from
     - only questions that yield answers that help building a better KT

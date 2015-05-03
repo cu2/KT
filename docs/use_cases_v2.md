@@ -1,5 +1,8 @@
 # Use cases
 
+Related documents:
+    - [personas](personas_v2.md)
+    - [persona matrix](https://docs.google.com/spreadsheets/d/1MQLYhMIrHgpRXV3eS9elp-Ncf2NSJ1lLInfGBwpTNyc/edit?usp=sharing)
 
 ## Use cases by personas
 
