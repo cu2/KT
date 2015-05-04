@@ -13,6 +13,12 @@
 - occupation
 
 
+## Tech literacy
+
+- How often do you use the internet and what for?
+- What mobile apps do you use and how often?
+
+
 ## Watching films
 
 - What have you seen lately? In the last week/month?
@@ -22,6 +28,9 @@
     - you like
     - you hate
 - Why do you like them? e.g. entertainment, escaping reality, intellectual, emotional, job/studies
+    - give examples for each
+- Why do you hate them?
+    - give examples for each
 - How do you choose films you watch?
     - actively search/explore? or just an article/facebook post/comment by friend comes by?
     - popularity, mood, cinema program, director, genre, period, actors
