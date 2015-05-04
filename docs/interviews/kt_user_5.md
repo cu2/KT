@@ -4,7 +4,7 @@
 > 3rd May 2015
 
 - How long did it take?
-> 
+> 1.5 hours
 
 ## Basic demographic data
 
@@ -76,7 +76,7 @@
 > I used to watch 60-70 films per year, now that number has fallen to 30-40 - mostly because of household chores and family duties, and we watch more TV series (8-10 seasons per year)
 
 - How much money do you spend on? For what? e.g. cinema, buying dvds, books
-> 5,000 HUF per month on cinema
+> 2,500 HUF per month on cinema
 > I would pay for netflix or hulu if they were available in Hungary
 
 ## Websites/apps
