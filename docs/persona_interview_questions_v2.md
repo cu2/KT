@@ -11,6 +11,7 @@
 - location
 - education
 - occupation
+- family status
 
 
 ## Tech literacy
@@ -27,7 +28,8 @@
     - favourite
     - you like
     - you hate
-- Why do you like them? e.g. entertainment, escaping reality, intellectual, emotional, job/studies
+- Why do you like these films?
+- Why do you like films in general? e.g. entertainment, escaping reality, intellectual, emotional, job/studies
     - give examples for each
 - Why do you hate them?
     - give examples for each
@@ -71,9 +73,9 @@
 - How? in person, on social media, on blogs, websites...
 - Why do you like talking, discussing?
 
-- Do you like sharing the films you saw?
+- Do you like sharing your film experiences?
 - With whom? In what format? e.g. rating, comment, long rant
-- Why do you like to share it?
+- Why do you like to share them?
 
 - Do you go to film clubs, thematic days, festivals?
 - What kind?
