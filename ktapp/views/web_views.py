@@ -410,5 +410,5 @@ def user_profile(request, id, name_slug):
         return HttpResponseRedirect(reverse('user_profile_own'))
     return render(request, 'ktapp/user_profile.html', {
         'selected_user': selected_user,
-        'last_votes': selected_user.votes().order_by('-when')[:20],
+        'last_votes': selected_user.votes().order_by('-when', '-id')[:20],
     })

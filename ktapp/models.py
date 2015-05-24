@@ -160,7 +160,7 @@ class Vote(models.Model):
     film = models.ForeignKey(Film)
     user = models.ForeignKey(KTUser)
     rating = models.PositiveSmallIntegerField()
-    when = models.DateTimeField(auto_now=True, auto_now_add=True)
+    when = models.DateTimeField(auto_now=True, auto_now_add=True, null=True)
 
     def __unicode__(self):
         return self.film.orig_title + ' + ' + self.user.username + ' = ' + unicode(self.rating)
