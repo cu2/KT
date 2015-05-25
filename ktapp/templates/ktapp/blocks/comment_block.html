@@ -19,7 +19,9 @@
             </h3>
         </td>
         <td class="comment_content_td">
+            {% autoescape off %}
             <p>{{ comment.content|linebreaksbr }}</p>
+            {% endautoescape %}
         </td>
     </tr>
 </table>
