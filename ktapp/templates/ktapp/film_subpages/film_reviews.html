@@ -11,7 +11,7 @@
                     <p><a href="{% url 'film_review' film.id film.film_slug r.id %}">Tovább...</a></p>
                 </div>
                 <div class="film_addon_author">
-                    <p>{{ r.created_at|date:"Y-m-d" }} <a href="{% url 'user_profile' r.created_by.id r.created_by.username|slugify %}">{{ r.created_by }}</a></p>
+                    <a href="{% url 'user_profile' r.created_by.id r.created_by.username|slugify %}">{{ r.created_by }}</a>, {{ r.created_at|date:"Y-m-d" }}
                 </div>
             </div>
         {% endfor %}
