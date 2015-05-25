@@ -316,14 +316,18 @@ def new_picture(request):
 
 def artist(request, id, name_slug):
     artist = get_object_or_404(models.Artist, pk=id)
-    directions = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR)
+    directions = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR).order_by('-film__year', 'film__orig_title')
     if directions:
         director_votes = directions.aggregate(nr1=Sum('film__number_of_ratings_1'),
                                               nr2=Sum('film__number_of_ratings_2'),
                                               nr3=Sum('film__number_of_ratings_3'),
                                               nr4=Sum('film__number_of_ratings_4'),
                                               nr5=Sum('film__number_of_ratings_5'))
-        director_vote_count = director_votes.get("nr1", 0) + director_votes.get("nr2", 0) + director_votes.get("nr3", 0) + director_votes.get("nr4", 0) + director_votes.get("nr5", 0)
+        director_vote_count = director_votes.get('nr1', 0) + director_votes.get('nr2', 0) + director_votes.get('nr3', 0) + director_votes.get('nr4', 0) + director_votes.get('nr5', 0)
+        if director_vote_count:
+            director_vote_avg = 1.0 * (director_votes.get('nr1', 0) + 2*director_votes.get('nr2', 0) + 3*director_votes.get('nr3', 0) + 4*director_votes.get('nr4', 0) + 5*director_votes.get('nr5', 0)) / director_vote_count
+        else:
+            director_vote_avg = 0
     else:
         director_vote_count = 0
     roles = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR)
@@ -333,7 +337,11 @@ def artist(request, id, name_slug):
                                       nr3=Sum('film__number_of_ratings_3'),
                                       nr4=Sum('film__number_of_ratings_4'),
                                       nr5=Sum('film__number_of_ratings_5'))
-        actor_vote_count = actor_votes.get("nr1", 0) + actor_votes.get("nr2", 0) + actor_votes.get("nr3", 0) + actor_votes.get("nr4", 0) + actor_votes.get("nr5", 0)
+        actor_vote_count = actor_votes.get('nr1', 0) + actor_votes.get('nr2', 0) + actor_votes.get('nr3', 0) + actor_votes.get('nr4', 0) + actor_votes.get('nr5', 0)
+        if actor_vote_count:
+            actor_vote_avg = 1.0 * (actor_votes.get('nr1', 0) + 2*actor_votes.get('nr2', 0) + 3*actor_votes.get('nr3', 0) + 4*actor_votes.get('nr4', 0) + 5*actor_votes.get('nr5', 0)) / actor_vote_count
+        else:
+            actor_vote_avg = 0
     else:
         actor_vote_count = 0
     return render(request, "ktapp/artist.html", {
@@ -342,6 +350,8 @@ def artist(request, id, name_slug):
         "roles": roles,
         "director_vote_count": director_vote_count,
         "actor_vote_count": actor_vote_count,
+        "director_vote_avg": director_vote_avg,
+        "actor_vote_avg": actor_vote_avg,
         "awards": models.Award.objects.filter(artist=artist),
     })
 
