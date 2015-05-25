@@ -401,6 +401,33 @@ ul.nobullet {
     margin-right: 1%;
 }
 
+
+.comment_block {
+    margin: 20px 0 40px 0;
+}
+.comment_block_content {
+    background: rgb(249,244,218);
+}
+.comment_block_content p {
+    margin: 0;
+    padding: 5px;
+}
+.comment_block_source {
+    background: rgb(218,211,184);
+    margin: 0;
+    padding: 2px 5px;
+    font-size: 9pt;
+    font-weight: bold;
+}
+.comment_block_author {
+    background: rgb(218,211,184);
+    margin: 0;
+    padding: 2px 5px;
+    font-size: 9pt;
+    text-align: right;
+}
+
+
 .comment_block_table {
     width: 100%;
     margin: 25px 0 50px 0;

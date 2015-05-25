@@ -1,6 +1,6 @@
-<table class="comment_block_table">
+<div class="comment_block">
     {% if show_comment_source %}
-    <tr class="comment_block_tr"><th colspan="2">
+    <div class="comment_block_source">
         {% if comment.domain == 'F' %}
             <a href="{% url 'film_comments' comment.film.id comment.film.film_slug %}">{{ comment.film.orig_title }}</a>
         {% elif comment.domain == 'T' %}
@@ -8,20 +8,14 @@
         {% elif comment.domain == 'P' %}
             {{ comment.poll }}
         {% endif %}
-    </th></tr>
+    </div>
     {% endif %}
-    <tr class="comment_block_tr">
-        <td class="comment_header_td">
-            <h3>
-                <a href="{% url 'user_profile' comment.created_by.id comment.created_by.username|slugify %}">{{ comment.created_by }}</a>{% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}
-                <br />
-                {{ comment.created_at|date:"Y-m-d H:i:s" }}
-            </h3>
-        </td>
-        <td class="comment_content_td">
-            {% autoescape off %}
+    <div class="comment_block_content">
+        {% autoescape off %}
             <p>{{ comment.content|linebreaksbr }}</p>
-            {% endautoescape %}
-        </td>
-    </tr>
-</table>
+        {% endautoescape %}
+    </div>
+    <div class="comment_block_author">
+        <a href="{% url 'user_profile' comment.created_by.id comment.created_by.username|slugify %}">{{ comment.created_by }}</a>{% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}, {{ comment.created_at|date:"Y-m-d H:i:s" }}
+    </div>
+</div>

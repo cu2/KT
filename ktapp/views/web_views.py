@@ -388,7 +388,7 @@ def forum(request, id, title_slug):
     comment_form.fields["reply_to"].widget = forms.HiddenInput()
     return render(request, "ktapp/forum.html", {
         "topic": topic,
-        "comments": topic.comment_set.all(),
+        "comments": topic.comment_set.all()[:100],
         "comment_form": comment_form,
     })
 
