@@ -32,7 +32,6 @@ def index(request):
     return render(request, "ktapp/index.html", {
         "premier_list": premier_list,
         "comments": models.Comment.objects.filter(domain=models.Comment.DOMAIN_FILM)[:20],
-        "show_comment_source": True,
     })
 
 
@@ -397,7 +396,6 @@ def forum(request, id, title_slug):
 def latest_comments(request):
     return render(request, "ktapp/latest_comments.html", {
         "comments": models.Comment.objects.all()[:100],
-        "show_comment_source": True,
     })
 
 

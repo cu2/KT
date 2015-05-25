@@ -34,7 +34,7 @@
         <h2>Legfrissebb kommentek</h2>
         {% if comments %}
             {% for c in comments %}
-                {% include 'ktapp/blocks/comment_block.html' with comment=c %}
+                {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
             {% endfor %}
         {% endif %}
     </div>
