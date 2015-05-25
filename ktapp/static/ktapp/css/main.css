@@ -120,6 +120,28 @@ footer ul li {
     width: 70%;
 }
 
+.left_content {
+    float: left;
+    width: 50%;
+}
+.right_content {
+    float: right;
+    width: 49%;
+}
+.film_block {
+    background: rgb(249,244,218);
+    margin-bottom: 20px;
+    padding: 10px;
+}
+.film_block_content {
+    margin-left: 210px;
+}
+.film_block_picture {
+    float: left;
+    width: 200px;
+    margin-top: 5px;
+}
+
 
 
 /* GENERAL FONTS, COLORS, STYLE */
@@ -237,6 +259,14 @@ input.small_button {
     border: solid 1px rgb(0,0,0);
 }
 
+#SPOIL1 {
+    border: solid 1px rgb(0,0,0);
+    color: rgb(249,244,218);
+    background-image: url(http://kritikustomeg.org/kepek/sp1.png);
+    background-position: 5px 5px;
+    background-repeat: no-repeat;
+    padding: 20px 5px 5px 5px;
+}
 
 
 /* TABLES */

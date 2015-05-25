@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
@@ -13,14 +15,24 @@ from ktapp import forms as kt_forms
 
 
 def index(request):
-    film_list = models.Film.objects.all()[:16]
+    today = datetime.date.today()
+    today = datetime.datetime.strptime('2014-11-10', '%Y-%m-%d')  # HACK
+    offset = (today.weekday() - 3) % 7  # last Thursday=premier day
+    from_date = today - datetime.timedelta(days=offset+7)
+    until_date = today - datetime.timedelta(days=offset-7)
     premier_list = []
-    for film in film_list:
-        premier_list.append(film)
+    # TODO: add alternative premier dates
+    for film in models.Film.objects.filter(main_premier__gte=from_date, main_premier__lte=until_date).order_by('-main_premier', 'orig_title'):
+        if premier_list:
+            if premier_list[-1][0] != film.main_premier:
+                premier_list.append([film.main_premier, []])
+        else:
+            premier_list.append([film.main_premier, []])
+        premier_list[-1][1].append(film)
     return render(request, "ktapp/index.html", {
-        "film_list": film_list,
         "premier_list": premier_list,
-        "topic_list": models.Topic.objects.all(),
+        "comments": models.Comment.objects.filter(domain=models.Comment.DOMAIN_FILM)[:20],
+        "show_comment_source": True,
     })
 
 
