@@ -36,6 +36,39 @@
 - <http://www.typewolf.com/cheatsheet>
 - <http://hungarumlaut.com/>
 
+- <https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight>
+- <http://www.webtype.com/info/articles/fonts-weights/>
+- <http://en.wikipedia.org/wiki/Trebuchet_MS>
+- <http://typophile.com/node/75457>
+- <http://www.typetester.org/>
+- <http://www.identifont.com/similar?XG>
+- <http://www.cssfontstack.com/Verdana>
+- <http://www.will-harris.com/verdana-georgia.htm>
+- <http://www.prepressure.com/fonts/interesting/verdana>
+- <http://www.fontbureau.com/fonts/VerdanaPro/>
+- <https://medium.com/designing-medium/death-to-typewriters-9b7712847639>
+- <https://medium.com/designing-medium/whitespace-8b92273ab49e>
+- <http://ionicons.com/>
+
+
+## Mobile
+
+### Multiplatform mobile web apps
+
+- <http://www.appgyver.com/>
+- <https://cordova.apache.org/>
+- <http://phonegap.com/>
+- <http://en.wikipedia.org/wiki/PhoneGap>
+- <http://www.smashingmagazine.com/2014/02/11/four-ways-to-build-a-mobile-app-part3-phonegap/>
+- <http://www.smashingmagazine.com/2014/03/10/4-ways-build-mobile-application-part4-appcelerator-titanium/>
+
+### Mobile design guidelines
+
+- <http://www.smashingmagazine.com/2012/07/12/elements-mobile-user-experience/>
+- <http://developer.android.com/design/patterns/pure-android.html>
+- <https://developer.apple.com/library/ios/documentation/UserExperience/Conceptual/MobileHIG/index.html>
+- <https://msdn.microsoft.com/library/windows/apps/hh465424.aspx>
+
 
 ## Misc
 
