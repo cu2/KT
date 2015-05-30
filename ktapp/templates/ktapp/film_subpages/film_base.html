@@ -24,7 +24,7 @@
             {% endif %}
             {% if film.all_sequels %}
                 {% for seq in film.all_sequels %}
-                <p class="sequels"><span class="sequel_title">{{ seq }}{% if seq.sequel_type = 'A' %} adaptációk{% endif %}</span>: {% for f in seq.all_films %}{% if f == film %}<b>{% else %}<a href="{% url 'film_main' f.id f.film_slug %}">{% endif %}{{ f.orig_title }}{% if f == film %}</b>{% else %}</a>{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                <p class="sequels"><span class="sequel_title">{{ seq }}{% if seq.sequel_type = 'A' %} adaptációk{% endif %}{% if seq.sequel_type = 'R' %} remake{% endif %}</span>: {% for f in seq.all_films %}{% if f == film %}<b>{% else %}<a href="{% url 'film_main' f.id f.film_slug %}">{% endif %}{{ f.orig_title }} ({{ f.year }}){% if f == film %}</b>{% else %}</a>{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
                 {% endfor %}
             {% endif %}
         </div>
