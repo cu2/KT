@@ -714,6 +714,9 @@ class Wishlist(models.Model):
     ]
     wish_type = models.CharField(max_length=1, choices=WISH_TYPES, default=WISH_TYPE_YES)
 
+    class Meta:
+        unique_together = ['film', 'wished_by']
+
 
 class TVChannel(models.Model):
     name = models.CharField(max_length=250)
