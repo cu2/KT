@@ -31,7 +31,8 @@ class ReviewForm(forms.ModelForm):
 class PictureUploadForm(forms.ModelForm):
     class Meta:
         model = models.Picture
-        fields = ['film', 'img', 'picture_type', 'source_url', 'artists']
+        fields = ['film', 'img', 'picture_type', 'source_url']
+        # fields = ['film', 'img', 'picture_type', 'source_url', 'artists']
 
 
 class TopicForm(forms.ModelForm):

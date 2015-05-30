@@ -600,8 +600,8 @@ class Picture(models.Model):
         file_root, file_ext = os.path.splitext(filename)
         yearmonth = path[-6:]
         filedir = settings.MEDIA_ROOT + 'pix/' + thumbnail_type + '/' + yearmonth
-        filename = filedir + '/' + file_root + '.png'
-        url = settings.MEDIA_URL + 'pix/' + thumbnail_type + '/' + yearmonth + '/' + file_root + '.png'
+        filename = filedir + '/' + file_root + '.jpg'
+        url = settings.MEDIA_URL + 'pix/' + thumbnail_type + '/' + yearmonth + '/' + file_root + '.jpg'
         return filedir, filename, url
 
     def generate_thumbnail(self, thumbnail_type, maxwidth, maxheight=None):
