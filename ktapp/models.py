@@ -34,6 +34,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     public_gender = models.BooleanField(default=False)
     public_location = models.BooleanField(default=False)
     public_year_of_birth = models.BooleanField(default=False)
+    follow = models.ManyToManyField('KTUser', symmetrical=False, through='Follow', through_fields=('who', 'whom'))
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -50,6 +51,12 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
 
     def votes(self):
         return self.vote_set.all()
+
+    def get_follows(self):
+        return self.follow.all()
+
+    def get_followed_by(self):
+        return [u.who for u in self.followed_by.all()]
 
 
 class Film(models.Model):
@@ -772,3 +779,9 @@ class Donation(models.Model):
     money = models.PositiveIntegerField()
     tshirt = models.BooleanField(default=False)
     comment = models.CharField(max_length=250, blank=True)
+
+
+class Follow(models.Model):
+    who = models.ForeignKey(KTUser, related_name='follows')
+    whom = models.ForeignKey(KTUser, related_name='followed_by')
+    started_at = models.DateTimeField(auto_now_add=True)
