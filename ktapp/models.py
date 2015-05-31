@@ -708,14 +708,16 @@ class Wishlist(models.Model):
     wished_at = models.DateTimeField(auto_now_add=True)
     WISH_TYPE_YES = 'Y'
     WISH_TYPE_NO = 'N'
+    WISH_TYPE_GET = 'G'
     WISH_TYPES = [
         (WISH_TYPE_YES, 'Yes'),
         (WISH_TYPE_NO, 'No'),
+        (WISH_TYPE_GET, 'Get'),
     ]
     wish_type = models.CharField(max_length=1, choices=WISH_TYPES, default=WISH_TYPE_YES)
 
     class Meta:
-        unique_together = ['film', 'wished_by']
+        unique_together = ['film', 'wished_by', 'wish_type']
 
 
 class TVChannel(models.Model):
