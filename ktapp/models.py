@@ -764,3 +764,11 @@ class UserToplistItem(models.Model):
     director = models.ForeignKey(Artist, blank=True, null=True, related_name='director_usertoplist')
     actor = models.ForeignKey(Artist, blank=True, null=True, related_name='actor_usertoplist')
     comment = models.TextField()
+
+
+class Donation(models.Model):
+    given_by = models.ForeignKey(KTUser, blank=True, null=True)
+    given_at = models.DateTimeField(auto_now_add=True)
+    money = models.PositiveIntegerField()
+    tshirt = models.BooleanField(default=False)
+    comment = models.CharField(max_length=250, blank=True)
