@@ -8,7 +8,7 @@
     </tr>
 {% for role in roles %}
     <tr class="{% cycle '' 'odd' %}">
-        <td><a href="{% url 'role' role.id role.role_name|slugify %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</td>
+        <td><a href="{% url 'role' role.id role.slug_cache %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</td>
         <td>{{ role.film|film_url_html }}</td>
         <td class="center">{{ role.film.year }}</td>
         <td class="center">{{ role.film|film_rating_html }}</td>

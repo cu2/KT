@@ -7,7 +7,6 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django import forms
-from django.template.defaultfilters import slugify
 from django.db.models import Sum, Q
 
 from ktapp import models
@@ -48,7 +47,7 @@ def search(request):
             'rank': 1000 + result.num_rating(),
             'type': 'film',
             'title': '%s (%s)' % (result.orig_title, result.year),
-            'url': reverse('film_main', args=(result.id, result.film_slug)),
+            'url': reverse('film_main', args=(result.id, result.slug_cache)),
             'object': result,
         })
     for result in models.Artist.objects.filter(name__icontains=q):
@@ -56,7 +55,7 @@ def search(request):
             'rank': 1000  + result.num_rating(),
             'type': 'artist',
             'title': result.name,
-            'url': reverse('artist', args=(result.id, slugify(result.name))),
+            'url': reverse('artist', args=(result.id, result.slug_cache)),
             'object': result,
         })
     for result in models.FilmArtistRelationship.objects.filter(role_name__icontains=q, role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR):
@@ -64,7 +63,7 @@ def search(request):
             'rank': 900,
             'type': 'role',
             'title': result.role_name,
-            'url': reverse('role', args=(result.id, slugify(result.role_name))),
+            'url': reverse('role', args=(result.id, result.slug_cache)),
             'object': result,
         })
     for result in models.Sequel.objects.filter(name__icontains=q):
@@ -88,7 +87,7 @@ def search(request):
             'rank': 750,
             'type': 'topic',
             'title': result.title,
-            'url': reverse('forum', args=(result.id, slugify(result.title))),
+            'url': reverse('forum', args=(result.id, result.slug_cache)),
             'object': result,
         })
     for result in models.Poll.objects.filter(title__icontains=q):
@@ -104,7 +103,7 @@ def search(request):
             'rank': 500,
             'type': 'user',
             'title': result.username,
-            'url': reverse('user_profile', args=(result.id, slugify(result.username))),
+            'url': reverse('user_profile', args=(result.id, result.slug_cache)),
             'object': result,
         })
     # content searches (should be separate?):
@@ -112,10 +111,10 @@ def search(request):
     # for result in models.Comment.objects.filter(content__icontains=q):
     #     if result.domain == models.Comment.DOMAIN_FILM:
     #         title = '%s (%s)' % (result.film.orig_title, result.film.year)
-    #         url = reverse('film_comments', args=(result.film.id, result.film.film_slug))
+    #         url = reverse('film_comments', args=(result.film.id, result.film.slug_cache))
     #     elif result.domain == models.Comment.DOMAIN_TOPIC:
     #         title = result.topic.title
-    #         url = reverse('forum', args=(result.topic.id, slugify(result.topic.title)))
+    #         url = reverse('forum', args=(result.topic.id, result.topic.slug_cache))
     #     else:
     #         title = result.poll.title
     #         url = ''  # TODO
@@ -151,7 +150,7 @@ def film_main(request, id, film_slug):
         "rating": rating,
         "ratings": range(1, 6),
         "roles": film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR),
-        "votes": [film.vote_set.filter(rating=r) for r in range(1, 6)],
+        "votes": [film.vote_set.filter(rating=r).select_related('user').order_by('user__username') for r in range(5, 0, -1)],
     })
 
 
@@ -336,7 +335,7 @@ def vote(request):
         vote, created = models.Vote.objects.get_or_create(film=film, user=request.user, defaults={"rating": rating})
         vote.rating = rating
         vote.save()
-    return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.film_slug)))
+    return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.slug_cache)))
 
 
 @login_required
@@ -357,9 +356,9 @@ def new_comment(request):  # TODO: extend with poll comments
             comment.created_by = request.user
             comment.save(domain=domain)  # Comment model updates domain object
     if domain_type == models.Comment.DOMAIN_FILM:
-        return HttpResponseRedirect(reverse("film_comments", args=(domain.pk, domain.film_slug)))
+        return HttpResponseRedirect(reverse("film_comments", args=(domain.pk, domain.slug_cache)))
     elif domain_type == models.Comment.DOMAIN_TOPIC:
-        return HttpResponseRedirect(reverse("forum", args=(domain.pk, slugify(domain.title))))
+        return HttpResponseRedirect(reverse("forum", args=(domain.pk, domain.slug_cache)))
     elif domain_type == models.Comment.DOMAIN_POLL:
         return HttpResponseRedirect(reverse("index"))
     else:
@@ -375,7 +374,7 @@ def new_quote(request):
             quote = quote_form.save(commit=False)
             quote.created_by = request.user
             quote.save()
-    return HttpResponseRedirect(reverse("film_quotes", args=(film.pk, film.film_slug)))
+    return HttpResponseRedirect(reverse("film_quotes", args=(film.pk, film.slug_cache)))
 
 
 @login_required
@@ -387,7 +386,7 @@ def new_trivia(request):
             trivia = trivia_form.save(commit=False)
             trivia.created_by = request.user
             trivia.save()
-    return HttpResponseRedirect(reverse("film_trivias", args=(film.pk, film.film_slug)))
+    return HttpResponseRedirect(reverse("film_trivias", args=(film.pk, film.slug_cache)))
 
 
 @login_required
@@ -399,7 +398,7 @@ def new_review(request):
             review = review_form.save(commit=False)
             review.created_by = request.user
             review.save()
-    return HttpResponseRedirect(reverse("film_reviews", args=(film.pk, film.film_slug)))
+    return HttpResponseRedirect(reverse("film_reviews", args=(film.pk, film.slug_cache)))
 
 
 @login_required
@@ -411,7 +410,7 @@ def new_picture(request):
             picture = upload_form.save(commit=False)
             picture.created_by = request.user
             picture.save()
-    return HttpResponseRedirect(reverse("film_pictures", args=(film.pk, film.film_slug)))
+    return HttpResponseRedirect(reverse("film_pictures", args=(film.pk, film.slug_cache)))
 
 
 def artist(request, id, name_slug):
@@ -506,7 +505,7 @@ def new_topic(request):
             topic = topic_form.save(commit=False)
             topic.created_by = request.user
             topic.save()
-            return HttpResponseRedirect(reverse("forum", args=(topic.pk, slugify(topic.title))))
+            return HttpResponseRedirect(reverse("forum", args=(topic.pk, topic.slug_cache)))
     return HttpResponseRedirect(reverse("list_of_topics"))
 
 

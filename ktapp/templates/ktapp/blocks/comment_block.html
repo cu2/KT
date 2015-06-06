@@ -2,9 +2,9 @@
     {% if show_comment_source %}
     <div class="comment_block_source">
         {% if comment.domain == 'F' %}
-            <a href="{% url 'film_comments' comment.film.id comment.film.film_slug %}">{{ comment.film.orig_title }}</a>
+            <a href="{% url 'film_comments' comment.film.id comment.film.slug_cache %}">{{ comment.film.orig_title }}</a>
         {% elif comment.domain == 'T' %}
-            [<a href="{% url 'forum' comment.topic.id comment.topic.title|slugify %}">{{ comment.topic }}</a>]
+            [<a href="{% url 'forum' comment.topic.id comment.topic.slug_cache %}">{{ comment.topic }}</a>]
         {% elif comment.domain == 'P' %}
             {{ comment.poll }}
         {% endif %}
@@ -16,6 +16,6 @@
         {% endautoescape %}
     </div>
     <div class="comment_block_author">
-        <a href="{% url 'user_profile' comment.created_by.id comment.created_by.username|slugify %}">{{ comment.created_by }}</a>{% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}, {{ comment.created_at|date:"Y-m-d H:i:s" }}
+        <a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}, {{ comment.created_at|date:"Y-m-d H:i:s" }}
     </div>
 </div>

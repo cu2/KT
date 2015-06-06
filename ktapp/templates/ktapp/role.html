@@ -7,9 +7,9 @@
 {% endblock %}
 
 {% block main %}
-    <h2><a href="{% url 'film_main' role.film.id role.film.film_slug %}">{{ role.film.orig_title }} [{{ role.film.year }}]</a></h2>
+    <h2><a href="{% url 'film_main' role.film.id role.film.slug_cache %}">{{ role.film.orig_title }} [{{ role.film.year }}]</a></h2>
     {% if role.film.other_titles %}
         <h3>{{ role.film.other_titles|linebreaksbr }}</h3>
     {% endif %}
-    <h2><a href="{% url 'artist' role.artist.id role.artist.name|slugify %}">{{ role.artist.name }}</a></h2>
+    <h2><a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a></h2>
 {% endblock %}

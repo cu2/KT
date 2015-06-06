@@ -99,10 +99,6 @@ class Film(models.Model):
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'
 
-    @property
-    def film_slug(self):  # TODO: remove
-        return self.slug_cache
-
     def num_specific_rating(self, r):
         if 1 <= r <= 5:
             return getattr(self, 'number_of_ratings_' + str(r))

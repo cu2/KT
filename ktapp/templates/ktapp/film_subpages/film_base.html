@@ -5,12 +5,12 @@
 {% block header %}
     <div id="film_header">
         <div id="film_title">
-            <h1>{{ film.orig_title }} [{{ film.year }}]</h1>
+            <h1>{{ film.orig_title }} <span class="film_year">({{ film.year }})</span></h1>
             {% if film.other_titles %}
                 <h2>{{ film.other_titles|linebreaksbr }}</h2>
             {% endif %}
             {% if film.directors %}
-                <h3>({% for director in film.directors %}<a href="{% url 'artist' director.id director.name|slugify %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
+                <h3>({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
             {% endif %}
             {% if film.countries or film.genres %}
                 <p>
@@ -21,11 +21,6 @@
                         film
                     {% endif %}
                 </p>
-            {% endif %}
-            {% if film.all_sequels %}
-                {% for seq in film.all_sequels %}
-                <p class="sequels"><span class="sequel_title">{{ seq }}{% if seq.sequel_type = 'A' %} adaptációk{% endif %}{% if seq.sequel_type = 'R' %} remake{% endif %}</span>: {% for f in seq.all_films %}{% if f == film %}<b>{% else %}<a href="{% url 'film_main' f.id f.film_slug %}">{% endif %}{{ f.orig_title }} ({{ f.year }}){% if f == film %}</b>{% else %}</a>{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-                {% endfor %}
             {% endif %}
         </div>
         {% if film.num_rating and film.avg_rating %}
@@ -54,22 +49,6 @@
                     <span><a href="{{ film.wikipedia_link_hu }}">Wikipédia</a></span>
                     {% endif %}
                 </li>
-                <li class="premiers">
-                    {% if film.main_premier %}
-                    Bemutató: {{ film.main_premier|date:"Y-m-d" }}
-                    {% elif film.main_premier_year %}
-                    Bemutató: {{ film.main_premier_year }}
-                    {% endif %}
-                    {% if film.other_premiers %}
-                    <br />További bemutatók:
-                    {% for p in film.other_premiers %}
-                    <br />{{ p.premier_type }}: {{ p.when|date:"Y-m-d" }}
-                    {% endfor %}
-                    {% endif %}
-                </li>
-                <li>
-                    Tévé
-                </li>
             </ul>
         </div>
     </div>
@@ -79,15 +58,15 @@
 
     <nav id="tabs" class="clearfix">
         <ul>
-            <li style="width: 7%"{% if active_tab == 'main' %} class="active_tab"{% endif %}><a href="{% url 'film_main' film.id film.film_slug %}">főoldal</a></li>
-            <li style="width: 9%"{% if active_tab == 'pictures' %} class="active_tab"{% endif %}><a href="{% url 'film_pictures' film.id film.film_slug %}"{% if not film.number_of_pictures %} class="inactive_action"{% endif %}>képek</a>{% if film.number_of_pictures %}<span class="tab_count"> ({{ film.number_of_pictures }})</span>{% endif %}</li>
-            <li style="width: 8%"{% if active_tab == 'awards' %} class="active_tab"{% endif %}><a href="{% url 'film_awards' film.id film.film_slug %}"{% if not film.number_of_awards %} class="inactive_action"{% endif %}>díjak</a>{% if film.number_of_awards %}<span class="tab_count"> ({{ film.number_of_awards }})</span>{% endif %}</li>
-            <li style="width: 12%"{% if active_tab == 'reviews' %} class="active_tab"{% endif %}><a href="{% url 'film_reviews' film.id film.film_slug %}"{% if not film.number_of_reviews %} class="inactive_action"{% endif %}>elemzések</a>{% if film.number_of_reviews %}<span class="tab_count"> ({{ film.number_of_reviews }})</span>{% endif %}</li>
-            <li style="width: 15%"{% if active_tab == 'comments' %} class="active_tab"{% endif %}><a href="{% url 'film_comments' film.id film.film_slug %}"{% if not film.number_of_comments %} class="inactive_action"{% endif %}>vélemények</a>{% if film.number_of_comments %}<span class="tab_count"> ({{ film.number_of_comments }})</span>{% endif %}</li>
-            <li style="width: 11%"{% if active_tab == 'quotes' %} class="active_tab"{% endif %}><a href="{% url 'film_quotes' film.id film.film_slug %}"{% if not film.number_of_quotes %} class="inactive_action"{% endif %}>idézetek</a>{% if film.number_of_quotes %}<span class="tab_count"> ({{ film.number_of_quotes }})</span>{% endif %}</li>
-            <li style="width: 14%"{% if active_tab == 'trivias' %} class="active_tab"{% endif %}><a href="{% url 'film_trivias' film.id film.film_slug %}"{% if not film.number_of_trivias %} class="inactive_action"{% endif %}>érdekességek</a>{% if film.number_of_trivias %}<span class="tab_count"> ({{ film.number_of_trivias }})</span>{% endif %}</li>
-            <li style="width: 14%"{% if active_tab == 'keywords' %} class="active_tab"{% endif %}><a href="{% url 'film_keywords' film.id film.film_slug %}"{% if not film.number_of_keywords %} class="inactive_action"{% endif %}>kulcsszavak</a>{% if film.number_of_keywords %}<span class="tab_count"> ({{ film.number_of_keywords }})</span>{% endif %}</li>
-            <li style="width: 9%"{% if active_tab == 'links' %} class="active_tab"{% endif %}><a href="{% url 'film_links' film.id film.film_slug %}"{% if not film.number_of_links %} class="inactive_action"{% endif %}>linkek</a>{% if film.number_of_links %}<span class="tab_count"> ({{ film.number_of_links }})</span>{% endif %}</li>
+            <li style="width: 7%"{% if active_tab == 'main' %} class="active_tab"{% endif %}><a href="{% url 'film_main' film.id film.slug_cache %}">főoldal</a></li>
+            <li style="width: 9%"{% if active_tab == 'pictures' %} class="active_tab"{% endif %}><a href="{% url 'film_pictures' film.id film.slug_cache %}"{% if not film.number_of_pictures %} class="inactive_action"{% endif %}>képek</a>{% if film.number_of_pictures %}<span class="tab_count"> ({{ film.number_of_pictures }})</span>{% endif %}</li>
+            <li style="width: 8%"{% if active_tab == 'awards' %} class="active_tab"{% endif %}><a href="{% url 'film_awards' film.id film.slug_cache %}"{% if not film.number_of_awards %} class="inactive_action"{% endif %}>díjak</a>{% if film.number_of_awards %}<span class="tab_count"> ({{ film.number_of_awards }})</span>{% endif %}</li>
+            <li style="width: 12%"{% if active_tab == 'reviews' %} class="active_tab"{% endif %}><a href="{% url 'film_reviews' film.id film.slug_cache %}"{% if not film.number_of_reviews %} class="inactive_action"{% endif %}>elemzések</a>{% if film.number_of_reviews %}<span class="tab_count"> ({{ film.number_of_reviews }})</span>{% endif %}</li>
+            <li style="width: 15%"{% if active_tab == 'comments' %} class="active_tab"{% endif %}><a href="{% url 'film_comments' film.id film.slug_cache %}"{% if not film.number_of_comments %} class="inactive_action"{% endif %}>vélemények</a>{% if film.number_of_comments %}<span class="tab_count"> ({{ film.number_of_comments }})</span>{% endif %}</li>
+            <li style="width: 11%"{% if active_tab == 'quotes' %} class="active_tab"{% endif %}><a href="{% url 'film_quotes' film.id film.slug_cache %}"{% if not film.number_of_quotes %} class="inactive_action"{% endif %}>idézetek</a>{% if film.number_of_quotes %}<span class="tab_count"> ({{ film.number_of_quotes }})</span>{% endif %}</li>
+            <li style="width: 14%"{% if active_tab == 'trivias' %} class="active_tab"{% endif %}><a href="{% url 'film_trivias' film.id film.slug_cache %}"{% if not film.number_of_trivias %} class="inactive_action"{% endif %}>érdekességek</a>{% if film.number_of_trivias %}<span class="tab_count"> ({{ film.number_of_trivias }})</span>{% endif %}</li>
+            <li style="width: 14%"{% if active_tab == 'keywords' %} class="active_tab"{% endif %}><a href="{% url 'film_keywords' film.id film.slug_cache %}"{% if not film.number_of_keywords %} class="inactive_action"{% endif %}>kulcsszavak</a>{% if film.number_of_keywords %}<span class="tab_count"> ({{ film.number_of_keywords }})</span>{% endif %}</li>
+            <li style="width: 9%"{% if active_tab == 'links' %} class="active_tab"{% endif %}><a href="{% url 'film_links' film.id film.slug_cache %}"{% if not film.number_of_links %} class="inactive_action"{% endif %}>linkek</a>{% if film.number_of_links %}<span class="tab_count"> ({{ film.number_of_links }})</span>{% endif %}</li>
         </ul>
     </nav>
 

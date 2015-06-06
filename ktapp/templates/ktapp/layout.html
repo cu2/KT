@@ -22,7 +22,7 @@
                 <ul>
                     <li><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
                     {% if user.is_authenticated %}
-                    <li>[<a href="{% url 'user_profile' user.id user.username|slugify %}">{{ user.username }}</a>]</li>
+                    <li>[<a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a>]</li>
                     {% if user.is_staff %}
                     <li>(<a href="/admin/">szerk</a>)</li>
                     {% endif %}

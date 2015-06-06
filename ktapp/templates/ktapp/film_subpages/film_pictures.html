@@ -6,11 +6,11 @@
     <div id="film_centered">
         {% if picture %}
         <p class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
-            <a href="{% url 'film_picture' film.id film.film_slug next_picture.id %}#pix"><img src="{{ picture.get_display_url_mid }}" style="width: {{ picture.get_width_mid }}px; height: {{ picture.get_height_mid }}px" class="picture" /></a>
+            <a href="{% url 'film_picture' film.id film.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_url_mid }}" style="width: {{ picture.get_width_mid }}px; height: {{ picture.get_height_mid }}px" class="picture" /></a>
             <a name="pix" class="jumptarget"></a>
             <br />
             {% if artists %}
-            {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.name|slugify %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film.orig_title }} című filmben.
+            {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film.orig_title }} című filmben.
             {% else %}
                 {% if picture.picture_type == "P" %}
                     {{ film_title_article|title }} {{ film.orig_title }} című film plakátja.
@@ -24,7 +24,7 @@
         {% endif %}
         <p>
         {% for picture in pictures %}
-            <a href="{% url 'film_picture' film.id film.film_slug picture.id %}#pix"><img src="{{ picture.get_display_url_min }}" style="width: {{ picture.get_width_min }}px; height: {{ picture.get_height_min }}px" class="thumbnail" /></a>
+            <a href="{% url 'film_picture' film.id film.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_url_min }}" style="width: {{ picture.get_width_min }}px; height: {{ picture.get_height_min }}px" class="thumbnail" /></a>
         {% endfor %}
         </p>
         {% if user.is_authenticated %}

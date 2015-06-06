@@ -2,70 +2,116 @@
 
 {% block film_main %}
 
-    <div id="film_main_voting">
-        <h2>Szerinted milyen?</h2>
-        {% if user.is_authenticated %}
-            <div id="film_your_rating">
-            {% for r in ratings %}
-            {% cycle 'nézhetetlen' 'rossz' 'oké/elmegy' 'jó' 'zseniális' as named_rating silent %}
-                {% if r == rating %}
-                    <b>{{ named_rating }}</b>
-                {% else %}
-                    <form action="{% url 'vote' %}" method="post" class="inline">
-                        {% csrf_token %}
-                        <input type="hidden" name="film_id" value="{{ film.pk }}" />
-                        <input type="hidden" name="rating" value="{{ r }}" />
-                        <input type="submit" value="{{ named_rating }}"{% if rating %} class="inactive_action"{% endif %} />
-                    </form>
-                {% endif %}
-            {% endfor %}
-            </div>
-            <div>
-            {% if rating == 0 %}
-                <b>Nem tudom.</b>
-            {% else %}
-                <form action="{% url 'vote' %}" method="post" class="inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
-                    <input type="hidden" name="rating" value="0" />
-                    <input type="submit" value="Nem tudom." class="small_button inactive_action no_bottom" />
-                </form>
-            {% endif %}
-            </div>
-        {% else %}
-            <p>Ahhoz, hogy szavazhass, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
-        {% endif %}
-    </div>
-
     <div class="clearfix">
         <div id="film_main_left">
-            {% if film.plot_summary %}
-                <p class="textblock">{{ film.plot_summary|linebreaksbr }}</p>
-            {% endif %}
-            <ul id="film_votes">
-            {% for vote in votes reversed %}
-            {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
-                {% if vote %}
-                <li>{{ vote|length }} {{ named_rating }}:
-                    {% for voteuser in vote %}
-                        <a href="{% url 'user_profile' voteuser.user.id voteuser.user.username|slugify %}">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </li>
+            <div class="film_block">
+                <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} [{{ film.year }}]"><img src="http://kritikustomeg.org/pix/mid/p7557557510345.jpg" class="picture film_block_picture" alt="{{ film.orig_title }} [{{ film.year }}]" /></a>
+                {% if film.plot_summary %}
+                    <p class="film_block_content">
+                        {{ film.plot_summary }}
+                    </p>
                 {% endif %}
-            {% endfor %}
-            </ul>
-        </div>
-        <div id="film_main_right">
+                <br class="clear" />
+            </div>
             {% if roles %}
+                <h3>Szereplők</h3>
                 <table class="fullsize">
-                {% for role in roles %}
-                    <tr class="{% cycle 'odd' '' %}">
-                        <td><a href="{% url 'role' role.id role.role_name|slugify %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</td>
-                        <td><a href="{% url 'artist' role.artist.id role.artist.name|slugify %}">{{ role.artist.name }}</a></td>
-                    </tr>
-                {% endfor %}
+                    {% for role in roles %}
+                        <tr class="{% cycle 'odd' '' %}">
+                            <td><a href="{% url 'role' role.id role.slug_cache %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</td>
+                            <td><a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a></td>
+                        </tr>
+                    {% endfor %}
                 </table>
             {% endif %}
+            {% if film.all_sequels %}
+                {% for seq in film.all_sequels %}
+                    <h3>{{ seq }}{% if seq.sequel_type = 'A' %} adaptációk{% endif %}{% if seq.sequel_type = 'R' %} remake-ek{% endif %}{% if seq.sequel_type = 'S' %} sequelek{% endif %}</h3>
+                    <ul>
+                        {% for f in seq.all_films %}
+                            <li>{% if f == film %}<b>{% else %}<a href="{% url 'film_main' f.id f.slug_cache %}">{% endif %}{{ f.orig_title }} ({{ f.year }}){% if f == film %}</b>{% else %}</a>{% endif %}</li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+            {% endif %}
+            {% if film.main_premier or film.main_premier_year %}
+                <h3>Bemutató</h3>
+                <p>
+                    {% if film.main_premier %}
+                        {{ film.main_premier|date:"Y. F d." }}
+                    {% elif film.main_premier_year %}
+                        {{ film.main_premier_year }}
+                    {% endif %}
+                </p>
+            {% endif %}
+            {% if film.other_premiers %}
+                <h3>További bemutatók</h3>
+                <p>
+                    {% for p in film.other_premiers %}
+                        {{ p.premier_type }}: {{ p.when|date:"Y. F d." }}{% if not forloop.last %}<br />{% endif %}
+                    {% endfor %}
+                </p>
+            {% endif %}
+        </div>
+        <div id="film_main_right">
+            <div id="film_main_voting_block">
+                {% if user.is_authenticated %}
+                    {% if rating %}
+                        <h3>Szerinted milyen?
+                            {% for r in ratings %}
+                                {% cycle 'nézhetetlen' 'rossz' 'oké/elmegy' 'jó' 'zseniális' as named_rating silent %}
+                                {% if r == rating %}
+                                    {{ named_rating }}
+                                {% endif %}
+                            {% endfor %}
+                            <span class="show_change_vote"> (<span class="action_text" id="show_change_vote_button">szavazat módosítása</span>)</span></h3>
+                    {% else %}
+                        <h3>Szerinted milyen?</h3>
+                    {% endif %}
+                    <div class="change_vote"{% if rating %} style="display: none"{% endif %}>
+                        {% for r in ratings %}
+                            {% cycle 'nézhetetlen' 'rossz' 'oké/elmegy' 'jó' 'zseniális' as named_rating silent %}
+                            {% if r == rating %}
+                                <span class="small_rating">{{ named_rating }}</span>
+                            {% else %}
+                                <form action="{% url 'vote' %}" method="post" class="inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                                    <input type="hidden" name="rating" value="{{ r }}" />
+                                    <input type="submit" value="{{ named_rating }}"{% if rating %} class=""{% endif %} />
+                                </form>
+                            {% endif %}
+                        {% endfor %}
+                        {% if rating %}
+                            <form action="{% url 'vote' %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                                <input type="hidden" name="rating" value="0" />
+                                <input type="submit" value="???" class="" />
+                            </form>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <h3>Szerinted milyen?</h3>
+                    <p>Ahhoz, hogy szavazhass, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
+                {% endif %}
+            </div>
+            <div id="film_main_ratings_block">
+                <h3>Szavazatok<span class="show_rating_details"> (<span class="action_text" id="show_rating_details_button">részletes szavazatok</span>)</span></h3>
+                <ul id="film_votes">
+                    {% for vote in votes %}
+                        {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
+                        {% if vote %}
+                            <li>{{ vote|length }} {{ named_rating }}<span class="rating_details" style="display: none">:
+                                {% for voteuser in vote %}
+                                    <a href="{% url 'user_profile' voteuser.user.id voteuser.user.slug_cache %}">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                                </span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
 

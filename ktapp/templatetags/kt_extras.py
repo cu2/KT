@@ -13,7 +13,7 @@ def film_url_html(film, subpage='film_main'):
     else:
         second_row = '&nbsp;'
     return mark_safe(u'<a href="{url}">{orig_title}</a><br />\n<span class="td_sub">{second_row}</span>'.format(
-        url=reverse(subpage, args=(film.pk, film.film_slug)),
+        url=reverse(subpage, args=(film.id, film.slug_cache)),
         orig_title=film.orig_title,
         second_row=second_row,
     ))
