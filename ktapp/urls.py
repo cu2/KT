@@ -57,7 +57,6 @@ urlpatterns += patterns(
     url(r'^legfrissebb_kommentek$', web_views.latest_comments, name='latest_comments'),
 
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>.*)$', web_views.user_profile, name='user_profile'),
-    url(r'^en/$', login, name='user_profile_own', kwargs={'template_name': 'ktapp/user_profile_own.html'}),
     url(r'^bejelentkezes/$', login, name='login', kwargs={'template_name': 'ktapp/login.html'}),
     url(r'^kijelentkezes/$', logout, name='logout', kwargs={'next_page': '/'}),
     url(r'^regisztracio/$', web_views.registration, name='registration'),

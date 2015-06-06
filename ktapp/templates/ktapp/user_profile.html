@@ -6,15 +6,15 @@
 {% block header %}<h1>{{ selected_user.username }}</h1>{% endblock %}
 
 {% block main %}
-    <h2>Alap adatai</h2>
+    <h2>Alap adatok</h2>
     <p>
-        Neme: {% if selected_user.public_gender %}{{ selected_user.gender }}{% else %}?{% endif %}<br />
-        Születési éve: {% if selected_user.public_location %}{{ selected_user.location }}{% else %}?{% endif %}<br />
-        Lakhelye: {% if selected_user.public_year_of_birth %}{{ selected_user.year_of_birth }}{% else %}?{% endif %}<br />
-        Regisztrált: {{ selected_user.date_joined|date:"Y. F d." }}
+        Nem: {% if selected_user.public_gender %}{{ selected_user.gender }}{% else %}?{% endif %}<br />
+        Születési év: {% if selected_user.public_location %}{{ selected_user.location }}{% else %}?{% endif %}<br />
+        Lakhely: {% if selected_user.public_year_of_birth %}{{ selected_user.year_of_birth }}{% else %}?{% endif %}<br />
+        Regisztráció: {{ selected_user.date_joined|date:"Y. F d." }} ({{ selected_user.date_joined|timesince }})
     </p>
 
-    <h2>Utolsó szavazatai</h2>
+    <h2>Utolsó szavazatok</h2>
     <table>
         <tr class="header_tr">
             <th>Film</th>
