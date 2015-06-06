@@ -235,7 +235,7 @@ def film_awards(request, id, film_slug):
     return render(request, "ktapp/film_subpages/film_awards.html", {
         "active_tab": "awards",
         "film": film,
-        "awards": film.award_set.all(),
+        "awards": film.award_set.all().order_by('name', 'year', 'category'),
     })
 
 
@@ -428,7 +428,7 @@ def artist(request, id, name_slug):
             director_vote_avg = 1.0 * (director_votes.get('nr1', 0) + 2*director_votes.get('nr2', 0) + 3*director_votes.get('nr3', 0) + 4*director_votes.get('nr4', 0) + 5*director_votes.get('nr5', 0)) / director_vote_count
     else:
         director_vote_count = 0
-    roles = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR)
+    roles = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).order_by('-film__year', 'film__orig_title')
     actor_vote_avg = 0
     if roles:
         actor_votes = roles.aggregate(nr1=Sum('film__number_of_ratings_1'),
@@ -449,7 +449,7 @@ def artist(request, id, name_slug):
         "actor_vote_count": actor_vote_count,
         "director_vote_avg": director_vote_avg,
         "actor_vote_avg": actor_vote_avg,
-        "awards": models.Award.objects.filter(artist=artist),
+        "awards": models.Award.objects.filter(artist=artist).order_by('name', 'year', 'category'),
     })
 
 

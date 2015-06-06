@@ -4,12 +4,11 @@
         <th>Év</th>
         <th>Kategória</th>
         {% if show_film %}
-        <th>Szerep</th>
         <th>Film</th>
+        <th>Megjegyzés</th>
         {% else %}
         <th>Művész</th>
         {% endif %}
-        <th>Megjegyzés</th>
     </tr>
 {% for a in awards %}
     <tr class="{% cycle '' 'odd' %}">
@@ -17,12 +16,12 @@
         <td>{{ a.year }}</td>
         <td>{{ a.category }}</td>
         {% if show_film %}
-        <td>???</td>
         <td><a href="{% url 'film_main' a.film.id a.film.slug_cache %}">{{ a.film.orig_title }}</a></td>
-        {% else %}
-        <td>{% if a.artist %}<a href="{% url 'artist' a.artist.id a.artist.slug_cache %}">{{ a.artist.name }}</a>{% endif %}</td>
-        {% endif %}
         <td>{{ a.note }}</td>
+        {% else %}
+        <td>{% if a.artist %}<a href="{% url 'artist' a.artist.id a.artist.slug_cache %}">{{ a.artist.name }}</a>{% endif %}
+        {{ a.note }}</td>
+        {% endif %}
     </tr>
 {% endfor %}
 </table>
