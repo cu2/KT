@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django import forms
 from django.template.defaultfilters import slugify
-from django.db.models import Sum
+from django.db.models import Sum, Q
 
 from ktapp import models
 from ktapp import forms as kt_forms
@@ -32,6 +32,107 @@ def index(request):
     return render(request, "ktapp/index.html", {
         "premier_list": premier_list,
         "comments": models.Comment.objects.filter(domain=models.Comment.DOMAIN_FILM)[:20],
+    })
+
+
+def search(request):
+    q = request.GET.get('q')
+    if not q:
+        return HttpResponseRedirect(reverse('index'))
+    results = []
+    for result in models.Film.objects.filter(
+            Q(orig_title__icontains=q)
+            | Q(other_titles__icontains=q)
+    ):
+        results.append({
+            'rank': 1000 + result.num_rating(),
+            'type': 'film',
+            'title': '%s (%s)' % (result.orig_title, result.year),
+            'url': reverse('film_main', args=(result.id, result.film_slug)),
+            'object': result,
+        })
+    for result in models.Artist.objects.filter(name__icontains=q):
+        results.append({
+            'rank': 1000  + result.num_rating(),
+            'type': 'artist',
+            'title': result.name,
+            'url': reverse('artist', args=(result.id, slugify(result.name))),
+            'object': result,
+        })
+    for result in models.FilmArtistRelationship.objects.filter(role_name__icontains=q, role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR):
+        results.append({
+            'rank': 900,
+            'type': 'role',
+            'title': result.role_name,
+            'url': reverse('role', args=(result.id, slugify(result.role_name))),
+            'object': result,
+        })
+    for result in models.Sequel.objects.filter(name__icontains=q):
+        results.append({
+            'rank': 850,
+            'type': 'sequel/%s' % result.sequel_type,
+            'title': result.name,
+            'url': '',  # TODO
+            'object': result,
+        })
+    for result in models.Keyword.objects.filter(name__icontains=q):
+        results.append({
+            'rank': 800,
+            'type': 'keyword/%s' % result.keyword_type,
+            'title': result.name,
+            'url': '',  # TODO
+            'object': result,
+        })
+    for result in models.Topic.objects.filter(title__icontains=q):
+        results.append({
+            'rank': 750,
+            'type': 'topic',
+            'title': result.title,
+            'url': reverse('forum', args=(result.id, slugify(result.title))),
+            'object': result,
+        })
+    for result in models.Poll.objects.filter(title__icontains=q):
+        results.append({
+            'rank': 700,
+            'type': 'poll',
+            'title': result.title,
+            'url': '',  # TODO
+            'object': result,
+        })
+    for result in models.KTUser.objects.filter(username__icontains=q):
+        results.append({
+            'rank': 500,
+            'type': 'user',
+            'title': result.username,
+            'url': reverse('user_profile', args=(result.id, slugify(result.username))),
+            'object': result,
+        })
+    # content searches (should be separate?):
+    # | Q(plot_summary__icontains=q)
+    # for result in models.Comment.objects.filter(content__icontains=q):
+    #     if result.domain == models.Comment.DOMAIN_FILM:
+    #         title = '%s (%s)' % (result.film.orig_title, result.film.year)
+    #         url = reverse('film_comments', args=(result.film.id, result.film.film_slug))
+    #     elif result.domain == models.Comment.DOMAIN_TOPIC:
+    #         title = result.topic.title
+    #         url = reverse('forum', args=(result.topic.id, slugify(result.topic.title)))
+    #     else:
+    #         title = result.poll.title
+    #         url = ''  # TODO
+    #     results.append({
+    #         'rank': 750,
+    #         'type': 'comment',
+    #         'title': title,
+    #         'url': url,
+    #         'object': result,
+    #     })
+    # Quote
+    # Trivia
+    # Review
+    return render(request, 'ktapp/search.html', {
+        'q': q,
+        'result_count': len(results),
+        'results': sorted(results, key=lambda r: (-r['rank'], r['title']))[:100],
     })
 
 
@@ -316,6 +417,7 @@ def new_picture(request):
 def artist(request, id, name_slug):
     artist = get_object_or_404(models.Artist, pk=id)
     directions = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR).order_by('-film__year', 'film__orig_title')
+    director_vote_avg = 0
     if directions:
         director_votes = directions.aggregate(nr1=Sum('film__number_of_ratings_1'),
                                               nr2=Sum('film__number_of_ratings_2'),
@@ -325,11 +427,10 @@ def artist(request, id, name_slug):
         director_vote_count = director_votes.get('nr1', 0) + director_votes.get('nr2', 0) + director_votes.get('nr3', 0) + director_votes.get('nr4', 0) + director_votes.get('nr5', 0)
         if director_vote_count:
             director_vote_avg = 1.0 * (director_votes.get('nr1', 0) + 2*director_votes.get('nr2', 0) + 3*director_votes.get('nr3', 0) + 4*director_votes.get('nr4', 0) + 5*director_votes.get('nr5', 0)) / director_vote_count
-        else:
-            director_vote_avg = 0
     else:
         director_vote_count = 0
     roles = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR)
+    actor_vote_avg = 0
     if roles:
         actor_votes = roles.aggregate(nr1=Sum('film__number_of_ratings_1'),
                                       nr2=Sum('film__number_of_ratings_2'),
@@ -339,8 +440,6 @@ def artist(request, id, name_slug):
         actor_vote_count = actor_votes.get('nr1', 0) + actor_votes.get('nr2', 0) + actor_votes.get('nr3', 0) + actor_votes.get('nr4', 0) + actor_votes.get('nr5', 0)
         if actor_vote_count:
             actor_vote_avg = 1.0 * (actor_votes.get('nr1', 0) + 2*actor_votes.get('nr2', 0) + 3*actor_votes.get('nr3', 0) + 4*actor_votes.get('nr4', 0) + 5*actor_votes.get('nr5', 0)) / actor_vote_count
-        else:
-            actor_vote_avg = 0
     else:
         actor_vote_count = 0
     return render(request, "ktapp/artist.html", {

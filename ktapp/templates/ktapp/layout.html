@@ -44,8 +44,8 @@
                 </ul>
             </div>
             <div id="toptopmenu_right">
-                <form class="inline">
-                    <input type="text" placeholder="Keresés..." tabindex="1" />
+                <form class="inline" action="{% url 'search' %}" method="get">
+                    <input type="text" placeholder="Keresés..." tabindex="1" name="q" />
                 </form>
             </div>
         </nav>

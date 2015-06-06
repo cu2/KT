@@ -1,0 +1,89 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Keresési találatok</h1>
+{% endblock %}
+
+{% block main %}
+
+    <form action="{% url 'search' %}" method="get">
+        <p>
+            <input type="text" placeholder="Keresés..." name="q" value="{{ q }}" />
+        </p>
+    </form>
+    <p>{{ result_count }} találat:</p>
+    <ul id="search_results">
+        {% for result in results %}
+            <li>
+                <span class="search_result_type">
+                    {% if result.type == 'film' %}
+                        film
+                    {% elif result.type == 'user' %}
+                        felhasználó
+                    {% elif result.type == 'artist' %}
+                        színész/rendező
+                    {% elif result.type == 'role' %}
+                        szereplő
+                    {% elif result.type == 'keyword/C' %}
+                        ország
+                    {% elif result.type == 'keyword/G' %}
+                        műfaj
+                    {% elif result.type == 'keyword/M' or result.type == 'keyword/O' %}
+                        kulcsszó
+                    {% elif result.type == 'sequel/S' %}
+                        sequel
+                    {% elif result.type == 'sequel/R' %}
+                        remake
+                    {% elif result.type == 'sequel/A' %}
+                        adaptáció
+                    {% elif result.type == 'topic' %}
+                        topik
+                    {% elif result.type == 'poll' %}
+                        közkérdés
+                    {% elif result.type == 'comment' %}
+                        komment
+                    {% else %}
+                        ???
+                    {% endif %}
+                </span>
+                <span class="search_result_title">
+                    <a href="{{ result.url }}">{{ result.title }}</a>
+                </span>
+                <span class="search_result_details">
+                {% if result.type == 'film' %}
+                    {% if result.object.other_titles %}
+                    <br />
+                    {{ result.object.other_titles|linebreaksbr }}
+                    {% endif %}
+                    {% if result.object.directors %}
+                    <br />
+                    ({% for director in result.object.directors %}{{ director.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
+                    {% endif %}
+                    <br />
+                    {% for country in result.object.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
+                    {% for genre in result.object.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                {% elif result.type == 'role' %}
+                    <br />film: {{ result.object.film.orig_title }}
+                    <br />színész: {{ result.object.artist.name }}
+                {% elif result.type|slice:"6" == 'sequel' %}
+                    {% for film in result.object.all_films %}
+                        <br />
+                        {{ film.orig_title }} ({{ film.year }})
+                    {% endfor %}
+                {% elif result.type == 'poll' %}
+                    {% if result.object.open_from %}
+                        <br />
+                        {{ result.object.open_from|date:"Y. F d." }}{% if result.object.open_until %} - {% if result.object.open_from|date:"Y" == result.object.open_until|date:"Y" %}{{ result.object.open_until|date:"F d." }}{% else %}{{ result.object.open_until|date:"Y. F d." }}{% endif %}{% endif %}
+                    {% endif %}
+                {% elif result.type == 'comment' %}
+                    <br />
+                    {{ result.object.content }}
+                {% endif %}
+                </span>
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock %}

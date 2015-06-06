@@ -25,7 +25,9 @@ def film_rating_html(film, with_count=True):
     if num_rating == 0:
         return ''
     avg_rating = film.avg_rating()
-    if avg_rating is not None:
+    if avg_rating is None:
+        avg_rating = '?'
+    else:
         avg_rating = round(avg_rating, 1)
     if with_count:
         return mark_safe(u'{avg_rating}<br />\n<span class="td_sub">({num_rating})</span>'.format(

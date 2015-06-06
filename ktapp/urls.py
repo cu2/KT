@@ -29,6 +29,8 @@ urlpatterns += patterns(
     '',
     url(r'^$', web_views.index, name='index'),
 
+    url(r'^keres$', web_views.search, name='search'),
+
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/velemenyek$', web_views.film_comments, name='film_comments'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/idezetek$', web_views.film_quotes, name='film_quotes'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)/erdekessegek$', web_views.film_trivias, name='film_trivias'),

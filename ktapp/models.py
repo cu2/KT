@@ -113,7 +113,7 @@ class Film(models.Model):
     num_rating.short_description = 'Number of ratings'
 
     def avg_rating(self):
-        if self.num_rating() == 0:
+        if self.num_rating() < 10:
             return None
         return (1.0 * self.number_of_ratings_1 +
                 2.0 * self.number_of_ratings_2 +
@@ -461,6 +461,9 @@ class Artist(models.Model):
 
     class Meta:
         ordering = ['name']
+
+    def num_rating(self):
+        return sum([f.num_rating() for f in self.films.all()])
 
 
 class FilmArtistRelationship(models.Model):

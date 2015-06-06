@@ -529,3 +529,23 @@ ul.nobullet {
 #film_votes li {
     padding: 5px 0;
 }
+
+
+#search_results {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#search_results li {
+    padding: 10px 0;
+}
+#search_results li .search_result_type {
+    font-variant: small-caps;
+    font-weight: bold;
+}
+#search_results li .search_result_title {
+    font-weight: bold;
+}
+#search_results li .search_result_details {
+    font-size: 9pt;
+}
