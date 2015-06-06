@@ -35,6 +35,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     public_location = models.BooleanField(default=False)
     public_year_of_birth = models.BooleanField(default=False)
     follow = models.ManyToManyField('KTUser', symmetrical=False, through='Follow', through_fields=('who', 'whom'))
+    slug_cache = models.CharField(max_length=250, blank=True)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -57,6 +58,10 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
 
     def get_followed_by(self):
         return [u.who for u in self.followed_by.all()]
+
+    def save(self, *args, **kwargs):
+        self.slug_cache = slugify(self.username)
+        super(KTUser, self).save(*args, **kwargs)
 
 
 class Film(models.Model):
@@ -89,16 +94,14 @@ class Film(models.Model):
     sequels = models.ManyToManyField('Sequel', through='FilmSequelRelationship')
     main_premier = models.DateField(blank=True, null=True)
     main_premier_year = models.PositiveIntegerField(blank=True, null=True)
+    slug_cache = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'
 
     @property
-    def film_slug(self):
-        if self.other_titles:
-            return slugify(self.orig_title) + '-' + slugify(self.other_titles) + '-' + slugify(self.year)
-        else:
-            return slugify(self.orig_title) + '-' + slugify(self.year)
+    def film_slug(self):  # TODO: remove
+        return self.slug_cache
 
     def num_specific_rating(self, r):
         if 1 <= r <= 5:
@@ -142,6 +145,10 @@ class Film(models.Model):
 
     def other_premiers(self):
         return Premier.objects.filter(film=self)
+
+    def save(self, *args, **kwargs):
+        self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.year)
+        super(Film, self).save(*args, **kwargs)
 
 
 class PremierType(models.Model):
@@ -248,12 +255,17 @@ class Topic(models.Model):
     created_by = models.ForeignKey(KTUser)
     created_at = models.DateTimeField(auto_now_add=True)
     last_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='last_topic_comment', on_delete=models.SET_NULL)
+    slug_cache = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.title
 
     class Meta:
         ordering = ['-last_comment']
+
+    def save(self, *args, **kwargs):
+        self.slug_cache = slugify(self.title)
+        super(Topic, self).save(*args, **kwargs)
 
 
 class Poll(models.Model):
@@ -277,9 +289,14 @@ class Poll(models.Model):
     number_of_comments = models.PositiveIntegerField(default=0)
     number_of_votes = models.PositiveIntegerField(default=0)
     number_of_people = models.PositiveIntegerField(default=0)
+    slug_cache = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        self.slug_cache = slugify(self.title)
+        super(Poll, self).save(*args, **kwargs)
 
 
 class PollChoice(models.Model):
@@ -455,6 +472,7 @@ class Artist(models.Model):
     ]
     gender = models.CharField(max_length=1, choices=GENDER_TYPES, default=GENDER_TYPE_UNKNOWN)
     films = models.ManyToManyField(Film, through='FilmArtistRelationship')
+    slug_cache = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -464,6 +482,10 @@ class Artist(models.Model):
 
     def num_rating(self):
         return sum([f.num_rating() for f in self.films.all()])
+
+    def save(self, *args, **kwargs):
+        self.slug_cache = slugify(self.name)
+        super(Artist, self).save(*args, **kwargs)
 
 
 class FilmArtistRelationship(models.Model):
@@ -486,9 +508,14 @@ class FilmArtistRelationship(models.Model):
     role_type = models.CharField(max_length=1, choices=ROLE_TYPES, default=ROLE_TYPE_DIRECTOR)
     actor_subtype = models.CharField(max_length=1, choices=ACTOR_SUBTYPES, default=ACTOR_SUBTYPE_FULL)
     role_name = models.CharField(max_length=250, blank=True)
+    slug_cache = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.role_type + '[' + self.role_name + ']:' + unicode(self.film) + '/' + unicode(self.artist)
+
+    def save(self, *args, **kwargs):
+        self.slug_cache = slugify(self.role_name)
+        super(FilmArtistRelationship, self).save(*args, **kwargs)
 
 
 class Keyword(models.Model):
@@ -505,12 +532,17 @@ class Keyword(models.Model):
     ]
     keyword_type = models.CharField(max_length=1, choices=KEYWORD_TYPES, default=KEYWORD_TYPE_OTHER)
     films = models.ManyToManyField(Film, through='FilmKeywordRelationship')
+    slug_cache = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.keyword_type + ':' + self.name
 
     class Meta:
         ordering = ['keyword_type', 'name']
+
+    def save(self, *args, **kwargs):
+        self.slug_cache = slugify(self.name)
+        super(Keyword, self).save(*args, **kwargs)
 
 
 class FilmKeywordRelationship(models.Model):
@@ -547,6 +579,7 @@ class Sequel(models.Model):
     ]
     sequel_type = models.CharField(max_length=1, choices=SEQUEL_TYPES, default=SEQUEL_TYPE_SEQUEL)
     films = models.ManyToManyField(Film, through='FilmSequelRelationship')
+    slug_cache = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -556,6 +589,10 @@ class Sequel(models.Model):
 
     def all_films(self):
         return self.films.all()
+
+    def save(self, *args, **kwargs):
+        self.slug_cache = slugify(self.name)
+        super(Sequel, self).save(*args, **kwargs)
 
 
 class FilmSequelRelationship(models.Model):
