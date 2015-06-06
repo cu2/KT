@@ -10,15 +10,15 @@
 <div class="centered_content">
 
 {% if directions and director_vote_count >= actor_vote_count %}
-    <h2>Rendezőként{% if director_vote_count >= 50 %} ({{ director_vote_avg|floatformat:"1" }}){% endif %}</h2>
+    <h2>Rendezőként{% if director_vote_count >= 50 %}<span class="artist_avg"> ({{ director_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
     {% include 'ktapp/tables/directions.html' with directions=directions %}
 {% endif %}
 {% if roles %}
-    <h2>Színészként{% if actor_vote_count >= 50 %} ({{ actor_vote_avg|floatformat:"1" }}){% endif %}</h2>
+    <h2>Színészként{% if actor_vote_count >= 50 %}<span class="artist_avg"> ({{ actor_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
     {% include 'ktapp/tables/roles.html' with roles=roles %}
 {% endif %}
 {% if directions and actor_vote_count > director_vote_count %}
-    <h2>Rendezőként{% if director_vote_count >= 50 %} ({{ director_vote_avg|floatformat:"1" }}){% endif %}</h2>
+    <h2>Rendezőként{% if director_vote_count >= 50 %}<span class="artist_avg"> ({{ director_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
     {% include 'ktapp/tables/directions.html' with directions=directions %}
 {% endif %}
 
