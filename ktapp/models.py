@@ -223,6 +223,12 @@ class Comment(models.Model):
         """Save comment and update domain object as well"""
         if 'domain' in kwargs:
             self.serial_number = kwargs['domain'].comment_set.count() + 1
+            if self.domain == Comment.DOMAIN_FILM:
+                try:
+                    vote = Vote.objects.get(film=self.film, user=self.created_by)
+                    self.rating = vote.rating
+                except Vote.DoesNotExist:
+                    self.rating = None
         super_kwargs = {key: value for key, value in kwargs.iteritems() if key != 'domain'}
         super(Comment, self).save(*args, **super_kwargs)
         if 'domain' in kwargs:
