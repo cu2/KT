@@ -219,6 +219,14 @@ input, select, textarea {
 textarea {
     width: 100%;
 }
+.button {
+    color: rgb(146,23,23);
+    background: rgb(249,244,218);
+    border: solid 1px rgb(128,128,128);
+    border-radius: 12px;
+    padding: 1px 12px;
+    cursor: pointer;
+}
 input[type=submit] {
     color: rgb(146,23,23);
     border-radius: 12px;
@@ -228,12 +236,12 @@ input.inactive_action {
     background: rgb(239,233,207);
     border: solid 1px rgb(178,175,161);
 }
-input.small_button {
+.small_button {
     font-size: 8pt;
     border-radius: 10px;
     padding: 1px 10px;
 }
-#toptopmenu input.small_button {
+#toptopmenu .small_button {
     font-size: 9pt;
     border-radius: 10px;
     padding: 1px 10px;
@@ -400,6 +408,7 @@ ul.nobullet {
     margin: 20px 0 40px 0;
 }
 .comment_block_content {
+    position: relative;
     background: rgb(249,244,218);
 }
 .comment_block_content p {
@@ -419,6 +428,23 @@ ul.nobullet {
     padding: 2px 5px;
     font-size: 9pt;
     text-align: right;
+}
+.comment_block_reply_to {
+    text-align: right;
+    font-size: 9pt;
+}
+.comment_block_reply_to hr {
+    width: 200px;
+    margin: 0 5px 0 auto;
+    padding: 0;
+}
+.comment_button_reply {
+    position: absolute; z-index: 10;
+    right: 5px; top: 5px;
+    display: none;
+}
+.comment_block_content:hover .comment_button_reply {
+    display: inline;
 }
 
 

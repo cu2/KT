@@ -11,9 +11,21 @@
     </div>
     {% endif %}
     <div class="comment_block_content">
+        {% if comment.domain == 'F' %}
+            <a href="{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}" class="comment_button_reply button small_button">Válasz erre a kommentre</a>
+        {% elif comment.domain == 'T' %}
+            <a href="{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}" class="comment_button_reply button small_button">Válasz erre a kommentre</a>
+        {% elif comment.domain == 'P' %}
+        {% endif %}
         {% autoescape off %}
             <p>{{ comment.content|linebreaksbr }}</p>
         {% endautoescape %}
+        {% if comment.reply_to %}
+            <div class="comment_block_reply_to">
+                <hr />
+                <p>válasz a #{{ comment.reply_to.serial_number }} kommentre</p>
+            </div>
+        {% endif %}
     </div>
     <div class="comment_block_author">
         <a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %} #{{ comment.serial_number }}, {{ comment.created_at|date:"Y-m-d H:i:s" }}

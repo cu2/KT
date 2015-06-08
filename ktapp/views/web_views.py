@@ -156,23 +156,30 @@ def film_main(request, id, film_slug):
 
 def film_comments(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
+    try:
+        reply_to_comment = models.Comment.objects.get(id=request.GET.get('valasz'))
+        reply_to_id = reply_to_comment.id
+    except models.Comment.DoesNotExist:
+        reply_to_comment = None
+        reply_to_id = None
     comment_form = kt_forms.CommentForm(initial={
-        "domain": models.Comment.DOMAIN_FILM,
-        "film": film,
-        "topic": None,
-        "poll": None,
-        "reply_to": None,
+        'domain': models.Comment.DOMAIN_FILM,
+        'film': film,
+        'topic': None,
+        'poll': None,
+        'reply_to': reply_to_id,
     })
-    comment_form.fields["domain"].widget = forms.HiddenInput()
-    comment_form.fields["film"].widget = forms.HiddenInput()
-    comment_form.fields["topic"].widget = forms.HiddenInput()
-    comment_form.fields["poll"].widget = forms.HiddenInput()
-    comment_form.fields["reply_to"].widget = forms.HiddenInput()
-    return render(request, "ktapp/film_subpages/film_comments.html", {
-        "active_tab": "comments",
-        "film": film,
-        "comments": film.comment_set.all(),
-        "comment_form": comment_form,
+    comment_form.fields['domain'].widget = forms.HiddenInput()
+    comment_form.fields['film'].widget = forms.HiddenInput()
+    comment_form.fields['topic'].widget = forms.HiddenInput()
+    comment_form.fields['poll'].widget = forms.HiddenInput()
+    comment_form.fields['reply_to'].widget = forms.HiddenInput()
+    return render(request, 'ktapp/film_subpages/film_comments.html', {
+        'active_tab': 'comments',
+        'film': film,
+        'comments': film.comment_set.all(),
+        'comment_form': comment_form,
+        'reply_to_comment': reply_to_comment,
     })
 
 
@@ -471,23 +478,30 @@ def forum(request, id, title_slug):
     try:
         topic = models.Topic.objects.get(pk=id)
     except models.Topic.DoesNotExist:
-        return HttpResponseRedirect(reverse("list_of_topics"))
+        return HttpResponseRedirect(reverse('list_of_topics'))
+    try:
+        reply_to_comment = models.Comment.objects.get(id=request.GET.get('valasz'))
+        reply_to_id = reply_to_comment.id
+    except models.Comment.DoesNotExist:
+        reply_to_comment = None
+        reply_to_id = None
     comment_form = kt_forms.CommentForm(initial={
-        "domain": models.Comment.DOMAIN_TOPIC,
-        "film": None,
-        "topic": topic,
-        "poll": None,
-        "reply_to": None,
+        'domain': models.Comment.DOMAIN_TOPIC,
+        'film': None,
+        'topic': topic,
+        'poll': None,
+        'reply_to': reply_to_id,
     })
-    comment_form.fields["domain"].widget = forms.HiddenInput()
-    comment_form.fields["film"].widget = forms.HiddenInput()
-    comment_form.fields["topic"].widget = forms.HiddenInput()
-    comment_form.fields["poll"].widget = forms.HiddenInput()
-    comment_form.fields["reply_to"].widget = forms.HiddenInput()
-    return render(request, "ktapp/forum.html", {
-        "topic": topic,
-        "comments": topic.comment_set.all()[:100],
-        "comment_form": comment_form,
+    comment_form.fields['domain'].widget = forms.HiddenInput()
+    comment_form.fields['film'].widget = forms.HiddenInput()
+    comment_form.fields['topic'].widget = forms.HiddenInput()
+    comment_form.fields['poll'].widget = forms.HiddenInput()
+    comment_form.fields['reply_to'].widget = forms.HiddenInput()
+    return render(request, 'ktapp/forum.html', {
+        'topic': topic,
+        'comments': topic.comment_set.all()[:100],
+        'comment_form': comment_form,
+        'reply_to_comment': reply_to_comment,
     })
 
 

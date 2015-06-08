@@ -4,9 +4,12 @@
             {% for hidden in comment_form.hidden_fields %}
                 {{ hidden }}
             {% endfor %}
+            {% if reply_to_comment %}
+                <p>Válasz a #{{ reply_to_comment.serial_number }} kommentre (<a href="{% if film %}{% url 'film_comments' film.id film.slug_cache %}{% elif topic %}{% url 'forum' topic.id topic.slug_cache %}{% endif %}">mégse</a>):</p>
+            {% endif %}
             {{ comment_form.content.errors }}
             {{ comment_form.content }}
-            <p class="center"><input type="submit" value="Mehet." /></p>
+            <p class="center"><input type="submit" value="Komment elküldése." /></p>
         </form>
     {% else %}
         <p>Ahhoz, hogy kommentelhess, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
