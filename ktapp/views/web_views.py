@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import math
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
@@ -11,6 +12,9 @@ from django.db.models import Sum, Q
 
 from ktapp import models
 from ktapp import forms as kt_forms
+
+
+COMMENTS_PER_PAGE = 5
 
 
 def index(request):
@@ -156,6 +160,22 @@ def film_main(request, id, film_slug):
 
 def film_comments(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
+    p = int(request.GET.get('p', 0))
+    if p == 1:
+        return HttpResponseRedirect(reverse('film_comments', args=(film.id, film.slug_cache)))
+    max_pages = int(math.ceil(1.0 * film.number_of_comments / COMMENTS_PER_PAGE))
+    if max_pages == 0:
+        max_pages = 1
+    if p == 0:
+        p = 1
+    if p > max_pages:
+        return HttpResponseRedirect(reverse('film_comments', args=(film.id, film.slug_cache)) + '?p=' + str(max_pages))
+    if max_pages > 1:
+        first_comment = film.number_of_comments - COMMENTS_PER_PAGE * (p - 1) - (COMMENTS_PER_PAGE - 1)
+        last_comment = film.number_of_comments - COMMENTS_PER_PAGE * (p - 1)
+        comments = film.comment_set.filter(serial_number__lte=last_comment, serial_number__gte=first_comment)
+    else:
+        comments = film.comment_set.all()
     try:
         reply_to_comment = models.Comment.objects.get(id=request.GET.get('valasz'))
         reply_to_id = reply_to_comment.id
@@ -177,9 +197,11 @@ def film_comments(request, id, film_slug):
     return render(request, 'ktapp/film_subpages/film_comments.html', {
         'active_tab': 'comments',
         'film': film,
-        'comments': film.comment_set.all(),
+        'comments': comments,
         'comment_form': comment_form,
         'reply_to_comment': reply_to_comment,
+        'p': p,
+        'max_pages': max_pages,
     })
 
 
@@ -479,6 +501,22 @@ def forum(request, id, title_slug):
         topic = models.Topic.objects.get(pk=id)
     except models.Topic.DoesNotExist:
         return HttpResponseRedirect(reverse('list_of_topics'))
+    p = int(request.GET.get('p', 0))
+    if p == 1:
+        return HttpResponseRedirect(reverse('forum', args=(topic.id, topic.slug_cache)))
+    max_pages = int(math.ceil(1.0 * topic.number_of_comments / COMMENTS_PER_PAGE))
+    if max_pages == 0:
+        max_pages = 1
+    if p == 0:
+        p = 1
+    if p > max_pages:
+        return HttpResponseRedirect(reverse('forum', args=(topic.id, topic.slug_cache)) + '?p=' + str(max_pages))
+    if max_pages > 1:
+        first_comment = topic.number_of_comments - COMMENTS_PER_PAGE * (p - 1) - (COMMENTS_PER_PAGE - 1)
+        last_comment = topic.number_of_comments - COMMENTS_PER_PAGE * (p - 1)
+        comments = topic.comment_set.filter(serial_number__lte=last_comment, serial_number__gte=first_comment)
+    else:
+        comments = topic.comment_set.all()
     try:
         reply_to_comment = models.Comment.objects.get(id=request.GET.get('valasz'))
         reply_to_id = reply_to_comment.id
@@ -499,9 +537,11 @@ def forum(request, id, title_slug):
     comment_form.fields['reply_to'].widget = forms.HiddenInput()
     return render(request, 'ktapp/forum.html', {
         'topic': topic,
-        'comments': topic.comment_set.all()[:100],
+        'comments': comments,
         'comment_form': comment_form,
         'reply_to_comment': reply_to_comment,
+        'p': p,
+        'max_pages': max_pages,
     })
 
 

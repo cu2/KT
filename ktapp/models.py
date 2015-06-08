@@ -302,6 +302,7 @@ class Poll(models.Model):
     number_of_votes = models.PositiveIntegerField(default=0)
     number_of_people = models.PositiveIntegerField(default=0)
     slug_cache = models.CharField(max_length=250, blank=True)
+    last_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='last_poll_comment', on_delete=models.SET_NULL)
 
     def __unicode__(self):
         return self.title
