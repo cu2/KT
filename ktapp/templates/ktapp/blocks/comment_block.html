@@ -16,6 +16,6 @@
         {% endautoescape %}
     </div>
     <div class="comment_block_author">
-        <a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}, {{ comment.created_at|date:"Y-m-d H:i:s" }}
+        <a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %} #{{ comment.serial_number }}, {{ comment.created_at|date:"Y-m-d H:i:s" }}
     </div>
 </div>

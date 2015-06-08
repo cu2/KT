@@ -210,6 +210,7 @@ class Comment(models.Model):
     content = models.TextField()
     reply_to = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL)
     rating = models.PositiveSmallIntegerField(blank=True, null=True)  # cache for film comments
+    serial_number = models.PositiveIntegerField(default=0)
 
     def __unicode__(self):
         return self.content[:100]
@@ -220,23 +221,32 @@ class Comment(models.Model):
 
     def save(self, *args, **kwargs):
         """Save comment and update domain object as well"""
+        if 'domain' in kwargs:
+            self.serial_number = kwargs['domain'].comment_set.count() + 1
         super_kwargs = {key: value for key, value in kwargs.iteritems() if key != 'domain'}
         super(Comment, self).save(*args, **super_kwargs)
-        kwargs['domain'].number_of_comments = kwargs['domain'].comment_set.count()
-        kwargs['domain'].last_comment = kwargs['domain'].comment_set.latest()
-        kwargs['domain'].save()
+        if 'domain' in kwargs:
+            kwargs['domain'].number_of_comments = kwargs['domain'].comment_set.count()
+            kwargs['domain'].last_comment = kwargs['domain'].comment_set.latest()
+            kwargs['domain'].save()
 
 
 @receiver(post_delete, sender=Comment)
 def delete_comment(sender, instance, **kwargs):
     if instance.domain == Comment.DOMAIN_FILM:
         domain = instance.film
+        remaining_comments = Comment.objects.filter(domain=instance.domain, film=instance.film)
     elif instance.domain == Comment.DOMAIN_TOPIC:
         domain = instance.topic
+        remaining_comments = Comment.objects.filter(domain=instance.domain, topic=instance.topic)
     elif instance.domain == Comment.DOMAIN_POLL:
         domain = instance.poll
+        remaining_comments = Comment.objects.filter(domain=instance.domain, poll=instance.poll)
     else:
         return
+    for idx, remaining_comment in enumerate(remaining_comments.filter(serial_number__gt=instance.serial_number).order_by('created_at', 'id')):
+        remaining_comment.serial_number = idx + instance.serial_number
+        remaining_comment.save()
     domain.number_of_comments = domain.comment_set.count()
     if domain.number_of_comments > 0:
         domain.last_comment = domain.comment_set.latest()
