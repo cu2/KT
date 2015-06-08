@@ -14,7 +14,7 @@ from ktapp import models
 from ktapp import forms as kt_forms
 
 
-COMMENTS_PER_PAGE = 5
+COMMENTS_PER_PAGE = 100
 
 
 def index(request):

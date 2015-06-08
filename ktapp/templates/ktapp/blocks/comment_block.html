@@ -18,7 +18,7 @@
         {% elif comment.domain == 'P' %}
         {% endif %}
         {% autoescape off %}
-            <p>{{ comment.content|linebreaksbr }}</p>
+            <p>{{ comment.content_html|linebreaksbr }}</p>
         {% endautoescape %}
         {% if comment.reply_to %}
             <div class="comment_block_reply_to">

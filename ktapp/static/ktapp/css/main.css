@@ -266,7 +266,8 @@ input.inactive_action {
     border: solid 1px rgb(0,0,0);
 }
 
-#SPOIL1 {
+.spoiler {
+    display: inline-block;
     border: solid 1px rgb(0,0,0);
     color: rgb(249,244,218);
     background-image: url(http://kritikustomeg.org/kepek/sp1.png);
@@ -274,6 +275,10 @@ input.inactive_action {
     background-repeat: no-repeat;
     padding: 20px 5px 5px 5px;
 }
+.comment_img {
+    max-width: 500px;
+}
+
 
 
 /* TABLES */
