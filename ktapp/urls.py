@@ -54,7 +54,7 @@ urlpatterns += patterns(
     url(r'^szereplo/(?P<id>\d+)/(?P<name_slug>.*)$', web_views.role, name='role'),
 
     url(r'^forum/(?P<id>\d+)/(?P<title_slug>.*)$', web_views.forum, name='forum'),
-    url(r'^forum$', web_views.list_of_topics, name='list_of_topics'),
+    url(r'^forum/$', web_views.list_of_topics, name='list_of_topics'),
     url(r'^uj_topik$', web_views.new_topic, name='new_topic'),
     url(r'^legfrissebb_kommentek$', web_views.latest_comments, name='latest_comments'),
 

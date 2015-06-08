@@ -21,12 +21,12 @@
         <nav id="toptopmenu" class="clearfix">
             <div id="toptopmenu_left">
                 <ul>
-                    <li><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
+                    <li id="logo"><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
                     {% if user.is_authenticated %}
-                    <li>[<a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a>]</li>
-                    {% if user.is_staff %}
-                    <li>(<a href="/admin/">szerk</a>)</li>
-                    {% endif %}
+                    <li>|<a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a>|</li>
+{#                    {% if user.is_staff %}#}
+{#                    <li>(<a href="/admin/">szerk</a>)</li>#}
+{#                    {% endif %}#}
                     <li>Beállítások</li>
                     <li><form action="{% url 'logout' %}" method="post" class="inline">
                         {% csrf_token %}
@@ -46,87 +46,53 @@
             </div>
             <div id="toptopmenu_right">
                 <form class="inline" action="{% url 'search' %}" method="get">
-                    <input type="text" placeholder="Keresés..." tabindex="1" name="q" />
+                    <input type="text" placeholder="Keresés..." tabindex="1" name="q" class="search_input" />
                 </form>
             </div>
         </nav>
-        <nav id="topmenu" class="clearfix">
-            <div id="topmenu_left">
-                <ul>
-                    <li>Filmek<br />
-                        <ul class="submenu">
-                            <li>Böngészés</li>
-                            <li>Várakozó</li>
-                            <li>Friss filmek</li>
-                            <li>Bemutatók</li>
-                            <li>Hiányzik!</li>
-                        </ul>
-                    </li>
-                    <li>Toplisták<br />
-                        <ul class="submenu">
-                            <li>Topfilmek</li>
-                            <li>Országonként</li>
-                            <li>Műfajonként</li>
-                            <li>Egyéni listák</li>
-                            <li>Toprendezők</li>
-                            <li>Topkívánságok</li>
-                            <li>Topországok</li>
-                        </ul>
-                    </li>
-                    <li>Tartalmak<br />
-                        <ul class="submenu">
-                            <li>Képek</li>
-                            <li>Idézetek</li>
-                            <li>Elemzések</li>
-                            <li>Érdekességek</li>
-                            <li>Kulcsszavak</li>
-                            <li>Portrék</li>
-                            <li>Díjak</li>
-                        </ul>
-                    </li>
-                    <li>Közösség<br />
-                        <ul class="submenu">
-                            <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
-                            <li><a href="{% url 'latest_comments' %}">Beszólások</a></li>
-                            <li>JÁTÉK</li>
-                            <li>Mindenki</li>
-                            <li>Jófejek</li>
-                            <li>Hasonlók</li>
-                            <li>Tapasztaltak</li>
-                        </ul>
-                    </li>
-                    <li>Ajánlók<br />
-                        <ul class="submenu">
-                            <li>Kedvenceid</li>
-                            <li>Emberi</li>
-                            <li>Gépi</li>
-                            <li>Tévés</li>
-                        </ul>
-                    </li>
-                    <li>Közkérdések<br />
-                        <ul class="submenu">
-                            <li>Leendő</li>
-                            <li>Aktív</li>
-                            <li>Lefutott</li>
-                        </ul>
-                    </li>
-                    <li>Vapiti<br />
-                        <ul class="submenu">
-                            <li>Arany</li>
-                            <li>Ezüst</li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-            <div id="topmenu_toggler"></div>
+
+        <nav id="leftmenu">
+            <ul>
+                <li>Filmek<br />
+                    <ul class="submenu">
+                        <li>Bemutatók</li>
+                    </ul>
+                </li>
+                <li>Toplisták<br />
+                    <ul class="submenu">
+                        <li>Filmek</li>
+                        <li>Rendezők</li>
+                        <li>Országok</li>
+                        <li>Egyéni listák</li>
+                    </ul>
+                </li>
+                <li>Közösség<br />
+                    <ul class="submenu">
+                        <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
+                        <li><a href="{% url 'latest_comments' %}">Beszólások</a></li>
+                    </ul>
+                </li>
+                <li>Ajánlók<br />
+                    <ul class="submenu">
+                        <li>Kedvenceid</li>
+                        <li>Emberi</li>
+                        <li>Gépi</li>
+                    </ul>
+                </li>
+                <li>Közkérdések<br />
+                    <ul class="submenu">
+                        <li>Leendő</li>
+                        <li>Aktív</li>
+                        <li>Lefutott</li>
+                    </ul>
+                </li>
+            </ul>
         </nav>
 
         <footer>
             <ul class="clearfix">
                 <li>Impresszum</li>
                 <li>Rulez</li>
-                <li>Gy.I.K.</li>
-                <li>Linkek</li>
                 <li>Facebook</li>
                 <li>Kassza</li>
                 <li>Üzenet a szerk-nek</li>
