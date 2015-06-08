@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.template.defaultfilters import slugify
+from django.utils.html import strip_tags
 
 from kt import settings
 from ktapp import utils
@@ -225,7 +226,7 @@ class Comment(models.Model):
     def save(self, *args, **kwargs):
         """Save comment and update domain object as well"""
         if 'domain' in kwargs:
-            # TODO: strip tags from content
+            self.content = strip_tags(self.content)
             self.content_html = utils.bbcode_to_html(self.content)
             self.serial_number = kwargs['domain'].comment_set.count() + 1
             if self.domain == Comment.DOMAIN_FILM:
