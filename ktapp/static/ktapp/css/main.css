@@ -7,7 +7,7 @@
     width: 100%;
     padding-top: 11px;
     height: 32px;
-    font-size: 11pt;
+    font-size: 12pt;
     overflow: hidden;
     border-bottom: solid rgba(109,106,92,0.5) 1px;
     box-shadow: 0 2px 5px rgba(109,106,92,0.5);
@@ -439,7 +439,7 @@ ul.nobullet {
     right: 5px; top: 5px;
     display: none;
 }
-.comment_block_content:hover .comment_button_reply {
+.comment_block:hover .comment_button_reply {
     display: inline;
 }
 

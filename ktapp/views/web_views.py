@@ -581,7 +581,8 @@ def user_profile(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
     return render(request, 'ktapp/user_profile.html', {
         'selected_user': selected_user,
-        'last_votes': selected_user.votes().order_by('-when', '-id')[:20],
+        'latest_votes': selected_user.votes().order_by('-when', '-id')[:50],
+        'latest_comments': models.Comment.objects.filter(created_by=selected_user)[:20],
     })
 
 

@@ -6,30 +6,53 @@
 {% block header %}<h1>{{ selected_user.username }}</h1>{% endblock %}
 
 {% block main %}
-    <h2>Alap adatok</h2>
-    <p>
-        Nem: {% if selected_user.public_gender %}{{ selected_user.gender }}{% else %}?{% endif %}<br />
-        Születési év: {% if selected_user.public_location %}{{ selected_user.location }}{% else %}?{% endif %}<br />
-        Lakhely: {% if selected_user.public_year_of_birth %}{{ selected_user.year_of_birth }}{% else %}?{% endif %}<br />
-        Regisztráció: {{ selected_user.date_joined|date:"Y. F d." }} ({{ selected_user.date_joined|timesince }})
-    </p>
 
-    <h2>Utolsó szavazatok</h2>
-    <table>
-        <tr class="header_tr">
-            <th>Film</th>
-            <th>Szavazat</th>
-            <th>Mikor</th>
-            <th>Átlag</th>
-        </tr>
-    {% for vote in last_votes %}
-        <tr class="{% cycle '' 'odd' %}">
-            <td>{{ vote.film|film_url_html }}</td>
-            <td class="center">{{ vote.rating }}</td>
-            <td class="center">{{ vote.when|date:"Y-m-d" }}</td>
-            <td class="center">{{ vote.film|film_rating_html }}</td>
-        </tr>
-    {% endfor %}
-    </table>
+    <div class="left_content">
+
+        <p>
+            Nem: {% if selected_user.public_gender or selected_user == user.id %}
+                {% if selected_user.gender == 'M' %}
+                    férfi
+                {% elif selected_user.gender == 'F' %}
+                    nő
+                {% else %}
+                    ?
+                {% endif %}
+            {% else %}?{% endif %}<br />
+            Születési év: {% if selected_user.public_year_of_birth or selected_user == user.id %}{{ selected_user.year_of_birth }}{% else %}?{% endif %}<br />
+            Lakhely: {% if selected_user.public_location or selected_user == user.id %}{{ selected_user.location }}{% else %}?{% endif %}<br />
+            Regisztráció: {{ selected_user.date_joined|date:"Y. F d." }} ({{ selected_user.date_joined|timesince }})
+        </p>
+
+        <h2>Legutóbbi szavazatok</h2>
+        <table>
+            <tr class="header_tr">
+                <th>Film</th>
+                <th>Szavazat</th>
+                <th>Mikor</th>
+                <th>Átlag</th>
+            </tr>
+        {% for vote in latest_votes %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td>{{ vote.film|film_url_html }}</td>
+                <td class="center">{{ vote.rating }}</td>
+                <td class="center">{{ vote.when|date:"Y-m-d" }}</td>
+                <td class="center">{{ vote.film|film_rating_html }}</td>
+            </tr>
+        {% endfor %}
+        </table>
+
+    </div>
+    <div class="right_content">
+
+        <h2>Legutóbbi kommentek</h2>
+        {% if latest_comments %}
+            {% for c in latest_comments %}
+                {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
+            {% endfor %}
+        {% endif %}
+
+    </div>
+    <br class="clear" />
 
 {% endblock %}

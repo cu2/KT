@@ -23,11 +23,10 @@
                 <ul>
                     <li id="logo"><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
                     {% if user.is_authenticated %}
-                    <li>|<a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a>|</li>
+                    <li><b><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></b></li>
 {#                    {% if user.is_staff %}#}
 {#                    <li>(<a href="/admin/">szerk</a>)</li>#}
 {#                    {% endif %}#}
-                    <li>Beállítások</li>
                     <li><a href="{% url 'messages' %}">Üzenetek</a></li>
                     <li><form action="{% url 'logout' %}" method="post" class="inline">
                         {% csrf_token %}
