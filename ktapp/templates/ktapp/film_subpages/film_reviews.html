@@ -8,7 +8,7 @@
             <div class="film_addon">
                 <div class="film_addon_content">
                     {% autoescape off %}
-                        <p>{{ r.content_html|striptags|truncatechars:400|linebreaksbr }}</p>
+                        {{ r.content_html|striptags|truncatechars:400|linebreaks }}
                     {% endautoescape %}
                     <p><a href="{% url 'film_review' film.id film.slug_cache r.id %}">Tovább...</a></p>
                 </div>

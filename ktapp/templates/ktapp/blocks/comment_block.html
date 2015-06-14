@@ -22,8 +22,7 @@
         {% endautoescape %}
         {% if comment.reply_to %}
             <div class="comment_block_reply_to">
-                <hr />
-                <p>válasz a #{{ comment.reply_to.serial_number }} kommentre</p>
+                <p><span>előzmény: {{ comment.reply_to.created_by }} (#{{ comment.reply_to.serial_number }})</span></p>
             </div>
         {% endif %}
     </div>

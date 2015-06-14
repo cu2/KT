@@ -257,13 +257,8 @@ input.inactive_action {
 }
 
 .spoiler {
-    display: inline-block;
-    border: solid 1px rgb(0,0,0);
-    color: rgb(249,244,218);
-    background-image: url(http://kritikustomeg.org/kepek/sp1.png);
-    background-position: 5px 5px;
-    background-repeat: no-repeat;
-    padding: 20px 5px 5px 5px;
+    background: rgb(0,0,0);
+    color: rgb(0,0,0);
 }
 .comment_img {
     max-width: 500px;
@@ -428,10 +423,8 @@ ul.nobullet {
     text-align: right;
     font-size: 9pt;
 }
-.comment_block_reply_to hr {
-    width: 200px;
-    margin: 0 5px 0 auto;
-    padding: 0;
+.comment_block_reply_to p span {
+    border-top: solid rgb(0,0,0) 1px;
 }
 .comment_button_reply {
     position: absolute; z-index: 10;

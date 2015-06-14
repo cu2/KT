@@ -6,7 +6,7 @@
         <div class="film_addon">
             <div class="film_addon_content">
                 {% autoescape off %}
-                    <p>{{ review.content_html|linebreaksbr }}</p>
+                    {{ review.content_html|linebreaks }}
                 {% endautoescape %}
             </div>
             <div class="film_addon_author">

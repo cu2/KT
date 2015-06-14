@@ -613,7 +613,7 @@ class Sequel(models.Model):
         ordering = ['sequel_type', 'name']
 
     def all_films(self):
-        return self.films.all()
+        return self.films.all().order_by('year', 'orig_title', 'id')
 
     def save(self, *args, **kwargs):
         self.slug_cache = slugify(self.name)
