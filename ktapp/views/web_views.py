@@ -582,3 +582,10 @@ def user_profile(request, id, name_slug):
         'selected_user': selected_user,
         'last_votes': selected_user.votes().order_by('-when', '-id')[:20],
     })
+
+
+@login_required
+def messages(request):
+    return render(request, 'ktapp/messages.html', {
+        'messages': models.Message.objects.filter(owned_by=request.user).order_by('-sent_at')[:50]
+    })

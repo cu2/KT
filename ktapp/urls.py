@@ -62,6 +62,7 @@ urlpatterns += patterns(
     url(r'^bejelentkezes/$', login, name='login', kwargs={'template_name': 'ktapp/login.html'}),
     url(r'^kijelentkezes/$', logout, name='logout', kwargs={'next_page': '/'}),
     url(r'^regisztracio/$', web_views.registration, name='registration'),
+    url(r'^uzik/$', web_views.messages, name='messages'),
 )
 
 

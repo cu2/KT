@@ -767,6 +767,9 @@ class Message(models.Model):
             ['owned_by', 'sent_at'],
         ]
 
+    def recipients(self):
+        return self.sent_to.all().order_by('username', 'id')
+
 
 class Wishlist(models.Model):
     film = models.ForeignKey(Film, blank=True, null=True)

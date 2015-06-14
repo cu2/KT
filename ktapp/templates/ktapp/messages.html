@@ -1,0 +1,14 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}<h1>Privát üzik</h1>{% endblock %}
+
+{% block main %}
+
+    {% for message in messages %}
+        {% include 'ktapp/blocks/message_block.html' with message=message %}
+    {% endfor %}
+
+{% endblock %}

@@ -28,6 +28,7 @@
 {#                    <li>(<a href="/admin/">szerk</a>)</li>#}
 {#                    {% endif %}#}
                     <li>Beállítások</li>
+                    <li><a href="{% url 'messages' %}">Üzenetek</a></li>
                     <li><form action="{% url 'logout' %}" method="post" class="inline">
                         {% csrf_token %}
                         <input type="submit" value="Kijelentkezés" class="small_button" />
