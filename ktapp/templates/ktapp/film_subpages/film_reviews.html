@@ -7,7 +7,9 @@
         {% for r in reviews %}
             <div class="film_addon">
                 <div class="film_addon_content">
-                    <p>{{ r.content|truncatechars:400|linebreaksbr }}</p>
+                    {% autoescape off %}
+                        <p>{{ r.content_html|striptags|truncatechars:400|linebreaksbr }}</p>
+                    {% endautoescape %}
                     <p><a href="{% url 'film_review' film.id film.slug_cache r.id %}">Tovább...</a></p>
                 </div>
                 <div class="film_addon_author">
