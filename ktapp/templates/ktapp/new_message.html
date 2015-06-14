@@ -1,0 +1,20 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}<h1>Új privát üzenet</h1>{% endblock %}
+
+{% block main %}
+
+    <form action="{% url 'new_message' %}" method="post">
+        {% csrf_token %}
+        <p>Címzett(ek): <input type="text" name="recipients" class="recipients_input" id="recipients" /></p>
+        <p>
+            Üzenet:<br />
+            <textarea name="content" rows="10"></textarea>
+        </p>
+        <p class="center"><input type="submit" value="Üzenet elküldése." /></p>
+    </form>
+
+{% endblock %}

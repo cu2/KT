@@ -205,7 +205,6 @@ input, select, textarea {
     background: rgb(249,244,218);
     border: solid 1px rgb(128,128,128);
     border-radius: 3px;
-    margin-bottom: 20px;
 }
 textarea {
     width: 100%;
@@ -636,4 +635,18 @@ ul.nobullet {
 
 .artist_avg {
     font-size: 10pt;
+}
+
+
+
+
+
+.recipients_input {
+    width: 300px;
+}
+
+.ui-autocomplete-loading {
+    background-image: url(images/ajax-loader.gif);
+    background-position: right center;
+    background-repeat: no-repeat;
 }

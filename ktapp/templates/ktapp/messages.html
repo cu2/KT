@@ -7,6 +7,8 @@
 
 {% block main %}
 
+    <p><a href="{% url 'new_message' %}">Új üzenet küldése</a></p>
+
     {% for message in messages %}
         {% include 'ktapp/blocks/message_block.html' with message=message %}
     {% endfor %}

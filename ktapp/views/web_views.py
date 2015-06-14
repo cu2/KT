@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django import forms
 from django.db.models import Sum, Q
+from django.utils.html import strip_tags
 
 from ktapp import models
 from ktapp import forms as kt_forms
@@ -604,3 +605,36 @@ def messages(request):
         'p': p,
         'max_pages': max_pages,
     })
+
+
+@login_required
+def new_message(request):
+    if request.POST:
+        raw_content = request.POST['content']
+        content = strip_tags(raw_content)
+        if len(content) == 0:
+            return HttpResponseRedirect(reverse('messages'))
+        raw_recipients = request.POST['recipients']
+        recipients = []
+        for recipient_name in raw_recipients.strip().split(','):
+            try:
+                recipient = models.KTUser.objects.get(username=recipient_name.strip())
+            except models.KTUser.DoesNotExist:
+                continue
+            recipients.append(recipient)
+        recipients = list(set(recipients))
+        if len(recipients) == 0:
+            return HttpResponseRedirect(reverse('messages'))
+        owners = list(set(recipients + [request.user]))
+        for owner in owners:
+            message = models.Message.objects.create(
+                sent_by=request.user,
+                content=content,
+                owned_by=owner,
+                private=len(recipients)==1,
+            )
+            for recipient in recipients:
+                message.sent_to.add(recipient)
+            message.save()
+        return HttpResponseRedirect(reverse('messages'))
+    return render(request, 'ktapp/new_message.html')

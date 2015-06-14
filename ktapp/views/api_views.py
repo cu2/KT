@@ -1,3 +1,6 @@
+import json
+
+from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
@@ -41,3 +44,14 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
 class SequelViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Sequel.objects.all()
     serializer_class = serializers.SequelSerializer
+
+
+def get_users(request):
+    q = request.GET.get('q', '')
+    if len(q) < 2:
+        return HttpResponse(json.dumps({
+            'results': [],
+        }), content_type='application/json')
+    return HttpResponse(json.dumps(
+        [user.username for user in models.KTUser.objects.filter(username__icontains=q).order_by('username', 'id')[:10]]
+    ), content_type='application/json')

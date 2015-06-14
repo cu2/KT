@@ -20,6 +20,8 @@ urlpatterns = patterns(
     '',
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # custom api endpoints:
+    url(r'^api/autocomplete/users$', api_views.get_users, name='get_users'),
 )
 
 
@@ -62,7 +64,9 @@ urlpatterns += patterns(
     url(r'^bejelentkezes/$', login, name='login', kwargs={'template_name': 'ktapp/login.html'}),
     url(r'^kijelentkezes/$', logout, name='logout', kwargs={'next_page': '/'}),
     url(r'^regisztracio/$', web_views.registration, name='registration'),
+
     url(r'^uzik/$', web_views.messages, name='messages'),
+    url(r'^uj_uzenet$', web_views.new_message, name='new_message'),
 )
 
 
