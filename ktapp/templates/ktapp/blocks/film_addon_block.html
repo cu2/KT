@@ -1,6 +1,8 @@
 <div class="film_addon">
     <div class="film_addon_content">
-        <p>{{ addon.content|linebreaksbr }}</p>
+        {% autoescape off %}
+            <p>{{ addon.content_html|linebreaksbr }}</p>
+        {% endautoescape %}
     </div>
     <div class="film_addon_author">
         {% if addon.created_by %}

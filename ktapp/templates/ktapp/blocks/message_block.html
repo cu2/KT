@@ -3,6 +3,8 @@
         {{ message.sent_at }} <a href="{% url 'user_profile' message.sent_by.id message.sent_by.slug_cache %}">{{ message.sent_by }}</a> &gt; {% for recipient in message.recipients %}<a href="{% url 'user_profile' recipient.id recipient.slug_cache %}">{{ recipient }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
     </div>
     <div class="comment_block_content">
-        <p>{{ message.content|linebreaksbr }}</p>
+        {% autoescape off %}
+            <p>{{ message.content_html|linebreaksbr }}</p>
+        {% endautoescape %}
     </div>
 </div>
