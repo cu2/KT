@@ -15,6 +15,7 @@ from ktapp import forms as kt_forms
 
 
 COMMENTS_PER_PAGE = 100
+MESSAGES_PER_PAGE = 50
 
 
 def index(request):
@@ -586,6 +587,19 @@ def user_profile(request, id, name_slug):
 
 @login_required
 def messages(request):
+    number_of_messages = models.Message.objects.filter(owned_by=request.user).count()
+    p = int(request.GET.get('p', 0))
+    if p == 1:
+        return HttpResponseRedirect(reverse('messages'))
+    max_pages = int(math.ceil(1.0 * number_of_messages / MESSAGES_PER_PAGE))
+    if max_pages == 0:
+        max_pages = 1
+    if p == 0:
+        p = 1
+    if p > max_pages:
+        return HttpResponseRedirect(reverse('messages') + '?p=' + str(max_pages))
     return render(request, 'ktapp/messages.html', {
-        'messages': models.Message.objects.filter(owned_by=request.user).order_by('-sent_at')[:50]
+        'messages': models.Message.objects.filter(owned_by=request.user).order_by('-sent_at')[(p-1) * MESSAGES_PER_PAGE:p * MESSAGES_PER_PAGE],
+        'p': p,
+        'max_pages': max_pages,
     })
