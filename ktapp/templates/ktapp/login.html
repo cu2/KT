@@ -6,22 +6,24 @@
 
 {% block main %}
 
-    {% if form.errors %}
-        <p class="error">Hibás név vagy jelszó!</p>
+    {% if error == 'ban' %}
+        <p class="error">Úgy tűnik, ki vagy tiltva.</p>
+    {% elif error == 'fail' %}
+        <p class="error">Véletlenül elgépelted a neved vagy jelszavad. Légyszi próbáld újra.</p>
     {% endif %}
 
     <form action="" method="post">
         {% csrf_token %}
-        <input type="hidden" name="next" value="{% url 'index' %}" />
+        <input type="hidden" name="next" value="{{ next }}" />
         <p>
-            <label for="username">Név:</label>
-            <input type="text" name="username" value="" id="username">
+            <label for="username">Név vagy email cím:</label>
+            <input type="text" name="username" value="" id="separate_login_username">
         </p>
         <p>
             <label for="password">Jelszó:</label>
-            <input type="password" name="password" value="" id="password">
+            <input type="password" name="password" value="" id="separate_login_password">
         </p>
-        <p><input type="submit" value="login" /></p>
+        <p><input type="submit" value="Bejelentkezés" /></p>
     </form>
 
 {% endblock %}

@@ -31,17 +31,18 @@
                     <li><a href="{% url 'messages' %}">Üzenetek</a></li>
                     <li><form action="{% url 'logout' %}" method="post" class="inline">
                         {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.path }}" />
                         <input type="submit" value="Kijelentkezés" class="small_button" />
                     </form></li>
                     {% else %}
                     <li id="login_menu"><form action="{% url 'login' %}" method="post" class="inline">
                         {% csrf_token %}
-                        <input type="hidden" name="next" value="{% url 'index' %}" />
-                        <input type="text" name="username" value="" id="login_username" placeholder="név" tabindex="2" />
+                        <input type="hidden" name="next" value="{{ request.path }}" />
+                        <input type="text" name="username" value="" id="login_username" placeholder="név vagy email" tabindex="2" />
                         <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
                         <input type="submit" value="Bejelentkezés" class="small_button" />
                     </form></li>
-                    <li><a href="{% url 'registration' %}">Regisztráció</a></li>
+                    <li><a href="{% url 'registration' %}?next={{ request.path }}">Regisztráció</a></li>
                     {% endif %}
                 </ul>
             </div>

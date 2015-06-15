@@ -643,3 +643,11 @@ ul.nobullet {
     background-position: right center;
     background-repeat: no-repeat;
 }
+
+
+
+.error {
+    border: solid rgba(109,106,92,0.5) 1px;
+    background: rgb(218,211,184);
+    padding: 10px;
+}

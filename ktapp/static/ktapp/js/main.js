@@ -45,4 +45,6 @@ $(function() {
             }
         });
 
+    $('#separate_login_username').focus();
+
 });

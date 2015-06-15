@@ -6,6 +6,7 @@ import math
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django import forms
 from django.db.models import Sum, Q
@@ -13,6 +14,7 @@ from django.utils.html import strip_tags
 
 from ktapp import models
 from ktapp import forms as kt_forms
+from ktapp import utils as kt_utils
 
 
 COMMENTS_PER_PAGE = 100
@@ -575,6 +577,35 @@ def registration(request):
         form = kt_forms.UserCreationForm()
     return render(request, "ktapp/registration.html", {
         'form': form,
+    })
+
+
+def custom_login(request):
+    if request.method == 'POST':
+        next = request.POST['next']
+        if next == '':
+            next = request.META.get('HTTP_REFERER')
+        username_or_email = request.POST['username']
+        password = request.POST['password']
+        user = kt_utils.custom_authenticate(models.KTUser, username_or_email, password)
+        if user is not None:
+            if user.is_active:  # success
+                login(request, user)
+                return HttpResponseRedirect(next)
+            else:  # disabled account
+                return render(request, 'ktapp/login.html', {
+                    'next': next,
+                    'error': 'ban',
+                })
+        else:  # login failed
+            return render(request, 'ktapp/login.html', {
+                'next': next,
+                'error': 'fail',
+            })
+    else:
+        next = request.GET.get('next', request.META.get('HTTP_REFERER'))
+    return render(request, 'ktapp/login.html', {
+        'next': next,
     })
 
 

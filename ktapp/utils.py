@@ -1,5 +1,7 @@
 import re
 
+from django.contrib.auth import authenticate
+
 
 def bbcode_to_html(value):
     value = re.sub('\[link=([^\]]*)\]', '<a href="\\1">', value)
@@ -33,3 +35,13 @@ def html_to_bbcode(value):
     value = value.replace('</div>', '[/spoiler]')
     value = re.sub('<img src="([^"]*)">', '[img]\\1[/img]', value)
     return value
+
+
+def custom_authenticate(user_model, username_or_email, password):
+    # TODO: old password -> new password
+    try:
+        user = user_model.objects.get(email=username_or_email)
+        username = user.username
+    except user_model.DoesNotExist:
+        username = username_or_email
+    return authenticate(username=username, password=password)
