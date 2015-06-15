@@ -24,25 +24,22 @@
                 <ul>
                     <li id="logo"><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
                     {% if user.is_authenticated %}
-                    <li><b><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></b></li>
-{#                    {% if user.is_staff %}#}
-{#                    <li>(<a href="/admin/">szerk</a>)</li>#}
-{#                    {% endif %}#}
-                    <li><a href="{% url 'messages' %}">Üzenetek</a></li>
-                    <li><form action="{% url 'logout' %}" method="post" class="inline">
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ request.path }}" />
-                        <input type="submit" value="Kijelentkezés" class="small_button" />
-                    </form></li>
+                        <li><b><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></b></li>
+                        <li><a href="{% url 'messages' %}">Üzenetek</a></li>
+                        <li><form action="{% url 'logout' %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}" />
+                            <input type="submit" value="Kijelentkezés" class="small_button" />
+                        </form></li>
                     {% else %}
-                    <li id="login_menu"><form action="{% url 'login' %}" method="post" class="inline">
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ request.path }}" />
-                        <input type="text" name="username" value="" id="login_username" placeholder="név vagy email" tabindex="2" />
-                        <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
-                        <input type="submit" value="Bejelentkezés" class="small_button" />
-                    </form></li>
-                    <li><a href="{% url 'registration' %}?next={{ request.path }}">Regisztráció</a></li>
+                        <li id="login_menu"><form action="{% url 'login' %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.path }}" />
+                            <input type="text" name="username" value="" id="login_username" placeholder="név vagy email" tabindex="2" />
+                            <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
+                            <input type="submit" value="Bejelentkezés" class="small_button" />
+                        </form></li>
+                        <li><a href="{% url 'registration' %}?next={{ request.path }}">Regisztráció</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -88,6 +85,13 @@
                         <li>Lefutott</li>
                     </ul>
                 </li>
+                {% if user.is_staff %}
+                    <li>Szerkesztőség<br />
+                        <ul class="submenu">
+                            <li><a href="/admin/">Admin</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
 
