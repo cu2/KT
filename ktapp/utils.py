@@ -38,7 +38,6 @@ def html_to_bbcode(value):
 
 
 def custom_authenticate(user_model, username_or_email, password):
-    # TODO: old password -> new password
     try:
         user = user_model.objects.get(email=username_or_email)
         username = user.username
