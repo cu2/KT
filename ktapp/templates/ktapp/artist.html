@@ -27,5 +27,21 @@
     {% include 'ktapp/tables/awards.html' with awards=awards show_film=True %}
     {% endif %}
 
+    {% if biographies %}
+        <h2>Portré{% if biographies.count > 1 %}k{% endif %}</h2>
+        {% for bio in biographies %}
+            <div class="film_addon">
+                <div class="film_addon_content">
+                    {% autoescape off %}
+                        {{ bio.content_html|linebreaks }}
+                    {% endautoescape %}
+                </div>
+                <div class="film_addon_author">
+                    <a href="{% url 'user_profile' bio.created_by.id bio.created_by.slug_cache %}">{{ bio.created_by }}</a>, {{ bio.created_at|date:"Y-m-d" }}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
 </div>
 {% endblock %}

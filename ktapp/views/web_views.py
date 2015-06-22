@@ -483,6 +483,7 @@ def artist(request, id, name_slug):
         "director_vote_avg": director_vote_avg,
         "actor_vote_avg": actor_vote_avg,
         "awards": models.Award.objects.filter(artist=artist).order_by('name', 'year', 'category'),
+        'biographies': models.Biography.objects.filter(artist=artist),
     })
 
 
