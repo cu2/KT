@@ -85,7 +85,6 @@ where `<something>` = anything random, but same as `kt/settings_local.py/DATABAS
 
 Initialize your database (mostly empty tables):
 
-    python manage.py syncdb
     python manage.py migrate
 
 Create a superuser to be able to access admin (`http://localhost:<port>/admin/`):
