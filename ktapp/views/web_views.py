@@ -6,11 +6,14 @@ import math
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django import forms
 from django.db.models import Sum, Q
 from django.utils.html import strip_tags
+from django.utils.crypto import get_random_string
 
 from ktapp import models
 from ktapp import forms as kt_forms
@@ -569,44 +572,82 @@ def new_topic(request):
 
 
 def registration(request):
+
+    def is_valid_email(email):
+        try:
+            validate_email(email)
+        except ValidationError:
+            return False
+        return True
+
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    error_type = ''
+    username = request.POST.get('username', '')
+    email = request.POST.get('email', '')
+    accept = request.POST.get('accept', False)
     if request.method == 'POST':
-        form = kt_forms.UserCreationForm(request.POST)
-        if form.is_valid():
-            new_user = form.save()
-            return HttpResponseRedirect(reverse("index"))
-    else:
-        form = kt_forms.UserCreationForm()
-    return render(request, "ktapp/registration.html", {
-        'form': form,
+        if accept:
+            error_type = 'robot'
+        elif username == '':
+            error_type = 'name_empty'
+        elif email == '':
+            error_type = 'email_empty'
+        elif not is_valid_email(email):
+            error_type = 'email_invalid'
+        elif models.KTUser.objects.filter(email=email).count():
+            error_type = 'email_taken'
+        elif models.KTUser.objects.filter(username=username).count():
+            error_type = 'name_taken'
+        else:
+            password = get_random_string(32)
+            models.KTUser.objects.create_user(username, email, password)
+            user = kt_utils.custom_authenticate(models.KTUser, username, password)
+            login(request, user)
+            return HttpResponseRedirect(next_url)
+    return render(request, 'ktapp/registration.html', {
+        'next': next_url,
+        'username': username,
+        'email': email,
+        'error_type': error_type,
     })
 
 
 def custom_login(request):
     if request.method == 'POST':
-        next = request.POST['next']
-        if next == '':
-            next = request.META.get('HTTP_REFERER')
+        next_url = request.POST.get('next', request.META.get('HTTP_REFERER'))
         username_or_email = request.POST['username']
+        if not username_or_email:
+            return render(request, 'ktapp/login.html', {
+                'next': next_url,
+                'error_type': 'name_empty',
+            })
         password = request.POST['password']
+        if not password:
+            return render(request, 'ktapp/login.html', {
+                'next': next_url,
+                'error_type': 'password_empty',
+                'username': username_or_email,
+            })
         user = kt_utils.custom_authenticate(models.KTUser, username_or_email, password)
         if user is not None:
             if user.is_active:  # success
                 login(request, user)
-                return HttpResponseRedirect(next)
+                return HttpResponseRedirect(next_url)
             else:  # disabled account
                 return render(request, 'ktapp/login.html', {
-                    'next': next,
-                    'error': 'ban',
+                    'next': next_url,
+                    'error_type': 'ban',
                 })
         else:  # login failed
             return render(request, 'ktapp/login.html', {
-                'next': next,
-                'error': 'fail',
+                'next': next_url,
+                'error_type': 'fail',
+                'username': username_or_email,
             })
     else:
-        next = request.GET.get('next', request.META.get('HTTP_REFERER'))
+        next_url = request.GET.get('next', request.META.get('HTTP_REFERER'))
     return render(request, 'ktapp/login.html', {
-        'next': next,
+        'next': next_url,
     })
 
 

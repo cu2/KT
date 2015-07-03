@@ -263,7 +263,9 @@ input.inactive_action {
 .comment_img {
     max-width: 500px;
 }
-
+.reg_optional {
+    display: none;
+}
 
 
 /* TABLES */

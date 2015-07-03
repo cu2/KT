@@ -6,10 +6,18 @@
 
 {% block main %}
 
-    {% if error == 'ban' %}
-        <p class="error">Úgy tűnik, ki vagy tiltva.</p>
-    {% elif error == 'fail' %}
-        <p class="error">Véletlenül elgépelted a neved vagy jelszavad. Légyszi próbáld újra.</p>
+    {% if error_type %}
+        <p class="error">
+            {% if error_type == 'ban' %}
+                Úgy tűnik, ki vagy tiltva.
+            {% elif error_type == 'name_empty' %}
+                Add meg a felhasználóneved vagy email címed.
+            {% elif error_type == 'password_empty' %}
+                Add meg a jelszavad.
+            {% elif error_type == 'fail' %}
+                Véletlenül elgépelted a neved vagy jelszavad. Légyszi próbáld újra.
+            {% endif %}
+        </p>
     {% endif %}
 
     <form action="" method="post">
@@ -17,7 +25,7 @@
         <input type="hidden" name="next" value="{{ next }}" />
         <p>
             <label for="username">Név vagy email cím:</label>
-            <input type="text" name="username" value="" id="separate_login_username">
+            <input type="text" name="username" value="{{ username }}" id="separate_login_username">
         </p>
         <p>
             <label for="password">Jelszó:</label>
@@ -25,5 +33,7 @@
         </p>
         <p><input type="submit" value="Bejelentkezés" /></p>
     </form>
+
+    <p>Ha még nem is regisztráltál, <a href="{% url 'registration' %}?next={{ next }}">itt tudsz</a>.</p>
 
 {% endblock %}

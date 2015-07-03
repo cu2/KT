@@ -6,10 +6,34 @@
 
 {% block main %}
 
+    {% if error_type %}
+        <p class="error">
+            {% if error_type == 'robot' %}
+                Ezen az oldalon csak emberek regisztrálhatnak.
+            {% elif error_type == 'name_empty' %}
+                Válassz egy felhasználónevet.
+            {% elif error_type == 'email_empty' %}
+                Add meg az email címed.
+            {% elif error_type == 'email_invalid' %}
+                Véletlenül elgépelted az email címed. Légyszi próbáld újra.
+            {% elif error_type == 'name_taken' %}
+                Ez a felhasználónév foglalt. Ha régebben már regisztráltál, <a href="{% url 'login' %}?next={{ next }}">itt tudsz bejelentkezni</a>.
+            {% elif error_type == 'email_taken' %}
+                Ezzel az email címmel már regisztrált valaki. Ha te voltál az, <a href="{% url 'login' %}?next={{ next }}">itt tudsz bejelentkezni</a>.
+            {% endif %}
+        </p>
+    {% endif %}
+
     <form action="" method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Regisztrálok">
+        <input type="hidden" name="next" value="{{ next }}" />
+        <p>Felhasználónév: <input type="text" name="username" value="{{ username }}" id="separate_reg_username" /></p>
+        <p>Email cím: <input type="email" name="email" value="{{ email }}" /></p>
+        <p class="reg_optional">Robot vagy? <input type="checkbox" name="accept" /></p>
+        <p>
+            <input type="submit" value="Regisztráció">
+            <a href="{{ next }}" class="button small_button" style="float: right">Mégsem</a>
+        </p>
     </form>
 
 {% endblock %}
