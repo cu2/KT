@@ -174,3 +174,8 @@ LOGIN_URL = '/bejelentkezes/'
 LOGIN_REDIRECT_URL = '/bejelentkezes/'
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+
+# override w settings_prod if KT_ENV=prod
+if os.getenv('KT_ENV', '') == 'prod':
+    from kt.settings_prod import *
