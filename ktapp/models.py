@@ -222,6 +222,10 @@ class Comment(models.Model):
     class Meta:
         ordering = ['-created_at']
         get_latest_by = 'created_at'
+        index_together = [
+            ['created_at'],
+            ['domain', 'created_at'],
+        ]
 
     def save(self, *args, **kwargs):
         """Save comment and update domain object as well"""
