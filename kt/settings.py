@@ -176,6 +176,20 @@ LOGIN_REDIRECT_URL = '/bejelentkezes/'
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 
+
+# if True, KTUser.email_user() will print the email instead of sending it
+try:
+    LOCAL_MAIL = kt.settings_local.LOCAL_MAIL
+except:
+    LOCAL_MAIL = False
+
+
+try:
+    DEFAULT_FROM_EMAIL = kt.settings_local.DEFAULT_FROM_EMAIL
+except:
+    DEFAULT_FROM_EMAIL = None
+
+
 # override w settings_prod if KT_ENV=prod
 if os.getenv('KT_ENV', '') == 'prod':
     from kt.settings_prod import *

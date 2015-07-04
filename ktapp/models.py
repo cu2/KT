@@ -51,8 +51,16 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.username
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        send_mail(subject, message, from_email, [self.email], **kwargs)
+    def email_user(self, subject, message, from_email=settings.DEFAULT_FROM_EMAIL, **kwargs):
+        if settings.LOCAL_MAIL:
+            print '[SUBJECT] %s' % subject
+            print '[FROM] %s' % from_email
+            print '[TO] %s' % self.email
+            print '[BODY]'
+            print message
+            print '[/BODY]'
+        else:
+            send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def votes(self):
         return self.vote_set.all()
