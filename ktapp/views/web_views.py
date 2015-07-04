@@ -584,9 +584,9 @@ def registration(request):
     error_type = ''
     username = request.POST.get('username', '')
     email = request.POST.get('email', '')
-    accept = request.POST.get('accept', False)
+    nickname = request.POST.get('nickname', '')
     if request.method == 'POST':
-        if accept:
+        if not nickname != '':
             error_type = 'robot'
         elif username == '':
             error_type = 'name_empty'
@@ -613,39 +613,35 @@ def registration(request):
 
 
 def custom_login(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
     if request.method == 'POST':
-        next_url = request.POST.get('next', request.META.get('HTTP_REFERER'))
-        username_or_email = request.POST['username']
-        if not username_or_email:
-            return render(request, 'ktapp/login.html', {
-                'next': next_url,
-                'error_type': 'name_empty',
-            })
-        password = request.POST['password']
-        if not password:
-            return render(request, 'ktapp/login.html', {
-                'next': next_url,
-                'error_type': 'password_empty',
-                'username': username_or_email,
-            })
-        user = kt_utils.custom_authenticate(models.KTUser, username_or_email, password)
-        if user is not None:
-            if user.is_active:  # success
-                login(request, user)
-                return HttpResponseRedirect(next_url)
-            else:  # disabled account
-                return render(request, 'ktapp/login.html', {
-                    'next': next_url,
-                    'error_type': 'ban',
-                })
-        else:  # login failed
-            return render(request, 'ktapp/login.html', {
-                'next': next_url,
-                'error_type': 'fail',
-                'username': username_or_email,
-            })
-    else:
-        next_url = request.GET.get('next', request.META.get('HTTP_REFERER'))
+        username_or_email = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        nickname = request.POST.get('nickname', '')
+        error_type = ''
+        if nickname != '':
+            error_type = 'robot'
+            username_or_email = ''
+        elif not username_or_email:
+            error_type = 'name_empty'
+            username_or_email = ''
+        elif not password:
+            error_type = 'password_empty'
+        else:
+            user = kt_utils.custom_authenticate(models.KTUser, username_or_email, password)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect(next_url)
+                else:
+                    error_type = 'ban'
+            else:
+                error_type = 'fail'
+        return render(request, 'ktapp/login.html', {
+            'next': next_url,
+            'error_type': error_type,
+            'username': username_or_email,
+        })
     return render(request, 'ktapp/login.html', {
         'next': next_url,
     })
@@ -666,9 +662,9 @@ def change_password(request):
     old_password = request.POST.get('old_password', '')
     new_password1 = request.POST.get('new_password1', '')
     new_password2 = request.POST.get('new_password2', '')
-    accept = request.POST.get('accept', False)
+    nickname = request.POST.get('nickname', '')
     if request.method == 'POST':
-        if accept:
+        if nickname != '':
             error_type = 'robot'
         elif not request.user.check_password(old_password):
             error_type = 'old_password_invalid'

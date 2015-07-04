@@ -6,9 +6,15 @@
 
 {% block main %}
 
+    {% if user.id %}
+        <p>Már be vagy jelentkezve <b>{{ user.username }}</b>-ként. Ha nem ő vagy, kattints fent a "Kijelentkezés" gombra, és jelentkezz be vagy regisztrálj más néven.</p>
+    {% else %}
+
     {% if error_type %}
         <p class="error">
-            {% if error_type == 'ban' %}
+            {% if error_type == 'robot' %}
+                Ha láttál olyan mezőt, amire az van írva, hogy "hagyd üresen", azt hagyd üresen. :-)
+            {% elif error_type == 'ban' %}
                 Úgy tűnik, ki vagy tiltva.
             {% elif error_type == 'name_empty' %}
                 Add meg a felhasználóneved vagy email címed.
@@ -31,9 +37,12 @@
             <label for="password">Jelszó:</label>
             <input type="password" name="password" />
         </p>
+        <p class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></p>
         <p><input type="submit" value="Bejelentkezés" /></p>
     </form>
 
     <p>Ha még nem is regisztráltál, <a href="{% url 'registration' %}?next={{ next }}">itt tudsz</a>.</p>
+
+    {% endif %}
 
 {% endblock %}

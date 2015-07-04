@@ -6,10 +6,14 @@
 
 {% block main %}
 
+    {% if user.id %}
+        <p>Már be vagy jelentkezve <b>{{ user.username }}</b>-ként. Ha nem ő vagy, kattints fent a "Kijelentkezés" gombra, és jelentkezz be vagy regisztrálj más néven.</p>
+    {% else %}
+
     {% if error_type %}
         <p class="error">
             {% if error_type == 'robot' %}
-                Ezen az oldalon csak emberek regisztrálhatnak.
+                Ha láttál olyan mezőt, amire az van írva, hogy "hagyd üresen", azt hagyd üresen. :-)
             {% elif error_type == 'name_empty' %}
                 Válassz egy felhasználónevet.
             {% elif error_type == 'email_empty' %}
@@ -29,7 +33,7 @@
         <input type="hidden" name="next" value="{{ next }}" />
         <p>Felhasználónév: <input type="text" name="username" value="{{ username }}" class="focus_this" /></p>
         <p>Email cím: <input type="email" name="email" value="{{ email }}" /></p>
-        <p class="reg_optional">Robot vagy? <input type="checkbox" name="accept" /></p>
+        <p class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></p>
         <p>
             <input type="submit" value="Regisztráció" />
             <a href="{{ next }}" class="button small_button" style="float: right">Mégsem</a>
@@ -37,5 +41,7 @@
     </form>
 
     <p>Ha már regisztráltál, <a href="{% url 'login' %}?next={{ next }}">itt tudsz bejelentkezni</a>.</p>
+
+    {% endif %}
 
 {% endblock %}
