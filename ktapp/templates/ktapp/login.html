@@ -38,7 +38,10 @@
             <input type="password" name="password" />
         </p>
         <p class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></p>
-        <p><input type="submit" value="Bejelentkezés" /></p>
+        <p>
+            <input type="submit" value="Bejelentkezés" />
+            <a href="{{ next }}" class="button small_button" style="float: right">Mégsem</a>
+        </p>
     </form>
 
     <p>Ha még nem is regisztráltál, <a href="{% url 'registration' %}?next={{ next }}">itt tudsz</a>.</p>
