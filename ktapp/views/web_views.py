@@ -41,7 +41,7 @@ def index(request):
         premier_list[-1][1].append(film)
     return render(request, "ktapp/index.html", {
         "premier_list": premier_list,
-        "comments": models.Comment.objects.filter(domain=models.Comment.DOMAIN_FILM)[:20],
+        "comments": models.Comment.objects.select_related('film', 'created_by', 'reply_to').filter(domain=models.Comment.DOMAIN_FILM)[:20],
     })
 
 
@@ -555,7 +555,7 @@ def forum(request, id, title_slug):
 
 def latest_comments(request):
     return render(request, "ktapp/latest_comments.html", {
-        "comments": models.Comment.objects.all()[:100],
+        "comments": models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to').all()[:100],
     })
 
 
@@ -652,7 +652,7 @@ def user_profile(request, id, name_slug):
     return render(request, 'ktapp/user_profile.html', {
         'selected_user': selected_user,
         'latest_votes': selected_user.votes().order_by('-when', '-id')[:50],
-        'latest_comments': models.Comment.objects.filter(created_by=selected_user)[:20],
+        'latest_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to').filter(created_by=selected_user)[:20],
     })
 
 
