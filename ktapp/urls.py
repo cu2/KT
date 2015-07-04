@@ -61,6 +61,7 @@ urlpatterns += patterns(
     url(r'^legfrissebb_kommentek$', web_views.latest_comments, name='latest_comments'),
 
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>.*)$', web_views.user_profile, name='user_profile'),
+    url(r'^jelszo_modositasa/$', web_views.change_password, name='change_password'),
     url(r'^bejelentkezes/$', web_views.custom_login, name='login'),
     url(r'^kijelentkezes/$', logout, name='logout'),
     url(r'^regisztracio/$', web_views.registration, name='registration'),

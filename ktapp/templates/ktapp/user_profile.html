@@ -10,7 +10,7 @@
     <div class="left_content">
 
         <p>
-            Nem: {% if selected_user.public_gender or selected_user == user.id %}
+            Nem: {% if selected_user.public_gender or selected_user.id == user.id %}
                 {% if selected_user.gender == 'M' %}
                     férfi
                 {% elif selected_user.gender == 'F' %}
@@ -19,10 +19,14 @@
                     ?
                 {% endif %}
             {% else %}?{% endif %}<br />
-            Születési év: {% if selected_user.public_year_of_birth or selected_user == user.id %}{{ selected_user.year_of_birth }}{% else %}?{% endif %}<br />
-            Lakhely: {% if selected_user.public_location or selected_user == user.id %}{{ selected_user.location }}{% else %}?{% endif %}<br />
+            Születési év: {% if selected_user.public_year_of_birth or selected_user.id == user.id %}{{ selected_user.year_of_birth }}{% else %}?{% endif %}<br />
+            Lakhely: {% if selected_user.public_location or selected_user.id == user.id %}{{ selected_user.location }}{% else %}?{% endif %}<br />
             Regisztráció: {{ selected_user.date_joined|date:"Y. F d." }} ({{ selected_user.date_joined|timesince }})
         </p>
+
+        {% if selected_user.id == user.id %}
+            <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
+        {% endif %}
 
         <h2>Legutóbbi szavazatok</h2>
         <table>

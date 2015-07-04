@@ -27,13 +27,15 @@
     <form action="" method="post">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}" />
-        <p>Felhasználónév: <input type="text" name="username" value="{{ username }}" id="separate_reg_username" /></p>
+        <p>Felhasználónév: <input type="text" name="username" value="{{ username }}" class="focus_this" /></p>
         <p>Email cím: <input type="email" name="email" value="{{ email }}" /></p>
         <p class="reg_optional">Robot vagy? <input type="checkbox" name="accept" /></p>
         <p>
-            <input type="submit" value="Regisztráció">
+            <input type="submit" value="Regisztráció" />
             <a href="{{ next }}" class="button small_button" style="float: right">Mégsem</a>
         </p>
     </form>
+
+    <p>Ha már regisztráltál, <a href="{% url 'login' %}?next={{ next }}">itt tudsz bejelentkezni</a>.</p>
 
 {% endblock %}

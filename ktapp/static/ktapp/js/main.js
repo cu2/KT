@@ -45,7 +45,6 @@ $(function() {
             }
         });
 
-    $('#separate_login_username').focus();
-    $('#separate_reg_username').focus();
+    $('.focus_this').focus();
 
 });

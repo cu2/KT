@@ -661,6 +661,31 @@ def user_profile(request, id, name_slug):
 
 
 @login_required
+def change_password(request):
+    error_type = ''
+    old_password = request.POST.get('old_password', '')
+    new_password1 = request.POST.get('new_password1', '')
+    new_password2 = request.POST.get('new_password2', '')
+    accept = request.POST.get('accept', False)
+    if request.method == 'POST':
+        if accept:
+            error_type = 'robot'
+        elif not request.user.check_password(old_password):
+            error_type = 'old_password_invalid'
+        elif len(new_password1) < 6:
+            error_type = 'new_password_short'
+        elif new_password1 != new_password2:
+            error_type = 'new_password_mismatch'
+        else:
+            request.user.set_password(new_password1)
+            request.user.save()
+            return HttpResponseRedirect(reverse('user_profile', args=(request.user.id, request.user.slug_cache)))
+    return render(request, 'ktapp/change_password.html', {
+        'error_type': error_type,
+    })
+
+
+@login_required
 def messages(request):
     number_of_messages = models.Message.objects.filter(owned_by=request.user).count()
     p = int(request.GET.get('p', 0))
