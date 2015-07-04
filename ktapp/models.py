@@ -38,6 +38,8 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     public_year_of_birth = models.BooleanField(default=False)
     follow = models.ManyToManyField('KTUser', symmetrical=False, through='Follow', through_fields=('who', 'whom'))
     slug_cache = models.CharField(max_length=250, blank=True)
+    validated_email = models.BooleanField(default=False)
+    core_member = models.BooleanField(default=False)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
