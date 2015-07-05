@@ -896,3 +896,9 @@ class Follow(models.Model):
     who = models.ForeignKey(KTUser, related_name='follows')
     whom = models.ForeignKey(KTUser, related_name='followed_by')
     started_at = models.DateTimeField(auto_now_add=True)
+
+
+class PasswordToken(models.Model):
+    token = models.CharField(max_length=64, unique=True)
+    belongs_to = models.ForeignKey(KTUser)
+    valid_until = models.DateTimeField()

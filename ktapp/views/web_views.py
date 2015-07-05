@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django import forms
 from django.db.models import Sum, Q
@@ -18,6 +18,7 @@ from django.utils.crypto import get_random_string
 from ktapp import models
 from ktapp import forms as kt_forms
 from ktapp import utils as kt_utils
+from ktapp import texts
 
 
 COMMENTS_PER_PAGE = 100
@@ -586,7 +587,7 @@ def registration(request):
     email = request.POST.get('email', '')
     nickname = request.POST.get('nickname', '')
     if request.method == 'POST':
-        if not nickname != '':
+        if nickname != '':
             error_type = 'robot'
         elif username == '':
             error_type = 'name_empty'
@@ -600,9 +601,21 @@ def registration(request):
             error_type = 'name_taken'
         else:
             password = get_random_string(32)
-            models.KTUser.objects.create_user(username, email, password)
-            user = kt_utils.custom_authenticate(models.KTUser, username, password)
-            login(request, user)
+            user = models.KTUser.objects.create_user(username, email, password)
+            token = get_random_string(64)
+            models.PasswordToken.objects.create(
+                token=token,
+                belongs_to=user,
+                valid_until=datetime.datetime.now() + datetime.timedelta(days=30),
+            )
+            user.email_user(
+                texts.WELCOME_EMAIL_SUBJECT,
+                texts.WELCOME_EMAIL_BODY.format(
+                    username=user.username,
+                    verification_url=reverse('verify_email', args=(token,))
+                )
+            )
+            login(request, kt_utils.custom_authenticate(models.KTUser, username, password))
             return HttpResponseRedirect(next_url)
     return render(request, 'ktapp/registration.html', {
         'next': next_url,
@@ -653,6 +666,49 @@ def user_profile(request, id, name_slug):
         'selected_user': selected_user,
         'latest_votes': selected_user.votes().order_by('-when', '-id')[:50],
         'latest_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to').filter(created_by=selected_user)[:20],
+    })
+
+
+def verify_email(request, token):
+    error_type = ''
+    new_password1 = request.POST.get('new_password1', '')
+    new_password2 = request.POST.get('new_password2', '')
+    nickname = request.POST.get('nickname', '')
+    token_object = None
+    if len(token) != 64:
+        error_type = 'short_token'
+    else:
+        try:
+            token_object = models.PasswordToken.objects.get(token=token)
+        except models.PasswordToken.DoesNotExist:
+            error_type = 'invalid_token'
+        if token_object:
+            if token_object.valid_until < datetime.datetime.now():
+                error_type = 'invalid_token'
+            else:
+                if request.user.id:
+                    if request.user.id != token_object.belongs_to.id:
+                        logout(request)
+                if not token_object.belongs_to.is_active:
+                    error_type = 'ban'
+    if error_type == '':
+        if request.method == 'POST':
+            if nickname != '':
+                error_type = 'robot'
+            elif len(new_password1) < 6:
+                error_type = 'new_password_short'
+            elif new_password1 != new_password2:
+                error_type = 'new_password_mismatch'
+            else:
+                token_object.belongs_to.set_password(new_password1)
+                token_object.belongs_to.validated_email = True
+                token_object.belongs_to.save()
+                if not request.user.id:
+                    login(request, kt_utils.custom_authenticate(models.KTUser, token_object.belongs_to.username, new_password1))
+                error_type = 'ok'
+                token_object.delete()
+    return render(request, 'ktapp/verify_email.html', {
+        'error_type': error_type,
     })
 
 
