@@ -812,6 +812,8 @@ def reset_password(request, token):
 
 @login_required
 def change_password(request):
+    if not request.user.validated_email:
+        return HttpResponseRedirect(reverse('user_profile', args=(request.user.id, request.user.slug_cache)))
     error_type = ''
     old_password = request.POST.get('old_password', '')
     new_password1 = request.POST.get('new_password1', '')
@@ -857,6 +859,8 @@ def messages(request):
 
 @login_required
 def new_message(request):
+    if not request.user.validated_email:
+        return HttpResponseRedirect(reverse('messages'))
     if request.POST:
         raw_content = request.POST['content']
         content = strip_tags(raw_content)

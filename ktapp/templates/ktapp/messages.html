@@ -3,11 +3,13 @@
 
 {% block title %}Kritikus Tömeg{% endblock %}
 
-{% block header %}<h1>Privát üzik</h1>{% endblock %}
+{% block header %}<h1>Privát üzenetek</h1>{% endblock %}
 
 {% block main %}
 
-    <p><a href="{% url 'new_message' %}">Új üzenet küldése</a></p>
+    {% if user.validated_email %}
+        <p><a href="{% url 'new_message' %}">Új üzenet küldése</a></p>
+    {% endif %}
 
     {% for message in messages %}
         {% include 'ktapp/blocks/message_block.html' with message=message %}

@@ -24,7 +24,7 @@
             Regisztráció: {{ selected_user.date_joined|date:"Y. F d." }} ({{ selected_user.date_joined|timesince }})
         </p>
 
-        {% if selected_user.id == user.id %}
+        {% if selected_user.id == user.id and user.validated_email %}
             <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
         {% endif %}
 
