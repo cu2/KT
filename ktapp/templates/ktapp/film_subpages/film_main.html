@@ -38,7 +38,7 @@
                 <h3>Bemutató</h3>
                 <p>
                     {% if film.main_premier %}
-                        {{ film.main_premier|date:"Y. F d." }}
+                        {{ film.main_premier|date:"Y. F j." }}
                     {% elif film.main_premier_year %}
                         {{ film.main_premier_year }}
                     {% endif %}
@@ -48,7 +48,7 @@
                 <h3>További bemutatók</h3>
                 <p>
                     {% for p in film.other_premiers %}
-                        {{ p.premier_type }}: {{ p.when|date:"Y. F d." }}{% if not forloop.last %}<br />{% endif %}
+                        {{ p.premier_type }}: {{ p.when|date:"Y. F j." }}{% if not forloop.last %}<br />{% endif %}
                     {% endfor %}
                 </p>
             {% endif %}

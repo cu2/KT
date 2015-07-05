@@ -75,7 +75,7 @@
                 {% elif result.type == 'poll' %}
                     {% if result.object.open_from %}
                         <br />
-                        {{ result.object.open_from|date:"Y. F d." }}{% if result.object.open_until %} - {% if result.object.open_from|date:"Y" == result.object.open_until|date:"Y" %}{{ result.object.open_until|date:"F d." }}{% else %}{{ result.object.open_until|date:"Y. F d." }}{% endif %}{% endif %}
+                        {{ result.object.open_from|date:"Y. F j." }}{% if result.object.open_until %} - {% if result.object.open_from|date:"Y" == result.object.open_until|date:"Y" %}{{ result.object.open_until|date:"F j." }}{% else %}{{ result.object.open_until|date:"Y. F j." }}{% endif %}{% endif %}
                     {% endif %}
                 {% elif result.type == 'comment' %}
                     <br />
