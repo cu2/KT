@@ -612,7 +612,7 @@ def registration(request):
                 texts.WELCOME_EMAIL_SUBJECT,
                 texts.WELCOME_EMAIL_BODY.format(
                     username=user.username,
-                    verification_url=reverse('verify_email', args=(token,))
+                    verification_url=request.build_absolute_uri(reverse('verify_email', args=(token,))),
                 )
             )
             login(request, kt_utils.custom_authenticate(models.KTUser, username, password))
@@ -760,7 +760,7 @@ def reset_password(request, token):
                         texts.PASSWORD_RESET_EMAIL_SUBJECT,
                         texts.PASSWORD_RESET_EMAIL_BODY.format(
                             username=user.username,
-                            reset_password_url=reverse('reset_password', args=(token,)),
+                            reset_password_url=request.build_absolute_uri(reverse('reset_password', args=(token,))),
                         )
                     )
                     error_type = 'ok'
