@@ -1,6 +1,6 @@
 <div class="comment_block">
     <div class="comment_block_source">
-        {{ message.sent_at }} <a href="{% url 'user_profile' message.sent_by.id message.sent_by.slug_cache %}">{{ message.sent_by }}</a> &gt; {% for recipient in message.recipients %}<a href="{% url 'user_profile' recipient.id recipient.slug_cache %}">{{ recipient }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}
+        {{ message.sent_at }} {% if message.sent_by %}<a href="{% url 'user_profile' message.sent_by.id message.sent_by.slug_cache %}">{{ message.sent_by }}</a>{% else %}?{% endif %} &gt; {% for recipient in message.recipients %}{% if recipient %}<a href="{% url 'user_profile' recipient.id recipient.slug_cache %}">{{ recipient }}</a>{% else %}?{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
     </div>
     <div class="comment_block_content">
         {% autoescape off %}

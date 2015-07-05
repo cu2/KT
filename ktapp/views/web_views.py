@@ -616,6 +616,17 @@ def registration(request):
                 )
             )
             login(request, kt_utils.custom_authenticate(models.KTUser, username, password))
+            welcome_message = models.Message.objects.create(
+                sent_by=None,
+                content=texts.WELCOME_PM_BODY.format(
+                    username=user.username,
+                    email=user.email,
+                ),
+                owned_by=user,
+                private=True,
+            )
+            welcome_message.sent_to.add(user)
+            welcome_message.save()
             return HttpResponseRedirect(next_url)
     return render(request, 'ktapp/registration.html', {
         'next': next_url,
