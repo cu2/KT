@@ -621,6 +621,7 @@ def registration(request):
                 content=texts.WELCOME_PM_BODY.format(
                     username=user.username,
                     email=user.email,
+                    reset_password_url=reverse('reset_password', args=('',)),  # important: don't send the token via pm
                 ),
                 owned_by=user,
                 private=True,
@@ -719,6 +720,92 @@ def verify_email(request, token):
                 error_type = 'ok'
                 token_object.delete()
     return render(request, 'ktapp/verify_email.html', {
+        'error_type': error_type,
+    })
+
+
+def reset_password(request, token):
+    error_type = ''
+    username_or_email = request.POST.get('username', '')
+    nickname = request.POST.get('nickname', '')
+    if token == '':
+        if request.method == 'POST':
+            if nickname != '':
+                error_type = 'robot'
+                username_or_email = ''
+            elif not username_or_email:
+                error_type = 'name_empty'
+                username_or_email = ''
+            else:
+                user = None
+                try:
+                    user = models.KTUser.objects.get(username=username_or_email)
+                except models.KTUser.DoesNotExist:
+                    try:
+                        user = models.KTUser.objects.get(email=username_or_email)
+                    except models.KTUser.DoesNotExist:
+                        pass
+                if user is None:
+                    error_type = 'no_user'
+                elif not user.is_active:
+                    error_type = 'ban'
+                else:
+                    token = get_random_string(64)
+                    models.PasswordToken.objects.create(
+                        token=token,
+                        belongs_to=user,
+                        valid_until=datetime.datetime.now() + datetime.timedelta(hours=24),
+                    )
+                    user.email_user(
+                        texts.PASSWORD_RESET_EMAIL_SUBJECT,
+                        texts.PASSWORD_RESET_EMAIL_BODY.format(
+                            username=user.username,
+                            reset_password_url=reverse('reset_password', args=(token,)),
+                        )
+                    )
+                    error_type = 'ok'
+        return render(request, 'ktapp/reset_password.html', {
+            'page_type': 'ask',
+            'error_type': error_type,
+            'username': username_or_email,
+        })
+    new_password1 = request.POST.get('new_password1', '')
+    new_password2 = request.POST.get('new_password2', '')
+    nickname = request.POST.get('nickname', '')
+    token_object = None
+    if len(token) != 64:
+        error_type = 'short_token'
+    else:
+        try:
+            token_object = models.PasswordToken.objects.get(token=token)
+        except models.PasswordToken.DoesNotExist:
+            error_type = 'invalid_token'
+        if token_object:
+            if token_object.valid_until < datetime.datetime.now():
+                error_type = 'invalid_token'
+            else:
+                if request.user.id:
+                    if request.user.id != token_object.belongs_to.id:
+                        logout(request)
+                if not token_object.belongs_to.is_active:
+                    error_type = 'ban'
+    if error_type == '':
+        if request.method == 'POST':
+            if nickname != '':
+                error_type = 'robot'
+            elif len(new_password1) < 6:
+                error_type = 'new_password_short'
+            elif new_password1 != new_password2:
+                error_type = 'new_password_mismatch'
+            else:
+                token_object.belongs_to.set_password(new_password1)
+                token_object.belongs_to.validated_email = True
+                token_object.belongs_to.save()
+                if not request.user.id:
+                    login(request, kt_utils.custom_authenticate(models.KTUser, token_object.belongs_to.username, new_password1))
+                error_type = 'ok'
+                token_object.delete()
+    return render(request, 'ktapp/reset_password.html', {
         'error_type': error_type,
     })
 

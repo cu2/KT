@@ -66,6 +66,7 @@ urlpatterns += patterns(
     url(r'^kijelentkezes/$', logout, name='logout'),
     url(r'^regisztracio/$', web_views.registration, name='registration'),
     url(r'^email_ellenorzes/(?P<token>.*)$', web_views.verify_email, name='verify_email'),
+    url(r'^jelszo_reset/(?P<token>.*)$', web_views.reset_password, name='reset_password'),
 
     url(r'^uzik/$', web_views.messages, name='messages'),
     url(r'^uj_uzenet$', web_views.new_message, name='new_message'),
