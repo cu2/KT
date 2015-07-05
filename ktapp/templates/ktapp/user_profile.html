@@ -9,26 +9,67 @@
 
     <div class="left_content">
 
-        <p>
-            Nem: {% if selected_user.public_gender or selected_user.id == user.id %}
+        {% if selected_user.id == user.id %}
+            <p>
+                Nemed:
                 {% if selected_user.gender == 'M' %}
                     férfi
                 {% elif selected_user.gender == 'F' %}
                     nő
                 {% else %}
-                    ?
+                    <i>nem adtad meg</i>
                 {% endif %}
-            {% else %}?{% endif %}<br />
-            Születési év: {% if selected_user.public_year_of_birth or selected_user.id == user.id %}{{ selected_user.year_of_birth }}{% else %}?{% endif %}<br />
-            Lakhely: {% if selected_user.public_location or selected_user.id == user.id %}{{ selected_user.location }}{% else %}?{% endif %}<br />
-            Regisztráció: {{ selected_user.date_joined|date:"Y. F j." }} ({{ selected_user.date_joined|timesince }})
-        </p>
+                <br />
+                Születési éved:
+                {% if selected_user.year_of_birth %}
+                    {{ selected_user.year_of_birth }}
+                {% else %}
+                    <i>nem adtad meg</i>
+                {% endif %}
+                <br />
+                Lakhelyed:
+                {% if selected_user.location %}
+                    {{ selected_user.location }}
+                {% else %}
+                    <i>nem adtad meg</i>
+                {% endif %}
+                <br />
+                Regisztrációd: {{ selected_user.date_joined|date:"Y. F j." }} ({{ selected_user.date_joined|timesince }})
+            </p>
+        {% else %}
+            <p>
+                Nem: {% if selected_user.public_gender %}
+                    {% if selected_user.gender == 'M' %}
+                        férfi
+                    {% elif selected_user.gender == 'F' %}
+                        nő
+                    {% else %}
+                        <i>?</i>
+                    {% endif %}
+                {% else %}<i>nem publikus</i>{% endif %}<br />
+                Születési év: {% if selected_user.public_year_of_birth %}
+                    {% if selected_user.year_of_birth %}
+                        {{ selected_user.year_of_birth }}
+                    {% else %}
+                        <i>?</i>
+                    {% endif %}
+                {% else %}<i>nem publikus</i>{% endif %}<br />
+                Lakhely: {% if selected_user.public_location %}
+                    {% if selected_user.location %}
+                        {{ selected_user.location }}
+                    {% else %}
+                        <i>?</i>
+                    {% endif %}
+                {% else %}<i>nem publikus</i>{% endif %}<br />
+                Regisztráció: {{ selected_user.date_joined|date:"Y. F j." }} ({{ selected_user.date_joined|timesince }})
+            </p>
+        {% endif %}
 
         {% if selected_user.id == user.id and user.validated_email %}
             <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
         {% endif %}
 
-        <h2>Legutóbbi szavazatok</h2>
+        <h2>Legutóbbi szavazat{% if selected_user.id == user.id %}aid{% else %}ok{% endif %}</h2>
         <table>
             <tr class="header_tr">
                 <th>Film</th>
@@ -49,7 +90,7 @@
     </div>
     <div class="right_content">
 
-        <h2>Legutóbbi kommentek</h2>
+        <h2>Legutóbbi komment{% if selected_user.id == user.id %}jeid{% else %}ek{% endif %}</h2>
         {% if latest_comments %}
             {% for c in latest_comments %}
                 {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
