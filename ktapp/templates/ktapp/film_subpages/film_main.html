@@ -99,10 +99,10 @@
             <div id="film_main_ratings_block">
                 <h3>Szavazatok<span class="show_rating_details"> (<span class="action_text" id="show_rating_details_button">részletes szavazatok</span>)</span></h3>
                 <ul id="film_votes">
-                    {% for vote in votes %}
+                    {% for num_vote, vote in votes %}
                         {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
                         {% if vote %}
-                            <li>{{ vote|length }} {{ named_rating }}<span class="rating_details" style="display: none">:
+                            <li>{{ num_vote }} {{ named_rating }}<span class="rating_details" style="display: none">:
                                 {% for voteuser in vote %}
                                     <a href="{% url 'user_profile' voteuser.user.id voteuser.user.slug_cache %}">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
                                 {% endfor %}

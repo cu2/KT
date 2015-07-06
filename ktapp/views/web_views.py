@@ -156,13 +156,16 @@ def film_main(request, id, film_slug):
             rating = vote.rating
         except models.Vote.DoesNotExist:
             pass
-    return render(request, "ktapp/film_subpages/film_main.html", {
-        "active_tab": "main",
-        "film": film,
-        "rating": rating,
-        "ratings": range(1, 6),
-        "roles": film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR),
-        "votes": [film.vote_set.filter(rating=r).select_related('user').order_by('user__username') for r in range(5, 0, -1)],
+    return render(request, 'ktapp/film_subpages/film_main.html', {
+        'active_tab': 'main',
+        'film': film,
+        'rating': rating,
+        'ratings': range(1, 6),
+        'roles': film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR),
+        'votes': zip(
+            [film.num_specific_rating(r) for r in range(5, 0, -1)],
+            [film.vote_set.filter(rating=r).select_related('user').order_by('user__username') for r in range(5, 0, -1)]
+        ),
     })
 
 
