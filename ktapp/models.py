@@ -1,3 +1,4 @@
+import hashlib
 import os
 import random
 import string
@@ -670,10 +671,10 @@ class FilmSequelRelationship(models.Model):
 
 def get_picture_upload_name(instance, filename):
     file_root, file_ext = os.path.splitext(filename)
-    yearmonth = datetime.now().strftime('%Y%m')
     random_chunk = ''.join((random.choice(string.ascii_lowercase) for _ in range(8)))
-    return ''.join(['pix/orig/', yearmonth,
-                    '/p_', unicode(instance.film.id), '_', random_chunk, file_ext])
+    new_file_name = 'p_%s_%s%s' % (unicode(instance.film.id), random_chunk, file_ext)
+    hashdir = hashlib.md5(new_file_name).hexdigest()[:3]
+    return 'pix/orig/%s/%s' % (hashdir, new_file_name)
 
 
 class Picture(models.Model):
@@ -700,7 +701,8 @@ class Picture(models.Model):
 
     THUMBNAIL_SIZES = {
         'min': (120, 120),
-        'mid': (720, 480),
+        'mid': (200, 200),
+        'max': (720, 600),
     }
 
     @property
@@ -711,20 +713,19 @@ class Picture(models.Model):
             return 2
         return 3
 
-    def get_thumbnail_filename(self, thumbnail_type):
+    def get_thumbnail_filename(self, maxwidth, maxheight):
+        thumbnail_type = 'tn{w}x{h}'.format(w=maxwidth, h=maxheight)
         path, filename = os.path.split(unicode(self.img))
         file_root, file_ext = os.path.splitext(filename)
-        yearmonth = path[-6:]
-        filedir = settings.MEDIA_ROOT + 'pix/' + thumbnail_type + '/' + yearmonth
+        hashdir = path[-3:]
+        filedir = settings.MEDIA_ROOT + 'pix/' + thumbnail_type + '/' + hashdir
         filename = filedir + '/' + file_root + '.jpg'
-        url = settings.MEDIA_URL + 'pix/' + thumbnail_type + '/' + yearmonth + '/' + file_root + '.jpg'
+        url = settings.MEDIA_URL + 'pix/' + thumbnail_type + '/' + hashdir + '/' + file_root + '.jpg'
         return filedir, filename, url
 
-    def generate_thumbnail(self, thumbnail_type, maxwidth, maxheight=None):
-        if maxheight is None:
-            maxheight = maxwidth
+    def generate_thumbnail(self, maxwidth, maxheight):
         infilename = settings.MEDIA_ROOT + unicode(self.img)
-        outfiledir, outfilename, _ = self.get_thumbnail_filename(thumbnail_type)
+        outfiledir, outfilename, _ = self.get_thumbnail_filename(maxwidth, maxheight)
         if not os.path.exists(outfiledir):
             os.makedirs(outfiledir)
         img = Image.open(infilename)
@@ -735,8 +736,8 @@ class Picture(models.Model):
         super(Picture, self).save(*args, **kwargs)
         self.film.number_of_pictures = self.film.picture_set.count()
         self.film.save()
-        self.generate_thumbnail('min', *self.THUMBNAIL_SIZES['min'])
-        self.generate_thumbnail('mid', *self.THUMBNAIL_SIZES['mid'])
+        for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
+            self.generate_thumbnail(w, h)
 
     def __unicode__(self):
         return unicode(self.img)
@@ -744,7 +745,7 @@ class Picture(models.Model):
     def get_display_url(self, thumbnail_type):
         if thumbnail_type == 'orig':
             return settings.MEDIA_URL + unicode(self.img)
-        _, _, url = self.get_thumbnail_filename(thumbnail_type)
+        _, _, url = self.get_thumbnail_filename(*self.THUMBNAIL_SIZES[thumbnail_type])
         return url
 
     def get_width(self, thumbnail_type):
@@ -763,45 +764,37 @@ class Picture(models.Model):
         else:
             return self.THUMBNAIL_SIZES[thumbnail_type][1]
 
-    # TODO: implement this in a better way (these are shortcuts for template)
-    def get_display_url_min(self):
-        return self.get_display_url('min')
+    def get_display_urls(self):
+        return {
+            thumbnail_type: self.get_display_url(thumbnail_type) for thumbnail_type in self.THUMBNAIL_SIZES.keys() + ['orig']
+        }
 
-    def get_display_url_mid(self):
-        return self.get_display_url('mid')
+    def get_widths(self):
+        return {
+            thumbnail_type: self.get_width(thumbnail_type) for thumbnail_type in self.THUMBNAIL_SIZES.keys() + ['orig']
+        }
 
-    def get_width_min(self):
-        return self.get_width('min')
-
-    def get_width_mid(self):
-        return self.get_width('mid')
-
-    def get_height_min(self):
-        return self.get_height('min')
-
-    def get_height_mid(self):
-        return self.get_height('mid')
+    def get_heights(self):
+        return {
+            thumbnail_type: self.get_height(thumbnail_type) for thumbnail_type in self.THUMBNAIL_SIZES.keys() + ['orig']
+        }
 
 
 @receiver(post_delete, sender=Picture)
 def delete_picture(sender, instance, **kwargs):
-    """Update number_of_pictures and delete files"""
+    '''Update number_of_pictures and delete files'''
     instance.film.number_of_pictures = instance.film.picture_set.count()
     instance.film.save()
     try:
         os.remove(settings.MEDIA_ROOT + unicode(instance.img))
     except OSError:
         pass
-    _, filename, _ = instance.get_thumbnail_filename('min')
-    try:
-        os.remove(filename)
-    except OSError:
-        pass
-    _, filename, _ = instance.get_thumbnail_filename('mid')
-    try:
-        os.remove(filename)
-    except OSError:
-        pass
+    for _, (w, h) in instance.THUMBNAIL_SIZES.iteritems():
+        _, filename, _ = instance.get_thumbnail_filename(w, h)
+        try:
+            os.remove(filename)
+        except OSError:
+            pass
 
 
 class Message(models.Model):

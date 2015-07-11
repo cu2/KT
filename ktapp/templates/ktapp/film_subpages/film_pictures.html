@@ -6,7 +6,7 @@
     <div id="film_centered">
         {% if picture %}
             <p class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
-                <a href="{% url 'film_picture' film.id film.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_url_mid }}" style="width: {{ picture.get_width_mid }}px; height: {{ picture.get_height_mid }}px" class="picture" /></a>
+                <a href="{% url 'film_picture' film.id film.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_urls.max }}" style="width: {{ picture.get_widths.max }}px; height: {{ picture.get_heights.max }}px" class="picture" /></a>
                 <a name="pix" class="jumptarget"></a>
                 <br />
                 {% if artists %}
@@ -53,7 +53,7 @@
             {% endif %}
         {% endif %}
         {% for picture in pictures %}
-            <a href="{% url 'film_picture' film.id film.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_url_min }}" style="width: {{ picture.get_width_min }}px; height: {{ picture.get_height_min }}px" class="thumbnail" /></a>
+            <a href="{% url 'film_picture' film.id film.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="thumbnail" /></a>
         {% endfor %}
         </p>
         {% if user.is_authenticated %}
