@@ -1,5 +1,5 @@
 <div class="comment_block">
-    <div class="comment_block_source">
+    <div class="comment_block_author">
         {{ message.sent_at }} {% if message.sent_by %}<a href="{% url 'user_profile' message.sent_by.id message.sent_by.slug_cache %}">{{ message.sent_by }}</a>{% else %}?{% endif %} &gt; {% for recipient in message.recipients %}{% if recipient %}<a href="{% url 'user_profile' recipient.id recipient.slug_cache %}">{{ recipient }}</a>{% else %}?{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
     </div>
     <div class="comment_block_content">

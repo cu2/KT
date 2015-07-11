@@ -4,13 +4,13 @@
 
     <div id="film_centered">
         <div class="film_addon">
+            <div class="review_author">
+                {{ review.created_at|date:"Y-m-d" }} <a href="{% url 'user_profile' review.created_by.id review.created_by.slug_cache %}">{{ review.created_by }}</a>
+            </div>
             <div class="film_addon_content">
                 {% autoescape off %}
                     {{ review.content_html|linebreaks }}
                 {% endautoescape %}
-            </div>
-            <div class="film_addon_author">
-                <a href="{% url 'user_profile' review.created_by.id review.created_by.slug_cache %}">{{ review.created_by }}</a>, {{ review.created_at|date:"Y-m-d" }}
             </div>
         </div>
     </div>

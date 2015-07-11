@@ -407,11 +407,7 @@ ul.nobullet {
     margin: 0;
     padding: 5px;
 }
-.comment_block_source {
-    background: rgb(218,211,184);
-    margin: 0;
-    padding: 2px 5px;
-    font-size: 9pt;
+.comment_source {
     font-weight: bold;
 }
 .comment_block_author {
@@ -419,7 +415,9 @@ ul.nobullet {
     margin: 0;
     padding: 2px 5px;
     font-size: 9pt;
-    text-align: right;
+}
+.comment_block_author_right {
+    float: right;
 }
 .comment_block_reply_to {
     text-align: right;
@@ -454,6 +452,12 @@ ul.nobullet {
     padding: 2px 5px;
     font-size: 9pt;
     text-align: right;
+}
+.review_author {
+    background: rgb(218,211,184);
+    margin: 0;
+    padding: 2px 5px;
+    font-size: 9pt;
 }
 
 

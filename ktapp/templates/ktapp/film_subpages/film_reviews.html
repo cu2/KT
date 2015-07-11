@@ -3,20 +3,20 @@
 {% block film_main %}
 
     <div id="film_centered">
-        {% include 'ktapp/blocks/new_review_block.html' %}
         {% for r in reviews %}
             <div class="film_addon">
+                <div class="review_author">
+                    {{ r.created_at|date:"Y-m-d" }} <a href="{% url 'user_profile' r.created_by.id r.created_by.slug_cache %}">{{ r.created_by }}</a>
+                </div>
                 <div class="film_addon_content">
                     {% autoescape off %}
                         {{ r.content_html|striptags|truncatechars:400|linebreaks }}
                     {% endautoescape %}
-                    <p><a href="{% url 'film_review' film.id film.slug_cache r.id %}">Tovább...</a></p>
-                </div>
-                <div class="film_addon_author">
-                    <a href="{% url 'user_profile' r.created_by.id r.created_by.slug_cache %}">{{ r.created_by }}</a>, {{ r.created_at|date:"Y-m-d" }}
+                    <p style="text-align: right"><a href="{% url 'film_review' film.id film.slug_cache r.id %}">Tovább...</a></p>
                 </div>
             </div>
         {% endfor %}
+        {% include 'ktapp/blocks/new_review_block.html' %}
     </div>
 
 {% endblock %}
