@@ -5,40 +5,75 @@
 
     <div id="film_centered">
         {% if picture %}
-        <p class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
-            <a href="{% url 'film_picture' film.id film.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_url_mid }}" style="width: {{ picture.get_width_mid }}px; height: {{ picture.get_height_mid }}px" class="picture" /></a>
-            <a name="pix" class="jumptarget"></a>
-            <br />
-            {% if artists %}
-            {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film.orig_title }} című filmben.
-            {% else %}
-                {% if picture.picture_type == "P" %}
-                    {{ film_title_article|title }} {{ film.orig_title }} című film plakátja.
-                {% elif picture.picture_type == "D" %}
-                    {{ film_title_article|title }} {{ film.orig_title }} című film DVD-borítója.
+            <p class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
+                <a href="{% url 'film_picture' film.id film.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_url_mid }}" style="width: {{ picture.get_width_mid }}px; height: {{ picture.get_height_mid }}px" class="picture" /></a>
+                <a name="pix" class="jumptarget"></a>
+                <br />
+                {% if artists %}
+                {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film.orig_title }} című filmben
                 {% else %}
-                    Kép {{ film_title_article }} {{ film.orig_title }} című filmből.
+                    {% if picture.picture_type == "P" %}
+                        {{ film_title_article|title }} {{ film.orig_title }} című film plakátja
+                    {% elif picture.picture_type == "D" %}
+                        {{ film_title_article|title }} {{ film.orig_title }} című film DVD-borítója
+                    {% else %}
+                        Kép {{ film_title_article }} {{ film.orig_title }} című filmből
+                    {% endif %}
                 {% endif %}
+                {% if picture.source_url %}
+                    <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
+                {% endif %}
+            </p>
+            {% if user.is_authenticated %}
+                <p style="text-align: center; font-size: 8pt">(<span class="action_text" id="show_picture_edit_button">kép szerkesztése/törlése</span>)</p>
+                <div class="picture_edit_block" style="display: none">
+                    <form action="{% url 'edit_picture' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="picture" value="{{ picture.id }}" />
+                        <p><label for="id_picture_type_edit">Típus:</label> <select name="picture_type" id="id_picture_type_edit">
+                            <option value="O"{% if picture.picture_type == 'O' %} selected="selected"{% endif %}>Kép a filmből</option>
+                            <option value="P"{% if picture.picture_type == 'P' %} selected="selected"{% endif %}>Plakát</option>
+                            <option value="D"{% if picture.picture_type == 'D' %} selected="selected"{% endif %}>DVD-borító</option>
+                            <option value="S"{% if picture.picture_type == 'S' %} selected="selected"{% endif %}>Saját kezűleg készített screenshot</option>
+                        </select></p>
+                        <p><label for="id_source_url_edit">Honnan való? (a kép pontos webcíme, nem csak az oldalé)</label> <input type="text" name="source_url" id="id_source_url_edit" maxlength="250" value="{{ picture.source_url }}" /></p>
+                        <p>Kik vannak rajta? (ha senki, vagy plakátról van szó, vagy animációról, ne ikszelj be senkit, ha többen, akkor nyugodtan többet is)<br />
+                            {% for artist in all_artists_in_film %}
+                                <input type="checkbox" name="picture_artist_cb_edit" id="picture_artist_cb_edit_{{ artist.id }}" value="{{ artist.id }}"{% if artist in artists %} checked="checked"{% endif %} /> <label for="picture_artist_cb_edit_{{ artist.id }}">{{ artist }}</label><br />
+                            {% endfor %}
+                        </p>
+                        <p class="center"><input type="submit" value="Kép adatainak mentése" /></p>
+                    </form>
+                    <form action="{% url 'delete_picture' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="picture" value="{{ picture.id }}" />
+                        <p class="center"><input type="submit" value="Kép törlése" /></p>
+                    </form>
+                </div>
             {% endif %}
-        </p>
         {% endif %}
-        <p>
         {% for picture in pictures %}
             <a href="{% url 'film_picture' film.id film.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_url_min }}" style="width: {{ picture.get_width_min }}px; height: {{ picture.get_height_min }}px" class="thumbnail" /></a>
         {% endfor %}
         </p>
         {% if user.is_authenticated %}
+            <h3>Új kép feltöltése</h3>
             <form action="{% url 'new_picture' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                {% for hidden in upload_form.hidden_fields %}
-                    {{ hidden }}
+                <input type="hidden" name="film" value="{{ film.id }}" />
+                <p><label for="id_img">Kép:</label> <input type="file" name="img" id="id_img" /></p>
+                <p><label for="id_picture_type">Típus:</label> <select name="picture_type" id="id_picture_type">
+                    <option value="O" selected="selected">Kép a filmből</option>
+                    <option value="P">Plakát</option>
+                    <option value="D">DVD-borító</option>
+                    <option value="S">Saját kezűleg készített screenshot</option>
+                </select></p>
+                <p><label for="id_source_url">Honnan való? (a kép pontos webcíme, nem csak az oldalé)</label> <input type="text" name="source_url" id="id_source_url" maxlength="250" /></p>
+                <p>Kik vannak rajta? (ha senki, vagy plakátról van szó, vagy animációról, ne ikszelj be senkit, ha többen, akkor nyugodtan többet is)<br />
+                {% for artist in all_artists_in_film %}
+                    <input type="checkbox" name="picture_artist_cb" id="picture_artist_cb_{{ artist.id }}" value="{{ artist.id }}" /> <label for="picture_artist_cb_{{ artist.id }}">{{ artist }}</label><br />
                 {% endfor %}
-                {% for field in upload_form.visible_fields %}
-                    <div class="fieldWrapper">
-                        {{ field.errors }}
-                        {{ field.label_tag }} {{ field }}
-                    </div>
-                {% endfor %}
+                </p>
                 <p class="center"><input type="submit" value="Kép feltöltése" /></p>
             </form>
         {% else %}

@@ -609,7 +609,9 @@ ul.nobullet {
     color: rgb(146,23,23);
     cursor: pointer;
 }
-
+.picture_source {
+    font-size: 8pt;
+}
 
 
 .search_input {

@@ -51,6 +51,8 @@ urlpatterns += patterns(
     url(r'^uj_erdekesseg$', web_views.new_trivia, name='new_trivia'),
     url(r'^uj_elemzes$', web_views.new_review, name='new_review'),
     url(r'^uj_kep$', web_views.new_picture, name='new_picture'),
+    url(r'^szerk_kep$', web_views.edit_picture, name='edit_picture'),
+    url(r'^torol_kep$', web_views.delete_picture, name='delete_picture'),
 
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>.*)$', web_views.artist, name='artist'),
     url(r'^szereplo/(?P<id>\d+)/(?P<name_slug>.*)$', web_views.role, name='role'),

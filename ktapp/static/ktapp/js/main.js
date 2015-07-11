@@ -5,6 +5,9 @@ $(function() {
     $('#show_change_vote_button').click(function () {
         $('.change_vote').toggle();
     });
+    $('#show_picture_edit_button').click(function () {
+        $('.picture_edit_block').toggle();
+    });
 
     function split(val) {
         return val.split(/,\s*/);

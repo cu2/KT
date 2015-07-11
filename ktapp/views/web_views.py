@@ -314,7 +314,7 @@ def _get_selected_picture_details(film, picture, next_picture):
 
 def film_pictures(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
-    pictures = film.picture_set.all()
+    pictures = sorted(film.picture_set.all(), key=lambda pic: (pic.order_key, pic.id))
     upload_form = kt_forms.PictureUploadForm(initial={
         "film": film,
     })
@@ -324,8 +324,9 @@ def film_pictures(request, id, film_slug):
         "film": film,
         "pictures": pictures,
         "upload_form": upload_form,
+        'all_artists_in_film': film.artists.all(),
     }
-    if pictures.count() == 1:
+    if len(pictures) == 1:
         next_picture = _get_next_picture(pictures, pictures[0])
         context.update(_get_selected_picture_details(film, pictures[0], next_picture))
     return render(request, "ktapp/film_subpages/film_pictures.html", context)
@@ -336,7 +337,7 @@ def film_picture(request, id, film_slug, picture_id):
     picture = get_object_or_404(models.Picture, pk=picture_id)
     if picture.film != film:
         raise Http404
-    pictures = film.picture_set.all()
+    pictures = sorted(film.picture_set.all(), key=lambda pic: (pic.order_key, pic.id))
     next_picture = _get_next_picture(pictures, picture)
     upload_form = kt_forms.PictureUploadForm(initial={
         "film": film,
@@ -347,6 +348,7 @@ def film_picture(request, id, film_slug, picture_id):
         "film": film,
         "pictures": pictures,
         "upload_form": upload_form,
+        'all_artists_in_film': film.artists.all(),
     }
     context.update(_get_selected_picture_details(film, picture, next_picture))
     return render(request, "ktapp/film_subpages/film_pictures.html", context)
@@ -443,14 +445,45 @@ def new_review(request):
 
 @login_required
 def new_picture(request):
-    film = get_object_or_404(models.Film, pk=request.POST["film"])
+    film = get_object_or_404(models.Film, pk=request.POST['film'])
     if request.POST:
         upload_form = kt_forms.PictureUploadForm(request.POST, request.FILES)
         if upload_form.is_valid():
             picture = upload_form.save(commit=False)
             picture.created_by = request.user
             picture.save()
-    return HttpResponseRedirect(reverse("film_pictures", args=(film.pk, film.slug_cache)))
+            possible_artists = {
+                unicode(artist.id): artist for artist in film.artists.all()
+            }
+            for artist_id in request.POST.getlist('picture_artist_cb'):
+                if artist_id in possible_artists:
+                    picture.artists.add(possible_artists[artist_id])
+    return HttpResponseRedirect(reverse('film_pictures', args=(film.pk, film.slug_cache)))
+
+
+@login_required
+def edit_picture(request):
+    picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
+    if request.POST:
+        picture.picture_type = request.POST.get('picture_type', 'O')
+        picture.source_url = request.POST.get('source_url', '')
+        picture.save()
+        picture.artists.clear()
+        possible_artists = {
+            unicode(artist.id): artist for artist in picture.film.artists.all()
+        }
+        for artist_id in request.POST.getlist('picture_artist_cb_edit'):
+            if artist_id in possible_artists:
+                picture.artists.add(possible_artists[artist_id])
+    return HttpResponseRedirect(reverse('film_picture', args=(picture.film.pk, picture.film.slug_cache, picture.id)) + '#pix')
+
+
+@login_required
+def delete_picture(request):
+    picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
+    if request.POST:
+        picture.delete()
+    return HttpResponseRedirect(reverse('film_pictures', args=(picture.film.pk, picture.film.slug_cache)))
 
 
 def artist(request, id, name_slug):

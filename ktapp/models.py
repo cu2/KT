@@ -703,6 +703,14 @@ class Picture(models.Model):
         'mid': (720, 480),
     }
 
+    @property
+    def order_key(self):
+        if self.picture_type == self.PICTURE_TYPE_POSTER:
+            return 1
+        if self.picture_type == self.PICTURE_TYPE_DVD:
+            return 2
+        return 3
+
     def get_thumbnail_filename(self, thumbnail_type):
         path, filename = os.path.split(unicode(self.img))
         file_root, file_ext = os.path.splitext(filename)
