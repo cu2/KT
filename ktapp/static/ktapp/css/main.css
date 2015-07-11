@@ -459,6 +459,12 @@ ul.nobullet {
     padding: 2px 5px;
     font-size: 9pt;
 }
+.portrait_author {
+    background: rgb(218,211,184);
+    margin: 0;
+    padding: 2px 5px;
+    font-size: 9pt;
+}
 
 
 .paging {
@@ -471,7 +477,7 @@ ul.nobullet {
     width: auto;
     background: rgb(249,244,218);
     border: solid 1px rgb(128,128,128);
-
+    border-radius: 20px;
 }
 .paging_ellipsis {
     background: none !important;
