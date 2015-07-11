@@ -6,7 +6,7 @@
             {% endfor %}
             {{ quote_form.content.errors }}
             {{ quote_form.content }}
-            <p class="center"><input type="submit" value="Mehet." /></p>
+            <p class="center"><input type="submit" value="Idézet beküldése" /></p>
         </form>
     {% else %}
         <p>Ahhoz, hogy idézetet tudj beküldeni, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
