@@ -701,7 +701,7 @@ class Picture(models.Model):
 
     THUMBNAIL_SIZES = {
         'min': (120, 120),
-        'mid': (200, 200),
+        'mid': (200, 1000),  # 200 x whatever
         'max': (720, 600),
     }
 

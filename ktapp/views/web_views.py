@@ -306,7 +306,7 @@ def _get_selected_picture_details(film, picture, next_picture):
     return {
         "picture": picture,
         "next_picture": next_picture,
-        "pic_height": models.Picture.THUMBNAIL_SIZES["mid"][1],
+        "pic_height": models.Picture.THUMBNAIL_SIZES['max'][1],
         "artists": picture.artists.all(),
         "film_title_article": "az" if film.orig_title[:1].lower() in u"aáeéiíoóöőuúüű" else "a",
     }

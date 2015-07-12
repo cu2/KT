@@ -5,7 +5,7 @@
     <div class="clearfix">
         <div id="film_main_left">
             <div class="film_block">
-                <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} [{{ film.year }}]"><img src="http://kritikustomeg.org/pix/mid/p7557557510345.jpg" class="picture film_block_picture" alt="{{ film.orig_title }} [{{ film.year }}]" /></a>
+                <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} [{{ film.year }}]"><img src="media/pix/tn200x1000/505/placeholder.jpg" class="picture film_block_picture" alt="{{ film.orig_title }} [{{ film.year }}]" /></a>
                 {% if film.plot_summary %}
                     <p class="film_block_content">
                         {{ film.plot_summary }}
