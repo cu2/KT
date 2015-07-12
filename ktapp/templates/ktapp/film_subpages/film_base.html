@@ -32,21 +32,21 @@
         <div id="film_misc_info">
             <ul>
                 <li>
-                    <span>{% if film.imdb_link %}<a href="http://www.imdb.com/title/{{ film.imdb_link }}/">IMDb</a>{% if film.imdb_real_rating %} {{ film.imdb_real_rating|floatformat:1 }}{% endif %}{% endif %}</span>
-                    <span>{% if film.porthu_link %}<a href="http://www.port.hu/pls/fi/films.film_page?i_where=2&i_film_id={{ film.porthu_link }}&i_city_id=-1&i_county_id=1">PORT.hu</a>{% endif %}</span>
+                    <span>{% if film.imdb_link %}<a href="http://www.imdb.com/title/{{ film.imdb_link }}/" class="link_w_icon imdb_link">IMDb</a>{% if film.imdb_real_rating %} {{ film.imdb_real_rating|floatformat:1 }}{% endif %}{% endif %}</span>
+                    <span>{% if film.porthu_link %}<a href="http://www.port.hu/pls/fi/films.film_page?i_where=2&i_film_id={{ film.porthu_link }}&i_city_id=-1&i_county_id=1" class="link_w_icon porthu_link">PORT.hu</a>{% endif %}</span>
                 </li>
                 <li>
-                    <span>{% if film.imdb_link %}<a href="http://www.rottentomatoes.com/alias?type=imdbid&s={{ film.imdb_link|slice:'2:' }}">RT</a>{% endif %}</span>
-                    <span><a href="http://www.youtube.com/results?search_query={{ film.orig_title|urlencode }}+trailer&search=Search">YouTube</a></span>
+                    <span>{% if film.imdb_link %}<a href="http://www.rottentomatoes.com/alias?type=imdbid&s={{ film.imdb_link|slice:'2:' }}" class="link_w_icon rt_link">RT</a>{% endif %}</span>
+                    <span><a href="http://www.youtube.com/results?search_query={{ film.orig_title|urlencode }}+trailer&search=Search" class="link_w_icon youtube_link">YouTube</a></span>
                 </li>
                 <li>
                     {% if film.wikipedia_link_en %}
-                    <span><a href="{{ film.wikipedia_link_en }}">Wikipedia</a></span>
+                    <span><a href="{{ film.wikipedia_link_en }}" class="link_w_icon wikipedia_link">Wikipedia</a></span>
                     {% else %}
-                    <span><a href="http://en.wikipedia.org/w/wiki.phtml?search={{ film.orig_title|urlencode }}">Wikipedia</a></span>
+                    <span><a href="http://en.wikipedia.org/w/wiki.phtml?search={{ film.orig_title|urlencode }}" class="link_w_icon wikipedia_link">Wikipedia</a></span>
                     {% endif %}
                     {% if film.wikipedia_link_hu %}
-                    <span><a href="{{ film.wikipedia_link_hu }}">Wikipédia</a></span>
+                    <span><a href="{{ film.wikipedia_link_hu }}" class="link_w_icon wikipedia_hu_link">Wikipédia</a></span>
                     {% endif %}
                 </li>
             </ul>
