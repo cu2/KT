@@ -156,7 +156,10 @@ class Film(models.Model):
         return Premier.objects.filter(film=self)
 
     def save(self, *args, **kwargs):
-        self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.year)
+        if self.other_titles:
+            self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.other_titles.split('\n')[0]) + '-' + slugify(self.year)
+        else:
+            self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.year)
         super(Film, self).save(*args, **kwargs)
 
 
