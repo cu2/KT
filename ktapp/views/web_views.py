@@ -168,6 +168,7 @@ def film_main(request, id, film_slug):
                 votes[idx][0].append(u)
             else:
                 votes[idx][1].append(u)
+    utls = models.UserToplistItem.objects.filter(film=film).select_related('usertoplist', 'usertoplist__created_by').order_by('serial_number', 'usertoplist__title', 'usertoplist__id')
     return render(request, 'ktapp/film_subpages/film_main.html', {
         'active_tab': 'main',
         'film': film,
@@ -178,6 +179,8 @@ def film_main(request, id, film_slug):
             [film.num_specific_rating(r) for r in range(5, 0, -1)],
             votes,
         ),
+        'special_users': special_users,
+        'utls': utls,
     })
 
 
