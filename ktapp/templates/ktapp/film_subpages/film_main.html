@@ -64,7 +64,7 @@
                                     {{ named_rating }}
                                 {% endif %}
                             {% endfor %}
-                            <span class="show_change_vote"> (<span class="action_text" id="show_change_vote_button">szavazat módosítása</span>)</span></h3>
+                            <span class="show_change_vote"> <span class="button small_button" id="show_change_vote_button">szavazat módosítása</span></span></h3>
                     {% else %}
                         <h3>Szerinted milyen?</h3>
                     {% endif %}
@@ -97,15 +97,20 @@
                 {% endif %}
             </div>
             <div id="film_main_ratings_block">
-                <h3>Szavazatok<span class="show_rating_details"> (<span class="action_text" id="show_rating_details_button">részletes szavazatok</span>)</span></h3>
+                <h3>Szavazatok<span class="show_rating_details"> <span class="button small_button" id="show_rating_details_button">összes szavazat megmutatása</span></span></h3>
                 <ul id="film_votes">
                     {% for num_vote, vote in votes %}
                         {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
                         {% if vote %}
-                            <li>{{ num_vote }} {{ named_rating }}<span class="rating_details" style="display: none">:
-                                {% for voteuser in vote %}
+                            <li>{{ num_vote }} {{ named_rating }}{% if vote.0 %}:{% endif %}
+                                {% for voteuser in vote.0 %}
                                     <a href="{% url 'user_profile' voteuser.user.id voteuser.user.slug_cache %}">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
                                 {% endfor %}
+                                <span class="rating_details" style="display: none">
+                                    <br />
+                                    {% for voteuser in vote.1 %}
+                                        <a href="{% url 'user_profile' voteuser.user.id voteuser.user.slug_cache %}">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
                                 </span>
                             </li>
                         {% endif %}

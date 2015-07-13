@@ -150,12 +150,24 @@ def search(request):
 def film_main(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
     rating = 0
+    special_users = set()
     if request.user.is_authenticated():
+        special_users.add(request.user.id)
+        for friend in request.user.get_follows():
+            special_users.add(friend.id)
         try:
             vote = models.Vote.objects.get(film=film, user=request.user)
             rating = vote.rating
         except models.Vote.DoesNotExist:
             pass
+    votes = []
+    for idx, r in enumerate(range(5, 0, -1)):
+        votes.append(([], []))
+        for u in film.vote_set.filter(rating=r).select_related('user').order_by('user__username'):
+            if u.user.id in special_users:
+                votes[idx][0].append(u)
+            else:
+                votes[idx][1].append(u)
     return render(request, 'ktapp/film_subpages/film_main.html', {
         'active_tab': 'main',
         'film': film,
@@ -164,7 +176,7 @@ def film_main(request, id, film_slug):
         'roles': film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR),
         'votes': zip(
             [film.num_specific_rating(r) for r in range(5, 0, -1)],
-            [film.vote_set.filter(rating=r).select_related('user').order_by('user__username') for r in range(5, 0, -1)]
+            votes,
         ),
     })
 
