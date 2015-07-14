@@ -634,8 +634,8 @@ def registration(request):
 
     next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
     error_type = ''
-    username = request.POST.get('username', '')
-    email = request.POST.get('email', '')
+    username = request.POST.get('username', '').strip()
+    email = request.POST.get('email', '').strip()
     nickname = request.POST.get('nickname', '')
     if request.method == 'POST':
         if nickname != '':
@@ -914,7 +914,7 @@ def new_message(request):
         return HttpResponseRedirect(reverse('messages'))
     if request.POST:
         raw_content = request.POST['content']
-        content = strip_tags(raw_content)
+        content = strip_tags(raw_content).strip()
         if len(content) == 0:
             return HttpResponseRedirect(reverse('messages'))
         raw_recipients = request.POST['recipients']
