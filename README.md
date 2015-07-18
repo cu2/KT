@@ -87,10 +87,6 @@ Initialize your database (mostly empty tables):
 
     python manage.py migrate
 
-Create a superuser to be able to access admin (`http://localhost:<port>/admin/`):
-
-    python manage.py createsuperuser
-
 
 ### Webserver
 
