@@ -53,5 +53,5 @@ def get_users(request):
             'results': [],
         }), content_type='application/json')
     return HttpResponse(json.dumps(
-        [user.username for user in models.KTUser.objects.filter(username__icontains=q).order_by('username', 'id')[:10]]
+        [user.username for user in models.KTUser.objects.filter(username__startswith=q).order_by('username', 'id')[:10]]
     ), content_type='application/json')

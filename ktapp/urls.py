@@ -46,6 +46,7 @@ urlpatterns += patterns(
     url(r'^film/(?P<id>\d+)/(?P<film_slug>.*)$', web_views.film_main, name='film_main'),
 
     url(r'^szavaz$', web_views.vote, name='vote'),
+    url(r'^kivan$', web_views.wish, name='wish'),
     url(r'^kommentel$', web_views.new_comment, name='new_comment'),
     url(r'^uj_idezet$', web_views.new_quote, name='new_quote'),
     url(r'^uj_erdekesseg$', web_views.new_trivia, name='new_trivia'),

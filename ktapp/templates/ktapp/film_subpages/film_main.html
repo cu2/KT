@@ -1,4 +1,5 @@
 {% extends "ktapp/film_subpages/film_base.html" %}
+{% load kt_extras %}
 
 {% block film_main %}
 
@@ -24,16 +25,6 @@
                     {% endfor %}
                 </table>
             {% endif %}
-            {% if film.all_sequels %}
-                {% for seq in film.all_sequels %}
-                    <h3>{{ seq }}{% if seq.sequel_type = 'A' %} adaptációk{% endif %}{% if seq.sequel_type = 'R' %} remake-ek{% endif %}{% if seq.sequel_type = 'S' %} sequelek{% endif %}</h3>
-                    <ul>
-                        {% for f in seq.all_films %}
-                            <li>{% if f == film %}<b>{% else %}<a href="{% url 'film_main' f.id f.slug_cache %}">{% endif %}{{ f.orig_title }} ({{ f.year }}){% if f == film %}</b>{% else %}</a>{% endif %}</li>
-                        {% endfor %}
-                    </ul>
-                {% endfor %}
-            {% endif %}
             {% if film.main_premier or film.main_premier_year %}
                 <h3>Bemutató</h3>
                 <p>
@@ -51,6 +42,25 @@
                         {{ p.premier_type }}: {{ p.when|date:"Y. F j." }}{% if not forloop.last %}<br />{% endif %}
                     {% endfor %}
                 </p>
+            {% endif %}
+            {% if film.all_sequels %}
+                {% for seq in film.all_sequels %}
+                    <h3>{{ seq }}{% if seq.sequel_type == 'A' %} adaptációk{% endif %}{% if seq.sequel_type == 'R' %} remake-ek{% endif %}</h3>
+                    <table class="fullsize">
+                        <tr class="header_tr">
+                            <th>Film</th>
+                            <th>Év</th>
+                            <th>Átlag</th>
+                        </tr>
+                        {% for f in seq.all_films %}
+                            <tr class="{% cycle '' 'odd' %}{% if f == film %} selected_film_tr{% endif %}">
+                                <td>{{ f|film_url_html }}</td>
+                                <td class="center">{{ f.year }}</td>
+                                <td class="center">{{ f|film_rating_html }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endfor %}
             {% endif %}
         </div>
         <div id="film_main_right">
@@ -98,7 +108,7 @@
             </div>
             <div id="film_main_ratings_block">
                 <h3>Szavazatok<span class="show_rating_details"> <span class="button small_button" id="show_rating_details_button">összes szavazat megmutatása</span></span></h3>
-                <ul id="film_votes">
+                <ul class="mini_list">
                     {% for num_vote, vote in votes %}
                         {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
                         {% if vote %}
@@ -117,6 +127,51 @@
                     {% endfor %}
                 </ul>
             </div>
+
+            <h3>Kívánságok</h3>
+            <ul class="mini_list">
+                {% if wish_count.0 > 0 %}<li>{{ wish_count.0 }} ember meg akarja nézni</li>{% endif %}
+                {% if wish_count.1 > 0 %}<li>{{ wish_count.1 }} ember kifejezetten nem akarja megnézni</li>{% endif %}
+            </ul>
+            <ul class="minimini_list">
+                <form action="{% url 'wish' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                    <input type="hidden" name="wish_type" value="Y" />
+                    {% if my_wishes.Y %}
+                        <input type="hidden" name="action" value="-" />
+                        <li class="hover_show_button_context">Meg akarod nézni. <input type="submit" value="Mégsem" class="small_button hover_show_button" /></li>
+                    {% else %}
+                        <input type="hidden" name="action" value="+" />
+                        <li>Meg akarod nézni? <input type="submit" value="Igen" class="small_button" /></li>
+                    {% endif %}
+                </form>
+                <form action="{% url 'wish' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                    <input type="hidden" name="wish_type" value="N" />
+                    {% if my_wishes.N %}
+                        <input type="hidden" name="action" value="-" />
+                        <li class="hover_show_button_context">Nem akarod megnézni. <input type="submit" value="Mégis" class="small_button hover_show_button" /></li>
+                    {% else %}
+                        <input type="hidden" name="action" value="+" />
+                        <li>Nem akarod megnézni? <input type="submit" value="Nem" class="small_button" /></li>
+                    {% endif %}
+                </form>
+                <form action="{% url 'wish' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                    <input type="hidden" name="wish_type" value="G" />
+                    {% if my_wishes.G %}
+                        <input type="hidden" name="action" value="-" />
+                        <li class="hover_show_button_context">Meg akarod szerezni. <input type="submit" value="Mégsem" class="small_button hover_show_button" /></li>
+                    {% else %}
+                        <input type="hidden" name="action" value="+" />
+                        <li>Meg akarod szerezni? <input type="submit" value="Igen" class="small_button" /></li>
+                    {% endif %}
+                </form>
+            </ul>
+
             {% if utls %}
                 <h3>Felhasználói toplisták</h3>
                 <table>

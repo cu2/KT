@@ -27,8 +27,7 @@ MESSAGES_PER_PAGE = 50
 
 def index(request):
     today = datetime.date.today()
-    today = datetime.datetime.strptime('2014-11-10', '%Y-%m-%d')  # HACK
-    offset = (today.weekday() - 3) % 7  # last Thursday=premier day
+    offset = (today.weekday() - 3) % 7  # last Thursday = premier day
     from_date = today - datetime.timedelta(days=offset+7)
     until_date = today - datetime.timedelta(days=offset-7)
     premier_list = []
@@ -169,17 +168,28 @@ def film_main(request, id, film_slug):
             else:
                 votes[idx][1].append(u)
     utls = models.UserToplistItem.objects.filter(film=film).select_related('usertoplist', 'usertoplist__created_by').order_by('serial_number', 'usertoplist__title', 'usertoplist__id')
+    my_wishes = dict((wish_type[0], False) for wish_type in models.Wishlist.WISH_TYPES)
+    wish_count = [0, 0]
+    for wish in models.Wishlist.objects.filter(film=film):
+        if wish.wish_type == models.Wishlist.WISH_TYPE_YES:
+            wish_count[0] += 1
+        if wish.wish_type == models.Wishlist.WISH_TYPE_NO:
+            wish_count[1] += 1
+        if wish.wished_by == request.user:
+            my_wishes[wish.wish_type] = True
     return render(request, 'ktapp/film_subpages/film_main.html', {
         'active_tab': 'main',
         'film': film,
         'rating': rating,
         'ratings': range(1, 6),
-        'roles': film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR),
+        'roles': film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).order_by('role_name'),
         'votes': zip(
             [film.num_specific_rating(r) for r in range(5, 0, -1)],
             votes,
         ),
         'special_users': special_users,
+        'my_wishes': my_wishes,
+        'wish_count': wish_count,
         'utls': utls,
     })
 
@@ -296,10 +306,13 @@ def film_awards(request, id, film_slug):
 
 def film_links(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
-    return render(request, "ktapp/film_subpages/film_links.html", {
-        "active_tab": "links",
-        "film": film,
-        "links": film.link_set.all(),
+    return render(request, 'ktapp/film_subpages/film_links.html', {
+        'active_tab': 'links',
+        'film': film,
+        'links_official': film.link_set.filter(link_type=models.Link.LINK_TYPE_OFFICIAL),
+        'links_reviews': film.link_set.filter(link_type=models.Link.LINK_TYPE_REVIEWS),
+        'links_interviews': film.link_set.filter(link_type=models.Link.LINK_TYPE_INTERVIEWS),
+        'links_other': film.link_set.filter(link_type=models.Link.LINK_TYPE_OTHER),
     })
 
 
@@ -393,6 +406,19 @@ def vote(request):
         vote.rating = rating
         vote.save()
     return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.slug_cache)))
+
+
+@login_required
+def wish(request):
+    film = get_object_or_404(models.Film, pk=request.POST['film_id'])
+    wish_type = request.POST.get('wish_type', '')
+    action = request.POST.get('action', '')
+    if wish_type in [type_code for type_code, type_name in models.Wishlist.WISH_TYPES] and action in ['+', '-']:
+        if action == '+':
+            models.Wishlist.objects.get_or_create(film=film, wished_by=request.user, wish_type=wish_type)
+        else:
+            models.Wishlist.objects.filter(film=film, wished_by=request.user, wish_type=wish_type).delete()
+    return HttpResponseRedirect(reverse('film_main', args=(film.pk, film.slug_cache)))
 
 
 @login_required
@@ -901,6 +927,8 @@ def messages(request):
         p = 1
     if p > max_pages:
         return HttpResponseRedirect(reverse('messages') + '?p=' + str(max_pages))
+    request.user.last_message_checking_at = datetime.datetime.now()
+    request.user.save()
     return render(request, 'ktapp/messages.html', {
         'messages': models.Message.objects.filter(owned_by=request.user).order_by('-sent_at')[(p-1) * MESSAGES_PER_PAGE:p * MESSAGES_PER_PAGE],
         'p': p,

@@ -1,7 +1,7 @@
 <div class="film_addon">
     <div class="film_addon_content">
         {% autoescape off %}
-            <p>{{ addon.content_html|linebreaksbr }}</p>
+            <p{% if addon.spoiler %} class="spoiler"{% endif %}>{{ addon.content_html|linebreaksbr }}</p>
         {% endautoescape %}
     </div>
     <div class="film_addon_author">
