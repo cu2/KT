@@ -7,13 +7,13 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ktapp', '0006_auto_20150525_1149'),
+        ('ktapp', '0007_topic_closed_until'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='review',
-            name='approved',
+            model_name='trivia',
+            name='spoiler',
             field=models.BooleanField(default=False),
             preserve_default=True,
         ),

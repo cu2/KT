@@ -7,14 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ktapp', '0004_auto_20150523_1901'),
+        ('ktapp', '0003_film_open_for_vote_from'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='premier',
-            name='when_year',
-            field=models.PositiveIntegerField(null=True, blank=True),
+            model_name='keyword',
+            name='old_imdb_name',
+            field=models.CharField(max_length=250, blank=True),
             preserve_default=True,
         ),
     ]
