@@ -1,15 +1,42 @@
 {% extends "ktapp/layout.html" %}
 
-{% block title %}{{ role.role_name }}{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %} - Kritikus Tömeg{% endblock %}
+{% block title %}{{ role.role_name }} - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{{ role.role_name }}{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</h1>
+    <h1>{{ role.role_name }}</h1>
 {% endblock %}
 
 {% block main %}
-    <h2><a href="{% url 'film_main' role.film.id role.film.slug_cache %}">{{ role.film.orig_title }} [{{ role.film.year }}]</a></h2>
-    {% if role.film.other_titles %}
-        <h3>{{ role.film.other_titles|linebreaksbr }}</h3>
+
+    <p>Film: <a href="{% url 'film_main' role.film.id role.film.slug_cache %}">{{ role.film.orig_title }} ({{ role.film.year }})</a> {{ role.film.second_title }}</p>
+    <p>Színész: <a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}</p>
+
+    {% if user.is_authenticated %}
+        <h3>Szereplő módosítása</h3>
+        <form action="" method="post">
+            {% csrf_token %}
+            <p>
+                <label for="id_role_name">Név vagy email cím:</label>
+                <input type="text" name="role_name" id="id_role_name" value="{{ role.role_name }}" />
+            </p>
+            <p>
+                <label for="id_role_type">Típus:</label>
+                <select name="role_type" id="id_role_type">
+                    <option value="F"{% if role.actor_subtype == 'F' %} selected="selected"{% endif %}>teljes valójában</option>
+                    <option value="V"{% if role.actor_subtype == 'V' %} selected="selected"{% endif %}>csak a hangja</option>
+                </select>
+            </p>
+            <p>
+                <input type="submit" value="Szereplő módosítása" />
+            </p>
+        </form>
+        <h3>Szereplő törlése</h3>
+        <form action="{% url 'delete_role' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="role" value="{{ role.id }}" />
+            <p><input type="submit" value="Szereplő törlése" /></p>
+        </form>
     {% endif %}
-    <h2><a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a></h2>
+
+
 {% endblock %}

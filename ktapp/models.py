@@ -181,6 +181,11 @@ class Film(models.Model):
     def other_premiers(self):
         return Premier.objects.filter(film=self)
 
+    def second_title(self):
+        if self.other_titles:
+            return self.other_titles.split('\n')[0]
+        return ''
+
     def save(self, *args, **kwargs):
         if self.other_titles:
             self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.other_titles.split('\n')[0]) + '-' + slugify(self.year)
@@ -569,11 +574,9 @@ class FilmArtistRelationship(models.Model):
     ]
     ACTOR_SUBTYPE_FULL = 'F'
     ACTOR_SUBTYPE_VOICE = 'V'
-    ACTOR_SUBTYPE_DUB = 'D'
     ACTOR_SUBTYPES = [
         (ACTOR_SUBTYPE_FULL, 'Full'),
         (ACTOR_SUBTYPE_VOICE, 'Voice'),
-        (ACTOR_SUBTYPE_DUB, 'Dub'),
     ]
     role_type = models.CharField(max_length=1, choices=ROLE_TYPES, default=ROLE_TYPE_DIRECTOR)
     actor_subtype = models.CharField(max_length=1, choices=ACTOR_SUBTYPES, default=ACTOR_SUBTYPE_FULL)

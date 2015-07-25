@@ -23,36 +23,38 @@
                     </tr>
                 {% endfor %}
             </table>
-            <h3>Új szereplő</h3>
-            <input type="hidden" id="new_role_film" value="{{ film.pk }}" />
-            <table class="fullsize">
-                <tr class="header_tr">
-                    <td class="half_td">Szerep</td>
-                    <td>Színész</td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="text" id="new_role_name" class="full_input" /><br />
-                        <select id="new_role_type">
-                            <option value="F">teljes valójában</option>
-                            <option value="V">csak a hangja</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" id="new_role_artist" class="full_input" /><br />
-                        <select id="new_role_gender">
-                            <option value="U">neme:</option>
-                            <option value="M">férfi</option>
-                            <option value="F">nő</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" class="center">
-                        <input type="submit" value="Új szereplő beküldése" class="small_button" id="submit_new_role" />
-                    </td>
-                </tr>
-            </table>
+            {% if user.is_authenticated %}
+                <h3>Új szereplő</h3>
+                <input type="hidden" id="new_role_film" value="{{ film.pk }}" />
+                <table class="fullsize">
+                    <tr class="header_tr">
+                        <td class="half_td">Szerep</td>
+                        <td>Színész</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" id="new_role_name" class="full_input" /><br />
+                            <select id="new_role_type">
+                                <option value="F">teljes valójában</option>
+                                <option value="V">csak a hangja</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" id="new_role_artist" class="full_input" /><br />
+                            <select id="new_role_gender">
+                                <option value="U">neme:</option>
+                                <option value="M">férfi</option>
+                                <option value="F">nő</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="center">
+                            <input type="submit" value="Új szereplő beküldése" class="small_button" id="submit_new_role" />
+                        </td>
+                    </tr>
+                </table>
+            {% endif %}
             {% if film.main_premier or film.main_premier_year %}
                 <h3>Bemutató</h3>
                 <p>

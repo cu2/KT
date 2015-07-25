@@ -30,12 +30,12 @@
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}" />
         <p>
-            <label for="username">Név vagy email cím:</label>
-            <input type="text" name="username" value="{{ username }}" class="focus_this" />
+            <label for="id_username">Név vagy email cím:</label>
+            <input type="text" name="username" id="id_username" value="{{ username }}" class="focus_this" />
         </p>
         <p>
-            <label for="password">Jelszó:</label>
-            <input type="password" name="password" />
+            <label for="id_password">Jelszó:</label>
+            <input type="password" name="password" id="id_password" />
             (Ha nem emlékszel a jelszavadra, <a href="{% url 'reset_password' '' %}">itt kérhetsz újat</a>.)
         </p>
         <p class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></p>

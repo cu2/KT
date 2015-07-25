@@ -571,8 +571,16 @@ def artist(request, id, name_slug):
 
 def role(request, id, name_slug):
     role = get_object_or_404(models.FilmArtistRelationship, pk=id)
-    return render(request, "ktapp/role.html", {
-        "role": role,
+    if request.POST:
+        role_name = request.POST.get('role_name', '').strip()
+        role_type = request.POST.get('role_type', '').strip()
+        if role_name != '' and role_type in ['F', 'V']:
+            role.role_name = role_name
+            role.actor_subtype = role_type
+            role.save()
+        return HttpResponseRedirect(reverse('role', args=(role.id, role.slug_cache)))
+    return render(request, 'ktapp/role.html', {
+        'role': role,
     })
 
 
@@ -609,6 +617,14 @@ def new_role(request):
             )
             return HttpResponse(json.dumps({'success': True}), content_type='application/json')
     return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+
+
+@login_required
+def delete_role(request):
+    role = get_object_or_404(models.FilmArtistRelationship, id=request.POST.get('role', 0))
+    if request.POST:
+        role.delete()
+    return HttpResponseRedirect(reverse('film_main', args=(role.film.id, role.film.slug_cache)))
 
 
 def list_of_topics(request):
