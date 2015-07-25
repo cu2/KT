@@ -22,6 +22,7 @@ urlpatterns = patterns(
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # custom api endpoints:
     url(r'^api/autocomplete/users$', api_views.get_users, name='get_users'),
+    url(r'^api/autocomplete/artists$', api_views.get_artists, name='get_artists'),
 )
 
 
@@ -57,6 +58,7 @@ urlpatterns += patterns(
 
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>.*)$', web_views.artist, name='artist'),
     url(r'^szereplo/(?P<id>\d+)/(?P<name_slug>.*)$', web_views.role, name='role'),
+    url(r'^uj_szereplo$', web_views.new_role, name='new_role'),
 
     url(r'^forum/(?P<id>\d+)/(?P<title_slug>.*)$', web_views.forum, name='forum'),
     url(r'^forum/$', web_views.list_of_topics, name='list_of_topics'),

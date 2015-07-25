@@ -2,9 +2,10 @@
 
 import datetime
 import math
+import json
 
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
@@ -573,6 +574,41 @@ def role(request, id, name_slug):
     return render(request, "ktapp/role.html", {
         "role": role,
     })
+
+
+@login_required
+def new_role(request):
+    if request.POST:
+        role_name = request.POST.get('role_name', '').strip()
+        role_type = request.POST.get('role_type', '').strip()
+        role_artist = request.POST.get('role_artist', '').strip()
+        role_gender = request.POST.get('role_gender', '').strip()
+        try:
+            film = models.Film.objects.get(id=request.POST.get('film_id', 0))
+        except models.Film.DoesNotExist:
+            film = None
+        if film and role_name != '' and role_type in ['F', 'V'] and role_artist != '' and role_gender in ['M', 'F']:
+            artist_list = models.Artist.objects.filter(name=role_artist)
+            if len(artist_list) == 0:
+                artist = models.Artist.objects.create(
+                    name=role_artist,
+                    gender=role_gender,
+                )
+            else:
+                artist = [artist for artist in artist_list if artist.name == role_artist][0]
+            if artist.gender != role_gender:
+                artist.gender = role_gender
+                artist.save()
+            models.FilmArtistRelationship.objects.create(
+                film=film,
+                artist=artist,
+                role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR,
+                actor_subtype=role_type,
+                role_name=role_name,
+                created_by=request.user,
+            )
+            return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+    return HttpResponse(json.dumps({'success': False}), content_type='application/json')
 
 
 def list_of_topics(request):

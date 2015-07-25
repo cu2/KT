@@ -49,9 +49,16 @@ class SequelViewSet(viewsets.ReadOnlyModelViewSet):
 def get_users(request):
     q = request.GET.get('q', '')
     if len(q) < 2:
-        return HttpResponse(json.dumps({
-            'results': [],
-        }), content_type='application/json')
+        return HttpResponse(json.dumps([]), content_type='application/json')
     return HttpResponse(json.dumps(
-        [user.username for user in models.KTUser.objects.filter(username__startswith=q).order_by('username', 'id')[:10]]
+        [user.username for user in models.KTUser.objects.filter(username__istartswith=q).order_by('username', 'id')[:10]]
+    ), content_type='application/json')
+
+
+def get_artists(request):
+    q = request.GET.get('q', '')
+    if len(q) < 2:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+    return HttpResponse(json.dumps(
+        [{'label': artist.name, 'value': artist.name, 'id': artist.id, 'gender': artist.gender} for artist in models.Artist.objects.filter(name__icontains=q).order_by('name', 'id')[:10]]
     ), content_type='application/json')

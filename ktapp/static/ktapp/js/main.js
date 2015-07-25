@@ -48,6 +48,47 @@ $(function() {
             }
         });
 
+    $('#new_role_artist')
+        .autocomplete({
+            source: function(request, response) {
+                $.getJSON('api/autocomplete/artists', {
+                    q: request.term
+                }, response);
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                if (ui.item) {
+                    this.value = ui.item.value;
+                    $('#new_role_gender').val(ui.item.gender);
+                }
+            }
+        });
+    $('#submit_new_role').click(function() {
+        if ($('#new_role_gender').val() == 'U') {
+            $('#new_role_gender').focus();
+        } else {
+            $.post('uj_szereplo', {
+                csrfmiddlewaretoken: $.cookie('csrftoken'),
+                film_id: $('#new_role_film').val(),
+                role_name: $('#new_role_name').val(),
+                role_type: $('#new_role_type').val(),
+                role_artist: $('#new_role_artist').val(),
+                role_gender: $('#new_role_gender').val()
+            }, function(data) {
+                if (data.success) {
+                    var role_name = $('#new_role_name').val();
+                    if ($('#new_role_type').val() == 'V') role_name += ' (hangja)';
+                    var artist_name = $('#new_role_artist').val();
+                    $('#table_of_roles').append('<tr><td>' + role_name + '</td><td>' + artist_name + '</td></tr>');
+                    $('#new_role_name').val('');
+                    $('#new_role_artist').val('');
+                    $('#new_role_gender').val('U');
+                }
+                $('#new_role_name').focus();
+            }, 'json');
+        }
+    });
+
     $('.focus_this').focus();
 
 });
