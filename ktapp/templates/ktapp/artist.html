@@ -43,5 +43,38 @@
         {% endfor %}
     {% endif %}
 
+    {% if user.is_authenticated %}
+        <h3>Színész/rendező módosítása</h3>
+        <form action="" method="post">
+            {% csrf_token %}
+            <p>
+                <label for="id_artist_name">Név:</label>
+                <input type="text" name="artist_name" id="id_artist_name" value="{{ artist.name }}" />
+            </p>
+            <p>
+                <label for="id_artist_gender">Nem:</label>
+                <select name="artist_gender" id="id_artist_gender">
+                    <option value="U"{% if artist.gender == 'U' %} selected="selected"{% endif %}>???</option>
+                    <option value="M"{% if artist.gender == 'M' %} selected="selected"{% endif %}>férfi</option>
+                    <option value="F"{% if artist.gender == 'F' %} selected="selected"{% endif %}>nő</option>
+                </select>
+            </p>
+            <p>
+                <input type="submit" value="Módosítás" />
+            </p>
+        </form>
+        {% if similar_artists %}
+            <h3>Színész/rendező összevonása</h3>
+            {% for a in similar_artists %}
+                <form action="{% url 'merge_artist' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="artist_1" value="{{ artist.id }}" />
+                    <input type="hidden" name="artist_2" value="{{ a.id }}" />
+                    <p>{{ a.name }} <input type="submit" value="Összevonás" /></p>
+                </form>
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+
 </div>
 {% endblock %}

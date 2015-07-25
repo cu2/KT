@@ -530,6 +530,14 @@ def delete_picture(request):
 
 def artist(request, id, name_slug):
     artist = get_object_or_404(models.Artist, pk=id)
+    if request.POST:
+        artist_name = request.POST.get('artist_name', '').strip()
+        artist_gender = request.POST.get('artist_gender', '').strip()
+        if artist_gender in ['U', 'M', 'F']:
+            artist.name = artist_name
+            artist.gender = artist_gender
+            artist.save()
+        return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))
     directions = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR).order_by('-film__year', 'film__orig_title')
     director_vote_avg = 0
     if directions:
@@ -556,6 +564,12 @@ def artist(request, id, name_slug):
             actor_vote_avg = 1.0 * (actor_votes.get('nr1', 0) + 2*actor_votes.get('nr2', 0) + 3*actor_votes.get('nr3', 0) + 4*actor_votes.get('nr4', 0) + 5*actor_votes.get('nr5', 0)) / actor_vote_count
     else:
         actor_vote_count = 0
+    normal_name = artist.name
+    similar_artists = [a for a in models.Artist.objects.filter(name=normal_name) if a != artist]
+    if ' ' in normal_name:
+        reversed_name = '%s %s' % (normal_name[normal_name.index(' ')+1:], normal_name[:normal_name.index(' ')])
+        similar_artists += [a for a in models.Artist.objects.filter(name=reversed_name)]
+        similar_artists = set(similar_artists)
     return render(request, "ktapp/artist.html", {
         "artist": artist,
         "directions": directions,
@@ -566,7 +580,42 @@ def artist(request, id, name_slug):
         "actor_vote_avg": actor_vote_avg,
         "awards": models.Award.objects.filter(artist=artist).order_by('name', 'year', 'category'),
         'biographies': models.Biography.objects.filter(artist=artist),
+        'similar_artists': similar_artists,
     })
+
+
+@login_required
+def merge_artist(request):
+    artist_1 = get_object_or_404(models.Artist, id=request.POST.get('artist_1', 0))
+    artist_2 = get_object_or_404(models.Artist, id=request.POST.get('artist_2', 0))
+    if request.POST:
+        if artist_1.id < artist_2.id:
+            artist_to_delete = artist_2
+            artist_to_leave = artist_1
+        else:
+            artist_to_delete = artist_1
+            artist_to_leave = artist_2
+        for role in artist_to_delete.filmartistrelationship_set.all():
+            role.artist = artist_to_leave
+            role.save()
+        for bio in models.Biography.objects.filter(artist=artist_to_delete):
+            bio.artist = artist_to_leave
+            bio.save()
+        for aw in models.Award.objects.filter(artist=artist_to_delete):
+            aw.artist = artist_to_leave
+            aw.save()
+        for utli in models.UserToplistItem.objects.filter(director=artist_to_delete):
+            utli.director = artist_to_leave
+            utli.save()
+        for utli in models.UserToplistItem.objects.filter(actor=artist_to_delete):
+            utli.actor = artist_to_leave
+            utli.save()
+        if artist_to_leave.name != artist_to_delete.name:
+            artist_to_leave.name = '%s / %s' % (artist_to_leave.name, artist_to_delete.name)
+            artist_to_leave.save()
+        artist_to_delete.delete()
+        return HttpResponseRedirect(reverse('artist', args=(artist_to_leave.id, artist_to_leave.slug_cache)))
+    return HttpResponseRedirect(reverse('artist', args=(artist_1.id, artist_1.slug_cache)))
 
 
 def role(request, id, name_slug):

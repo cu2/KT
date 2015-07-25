@@ -16,7 +16,7 @@
         <form action="" method="post">
             {% csrf_token %}
             <p>
-                <label for="id_role_name">Név vagy email cím:</label>
+                <label for="id_role_name">Név:</label>
                 <input type="text" name="role_name" id="id_role_name" value="{{ role.role_name }}" />
             </p>
             <p>
