@@ -192,6 +192,7 @@ def film_main(request, id, film_slug):
         'my_wishes': my_wishes,
         'wish_count': wish_count,
         'utls': utls,
+        'premier_types': models.PremierType.objects.all().order_by('name'),
     })
 
 
@@ -589,6 +590,52 @@ def edit_plot(request):
         plot = request.POST.get('plot', '').strip()
         film.plot_summary = plot
         film.save()
+    return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+
+
+@login_required
+def edit_premiers(request):
+    film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
+    if request.POST:
+        main_premier = request.POST.get('main_premier', '').strip()
+        if len(main_premier) == 4 and main_premier.isdigit():
+            film.main_premier_year = main_premier
+            film.main_premier = None
+            film.save()
+        elif len(main_premier) == 10 and kt_utils.is_date(main_premier):
+            film.main_premier = main_premier
+            film.main_premier_year = None
+            film.save()
+        for p in film.other_premiers():
+            premier_when = request.POST.get('other_premier_when_%s' % p.id, '').strip()
+            premier_type = request.POST.get('other_premier_type_%s' % p.id, 0).strip()
+            if premier_when == '':
+                p.delete()
+            elif len(premier_when) == 10 and kt_utils.is_date(premier_when):
+                try:
+                    pt = models.PremierType.objects.get(id=premier_type)
+                except models.PremierType.DoesNotExist:
+                    pt = None
+                if pt:
+                    p.when = premier_when
+                    p.premier_type = pt
+                    p.save()
+        for idx in xrange(1, 2):
+            premier_when = request.POST.get('new_other_premier_when_%s' % idx, '').strip()
+            premier_type = request.POST.get('new_other_premier_type_%s' % idx, 0).strip()
+            if premier_when == '':
+                continue
+            elif len(premier_when) == 10 and kt_utils.is_date(premier_when):
+                try:
+                    pt = models.PremierType.objects.get(id=premier_type)
+                except models.PremierType.DoesNotExist:
+                    pt = None
+                if pt:
+                    models.Premier.objects.create(
+                        film=film,
+                        when=premier_when,
+                        premier_type=pt,
+                    )
     return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
 
 

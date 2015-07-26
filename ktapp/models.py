@@ -204,7 +204,6 @@ class PremierType(models.Model):
 class Premier(models.Model):
     film = models.ForeignKey(Film)
     when = models.DateField()
-    when_year = models.PositiveIntegerField(blank=True, null=True)
     premier_type = models.ForeignKey(PremierType, blank=True, null=True, on_delete=models.SET_NULL)
 
     def __unicode__(self):

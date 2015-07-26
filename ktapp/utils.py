@@ -1,3 +1,4 @@
+import datetime
 import re
 
 from django.contrib.auth import authenticate
@@ -44,3 +45,11 @@ def custom_authenticate(user_model, username_or_email, password):
     except user_model.DoesNotExist:
         username = username_or_email
     return authenticate(username=username, password=password)
+
+
+def is_date(value):
+    try:
+        datetime.datetime.strptime(value, '%Y-%m-%d')
+    except ValueError:
+        return False
+    return True

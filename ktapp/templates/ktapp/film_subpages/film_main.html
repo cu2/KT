@@ -89,23 +89,53 @@
                     </table>
                 {% endfor %}
             {% endif %}
-            {% if film.main_premier or film.main_premier_year %}
-                <h3>Bemutató</h3>
-                <p>
-                    {% if film.main_premier %}
-                        {{ film.main_premier|date:"Y. F j." }}
-                    {% elif film.main_premier_year %}
-                        {{ film.main_premier_year }}
-                    {% endif %}
-                </p>
-            {% endif %}
-            {% if film.other_premiers %}
-                <h3>További bemutatók</h3>
-                <p>
-                    {% for p in film.other_premiers %}
-                        {{ p.premier_type }}: {{ p.when|date:"Y. F j." }}{% if not forloop.last %}<br />{% endif %}
-                    {% endfor %}
-                </p>
+            <div class="hover_show_button_context">
+                <h3>Bemutató{% if film.main_premier or film.main_premier_year %}{% if film.other_premiers %}k{% endif %}{% endif %}{% if user.is_authenticated %} <span class="hover_show_button button small_button" id="show_premier_form">bemutatók szerkesztése</span>{% endif %}</h3>
+                <ul class="mini_list">
+                {% if film.main_premier or film.main_premier_year %}
+                    <li>
+                        {% if film.main_premier %}
+                            {{ film.main_premier|date:"Y. F j." }}
+                        {% elif film.main_premier_year %}
+                            {{ film.main_premier_year }}
+                        {% endif %}
+                    </li>
+                {% endif %}
+                {% for p in film.other_premiers %}
+                    <li>{{ p.premier_type }}: {{ p.when|date:"Y. F j." }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+            {% if user.is_authenticated %}
+                <div id="premier_form" style="display: none">
+                    <form action="{% url 'edit_premiers' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                        <p>
+                            <label for="id_main_premier">Fő bemutató:</label><br />
+                            <input type="text" name="main_premier" id="id_main_premier" value="{% if film.main_premier %}{{ film.main_premier|date:"Y-m-d" }}{% elif film.main_premier_year %}{{ film.main_premier_year }}{% endif %}" />
+                        </p>
+                        <p>
+                            További bemutatók:<br />
+                            {% for p in film.other_premiers %}
+                                <input type="text" name="other_premier_when_{{ p.id }}" value="{{ p.when|date:"Y-m-d" }}" /> <select name="other_premier_type_{{ p.id }}">
+                                    {% for pt in premier_types %}
+                                        <option value="{{ pt.id }}"{% if p.premier_type.id == pt.id %} selected="selected"{% endif %}>{{ pt }}</option>
+                                    {% endfor %}
+                                </select><br />
+                            {% endfor %}
+                            <input type="text" name="new_other_premier_when_1" /> <select name="new_other_premier_type_1">
+                                {% for pt in premier_types %}
+                                    <option value="{{ pt.id }}">{{ pt }}</option>
+                                {% endfor %}
+                            </select><br />
+                        </p>
+                        <p>
+                            <input type="submit" value="Bemutatók mentése" />
+                            <span class="button small_button" style="float: right" id="hide_premier_form">Mégsem</span>
+                        </p>
+                    </form>
+                </div>
             {% endif %}
         </div>
         <div id="film_main_right">

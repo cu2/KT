@@ -28,6 +28,13 @@ $(function() {
     $('#hide_film_edit_form').click(function () {
         $('#film_edit_form').toggle();
     });
+    $('#show_premier_form').click(function () {
+        $('#premier_form').toggle();
+        if ($('#premier_form').is(':visible')) $('#id_main_premier').focus();
+    });
+    $('#hide_premier_form').click(function () {
+        $('#premier_form').toggle();
+    });
 
     function split(val) {
         return val.split(/,\s*/);
