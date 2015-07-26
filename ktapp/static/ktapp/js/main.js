@@ -11,6 +11,15 @@ $(function() {
     $('#show_new_role_form').click(function () {
         $('#new_role_form').toggle();
     });
+    $('#show_plot_edit_form').click(function () {
+        $('#plot_text').toggle();
+        $('#plot_edit_form').toggle();
+        $('#id_plot').focus();
+    });
+    $('#hide_plot_edit_form').click(function () {
+        $('#plot_edit_form').toggle();
+        $('#plot_text').toggle().focus();
+    });
 
     function split(val) {
         return val.split(/,\s*/);

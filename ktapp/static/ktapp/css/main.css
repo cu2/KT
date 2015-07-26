@@ -687,7 +687,9 @@ ul.nobullet {
 }
 
 
-
+.hover_show_button {
+    white-space: nowrap;
+}
 .hover_show_button_context .hover_show_button {
     visibility: hidden;
 }

@@ -528,6 +528,16 @@ def delete_picture(request):
     return HttpResponseRedirect(reverse('film_pictures', args=(picture.film.pk, picture.film.slug_cache)))
 
 
+@login_required
+def edit_plot(request):
+    film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
+    if request.POST:
+        plot = request.POST.get('plot', '').strip()
+        film.plot_summary = plot
+        film.save()
+    return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+
+
 def artist(request, id, name_slug):
     artist = get_object_or_404(models.Artist, pk=id)
     if request.POST:
