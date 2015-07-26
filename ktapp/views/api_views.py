@@ -62,3 +62,18 @@ def get_artists(request):
     return HttpResponse(json.dumps(
         [{'label': artist.name, 'value': artist.name, 'id': artist.id, 'gender': artist.gender} for artist in models.Artist.objects.filter(name__icontains=q).order_by('name', 'id')[:10]]
     ), content_type='application/json')
+
+
+def get_keywords(request):
+    t = request.GET.get('t', '')
+    q = request.GET.get('q', '')
+    if q.endswith('*'):
+        q = q[:-1]
+    if len(q) < 2:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+    keywords = models.Keyword.objects
+    if t != '':
+        keywords = keywords.filter(keyword_type=t)
+    return HttpResponse(json.dumps(
+        [keyword.name for keyword in keywords.filter(name__istartswith=q).order_by('name', 'id')[:10]]
+    ), content_type='application/json')

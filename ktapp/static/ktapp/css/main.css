@@ -119,6 +119,10 @@ footer ul li {
     float: right;
     width: 49%;
 }
+#film_title {
+    margin-left: 150px;
+    margin-right: 200px;
+}
 .film_block {
     background: rgb(249,244,218);
     margin-bottom: 20px;
@@ -146,6 +150,9 @@ footer ul li {
 #film_edit_form textarea {
     width: 99%;
     height: 100px;
+}
+#keyword_form input[type=text] {
+    width: 99%;
 }
 
 

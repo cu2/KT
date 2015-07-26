@@ -23,6 +23,7 @@ urlpatterns = patterns(
     # custom api endpoints:
     url(r'^api/autocomplete/users$', api_views.get_users, name='get_users'),
     url(r'^api/autocomplete/artists$', api_views.get_artists, name='get_artists'),
+    url(r'^api/autocomplete/keywords$', api_views.get_keywords, name='get_keywords'),
 )
 
 
@@ -59,6 +60,7 @@ urlpatterns += patterns(
     url(r'^szerk_film$', web_views.edit_film, name='edit_film'),
     url(r'^szerk_sztori$', web_views.edit_plot, name='edit_plot'),
     url(r'^szerk_bemutatok$', web_views.edit_premiers, name='edit_premiers'),
+    url(r'^szerk_kulcsszavak$', web_views.edit_keywords, name='edit_keywords'),
 
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>.*)$', web_views.artist, name='artist'),
     url(r'^szereplo/(?P<id>\d+)/(?P<name_slug>.*)$', web_views.role, name='role'),

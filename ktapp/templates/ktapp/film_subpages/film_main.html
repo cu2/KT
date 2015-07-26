@@ -108,6 +108,7 @@
             </div>
             {% if user.is_authenticated %}
                 <div id="premier_form" style="display: none">
+                    <h3>Bemutatók szerkesztése</h3>
                     <form action="{% url 'edit_premiers' %}" method="post" class="inline">
                         {% csrf_token %}
                         <input type="hidden" name="film_id" value="{{ film.pk }}" />

@@ -386,11 +386,11 @@ def film_picture(request, id, film_slug, picture_id):
 
 def film_keywords(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
-    return render(request, "ktapp/film_subpages/film_keywords.html", {
-        "active_tab": "keywords",
-        "film": film,
-        "major_keywords": film.keyword_set.filter(keyword_type=models.Keyword.KEYWORD_TYPE_MAJOR),
-        "other_keywords": film.keyword_set.filter(keyword_type=models.Keyword.KEYWORD_TYPE_OTHER),
+    return render(request, 'ktapp/film_subpages/film_keywords.html', {
+        'active_tab': 'keywords',
+        'film': film,
+        'major_keywords': [(x.keyword, x.spoiler) for x in models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=models.Keyword.KEYWORD_TYPE_MAJOR).order_by('keyword__name', 'keyword__id')],
+        'other_keywords': [(x.keyword, x.spoiler) for x in models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=models.Keyword.KEYWORD_TYPE_OTHER).order_by('keyword__name', 'keyword__id')],
     })
 
 
@@ -637,6 +637,39 @@ def edit_premiers(request):
                         premier_type=pt,
                     )
     return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+
+
+@login_required
+def edit_keywords(request):
+    film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
+    if request.POST:
+        for type_name, type_code in [('countries', 'C'), ('genres', 'G'), ('major_keywords', 'M'), ('other_keywords', 'O')]:
+            models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=type_code).delete()
+            for keyword_name in request.POST.get(type_name, '').strip().split(','):
+                keyword_name = keyword_name.strip()
+                if keyword_name.endswith('*'):
+                    spoiler = True
+                    keyword_name = keyword_name[:-1]
+                else:
+                    spoiler = False
+                if not keyword_name:
+                    continue
+                if type_code not in {'M', 'O'}:
+                    spoiler = False
+                keyword, created = models.Keyword.objects.get_or_create(
+                    name=keyword_name,
+                    keyword_type=type_code,
+                )
+                if created:
+                    keyword.created_by = request.user
+                    keyword.save()
+                models.FilmKeywordRelationship.objects.create(
+                    film=film,
+                    keyword=keyword,
+                    created_by=request.user,
+                    spoiler=spoiler,
+                )
+    return HttpResponseRedirect(reverse('film_keywords', args=(film.id, film.slug_cache)))
 
 
 def artist(request, id, name_slug):
