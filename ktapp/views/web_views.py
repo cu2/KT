@@ -769,6 +769,8 @@ def registration(request):
             error_type = 'robot'
         elif username == '':
             error_type = 'name_empty'
+        elif ',' in username:
+            error_type = 'name_invalid'
         elif email == '':
             error_type = 'email_empty'
         elif not is_valid_email(email):
@@ -827,7 +829,6 @@ def custom_login(request):
             username_or_email = ''
         elif not username_or_email:
             error_type = 'name_empty'
-            username_or_email = ''
         elif not password:
             error_type = 'password_empty'
         else:
