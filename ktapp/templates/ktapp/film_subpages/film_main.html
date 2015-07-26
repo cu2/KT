@@ -55,24 +55,6 @@
                     </tr>
                 </table>
             {% endif %}
-            {% if film.main_premier or film.main_premier_year %}
-                <h3>Bemutató</h3>
-                <p>
-                    {% if film.main_premier %}
-                        {{ film.main_premier|date:"Y. F j." }}
-                    {% elif film.main_premier_year %}
-                        {{ film.main_premier_year }}
-                    {% endif %}
-                </p>
-            {% endif %}
-            {% if film.other_premiers %}
-                <h3>További bemutatók</h3>
-                <p>
-                    {% for p in film.other_premiers %}
-                        {{ p.premier_type }}: {{ p.when|date:"Y. F j." }}{% if not forloop.last %}<br />{% endif %}
-                    {% endfor %}
-                </p>
-            {% endif %}
             {% if film.all_sequels %}
                 {% for seq in film.all_sequels %}
                     <h3>{{ seq }}{% if seq.sequel_type == 'A' %} adaptációk{% endif %}{% if seq.sequel_type == 'R' %} remake-ek{% endif %}</h3>
@@ -91,6 +73,24 @@
                         {% endfor %}
                     </table>
                 {% endfor %}
+            {% endif %}
+            {% if film.main_premier or film.main_premier_year %}
+                <h3>Bemutató</h3>
+                <p>
+                    {% if film.main_premier %}
+                        {{ film.main_premier|date:"Y. F j." }}
+                    {% elif film.main_premier_year %}
+                        {{ film.main_premier_year }}
+                    {% endif %}
+                </p>
+            {% endif %}
+            {% if film.other_premiers %}
+                <h3>További bemutatók</h3>
+                <p>
+                    {% for p in film.other_premiers %}
+                        {{ p.premier_type }}: {{ p.when|date:"Y. F j." }}{% if not forloop.last %}<br />{% endif %}
+                    {% endfor %}
+                </p>
             {% endif %}
         </div>
         <div id="film_main_right">
