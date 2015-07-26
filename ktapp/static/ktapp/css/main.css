@@ -439,10 +439,6 @@ ul.nobullet {
 .comment_button_reply {
     position: absolute; z-index: 10;
     right: 5px; top: 5px;
-    display: none;
-}
-.comment_block:hover .comment_button_reply {
-    display: inline;
 }
 
 
@@ -693,10 +689,10 @@ ul.nobullet {
 
 
 .hover_show_button_context .hover_show_button {
-    display: none;
+    visibility: hidden;
 }
 .hover_show_button_context:hover .hover_show_button {
-    display: inline;
+    visibility: visible;
 }
 
 

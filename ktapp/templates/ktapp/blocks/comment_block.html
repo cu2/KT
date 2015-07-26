@@ -15,11 +15,11 @@
             <span class="comment_block_author_right">#{{ comment.serial_number }}</span>
         {% endif %}
     </div>
-    <div class="comment_block_content">
+    <div class="comment_block_content hover_show_button_context">
         {% if comment.domain == 'F' %}
-            <a href="{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}" class="comment_button_reply button small_button">Válasz erre a kommentre</a>
+            <a href="{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}" class="comment_button_reply hover_show_button button small_button">Válasz erre a kommentre</a>
         {% elif comment.domain == 'T' %}
-            <a href="{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}" class="comment_button_reply button small_button">Válasz erre a kommentre</a>
+            <a href="{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}" class="comment_button_reply hover_show_button button small_button">Válasz erre a kommentre</a>
         {% elif comment.domain == 'P' %}
         {% endif %}
         {% autoescape off %}

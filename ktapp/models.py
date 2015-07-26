@@ -188,7 +188,7 @@ class Film(models.Model):
 
     def save(self, *args, **kwargs):
         if self.other_titles:
-            self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.other_titles.split('\n')[0]) + '-' + slugify(self.year)
+            self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.second_title()) + '-' + slugify(self.year)
         else:
             self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.year)
         super(Film, self).save(*args, **kwargs)

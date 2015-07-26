@@ -644,7 +644,7 @@ def new_role(request):
             film = models.Film.objects.get(id=request.POST.get('film_id', 0))
         except models.Film.DoesNotExist:
             film = None
-        if film and role_name != '' and role_type in ['F', 'V'] and role_artist != '' and role_gender in ['M', 'F']:
+        if film and role_name != '' and role_type in ['F', 'V'] and role_artist != '' and ',' not in role_artist and role_gender in ['M', 'F']:
             artist_list = models.Artist.objects.filter(name=role_artist)
             if len(artist_list) == 0:
                 artist = models.Artist.objects.create(

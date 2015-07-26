@@ -1,6 +1,6 @@
 {% extends "ktapp/layout.html" %}
 
-{% block title %}{{ film.orig_title }} [{{ film.year }}] - Kritikus Tömeg{% endblock %}
+{% block title %}{{ film.orig_title }}{% if film.second_title %} / {{ film.second_title }}{% endif %} ({{ film.year }}) - Kritikus Tömeg{% endblock %}
 
 {% block header %}
     <div id="film_header">

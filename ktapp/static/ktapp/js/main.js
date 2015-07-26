@@ -8,6 +8,9 @@ $(function() {
     $('#show_picture_edit_button').click(function () {
         $('.picture_edit_block').toggle();
     });
+    $('#show_new_role_form').click(function () {
+        $('#new_role_form').toggle();
+    });
 
     function split(val) {
         return val.split(/,\s*/);
