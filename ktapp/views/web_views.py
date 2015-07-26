@@ -529,6 +529,60 @@ def delete_picture(request):
 
 
 @login_required
+def edit_film(request):
+    film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
+    if request.POST:
+        film_orig_title = request.POST.get('film_orig_title', '').strip()
+        if film_orig_title:
+            film.orig_title = film_orig_title
+        film.other_titles = request.POST.get('film_other_titles', '').strip()
+        try:
+            film_year = int(request.POST.get('film_year', None))
+        except ValueError:
+            film_year = None
+        if film_year == 0:
+            film_year = None
+        film.year = film_year
+        directors = set()
+        for director_name in request.POST.get('film_directors', '').strip().split(','):
+            if director_name.strip() == '':
+                continue
+            director = models.Artist.get_artist_by_name(director_name.strip())
+            if director is None:
+                director = models.Artist.objects.create(name=director_name.strip())
+            directors.add(director)
+        models.FilmArtistRelationship.objects.filter(film=film, role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR).delete()
+        for director in directors:
+            models.FilmArtistRelationship.objects.create(
+                film=film,
+                artist=director,
+                role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR,
+                created_by=request.user,
+            )
+        film_imdb_link = request.POST.get('film_imdb_link', '').strip()
+        if film_imdb_link.startswith('tt'):
+            film.imdb_link = film_imdb_link
+        elif 'imdb.com' in film_imdb_link and '/tt' in film_imdb_link:
+            film.imdb_link = film_imdb_link[film_imdb_link.index('/tt')+1:].split('/')[0]
+        else:
+            film.imdb_link = ''
+        film_porthu_link = request.POST.get('film_porthu_link', '').strip()
+        if film_porthu_link.isdigit():
+            film.porthu_link = film_porthu_link
+        elif 'i_film_id' in film_porthu_link:
+            try:
+                film.porthu_link = int(film_porthu_link[film_porthu_link.index('i_film_id')+10:].split('&')[0])
+            except ValueError:
+                film.porthu_link = None
+        else:
+            film.porthu_link = None
+        film.wikipedia_link_en = request.POST.get('film_wikipedia_link_en', '').strip()
+        film.wikipedia_link_hu = request.POST.get('film_wikipedia_link_hu', '').strip()
+        film.save()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+@login_required
 def edit_plot(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
@@ -655,14 +709,12 @@ def new_role(request):
         except models.Film.DoesNotExist:
             film = None
         if film and role_name != '' and role_type in ['F', 'V'] and role_artist != '' and ',' not in role_artist and role_gender in ['M', 'F']:
-            artist_list = models.Artist.objects.filter(name=role_artist)
-            if len(artist_list) == 0:
+            artist = models.Artist.get_artist_by_name(role_artist)
+            if artist is None:
                 artist = models.Artist.objects.create(
                     name=role_artist,
                     gender=role_gender,
                 )
-            else:
-                artist = [artist for artist in artist_list if artist.name == role_artist][0]
             if artist.gender != role_gender:
                 artist.gender = role_gender
                 artist.save()

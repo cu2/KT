@@ -132,6 +132,21 @@ footer ul li {
     width: 200px;
     margin-top: 5px;
 }
+#film_edit_form {
+    background: rgb(218,211,184);
+    width: 70%;
+    box-sizing: border-box;
+    margin: 20px auto;
+    padding: 10px;
+    text-align: left;
+}
+#film_edit_form input[type=text] {
+    width: 99%;
+}
+#film_edit_form textarea {
+    width: 99%;
+    height: 100px;
+}
 
 
 /* GENERAL FONTS, COLORS, STYLE */

@@ -10,6 +10,7 @@ $(function() {
     });
     $('#show_new_role_form').click(function () {
         $('#new_role_form').toggle();
+        if ($('#new_role_form').is(':visible')) $('#new_role_name').focus();
     });
     $('#show_plot_edit_form').click(function () {
         $('#plot_text').toggle();
@@ -19,6 +20,13 @@ $(function() {
     $('#hide_plot_edit_form').click(function () {
         $('#plot_edit_form').toggle();
         $('#plot_text').toggle().focus();
+    });
+    $('#show_film_edit_form').click(function () {
+        $('#film_edit_form').toggle();
+        $('#id_film_orig_title').focus();
+    });
+    $('#hide_film_edit_form').click(function () {
+        $('#film_edit_form').toggle();
     });
 
     function split(val) {
@@ -75,6 +83,7 @@ $(function() {
                 }
             }
         });
+
     $('#submit_new_role').click(function() {
         if ($('#new_role_gender').val() == 'U') {
             $('#new_role_gender').focus();
@@ -100,6 +109,38 @@ $(function() {
             }, 'json');
         }
     });
+
+    $('#id_film_directors')
+        .bind('keydown', function(event) {
+            if (event.keyCode === $.ui.keyCode.TAB &&
+                $(this).autocomplete('instance').menu.active) {
+                event.preventDefault();
+            }
+        })
+        .autocomplete({
+            source: function(request, response) {
+                $.getJSON('api/autocomplete/artists', {
+                    q: extractLast(request.term)
+                }, response);
+            },
+            search: function() {
+                var term = extractLast(this.value);
+                if (term.length < 2) {
+                    return false;
+                }
+            },
+            focus: function() {
+                return false;
+            },
+            select: function(event, ui) {
+                var terms = split(this.value);
+                terms.pop();
+                terms.push(ui.item.value);
+                terms.push('');
+                this.value = terms.join(', ');
+                return false;
+            }
+        });
 
     $('.focus_this').focus();
 

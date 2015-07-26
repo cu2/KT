@@ -103,7 +103,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
 class Film(models.Model):
     orig_title = models.CharField(max_length=250)
     other_titles = models.TextField(blank=True)
-    year = models.PositiveIntegerField(default=0)
+    year = models.PositiveIntegerField(default=0, blank=True, null=True)
     plot_summary = models.TextField(blank=True)
     number_of_comments = models.PositiveIntegerField(default=0)
     last_comment = models.ForeignKey('Comment', blank=True, null=True, related_name='last_film_comment', on_delete=models.SET_NULL)
@@ -119,7 +119,7 @@ class Film(models.Model):
     keywords = models.ManyToManyField('Keyword', through='FilmKeywordRelationship')
     number_of_keywords = models.PositiveIntegerField(default=0)
     imdb_link = models.CharField(max_length=16, blank=True)
-    porthu_link = models.CharField(max_length=16, blank=True)
+    porthu_link = models.PositiveIntegerField(default=0, blank=True, null=True)
     wikipedia_link_en = models.CharField(max_length=250, blank=True)
     wikipedia_link_hu = models.CharField(max_length=250, blank=True)
     imdb_rating = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -561,6 +561,13 @@ class Artist(models.Model):
     def save(self, *args, **kwargs):
         self.slug_cache = slugify(self.name)
         super(Artist, self).save(*args, **kwargs)
+
+    @classmethod
+    def get_artist_by_name(cls, name):
+        artist_list = cls.objects.filter(name=name)
+        if artist_list:
+            return [artist for artist in artist_list if artist.name == name][0]
+        return None
 
 
 class FilmArtistRelationship(models.Model):

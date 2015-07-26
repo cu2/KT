@@ -8,7 +8,7 @@
 {% for direction in directions %}
     <tr class="{% cycle '' 'odd' %}">
         <td>{{ direction.film|film_url_html }}</td>
-        <td class="center">{{ direction.film.year }}</td>
+        <td class="center">{% if direction.film.year %}{{ direction.film.year }}{% endif %}</td>
         <td class="center">{{ direction.film|film_rating_html }}</td>
     </tr>
 {% endfor %}

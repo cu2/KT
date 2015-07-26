@@ -56,6 +56,7 @@ urlpatterns += patterns(
     url(r'^szerk_kep$', web_views.edit_picture, name='edit_picture'),
     url(r'^torol_kep$', web_views.delete_picture, name='delete_picture'),
 
+    url(r'^szerk_film$', web_views.edit_film, name='edit_film'),
     url(r'^szerk_sztori$', web_views.edit_plot, name='edit_plot'),
 
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>.*)$', web_views.artist, name='artist'),

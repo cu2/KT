@@ -3,9 +3,9 @@
 {% block title %}{{ film.orig_title }}{% if film.second_title %} / {{ film.second_title }}{% endif %} ({{ film.year }}) - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <div id="film_header">
+    <div id="film_header" class="hover_show_button_context">
         <div id="film_title">
-            <h1>{{ film.orig_title }} <span class="film_year">({{ film.year }})</span></h1>
+            <h1>{{ film.orig_title }}{% if film.year %} <span class="film_year">({{ film.year }})</span>{% endif %}</h1>
             {% if film.other_titles %}
                 <h2>{{ film.other_titles|linebreaksbr }}</h2>
             {% endif %}
@@ -50,8 +50,53 @@
                     {% endif %}
                 </li>
             </ul>
+            {% if user.is_authenticated %}<span class="hover_show_button button small_button" id="show_film_edit_form">film szerkesztése</span>{% endif %}
         </div>
     </div>
+    {% if user.is_authenticated %}
+        <div id="film_edit_form" style="display: none">
+            <form action="{% url 'edit_film' %}" method="post" class="inline">
+                {% csrf_token %}
+                <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                <p>
+                    <label for="id_film_orig_title">Eredeti cím:</label><br />
+                    <input type="text" name="film_orig_title" id="id_film_orig_title" value="{{ film.orig_title }}" />
+                </p>
+                <p>
+                    <label for="id_film_other_titles">További címek:</label><br />
+                    <textarea name="film_other_titles" id="id_film_other_titles">{{ film.other_titles }}</textarea>
+                </p>
+                <p>
+                    <label for="id_film_year">Év:</label><br />
+                    <input type="text" name="film_year" id="id_film_year" value="{% if film.year %}{{ film.year }}{% endif %}" />
+                </p>
+                <p>
+                    <label for="id_film_directors">Rendező(k) (vesszővel elválasztva):</label><br />
+                    <input type="text" name="film_directors" id="id_film_directors" value="{% for d in film.directors %}{{ d }}{% if not forloop.last %}, {% endif %}{% endfor %}" />
+                </p>
+                <p>
+                    <label for="id_film_imdb_link">IMDb:</label><br />
+                    <input type="text" name="film_imdb_link" id="id_film_imdb_link" value="{{ film.imdb_link }}" />
+                </p>
+                <p>
+                    <label for="id_film_porthu_link">Port.hu:</label><br />
+                    <input type="text" name="film_porthu_link" id="id_film_porthu_link" value="{% if film.porthu_link %}{{ film.porthu_link }}{% endif %}" />
+                </p>
+                <p>
+                    <label for="id_film_wikipedia_link_en">Wikipedia (angol):</label><br />
+                    <input type="text" name="film_wikipedia_link_en" id="id_film_wikipedia_link_en" value="{{ film.wikipedia_link_en }}" />
+                </p>
+                <p>
+                    <label for="id_film_wikipedia_link_hu">Wikipédia (magyar):</label><br />
+                    <input type="text" name="film_wikipedia_link_hu" id="id_film_wikipedia_link_hu" value="{{ film.wikipedia_link_hu }}" />
+                </p>
+                <p>
+                    <input type="submit" value="Film adatok mentése" />
+                    <span class="button small_button" style="float: right" id="hide_film_edit_form">Mégsem</span>
+                </p>
+            </form>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block main %}
