@@ -644,7 +644,11 @@ def edit_keywords(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
         for type_name, type_code in [('countries', 'C'), ('genres', 'G'), ('major_keywords', 'M'), ('other_keywords', 'O')]:
-            models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=type_code).delete()
+            old_keywords = set()
+            for keyword in models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=type_code):
+                old_keywords.add(keyword.keyword.id)
+            new_keywords = set()
+            new_keyword_spoiler = {}
             for keyword_name in request.POST.get(type_name, '').strip().split(','):
                 keyword_name = keyword_name.strip()
                 if keyword_name.endswith('*'):
@@ -663,12 +667,21 @@ def edit_keywords(request):
                 if created:
                     keyword.created_by = request.user
                     keyword.save()
+                new_keywords.add(keyword.id)
+                new_keyword_spoiler[keyword.id] = spoiler
+            for keyword_id in old_keywords - new_keywords:
+                models.FilmKeywordRelationship.objects.filter(film=film, keyword__id=keyword_id).delete()
+            for keyword_id in new_keywords - old_keywords:
                 models.FilmKeywordRelationship.objects.create(
                     film=film,
-                    keyword=keyword,
+                    keyword=models.Keyword.objects.get(id=keyword_id),
                     created_by=request.user,
-                    spoiler=spoiler,
+                    spoiler=new_keyword_spoiler[keyword_id],
                 )
+            for keyword_id in new_keywords & old_keywords:
+                keyword = models.FilmKeywordRelationship.objects.filter(film=film, keyword__id=keyword_id)[0]
+                keyword.spoiler = new_keyword_spoiler[keyword_id]
+                keyword.save()
     return HttpResponseRedirect(reverse('film_keywords', args=(film.id, film.slug_cache)))
 
 
