@@ -924,7 +924,7 @@ def registration(request):
             error_type = 'robot'
         elif username == '':
             error_type = 'name_empty'
-        elif ',' in username:
+        elif ',' in username or ';' in username:
             error_type = 'name_invalid'
         elif email == '':
             error_type = 'email_empty'
