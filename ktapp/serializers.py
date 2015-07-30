@@ -67,7 +67,7 @@ class FilmSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Film
         fields = (
-            'url', 'orig_title', 'other_titles', 'year',
+            'url', 'orig_title', 'second_title', 'third_title', 'year',
             'plot_summary',
             'main_premier', 'main_premier_year',
 

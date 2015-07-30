@@ -24,6 +24,7 @@ urlpatterns = patterns(
     url(r'^api/autocomplete/users$', api_views.get_users, name='get_users'),
     url(r'^api/autocomplete/artists$', api_views.get_artists, name='get_artists'),
     url(r'^api/autocomplete/keywords$', api_views.get_keywords, name='get_keywords'),
+    url(r'^api/autocomplete/films$', api_views.get_films, name='get_films'),
 )
 
 
@@ -57,6 +58,7 @@ urlpatterns += patterns(
     url(r'^szerk_kep$', web_views.edit_picture, name='edit_picture'),
     url(r'^torol_kep$', web_views.delete_picture, name='delete_picture'),
 
+    url(r'^uj_film$', web_views.new_film, name='new_film'),
     url(r'^szerk_film$', web_views.edit_film, name='edit_film'),
     url(r'^szerk_sztori$', web_views.edit_plot, name='edit_plot'),
     url(r'^szerk_bemutatok$', web_views.edit_premiers, name='edit_premiers'),

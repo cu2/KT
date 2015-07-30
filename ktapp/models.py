@@ -102,7 +102,8 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
 
 class Film(models.Model):
     orig_title = models.CharField(max_length=250)
-    other_titles = models.TextField(blank=True)
+    second_title = models.CharField(max_length=250, blank=True)
+    third_title = models.CharField(max_length=250, blank=True)
     year = models.PositiveIntegerField(default=0, blank=True, null=True)
     plot_summary = models.TextField(blank=True)
     number_of_comments = models.PositiveIntegerField(default=0)
@@ -181,14 +182,9 @@ class Film(models.Model):
     def other_premiers(self):
         return Premier.objects.filter(film=self)
 
-    def second_title(self):
-        if self.other_titles:
-            return self.other_titles.split('\n')[0]
-        return ''
-
     def save(self, *args, **kwargs):
-        if self.other_titles:
-            self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.second_title()) + '-' + slugify(self.year)
+        if self.second_title:
+            self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.second_title) + '-' + slugify(self.year)
         else:
             self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.year)
         super(Film, self).save(*args, **kwargs)

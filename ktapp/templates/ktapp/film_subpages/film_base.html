@@ -6,8 +6,14 @@
     <div id="film_header" class="hover_show_button_context">
         <div id="film_title">
             <h1>{{ film.orig_title }}{% if film.year %} <span class="film_year">({{ film.year }})</span>{% endif %}</h1>
-            {% if film.other_titles %}
-                <h2>{{ film.other_titles|linebreaksbr }}</h2>
+            {% if film.second_title %}
+                <h2>
+                    {{ film.second_title }}
+                    {% if film.third_title %}
+                        <br />
+                        {{ film.third_title }}
+                    {% endif %}
+                </h2>
             {% endif %}
             {% if film.directors %}
                 <h3>({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
@@ -63,11 +69,12 @@
                     <input type="text" name="film_orig_title" id="id_film_orig_title" value="{{ film.orig_title }}" />
                 </p>
                 <p>
-                    <label for="id_film_other_titles">További címek:</label><br />
-                    <textarea name="film_other_titles" id="id_film_other_titles">{{ film.other_titles }}</textarea>
+                    <label for="id_film_second_title">Magyar és további címek (ha magyar film, hagyd üresen):</label><br />
+                    <input type="text" name="film_second_title" id="id_film_second_title" value="{{ film.second_title }}" />
+                    <input type="text" name="film_third_title" id="id_film_third_title" value="{{ film.third_title }}" />
                 </p>
                 <p>
-                    <label for="id_film_year">Év:</label><br />
+                    <label for="id_film_year">Gyártás éve (ÉÉÉÉ):</label><br />
                     <input type="text" name="film_year" id="id_film_year" value="{% if film.year %}{{ film.year }}{% endif %}" />
                 </p>
                 <p>
@@ -75,19 +82,19 @@
                     <input type="text" name="film_directors" id="id_film_directors" value="{% for d in film.directors %}{{ d }}{% if not forloop.last %}, {% endif %}{% endfor %}" />
                 </p>
                 <p>
-                    <label for="id_film_imdb_link">IMDb:</label><br />
+                    <label for="id_film_imdb_link">IMDb link (a film imdb-s oldalának teljes url-je):</label><br />
                     <input type="text" name="film_imdb_link" id="id_film_imdb_link" value="{{ film.imdb_link }}" />
                 </p>
                 <p>
-                    <label for="id_film_porthu_link">Port.hu:</label><br />
+                    <label for="id_film_porthu_link">port.hu link (a film port.hu-s oldalának teljes url-je, kivéve, ha a tv-műsorból jutottál oda):</label><br />
                     <input type="text" name="film_porthu_link" id="id_film_porthu_link" value="{% if film.porthu_link %}{{ film.porthu_link }}{% endif %}" />
                 </p>
                 <p>
-                    <label for="id_film_wikipedia_link_en">Wikipedia (angol):</label><br />
+                    <label for="id_film_wikipedia_link_en">Wikipedia link (angol) (ha van):</label><br />
                     <input type="text" name="film_wikipedia_link_en" id="id_film_wikipedia_link_en" value="{{ film.wikipedia_link_en }}" />
                 </p>
                 <p>
-                    <label for="id_film_wikipedia_link_hu">Wikipédia (magyar):</label><br />
+                    <label for="id_film_wikipedia_link_hu">Wikipédia link (magyar) (ha van):</label><br />
                     <input type="text" name="film_wikipedia_link_hu" id="id_film_wikipedia_link_hu" value="{{ film.wikipedia_link_hu }}" />
                 </p>
                 <p>

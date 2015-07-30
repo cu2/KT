@@ -8,8 +8,8 @@ register = template.Library()
 
 @register.filter
 def film_url_html(film, subpage='film_main'):
-    if film.other_titles:
-        second_row = film.other_titles.split('\n')[0]
+    if film.second_title:
+        second_row = film.second_title
     else:
         second_row = '&nbsp;'
     return mark_safe(u'<a href="{url}">{orig_title}</a><br />\n<span class="td_sub">{second_row}</span>'.format(

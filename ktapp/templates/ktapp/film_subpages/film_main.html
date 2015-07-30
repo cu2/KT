@@ -113,11 +113,11 @@
                         {% csrf_token %}
                         <input type="hidden" name="film_id" value="{{ film.pk }}" />
                         <p>
-                            <label for="id_main_premier">Fő bemutató:</label><br />
+                            <label for="id_main_premier">Fő bemutató (ÉÉÉÉ-HH-NN):</label><br />
                             <input type="text" name="main_premier" id="id_main_premier" value="{% if film.main_premier %}{{ film.main_premier|date:"Y-m-d" }}{% elif film.main_premier_year %}{{ film.main_premier_year }}{% endif %}" />
                         </p>
                         <p>
-                            További bemutatók:<br />
+                            További bemutatók (ÉÉÉÉ-HH-NN):<br />
                             {% for p in film.other_premiers %}
                                 <input type="text" name="other_premier_when_{{ p.id }}" value="{{ p.when|date:"Y-m-d" }}" /> <select name="other_premier_type_{{ p.id }}">
                                     {% for pt in premier_types %}

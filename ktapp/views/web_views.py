@@ -53,7 +53,8 @@ def search(request):
     results = []
     for result in models.Film.objects.filter(
             Q(orig_title__icontains=q)
-            | Q(other_titles__icontains=q)
+            | Q(second_title__icontains=q)
+            | Q(third_title__icontains=q)
     ):
         results.append({
             'rank': 1000 + result.num_rating(),
@@ -530,13 +531,27 @@ def delete_picture(request):
 
 
 @login_required
+def new_film(request):
+    if request.POST:
+        film_orig_title = request.POST.get('film_orig_title', '').strip()
+        if False:  # validation
+            film = models.Film.objects.create(
+                orig_title=film_orig_title,
+                created_by=request.user,
+            )
+            return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+    return render(request, 'ktapp/new_film.html')
+
+
+@login_required
 def edit_film(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
         film_orig_title = request.POST.get('film_orig_title', '').strip()
         if film_orig_title:
             film.orig_title = film_orig_title
-        film.other_titles = request.POST.get('film_other_titles', '').strip()
+        film.second_title = request.POST.get('film_second_title', '').strip()
+        film.third_title = request.POST.get('film_third_title', '').strip()
         try:
             film_year = int(request.POST.get('film_year', None))
         except ValueError:

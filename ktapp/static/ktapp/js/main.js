@@ -196,6 +196,27 @@ $(function() {
             }
         });
 
+    $('#id_film_orig_title').blur(function() {
+        $.getJSON('api/autocomplete/films', {
+            q: $(this).val()
+        }, function(data) {
+            if (data.length) {
+                var similar_films = '';
+                for (var i=0; i < data.length; i++) {
+                    var title = data[i].orig_title;
+                    if (data[i].second_title) {
+                        title = title + ' / ' + data[i].second_title;
+                    }
+                    title = title + ' (' + data[i].year + ')';
+                    similar_films += '<li><a href="film/' + data[i].id + '/' + data[i].slug + '">' + title + '</a></li>';
+                }
+                $('#similar_films').html('<p>Hasonló filmek</p><ul>' + similar_films + '</ul>');
+            } else {
+                $('#similar_films').html('');
+            }
+        }, 'json');
+    });
+
     $('.focus_this').focus();
 
 });

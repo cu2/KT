@@ -53,13 +53,17 @@
                 </span>
                 <span class="search_result_details">
                 {% if result.type == 'film' %}
-                    {% if result.object.other_titles %}
-                    <br />
-                    {{ result.object.other_titles|linebreaksbr }}
+                    {% if result.object.second_title %}
+                        <br />
+                        {{ result.object.second_title }}
+                    {% endif %}
+                    {% if result.object.third_title %}
+                        <br />
+                        {{ result.object.third_title }}
                     {% endif %}
                     {% if result.object.directors %}
-                    <br />
-                    ({% for director in result.object.directors %}{{ director.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
+                        <br />
+                        ({% for director in result.object.directors %}{{ director.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
                     {% endif %}
                     <br />
                     {% for country in result.object.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
