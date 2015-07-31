@@ -29,10 +29,10 @@
                 </p>
             {% endif %}
         </div>
-        {% if film.num_rating and film.avg_rating %}
+        {% if film.number_of_ratings and film.average_rating %}
         <div id="film_rating">
-            <div id="film_rating_num">{{ film.num_rating }} szavazat<br />átlaga:</div>
-            <div id="film_rating_avg">{{ film.avg_rating|floatformat:1 }}</div>
+            <div id="film_rating_num">{{ film.number_of_ratings }} szavazat<br />átlaga:</div>
+            <div id="film_rating_avg">{{ film.average_rating|floatformat:1 }}</div>
         </div>
         {% endif %}
         <div id="film_misc_info">

@@ -27,7 +27,7 @@ class FilmAdmin(admin.ModelAdmin):
     def view_link(self):
         return '<a href="%s">%s</a>' % (reverse("film_main", args=(self.pk, self.orig_title)), self.orig_title)
     view_link.allow_tags = True
-    list_display = ['orig_title', 'second_title', 'year', 'avg_rating', 'num_rating', view_link]
+    list_display = ['orig_title', 'second_title', 'year', 'average_rating', 'number_of_ratings', view_link]
     search_fields = ['orig_title', 'second_title', 'year']
     fields = ['orig_title', 'second_title', 'third_title', 'year', 'plot_summary',
               'main_premier', 'main_premier_year',

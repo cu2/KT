@@ -57,7 +57,7 @@ def search(request):
             | Q(third_title__icontains=q)
     ):
         results.append({
-            'rank': 1000 + result.num_rating(),
+            'rank': 1000 + result.number_of_ratings,
             'type': 'film',
             'title': '%s (%s)' % (result.orig_title, result.year),
             'url': reverse('film_main', args=(result.id, result.slug_cache)),

@@ -76,7 +76,7 @@ class FilmSerializer(serializers.HyperlinkedModelSerializer):
             'genres',
             'sequels',
 
-            'num_rating', 'avg_rating',
+            'number_of_ratings', 'average_rating',
 
             'imdb_link', 'porthu_link', 'wikipedia_link_en', 'wikipedia_link_hu',
 

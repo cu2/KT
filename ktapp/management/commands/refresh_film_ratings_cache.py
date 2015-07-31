@@ -25,7 +25,12 @@ class Command(BaseCommand):
             f.number_of_ratings_2 = t.r2,
             f.number_of_ratings_3 = t.r3,
             f.number_of_ratings_4 = t.r4,
-            f.number_of_ratings_5 = t.r5
+            f.number_of_ratings_5 = t.r5,
+            f.number_of_ratings = t.r1 + t.r2 + t.r3 + t.r4 + t.r5,
+            f.average_rating = CASE
+              WHEN t.r1 + t.r2 + t.r3 + t.r4 + t.r5 < 10 THEN NULL
+              ELSE CAST((1.0 * t.r1 + 2.0 * t.r2 + 3.0 * t.r3 + 4.0 * t.r4 + 5.0 * t.r5) / (t.r1 + t.r2 + t.r3 + t.r4 + t.r5) AS DECIMAL(2, 1))
+            END
         WHERE f.id = t.id
         '''
         cursor.execute(sql)

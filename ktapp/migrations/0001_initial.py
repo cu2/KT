@@ -145,8 +145,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('orig_title', models.CharField(max_length=250)),
-                ('other_titles', models.TextField(blank=True)),
-                ('year', models.PositiveIntegerField(default=0)),
+                ('second_title', models.CharField(max_length=250, blank=True)),
+                ('third_title', models.CharField(max_length=250, blank=True)),
+                ('year', models.PositiveIntegerField(default=0, null=True, blank=True)),
                 ('plot_summary', models.TextField(blank=True)),
                 ('number_of_comments', models.PositiveIntegerField(default=0)),
                 ('number_of_ratings_1', models.PositiveIntegerField(default=0)),
@@ -154,12 +155,14 @@ class Migration(migrations.Migration):
                 ('number_of_ratings_3', models.PositiveIntegerField(default=0)),
                 ('number_of_ratings_4', models.PositiveIntegerField(default=0)),
                 ('number_of_ratings_5', models.PositiveIntegerField(default=0)),
+                ('number_of_ratings', models.PositiveIntegerField(default=0)),
+                ('average_rating', models.DecimalField(default=0, null=True, max_digits=2, decimal_places=1, blank=True)),
                 ('number_of_quotes', models.PositiveIntegerField(default=0)),
                 ('number_of_trivias', models.PositiveIntegerField(default=0)),
                 ('number_of_reviews', models.PositiveIntegerField(default=0)),
                 ('number_of_keywords', models.PositiveIntegerField(default=0)),
                 ('imdb_link', models.CharField(max_length=16, blank=True)),
-                ('porthu_link', models.CharField(max_length=16, blank=True)),
+                ('porthu_link', models.PositiveIntegerField(default=0, null=True, blank=True)),
                 ('wikipedia_link_en', models.CharField(max_length=250, blank=True)),
                 ('wikipedia_link_hu', models.CharField(max_length=250, blank=True)),
                 ('imdb_rating', models.PositiveSmallIntegerField(null=True, blank=True)),
@@ -171,6 +174,7 @@ class Migration(migrations.Migration):
                 ('main_premier_year', models.PositiveIntegerField(null=True, blank=True)),
                 ('slug_cache', models.CharField(max_length=250, blank=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('open_for_vote_from', models.DateField(null=True, blank=True)),
             ],
             options={
             },
@@ -181,7 +185,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('role_type', models.CharField(default=b'D', max_length=1, choices=[(b'D', b'Director'), (b'A', b'Actor/actress')])),
-                ('actor_subtype', models.CharField(default=b'F', max_length=1, choices=[(b'F', b'Full'), (b'V', b'Voice'), (b'D', b'Dub')])),
+                ('actor_subtype', models.CharField(default=b'F', max_length=1, choices=[(b'F', b'Full'), (b'V', b'Voice')])),
                 ('role_name', models.CharField(max_length=250, blank=True)),
                 ('slug_cache', models.CharField(max_length=250, blank=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
@@ -197,6 +201,9 @@ class Migration(migrations.Migration):
             name='FilmKeywordRelationship',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('spoiler', models.BooleanField(default=False)),
+                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, blank=True, to=settings.AUTH_USER_MODEL, null=True)),
                 ('film', models.ForeignKey(to='ktapp.Film')),
             ],
             options={
@@ -208,6 +215,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('serial_number', models.PositiveSmallIntegerField(default=0)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, blank=True, to=settings.AUTH_USER_MODEL, null=True)),
                 ('film', models.ForeignKey(to='ktapp.Film')),
             ],
             options={
@@ -235,6 +244,7 @@ class Migration(migrations.Migration):
                 ('keyword_type', models.CharField(default=b'O', max_length=1, choices=[(b'C', b'Country'), (b'G', b'Genre'), (b'M', b'Major'), (b'O', b'Other')])),
                 ('slug_cache', models.CharField(max_length=250, blank=True)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('old_imdb_name', models.CharField(max_length=250, blank=True)),
                 ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, blank=True, to=settings.AUTH_USER_MODEL, null=True)),
                 ('films', models.ManyToManyField(to='ktapp.Film', through='ktapp.FilmKeywordRelationship')),
             ],
@@ -368,7 +378,6 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('when', models.DateField()),
-                ('when_year', models.PositiveIntegerField(null=True, blank=True)),
                 ('film', models.ForeignKey(to='ktapp.Film')),
             ],
             options={
@@ -447,6 +456,7 @@ class Migration(migrations.Migration):
                 ('number_of_comments', models.PositiveIntegerField(default=0)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('slug_cache', models.CharField(max_length=250, blank=True)),
+                ('closed_until', models.DateTimeField(null=True, blank=True)),
                 ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, blank=True, to=settings.AUTH_USER_MODEL, null=True)),
                 ('last_comment', models.ForeignKey(related_name='last_topic_comment', on_delete=django.db.models.deletion.SET_NULL, blank=True, to='ktapp.Comment', null=True)),
             ],
@@ -463,6 +473,7 @@ class Migration(migrations.Migration):
                 ('content', models.TextField()),
                 ('content_html', models.TextField()),
                 ('content_old_html', models.TextField(blank=True)),
+                ('spoiler', models.BooleanField(default=False)),
                 ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.SET_NULL, blank=True, to=settings.AUTH_USER_MODEL, null=True)),
                 ('film', models.ForeignKey(to='ktapp.Film')),
             ],
@@ -508,6 +519,7 @@ class Migration(migrations.Migration):
                 ('quality', models.BooleanField(default=True)),
                 ('number_of_items', models.PositiveSmallIntegerField()),
                 ('toplist_type', models.CharField(default=b'F', max_length=1, choices=[(b'F', b'Film'), (b'D', b'Director'), (b'A', b'Actor')])),
+                ('slug_cache', models.CharField(max_length=250, blank=True)),
                 ('created_by', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={
@@ -535,6 +547,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('rating', models.PositiveSmallIntegerField()),
                 ('when', models.DateTimeField(auto_now=True, auto_now_add=True, null=True)),
+                ('shared_on_facebook', models.BooleanField(default=False)),
                 ('film', models.ForeignKey(to='ktapp.Film')),
                 ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],

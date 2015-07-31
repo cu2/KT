@@ -21,18 +21,16 @@ def film_url_html(film, subpage='film_main'):
 
 @register.filter
 def film_rating_html(film, with_count=True):
-    num_rating = film.num_rating()
-    if num_rating == 0:
+    if film.number_of_ratings == 0:
         return ''
-    avg_rating = film.avg_rating()
-    if avg_rating is None:
+    if film.average_rating is None:
         avg_rating = '?'
     else:
-        avg_rating = round(avg_rating, 1)
+        avg_rating = round(film.average_rating, 1)
     if with_count:
         return mark_safe(u'{avg_rating}<br />\n<span class="td_sub">({num_rating})</span>'.format(
             avg_rating=avg_rating,
-            num_rating=num_rating,
+            num_rating=film.number_of_ratings,
         ))
     return mark_safe(u'{avg_rating}'.format(
         avg_rating=avg_rating,

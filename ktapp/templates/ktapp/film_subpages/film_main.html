@@ -209,44 +209,46 @@
                 {% if wish_count.0 > 0 %}<li>{{ wish_count.0 }} ember meg akarja nézni</li>{% endif %}
                 {% if wish_count.1 > 0 %}<li>{{ wish_count.1 }} ember kifejezetten nem akarja megnézni</li>{% endif %}
             </ul>
-            <ul class="minimini_list">
-                <form action="{% url 'wish' %}" method="post" class="inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
-                    <input type="hidden" name="wish_type" value="Y" />
-                    {% if my_wishes.Y %}
-                        <input type="hidden" name="action" value="-" />
-                        <li class="hover_show_button_context">Meg akarod nézni. <input type="submit" value="Mégsem" class="small_button hover_show_button" /></li>
-                    {% else %}
-                        <input type="hidden" name="action" value="+" />
-                        <li>Meg akarod nézni? <input type="submit" value="Igen" class="small_button" /></li>
-                    {% endif %}
-                </form>
-                <form action="{% url 'wish' %}" method="post" class="inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
-                    <input type="hidden" name="wish_type" value="N" />
-                    {% if my_wishes.N %}
-                        <input type="hidden" name="action" value="-" />
-                        <li class="hover_show_button_context">Nem akarod megnézni. <input type="submit" value="Mégis" class="small_button hover_show_button" /></li>
-                    {% else %}
-                        <input type="hidden" name="action" value="+" />
-                        <li>Nem akarod megnézni? <input type="submit" value="Nem" class="small_button" /></li>
-                    {% endif %}
-                </form>
-                <form action="{% url 'wish' %}" method="post" class="inline">
-                    {% csrf_token %}
-                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
-                    <input type="hidden" name="wish_type" value="G" />
-                    {% if my_wishes.G %}
-                        <input type="hidden" name="action" value="-" />
-                        <li class="hover_show_button_context">Meg akarod szerezni. <input type="submit" value="Mégsem" class="small_button hover_show_button" /></li>
-                    {% else %}
-                        <input type="hidden" name="action" value="+" />
-                        <li>Meg akarod szerezni? <input type="submit" value="Igen" class="small_button" /></li>
-                    {% endif %}
-                </form>
-            </ul>
+            {% if user.is_authenticated %}
+                <ul class="minimini_list">
+                    <form action="{% url 'wish' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                        <input type="hidden" name="wish_type" value="Y" />
+                        {% if my_wishes.Y %}
+                            <input type="hidden" name="action" value="-" />
+                            <li class="hover_show_button_context">Meg akarod nézni. <input type="submit" value="Mégsem" class="small_button hover_show_button" /></li>
+                        {% else %}
+                            <input type="hidden" name="action" value="+" />
+                            <li>Meg akarod nézni? <input type="submit" value="Igen" class="small_button" /></li>
+                        {% endif %}
+                    </form>
+                    <form action="{% url 'wish' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                        <input type="hidden" name="wish_type" value="N" />
+                        {% if my_wishes.N %}
+                            <input type="hidden" name="action" value="-" />
+                            <li class="hover_show_button_context">Nem akarod megnézni. <input type="submit" value="Mégis" class="small_button hover_show_button" /></li>
+                        {% else %}
+                            <input type="hidden" name="action" value="+" />
+                            <li>Nem akarod megnézni? <input type="submit" value="Nem" class="small_button" /></li>
+                        {% endif %}
+                    </form>
+                    <form action="{% url 'wish' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                        <input type="hidden" name="wish_type" value="G" />
+                        {% if my_wishes.G %}
+                            <input type="hidden" name="action" value="-" />
+                            <li class="hover_show_button_context">Meg akarod szerezni. <input type="submit" value="Mégsem" class="small_button hover_show_button" /></li>
+                        {% else %}
+                            <input type="hidden" name="action" value="+" />
+                            <li>Meg akarod szerezni? <input type="submit" value="Igen" class="small_button" /></li>
+                        {% endif %}
+                    </form>
+                </ul>
+            {% endif %}
 
             {% if utls %}
                 <h3>Felhasználói toplisták</h3>

@@ -114,6 +114,8 @@ class Film(models.Model):
     number_of_ratings_3 = models.PositiveIntegerField(default=0)
     number_of_ratings_4 = models.PositiveIntegerField(default=0)
     number_of_ratings_5 = models.PositiveIntegerField(default=0)
+    number_of_ratings = models.PositiveIntegerField(default=0)
+    average_rating = models.DecimalField(default=0, max_digits=2, decimal_places=1, blank=True, null=True)
     number_of_quotes = models.PositiveIntegerField(default=0)
     number_of_trivias = models.PositiveIntegerField(default=0)
     number_of_reviews = models.PositiveIntegerField(default=0)
@@ -142,24 +144,6 @@ class Film(models.Model):
     def num_specific_rating(self, r):
         if 1 <= r <= 5:
             return getattr(self, 'number_of_ratings_' + str(r))
-
-    def num_rating(self):
-        return (self.number_of_ratings_1 +
-                self.number_of_ratings_2 +
-                self.number_of_ratings_3 +
-                self.number_of_ratings_4 +
-                self.number_of_ratings_5)
-    num_rating.short_description = 'Number of ratings'
-
-    def avg_rating(self):
-        if self.num_rating() < 10:
-            return None
-        return (1.0 * self.number_of_ratings_1 +
-                2.0 * self.number_of_ratings_2 +
-                3.0 * self.number_of_ratings_3 +
-                4.0 * self.number_of_ratings_4 +
-                5.0 * self.number_of_ratings_5) / self.num_rating()
-    avg_rating.short_description = 'Average rating'
 
     def directors(self):
         return self.artists.filter(filmartistrelationship__role_type=FilmArtistRelationship.ROLE_TYPE_DIRECTOR)
@@ -551,7 +535,7 @@ class Artist(models.Model):
         ordering = ['name']
 
     def num_rating(self):
-        return sum([f.num_rating() for f in self.films.all()])
+        return sum([f.number_of_ratings for f in self.films.all()])
 
     def save(self, *args, **kwargs):
         self.slug_cache = slugify(self.name)
