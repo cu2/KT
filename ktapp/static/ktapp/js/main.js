@@ -207,7 +207,8 @@ $(function() {
                     if (data[i].second_title) {
                         title = title + ' / ' + data[i].second_title;
                     }
-                    title = title + ' (' + data[i].year + ')';
+                    if (data[i].year) title = title + ' (' + data[i].year + ')';
+                    else title = title + ' (???)';
                     similar_films += '<li><a href="film/' + data[i].id + '/' + data[i].slug + '">' + title + '</a></li>';
                 }
                 $('#similar_films').html('<p>Hasonló filmek</p><ul>' + similar_films + '</ul>');

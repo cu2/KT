@@ -53,3 +53,7 @@ def is_date(value):
     except ValueError:
         return False
     return True
+
+
+def strip_whitespace(value):
+    return value.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ').strip()

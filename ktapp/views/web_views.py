@@ -533,13 +533,101 @@ def delete_picture(request):
 @login_required
 def new_film(request):
     if request.POST:
-        film_orig_title = request.POST.get('film_orig_title', '').strip()
-        if False:  # validation
-            film = models.Film.objects.create(
-                orig_title=film_orig_title,
+        film_orig_title = kt_utils.strip_whitespace(request.POST.get('film_orig_title', ''))
+        if film_orig_title == '':
+            return render(request, 'ktapp/new_film.html')
+        film = models.Film.objects.create(
+            orig_title=film_orig_title,
+            created_by=request.user,
+        )
+        film.second_title = kt_utils.strip_whitespace(request.POST.get('film_second_title', ''))
+        film.third_title = kt_utils.strip_whitespace(request.POST.get('film_third_title', ''))
+        try:
+            film_year = int(request.POST.get('film_year', None))
+        except ValueError:
+            film_year = None
+        if film_year == 0:
+            film_year = None
+        film.year = film_year
+
+        main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
+        if len(main_premier) == 4 and main_premier.isdigit():
+            film.main_premier_year = main_premier
+            film.main_premier = None
+        elif len(main_premier) == 10 and kt_utils.is_date(main_premier):
+            film.main_premier = main_premier
+            film.main_premier_year = None
+
+        directors = set()
+        for director_name in kt_utils.strip_whitespace(request.POST.get('film_directors', '')).split(','):
+            if director_name.strip() == '':
+                continue
+            director = models.Artist.get_artist_by_name(director_name.strip())
+            if director is None:
+                director = models.Artist.objects.create(name=director_name.strip())
+            directors.add(director)
+        for director in directors:
+            models.FilmArtistRelationship.objects.create(
+                film=film,
+                artist=director,
+                role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR,
                 created_by=request.user,
             )
-            return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+
+        for type_name, type_code in [('countries', 'C'), ('genres', 'G')]:
+            new_keywords = set()
+            new_keyword_spoiler = {}
+            for keyword_name in kt_utils.strip_whitespace(request.POST.get(type_name, '')).split(','):
+                keyword_name = keyword_name.strip()
+                if keyword_name.endswith('*'):
+                    spoiler = True
+                    keyword_name = keyword_name[:-1]
+                else:
+                    spoiler = False
+                if not keyword_name:
+                    continue
+                if type_code not in {'M', 'O'}:
+                    spoiler = False
+                keyword, created = models.Keyword.objects.get_or_create(
+                    name=keyword_name,
+                    keyword_type=type_code,
+                )
+                if created:
+                    keyword.created_by = request.user
+                    keyword.save()
+                new_keywords.add(keyword.id)
+                new_keyword_spoiler[keyword.id] = spoiler
+            for keyword_id in new_keywords:
+                models.FilmKeywordRelationship.objects.create(
+                    film=film,
+                    keyword=models.Keyword.objects.get(id=keyword_id),
+                    created_by=request.user,
+                    spoiler=new_keyword_spoiler[keyword_id],
+                )
+
+        film.plot_summary = request.POST.get('film_plot', '').strip()
+
+        film_imdb_link = kt_utils.strip_whitespace(request.POST.get('film_imdb_link', ''))
+        if film_imdb_link.startswith('tt'):
+            film.imdb_link = film_imdb_link
+        elif 'imdb.com' in film_imdb_link and '/tt' in film_imdb_link:
+            film.imdb_link = film_imdb_link[film_imdb_link.index('/tt')+1:].split('/')[0]
+        else:
+            film.imdb_link = ''
+        film_porthu_link = kt_utils.strip_whitespace(request.POST.get('film_porthu_link', ''))
+        if film_porthu_link.isdigit():
+            film.porthu_link = film_porthu_link
+        elif 'i_film_id' in film_porthu_link:
+            try:
+                film.porthu_link = int(film_porthu_link[film_porthu_link.index('i_film_id')+10:].split('&')[0])
+            except ValueError:
+                film.porthu_link = None
+        else:
+            film.porthu_link = None
+        film.wikipedia_link_en = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_en', ''))
+        film.wikipedia_link_hu = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_hu', ''))
+        film.save()
+        return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
     return render(request, 'ktapp/new_film.html')
 
 
@@ -547,11 +635,11 @@ def new_film(request):
 def edit_film(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
-        film_orig_title = request.POST.get('film_orig_title', '').strip()
+        film_orig_title = kt_utils.strip_whitespace(request.POST.get('film_orig_title', ''))
         if film_orig_title:
             film.orig_title = film_orig_title
-        film.second_title = request.POST.get('film_second_title', '').strip()
-        film.third_title = request.POST.get('film_third_title', '').strip()
+        film.second_title = kt_utils.strip_whitespace(request.POST.get('film_second_title', ''))
+        film.third_title = kt_utils.strip_whitespace(request.POST.get('film_third_title', ''))
         try:
             film_year = int(request.POST.get('film_year', None))
         except ValueError:
@@ -560,7 +648,7 @@ def edit_film(request):
             film_year = None
         film.year = film_year
         directors = set()
-        for director_name in request.POST.get('film_directors', '').strip().split(','):
+        for director_name in kt_utils.strip_whitespace(request.POST.get('film_directors', '')).split(','):
             if director_name.strip() == '':
                 continue
             director = models.Artist.get_artist_by_name(director_name.strip())
@@ -575,14 +663,14 @@ def edit_film(request):
                 role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR,
                 created_by=request.user,
             )
-        film_imdb_link = request.POST.get('film_imdb_link', '').strip()
+        film_imdb_link = kt_utils.strip_whitespace(request.POST.get('film_imdb_link', ''))
         if film_imdb_link.startswith('tt'):
             film.imdb_link = film_imdb_link
         elif 'imdb.com' in film_imdb_link and '/tt' in film_imdb_link:
             film.imdb_link = film_imdb_link[film_imdb_link.index('/tt')+1:].split('/')[0]
         else:
             film.imdb_link = ''
-        film_porthu_link = request.POST.get('film_porthu_link', '').strip()
+        film_porthu_link = kt_utils.strip_whitespace(request.POST.get('film_porthu_link', ''))
         if film_porthu_link.isdigit():
             film.porthu_link = film_porthu_link
         elif 'i_film_id' in film_porthu_link:
@@ -592,8 +680,8 @@ def edit_film(request):
                 film.porthu_link = None
         else:
             film.porthu_link = None
-        film.wikipedia_link_en = request.POST.get('film_wikipedia_link_en', '').strip()
-        film.wikipedia_link_hu = request.POST.get('film_wikipedia_link_hu', '').strip()
+        film.wikipedia_link_en = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_en', ''))
+        film.wikipedia_link_hu = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_hu', ''))
         film.save()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -612,7 +700,7 @@ def edit_plot(request):
 def edit_premiers(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
-        main_premier = request.POST.get('main_premier', '').strip()
+        main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
         if len(main_premier) == 4 and main_premier.isdigit():
             film.main_premier_year = main_premier
             film.main_premier = None
@@ -622,8 +710,11 @@ def edit_premiers(request):
             film.main_premier_year = None
             film.save()
         for p in film.other_premiers():
-            premier_when = request.POST.get('other_premier_when_%s' % p.id, '').strip()
-            premier_type = request.POST.get('other_premier_type_%s' % p.id, 0).strip()
+            premier_when = kt_utils.strip_whitespace(request.POST.get('other_premier_when_%s' % p.id, ''))
+            try:
+                premier_type = int(kt_utils.strip_whitespace(request.POST.get('other_premier_type_%s' % p.id, '0')))
+            except ValueError:
+                continue
             if premier_when == '':
                 p.delete()
             elif len(premier_when) == 10 and kt_utils.is_date(premier_when):
@@ -636,8 +727,11 @@ def edit_premiers(request):
                     p.premier_type = pt
                     p.save()
         for idx in xrange(1, 2):
-            premier_when = request.POST.get('new_other_premier_when_%s' % idx, '').strip()
-            premier_type = request.POST.get('new_other_premier_type_%s' % idx, 0).strip()
+            premier_when = kt_utils.strip_whitespace(request.POST.get('new_other_premier_when_%s' % idx, ''))
+            try:
+                premier_type = int(kt_utils.strip_whitespace(request.POST.get('new_other_premier_type_%s' % idx, '0')))
+            except ValueError:
+                continue
             if premier_when == '':
                 continue
             elif len(premier_when) == 10 and kt_utils.is_date(premier_when):
@@ -664,7 +758,7 @@ def edit_keywords(request):
                 old_keywords.add(keyword.keyword.id)
             new_keywords = set()
             new_keyword_spoiler = {}
-            for keyword_name in request.POST.get(type_name, '').strip().split(','):
+            for keyword_name in kt_utils.strip_whitespace(request.POST.get(type_name, '')).split(','):
                 keyword_name = keyword_name.strip()
                 if keyword_name.endswith('*'):
                     spoiler = True
@@ -703,8 +797,8 @@ def edit_keywords(request):
 def artist(request, id, name_slug):
     artist = get_object_or_404(models.Artist, pk=id)
     if request.POST:
-        artist_name = request.POST.get('artist_name', '').strip()
-        artist_gender = request.POST.get('artist_gender', '').strip()
+        artist_name = kt_utils.strip_whitespace(request.POST.get('artist_name', ''))
+        artist_gender = kt_utils.strip_whitespace(request.POST.get('artist_gender', ''))
         if artist_gender in ['U', 'M', 'F']:
             artist.name = artist_name
             artist.gender = artist_gender
@@ -793,8 +887,8 @@ def merge_artist(request):
 def role(request, id, name_slug):
     role = get_object_or_404(models.FilmArtistRelationship, pk=id)
     if request.POST:
-        role_name = request.POST.get('role_name', '').strip()
-        role_type = request.POST.get('role_type', '').strip()
+        role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))
+        role_type = kt_utils.strip_whitespace(request.POST.get('role_type', ''))
         if role_name != '' and role_type in ['F', 'V']:
             role.role_name = role_name
             role.actor_subtype = role_type
@@ -808,10 +902,10 @@ def role(request, id, name_slug):
 @login_required
 def new_role(request):
     if request.POST:
-        role_name = request.POST.get('role_name', '').strip()
-        role_type = request.POST.get('role_type', '').strip()
-        role_artist = request.POST.get('role_artist', '').strip()
-        role_gender = request.POST.get('role_gender', '').strip()
+        role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))
+        role_type = kt_utils.strip_whitespace(request.POST.get('role_type', ''))
+        role_artist = kt_utils.strip_whitespace(request.POST.get('role_artist', ''))
+        role_gender = kt_utils.strip_whitespace(request.POST.get('role_gender', ''))
         try:
             film = models.Film.objects.get(id=request.POST.get('film_id', 0))
         except models.Film.DoesNotExist:
@@ -931,8 +1025,8 @@ def registration(request):
 
     next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
     error_type = ''
-    username = request.POST.get('username', '').strip()
-    email = request.POST.get('email', '').strip()
+    username = kt_utils.strip_whitespace(request.POST.get('username', ''))
+    email = kt_utils.strip_whitespace(request.POST.get('email', ''))
     nickname = request.POST.get('nickname', '')
     if request.method == 'POST':
         if nickname != '':

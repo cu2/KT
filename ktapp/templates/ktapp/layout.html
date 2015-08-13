@@ -56,6 +56,9 @@
                 <li>Filmek<br />
                     <ul class="submenu">
                         <li>Bemutatók</li>
+                        {% if user.is_authenticated and user.core_member %}
+                            <li><a href="{% url 'new_film' %}">Új film</a></li>
+                        {% endif %}
                     </ul>
                 </li>
                 <li>Toplisták<br />
@@ -86,6 +89,13 @@
                         <li>Lefutott</li>
                     </ul>
                 </li>
+                {% if user.is_authenticated and user.is_superuser %}
+                    <li>Szerk<br />
+                        <ul class="submenu">
+                            <li><a href="{% url 'admin:index' %}">Admin</a></li>
+                        </ul>
+                    </li>
+                {% endif %}
             </ul>
         </nav>
 

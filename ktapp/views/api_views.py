@@ -104,8 +104,7 @@ def get_films(request):
                         CASE WHEN LOCATE(%s, orig_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(orig_title) - {lenq}) + LOCATE(%s, orig_title) END,
                         CASE WHEN LOCATE(%s, second_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(second_title) - {lenq}) + LOCATE(%s, second_title) END,
                         CASE WHEN LOCATE(%s, third_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(third_title) - {lenq}) + LOCATE(%s, third_title) END
-                    )'''.format(lenq=len(q))),
-                    ('number_of_ratings', 'number_of_ratings_1+number_of_ratings_2+number_of_ratings_3+number_of_ratings_4+number_of_ratings_5'),
+                    )-CAST(number_of_ratings AS SIGNED)'''.format(lenq=len(q))),
                 ]),
                 select_params=[q, q, q, q, q, q],
                 order_by=['difflen', '-number_of_ratings', 'orig_title', 'second_title', 'third_title', 'id']
