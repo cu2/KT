@@ -388,11 +388,23 @@ def film_picture(request, id, film_slug, picture_id):
 
 def film_keywords(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
+    rating = 0
+    if request.user.is_authenticated():
+        try:
+            vote = models.Vote.objects.get(film=film, user=request.user)
+            rating = vote.rating
+        except models.Vote.DoesNotExist:
+            pass
+    major_keywords = models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=models.Keyword.KEYWORD_TYPE_MAJOR)
+    other_keywords = models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=models.Keyword.KEYWORD_TYPE_OTHER)
+    if rating == 0:  # hide spoiler keywords
+        major_keywords = major_keywords.exclude(spoiler=True)
+        other_keywords = other_keywords.exclude(spoiler=True)
     return render(request, 'ktapp/film_subpages/film_keywords.html', {
         'active_tab': 'keywords',
         'film': film,
-        'major_keywords': [(x.keyword, x.spoiler) for x in models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=models.Keyword.KEYWORD_TYPE_MAJOR).order_by('keyword__name', 'keyword__id')],
-        'other_keywords': [(x.keyword, x.spoiler) for x in models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=models.Keyword.KEYWORD_TYPE_OTHER).order_by('keyword__name', 'keyword__id')],
+        'major_keywords': [(x.keyword, x.spoiler) for x in major_keywords.order_by('keyword__name', 'keyword__id')],
+        'other_keywords': [(x.keyword, x.spoiler) for x in other_keywords.order_by('keyword__name', 'keyword__id')],
     })
 
 
