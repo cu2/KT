@@ -465,6 +465,7 @@ def new_comment(request):  # TODO: extend with poll comments
 
 
 @login_required
+@kt_utils.kt_permission_required('new_quote')
 def new_quote(request):
     film = get_object_or_404(models.Film, pk=request.POST["film"])
     if request.POST:
@@ -477,6 +478,7 @@ def new_quote(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('new_trivia')
 def new_trivia(request):
     film = get_object_or_404(models.Film, pk=request.POST["film"])
     if request.POST:
@@ -489,6 +491,7 @@ def new_trivia(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('new_review')
 def new_review(request):
     film = get_object_or_404(models.Film, pk=request.POST.get('film', 0))
     if request.POST:
@@ -501,37 +504,38 @@ def new_review(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('approve_review')
 def approve_review(request):
     film = get_object_or_404(models.Film, pk=request.POST.get('film_id', 0))
-    if request.user.is_staff:
-        if request.POST:
-            review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
-            if review.film == film:
-                review.approved = True
-                review.save()
+    if request.POST:
+        review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
+        if review.film == film:
+            review.approved = True
+            review.save()
     return HttpResponseRedirect(reverse('film_reviews', args=(film.pk, film.slug_cache)))
 
 
 @login_required
+@kt_utils.kt_permission_required('approve_review')
 def disapprove_review(request):
     film = get_object_or_404(models.Film, pk=request.POST.get('film_id', 0))
-    if request.user.is_staff:
-        if request.POST:
-            review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
-            if review.film == film:
-                comment = models.Comment(
-                    domain=models.Comment.DOMAIN_FILM,
-                    film=film,
-                    created_by=review.created_by,
-                    content=review.content,
-                )
-                comment.save(domain=film)
-                review.film = film  # NOTE: this is needed, otherwise review.delete() will save the original values of the film (e.g. old number_of_comments)
-                review.delete()
+    if request.POST:
+        review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
+        if review.film == film:
+            comment = models.Comment(
+                domain=models.Comment.DOMAIN_FILM,
+                film=film,
+                created_by=review.created_by,
+                content=review.content,
+            )
+            comment.save(domain=film)
+            review.film = film  # NOTE: this is needed, otherwise review.delete() will save the original values of the film (e.g. old number_of_comments)
+            review.delete()
     return HttpResponseRedirect(reverse('film_comments', args=(film.pk, film.slug_cache)))
 
 
 @login_required
+@kt_utils.kt_permission_required('new_picture')
 def new_picture(request):
     film = get_object_or_404(models.Film, pk=request.POST['film'])
     if request.POST:
@@ -550,6 +554,7 @@ def new_picture(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('edit_picture')
 def edit_picture(request):
     picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
     if request.POST:
@@ -567,6 +572,7 @@ def edit_picture(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('delete_picture')
 def delete_picture(request):
     picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
     if request.POST:
@@ -575,6 +581,7 @@ def delete_picture(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('new_film')
 def new_film(request):
     if request.POST:
         film_orig_title = kt_utils.strip_whitespace(request.POST.get('film_orig_title', ''))
@@ -676,6 +683,7 @@ def new_film(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('edit_film')
 def edit_film(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
@@ -731,6 +739,7 @@ def edit_film(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('edit_film')
 def edit_plot(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
@@ -741,6 +750,7 @@ def edit_plot(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('edit_film')
 def edit_premiers(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
@@ -793,6 +803,7 @@ def edit_premiers(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('edit_film')
 def edit_keywords(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
@@ -838,16 +849,17 @@ def edit_keywords(request):
     return HttpResponseRedirect(reverse('film_keywords', args=(film.id, film.slug_cache)))
 
 
-def artist(request, id, name_slug):
+def artist_main(request, id, name_slug):
     artist = get_object_or_404(models.Artist, pk=id)
     if request.POST:
-        artist_name = kt_utils.strip_whitespace(request.POST.get('artist_name', ''))
-        artist_gender = kt_utils.strip_whitespace(request.POST.get('artist_gender', ''))
-        if artist_gender in ['U', 'M', 'F']:
-            artist.name = artist_name
-            artist.gender = artist_gender
-            artist.save()
-        return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))
+        if request.user.is_authenticated() and kt_utils.check_permission('edit_artist', request.user):
+            artist_name = kt_utils.strip_whitespace(request.POST.get('artist_name', ''))
+            artist_gender = kt_utils.strip_whitespace(request.POST.get('artist_gender', ''))
+            if artist_gender in ['U', 'M', 'F']:
+                artist.name = artist_name
+                artist.gender = artist_gender
+                artist.save()
+            return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))
     directions = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR).order_by('-film__year', 'film__orig_title')
     director_vote_avg = 0
     if directions:
@@ -896,6 +908,7 @@ def artist(request, id, name_slug):
 
 
 @login_required
+@kt_utils.kt_permission_required('merge_artist')
 def merge_artist(request):
     artist_1 = get_object_or_404(models.Artist, id=request.POST.get('artist_1', 0))
     artist_2 = get_object_or_404(models.Artist, id=request.POST.get('artist_2', 0))
@@ -932,19 +945,21 @@ def merge_artist(request):
 def role(request, id, name_slug):
     role = get_object_or_404(models.FilmArtistRelationship, pk=id)
     if request.POST:
-        role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))
-        role_type = kt_utils.strip_whitespace(request.POST.get('role_type', ''))
-        if role_name != '' and role_type in ['F', 'V']:
-            role.role_name = role_name
-            role.actor_subtype = role_type
-            role.save()
-        return HttpResponseRedirect(reverse('role', args=(role.id, role.slug_cache)))
+        if request.user.is_authenticated() and kt_utils.check_permission('edit_role', request.user):
+            role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))
+            role_type = kt_utils.strip_whitespace(request.POST.get('role_type', ''))
+            if role_name != '' and role_type in ['F', 'V']:
+                role.role_name = role_name
+                role.actor_subtype = role_type
+                role.save()
+            return HttpResponseRedirect(reverse('role', args=(role.id, role.slug_cache)))
     return render(request, 'ktapp/role.html', {
         'role': role,
     })
 
 
 @login_required
+@kt_utils.kt_permission_required('new_role')
 def new_role(request):
     if request.POST:
         role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))
@@ -978,6 +993,7 @@ def new_role(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('delete_role')
 def delete_role(request):
     role = get_object_or_404(models.FilmArtistRelationship, id=request.POST.get('role', 0))
     if request.POST:
@@ -1048,6 +1064,7 @@ def latest_comments(request):
 
 
 @login_required
+@kt_utils.kt_permission_required('new_topic')
 def new_topic(request):
     if request.POST:
         topic_form = kt_forms.TopicForm(data=request.POST)
