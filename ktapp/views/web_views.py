@@ -1232,6 +1232,7 @@ def verify_email(request, token):
 def reset_password(request, token):
     error_type = ''
     username_or_email = request.POST.get('username', '')
+    email = ''
     nickname = request.POST.get('nickname', '')
     if token == '':
         if request.method == 'POST':
@@ -1269,10 +1270,12 @@ def reset_password(request, token):
                         )
                     )
                     error_type = 'ok'
+                    email = user.email
         return render(request, 'ktapp/reset_password.html', {
             'page_type': 'ask',
             'error_type': error_type,
             'username': username_or_email,
+            'email': email,
         })
     new_password1 = request.POST.get('new_password1', '')
     new_password2 = request.POST.get('new_password2', '')
