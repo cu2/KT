@@ -43,6 +43,22 @@
         {% endfor %}
     {% endif %}
 
+    {% if user.is_staff and unapproved_biographies %}
+        <h2>Elfogadásra váró portré{% if unapproved_biographies.count > 1 %}k{% endif %}</h2>
+        {% for bio in unapproved_biographies %}
+            <div class="film_addon">
+                <div class="portrait_author">
+                    {{ bio.created_at|date:"Y-m-d" }} <a href="{% url 'user_profile' bio.created_by.id bio.created_by.slug_cache %}">{{ bio.created_by }}</a>
+                </div>
+                <div class="film_addon_content">
+                    {% autoescape off %}
+                        {{ bio.content_html|linebreaks }}
+                    {% endautoescape %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
     {% if user.is_authenticated %}
         <h3>Színész/rendező módosítása</h3>
         <form action="" method="post">

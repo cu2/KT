@@ -275,26 +275,27 @@ def film_trivias(request, id, film_slug):
 def film_reviews(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
     review_form = kt_forms.ReviewForm(initial={
-        "film": film,
+        'film': film,
     })
-    review_form.fields["film"].widget = forms.HiddenInput()
-    return render(request, "ktapp/film_subpages/film_reviews.html", {
-        "active_tab": "reviews",
-        "film": film,
-        "reviews": film.review_set.all(),
-        "review_form": review_form,
+    review_form.fields['film'].widget = forms.HiddenInput()
+    return render(request, 'ktapp/film_subpages/film_reviews.html', {
+        'active_tab': 'reviews',
+        'film': film,
+        'reviews': film.review_set.filter(approved=True).all(),
+        'unapproved_reviews': film.review_set.filter(approved=False).all(),
+        'review_form': review_form,
     })
 
 
 def film_review(request, id, film_slug, review_id):
     film = get_object_or_404(models.Film, pk=id)
-    review = get_object_or_404(models.Review, pk=review_id)
+    review = get_object_or_404(models.Review, pk=review_id, approved=True)
     if review.film != film:
         raise Http404
-    return render(request, "ktapp/film_subpages/film_review.html", {
-        "active_tab": "reviews",
-        "film": film,
-        "review": review,
+    return render(request, 'ktapp/film_subpages/film_review.html', {
+        'active_tab': 'reviews',
+        'film': film,
+        'review': review,
     })
 
 
@@ -477,14 +478,45 @@ def new_trivia(request):
 
 @login_required
 def new_review(request):
-    film = get_object_or_404(models.Film, pk=request.POST["film"])
+    film = get_object_or_404(models.Film, pk=request.POST.get('film', 0))
     if request.POST:
         review_form = kt_forms.ReviewForm(data=request.POST)
         if review_form.is_valid():
             review = review_form.save(commit=False)
             review.created_by = request.user
             review.save()
-    return HttpResponseRedirect(reverse("film_reviews", args=(film.pk, film.slug_cache)))
+    return HttpResponseRedirect(reverse('film_reviews', args=(film.pk, film.slug_cache)))
+
+
+@login_required
+def approve_review(request):
+    film = get_object_or_404(models.Film, pk=request.POST.get('film_id', 0))
+    if request.user.is_staff:
+        if request.POST:
+            review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
+            if review.film == film:
+                review.approved = True
+                review.save()
+    return HttpResponseRedirect(reverse('film_reviews', args=(film.pk, film.slug_cache)))
+
+
+@login_required
+def disapprove_review(request):
+    film = get_object_or_404(models.Film, pk=request.POST.get('film_id', 0))
+    if request.user.is_staff:
+        if request.POST:
+            review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
+            if review.film == film:
+                comment = models.Comment(
+                    domain=models.Comment.DOMAIN_FILM,
+                    film=film,
+                    created_by=review.created_by,
+                    content=review.content,
+                )
+                comment.save(domain=film)
+                review.film = film  # NOTE: this is needed, otherwise review.delete() will save the original values of the film (e.g. old number_of_comments)
+                review.delete()
+    return HttpResponseRedirect(reverse('film_comments', args=(film.pk, film.slug_cache)))
 
 
 @login_required
@@ -836,16 +868,17 @@ def artist(request, id, name_slug):
         reversed_name = '%s %s' % (normal_name[normal_name.index(' ')+1:], normal_name[:normal_name.index(' ')])
         similar_artists += [a for a in models.Artist.objects.filter(name=reversed_name)]
         similar_artists = set(similar_artists)
-    return render(request, "ktapp/artist.html", {
-        "artist": artist,
-        "directions": directions,
-        "roles": roles,
-        "director_vote_count": director_vote_count,
-        "actor_vote_count": actor_vote_count,
-        "director_vote_avg": director_vote_avg,
-        "actor_vote_avg": actor_vote_avg,
-        "awards": models.Award.objects.filter(artist=artist).order_by('name', 'year', 'category'),
-        'biographies': models.Biography.objects.filter(artist=artist),
+    return render(request, 'ktapp/artist.html', {
+        'artist': artist,
+        'directions': directions,
+        'roles': roles,
+        'director_vote_count': director_vote_count,
+        'actor_vote_count': actor_vote_count,
+        'director_vote_avg': director_vote_avg,
+        'actor_vote_avg': actor_vote_avg,
+        'awards': models.Award.objects.filter(artist=artist).order_by('name', 'year', 'category'),
+        'biographies': models.Biography.objects.filter(artist=artist, approved=True),
+        'unapproved_biographies': models.Biography.objects.filter(artist=artist, approved=False),
         'similar_artists': similar_artists,
     })
 

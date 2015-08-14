@@ -285,8 +285,8 @@ def delete_comment(sender, instance, **kwargs):
         remaining_comments = Comment.objects.filter(domain=instance.domain, poll=instance.poll)
     else:
         return
-    for idx, remaining_comment in enumerate(remaining_comments.filter(serial_number__gt=instance.serial_number).order_by('created_at', 'id')):
-        remaining_comment.serial_number = idx + instance.serial_number
+    for idx, remaining_comment in enumerate(remaining_comments.order_by('created_at', 'id')):
+        remaining_comment.serial_number = idx + 1
         remaining_comment.save()
     domain.number_of_comments = domain.comment_set.count()
     if domain.number_of_comments > 0:
@@ -431,7 +431,7 @@ class Review(FilmUserContent):
         self.content = strip_tags(self.content)
         self.content_html = utils.bbcode_to_html(self.content)
         super(Review, self).save(*args, **kwargs)
-        self.film.number_of_reviews = self.film.review_set.count()
+        self.film.number_of_reviews = self.film.review_set.filter(approved=True).count()
         self.film.save()
 
     def __unicode__(self):
@@ -440,7 +440,7 @@ class Review(FilmUserContent):
 
 @receiver(post_delete, sender=Review)
 def delete_review(sender, instance, **kwargs):
-    instance.film.number_of_reviews = instance.film.review_set.count()
+    instance.film.number_of_reviews = instance.film.review_set.filter(approved=True).count()
     instance.film.save()
 
 

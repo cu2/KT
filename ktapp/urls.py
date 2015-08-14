@@ -57,6 +57,8 @@ urlpatterns += patterns(
     url(r'^uj_kep$', web_views.new_picture, name='new_picture'),
     url(r'^szerk_kep$', web_views.edit_picture, name='edit_picture'),
     url(r'^torol_kep$', web_views.delete_picture, name='delete_picture'),
+    url(r'^elemzes_elfogadasa$', web_views.approve_review, name='approve_review'),
+    url(r'^elemzes_elutasitasa$', web_views.disapprove_review, name='disapprove_review'),
 
     url(r'^uj_film$', web_views.new_film, name='new_film'),
     url(r'^szerk_film$', web_views.edit_film, name='edit_film'),
