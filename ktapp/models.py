@@ -542,10 +542,10 @@ class Artist(models.Model):
         super(Artist, self).save(*args, **kwargs)
 
     @classmethod
-    def get_artist_by_name(cls, name):
-        artist_list = cls.objects.filter(name=name)
+    def get_artist_by_name(cls, name):  # case and more importantly accent sensitive getter
+        artist_list = [artist for artist in cls.objects.filter(name=name) if artist.name == name]
         if artist_list:
-            return [artist for artist in artist_list if artist.name == name][0]
+            return artist_list[0]
         return None
 
 
@@ -943,3 +943,10 @@ class PasswordToken(models.Model):
     token = models.CharField(max_length=64, unique=True)
     belongs_to = models.ForeignKey(KTUser)
     valid_until = models.DateTimeField()
+
+    @classmethod
+    def get_token(cls, token_value):  # case sensitive getter
+        token_list = [token for token in cls.objects.filter(token=token_value) if token.token == token_value]
+        if token_list:
+            return token_list[0]
+        return None

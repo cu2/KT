@@ -1195,10 +1195,7 @@ def verify_email(request, token):
     if len(token) != 64:
         error_type = 'short_token'
     else:
-        try:
-            token_object = models.PasswordToken.objects.get(token=token)
-        except models.PasswordToken.DoesNotExist:
-            error_type = 'invalid_token'
+        token_object = models.PasswordToken.get_token(token)
         if token_object:
             if token_object.valid_until < datetime.datetime.now():
                 error_type = 'invalid_token'
@@ -1208,6 +1205,8 @@ def verify_email(request, token):
                         logout(request)
                 if not token_object.belongs_to.is_active:
                     error_type = 'ban'
+        else:
+            error_type = 'invalid_token'
     if error_type == '':
         if request.method == 'POST':
             if nickname != '':
@@ -1284,10 +1283,7 @@ def reset_password(request, token):
     if len(token) != 64:
         error_type = 'short_token'
     else:
-        try:
-            token_object = models.PasswordToken.objects.get(token=token)
-        except models.PasswordToken.DoesNotExist:
-            error_type = 'invalid_token'
+        token_object = models.PasswordToken.get_token(token)
         if token_object:
             if token_object.valid_until < datetime.datetime.now():
                 error_type = 'invalid_token'
@@ -1297,6 +1293,8 @@ def reset_password(request, token):
                         logout(request)
                 if not token_object.belongs_to.is_active:
                     error_type = 'ban'
+        else:
+            error_type = 'invalid_token'
     if error_type == '':
         if request.method == 'POST':
             if nickname != '':
