@@ -59,7 +59,7 @@ $(function() {
         })
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/users', {
+                $.getJSON('api/autocomplete/users/', {
                     q: extractLast(request.term)
                 }, response);
             },
@@ -85,7 +85,7 @@ $(function() {
     $('#new_role_artist')
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/artists', {
+                $.getJSON('api/autocomplete/artists/', {
                     q: request.term
                 }, response);
             },
@@ -133,7 +133,7 @@ $(function() {
         })
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/artists', {
+                $.getJSON('api/autocomplete/artists/', {
                     q: extractLast(request.term)
                 }, response);
             },
@@ -172,7 +172,7 @@ $(function() {
         })
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/keywords', {
+                $.getJSON('api/autocomplete/keywords/', {
                     q: extractLast(request.term),
                     t: keyword_type
                 }, response);
@@ -197,7 +197,7 @@ $(function() {
         });
 
     $('#id_film_orig_title').blur(function() {
-        $.getJSON('api/autocomplete/films', {
+        $.getJSON('api/autocomplete/films/', {
             q: $(this).val()
         }, function(data) {
             if (data.length) {
