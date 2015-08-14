@@ -851,7 +851,7 @@ class Message(models.Model):
         self.content_html = utils.bbcode_to_html(self.content)
         super(Message, self).save(*args, **kwargs)
         for recipient in self.recipients():
-            if recipient.last_message_at < self.sent_at:
+            if recipient.last_message_at is None or recipient.last_message_at < self.sent_at:
                 recipient.last_message_at = self.sent_at
                 recipient.save()
 

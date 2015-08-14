@@ -294,6 +294,15 @@ input.inactive_action {
     width: 90%;
 }
 
+.new_message_warning {
+    background: rgb(146,23,23);
+    color: rgb(249,244,218);
+    font-size: 9pt;
+    padding: 2px 5px 3px 4px;
+    border-radius: 20px;
+    vertical-align: 2px;
+}
+
 
 /* TABLES */
 

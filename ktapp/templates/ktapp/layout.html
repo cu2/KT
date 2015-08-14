@@ -26,7 +26,7 @@
                     <li id="logo"><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
                     {% if user.is_authenticated %}
                         <li><b><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></b></li>
-                        <li><a href="{% url 'messages' %}">{% if user.last_message_at > user.last_message_checking_at %}&rarr;{% endif %}Üzenetek{% if user.last_message_at > user.last_message_checking_at %}&larr;{% endif %}</a></li>
+                        <li><a href="{% url 'messages' %}">Üzenetek{% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %} <span class="new_message_warning">új</span>{% endif %}</a></li>
                         <li><form action="{% url 'logout' %}" method="post" class="inline">
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{ request.path }}" />
