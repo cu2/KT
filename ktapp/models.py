@@ -316,7 +316,7 @@ class Topic(models.Model):
         return self.title
 
     class Meta:
-        ordering = ['-last_comment']
+        ordering = ['-last_comment__id']
 
     def save(self, *args, **kwargs):
         self.slug_cache = slugify(self.title)

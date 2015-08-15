@@ -346,6 +346,10 @@ tr.selected_film_tr {
 
 /* MISC */
 
+.nowrap {
+    white-space: nowrap;
+}
+
 .center {
     text-align: center;
 }
