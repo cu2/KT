@@ -1375,17 +1375,15 @@ def new_message(request):
         if len(content) == 0:
             return HttpResponseRedirect(reverse('messages'))
         raw_recipients = request.POST['recipients']
-        recipients = []
+        recipients = set()
         for recipient_name in raw_recipients.strip().split(','):
-            try:
-                recipient = models.KTUser.objects.get(username=recipient_name.strip())
-            except models.KTUser.DoesNotExist:
+            recipient = models.KTUser.get_user_by_name(recipient_name.strip())
+            if recipient is None:
                 continue
-            recipients.append(recipient)
-        recipients = list(set(recipients))
+            recipients.add(recipient)
         if len(recipients) == 0:
             return HttpResponseRedirect(reverse('messages'))
-        owners = list(set(recipients + [request.user]))
+        owners = recipients | {request.user}
         for owner in owners:
             message = models.Message.objects.create(
                 sent_by=request.user,
@@ -1396,5 +1394,15 @@ def new_message(request):
             for recipient in recipients:
                 message.sent_to.add(recipient)
             message.save()
+        # TODO: check KTUser.email_notification
+        # for recipient in recipients:
+        #     recipient.email_user(
+        #         texts.PM_EMAIL_SUBJECT.format(sent_by=request.user.username),
+        #         texts.PM_EMAIL_BODY.format(
+        #             username=recipient.username,
+        #             sent_by=request.user.username,
+        #             content=content,
+        #         )
+        #     )
         return HttpResponseRedirect(reverse('messages'))
     return render(request, 'ktapp/new_message.html')

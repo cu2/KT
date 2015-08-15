@@ -99,6 +99,13 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
         self.slug_cache = slugify(self.username)
         super(KTUser, self).save(*args, **kwargs)
 
+    @classmethod
+    def get_user_by_name(cls, name):  # case and more importantly accent sensitive getter
+        user_list = [user for user in cls.objects.filter(username=name) if user.username == name]
+        if user_list:
+            return user_list[0]
+        return None
+
 
 class Film(models.Model):
     orig_title = models.CharField(max_length=250)
