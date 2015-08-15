@@ -56,10 +56,10 @@
                     {% endif %}
                 </li>
             </ul>
-            {% if user.is_authenticated %}<span class="hover_show_button button small_button" id="show_film_edit_form">film szerkesztése</span>{% endif %}
+            {% if permission_edit_film %}<span class="hover_show_button button small_button" id="show_film_edit_form">film szerkesztése</span>{% endif %}
         </div>
     </div>
-    {% if user.is_authenticated %}
+    {% if permission_edit_film %}
         <div id="film_edit_form" style="display: none">
             <form action="{% url 'edit_film' %}" method="post" class="inline">
                 {% csrf_token %}

@@ -43,7 +43,7 @@
         {% endfor %}
     {% endif %}
 
-    {% if user.is_staff and unapproved_biographies %}
+    {% if permission_approve_bio and unapproved_biographies %}
         <h2>Elfogadásra váró portré{% if unapproved_biographies.count > 1 %}k{% endif %}</h2>
         {% for bio in unapproved_biographies %}
             <div class="film_addon">
@@ -59,7 +59,7 @@
         {% endfor %}
     {% endif %}
 
-    {% if user.is_authenticated %}
+    {% if permission_edit_artist %}
         <h3>Színész/rendező módosítása</h3>
         <form action="" method="post">
             {% csrf_token %}
@@ -79,7 +79,7 @@
                 <input type="submit" value="Módosítás" />
             </p>
         </form>
-        {% if similar_artists %}
+        {% if permission_merge_artist and similar_artists %}
             <h3>Színész/rendező összevonása</h3>
             {% for a in similar_artists %}
                 <form action="{% url 'merge_artist' %}" method="post">

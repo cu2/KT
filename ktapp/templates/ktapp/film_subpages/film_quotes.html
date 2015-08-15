@@ -3,7 +3,17 @@
 {% block film_main %}
 
     <div id="film_centered">
-        {% include 'ktapp/blocks/new_quote_block.html' %}
+        {% if permission_new_quote %}
+            <form action="{% url 'new_quote' %}" method="post">
+                {% csrf_token %}
+                {% for hidden in quote_form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+                {{ quote_form.content.errors }}
+                {{ quote_form.content }}
+                <p class="center"><input type="submit" value="Idézet beküldése" /></p>
+            </form>
+        {% endif %}
         {% for q in quotes %}
             {% include 'ktapp/blocks/film_addon_block.html' with addon=q %}
         {% endfor %}

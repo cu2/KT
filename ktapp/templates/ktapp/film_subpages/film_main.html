@@ -8,9 +8,9 @@
             <div class="film_block hover_show_button_context">
                 <img src="media/pix/tn200x1000/505/placeholder.jpg" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" />
                 <p class="film_block_content" id="plot_text">
-                    {{ film.plot_summary }}{% if user.is_authenticated %} <span class="hover_show_button button small_button" id="show_plot_edit_form">történet szerkesztése</span>{% endif %}
+                    {{ film.plot_summary }}{% if permission_edit_film %} <span class="hover_show_button button small_button" id="show_plot_edit_form">történet szerkesztése</span>{% endif %}
                 </p>
-                {% if user.is_authenticated %}
+                {% if permission_edit_film %}
                     <div id="plot_edit_form" style="display: none" class="film_block_content">
                         <form action="{% url 'edit_plot' %}" method="post" class="inline">
                             {% csrf_token %}
@@ -26,7 +26,7 @@
                 <br class="clear" />
             </div>
             <div class="hover_show_button_context">
-                <h3>Szereplők{% if user.is_authenticated %} <span class="hover_show_button button small_button" id="show_new_role_form">új szereplő felvétele</span>{% endif %}</h3>
+                <h3>Szereplők{% if permission_new_role %} <span class="hover_show_button button small_button" id="show_new_role_form">új szereplő felvétele</span>{% endif %}</h3>
                 <table class="fullsize" id="table_of_roles">
                     {% for role in roles %}
                         <tr class="{% cycle 'odd' '' %}">
@@ -36,7 +36,7 @@
                     {% endfor %}
                 </table>
             </div>
-            {% if user.is_authenticated %}
+            {% if permission_new_role %}
                 <div id="new_role_form" style="display: none">
                     <h3>Új szereplő</h3>
                     <input type="hidden" id="new_role_film" value="{{ film.pk }}" />
@@ -90,7 +90,7 @@
                 {% endfor %}
             {% endif %}
             <div class="hover_show_button_context">
-                <h3>Bemutató{% if film.main_premier or film.main_premier_year %}{% if film.other_premiers %}k{% endif %}{% endif %}{% if user.is_authenticated %} <span class="hover_show_button button small_button" id="show_premier_form">bemutatók szerkesztése</span>{% endif %}</h3>
+                <h3>Bemutató{% if film.main_premier or film.main_premier_year %}{% if film.other_premiers %}k{% endif %}{% endif %}{% if permission_edit_film %} <span class="hover_show_button button small_button" id="show_premier_form">bemutatók szerkesztése</span>{% endif %}</h3>
                 <ul class="mini_list">
                 {% if film.main_premier or film.main_premier_year %}
                     <li>
@@ -106,7 +106,7 @@
                 {% endfor %}
                 </ul>
             </div>
-            {% if user.is_authenticated %}
+            {% if permission_edit_film %}
                 <div id="premier_form" style="display: none">
                     <h3>Bemutatók szerkesztése</h3>
                     <form action="{% url 'edit_premiers' %}" method="post" class="inline">

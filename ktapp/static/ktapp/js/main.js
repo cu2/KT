@@ -8,6 +8,9 @@ $(function() {
     $('#show_picture_edit_button').click(function () {
         $('.picture_edit_block').toggle();
     });
+    $('#show_picture_delete_button').click(function () {
+        $('.picture_delete_block').toggle();
+    });
     $('#show_new_role_form').click(function () {
         $('#new_role_form').toggle();
         if ($('#new_role_form').is(':visible')) $('#new_role_name').focus();

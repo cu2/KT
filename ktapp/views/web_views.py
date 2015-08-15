@@ -194,6 +194,8 @@ def film_main(request, id, film_slug):
         'wish_count': wish_count,
         'utls': utls,
         'premier_types': models.PremierType.objects.all().order_by('name'),
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
+        'permission_new_role': kt_utils.check_permission('new_role', request.user),
     })
 
 
@@ -241,42 +243,41 @@ def film_comments(request, id, film_slug):
         'reply_to_comment': reply_to_comment,
         'p': p,
         'max_pages': max_pages,
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     })
 
 
 def film_quotes(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
-    quote_form = kt_forms.QuoteForm(initial={
-        "film": film,
-    })
-    quote_form.fields["film"].widget = forms.HiddenInput()
-    return render(request, "ktapp/film_subpages/film_quotes.html", {
-        "active_tab": "quotes",
-        "film": film,
-        "quotes": film.quote_set.all(),
-        "quote_form": quote_form,
+    quote_form = kt_forms.QuoteForm(initial={'film': film})
+    quote_form.fields['film'].widget = forms.HiddenInput()
+    return render(request, 'ktapp/film_subpages/film_quotes.html', {
+        'active_tab': 'quotes',
+        'film': film,
+        'quotes': film.quote_set.all(),
+        'quote_form': quote_form,
+        'permission_new_quote': kt_utils.check_permission('new_quote', request.user),
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     })
 
 
 def film_trivias(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
-    trivia_form = kt_forms.TriviaForm(initial={
-        "film": film,
-    })
-    trivia_form.fields["film"].widget = forms.HiddenInput()
-    return render(request, "ktapp/film_subpages/film_trivias.html", {
-        "active_tab": "trivias",
-        "film": film,
-        "trivias": film.trivia_set.all(),
-        "trivia_form": trivia_form,
+    trivia_form = kt_forms.TriviaForm(initial={'film': film})
+    trivia_form.fields['film'].widget = forms.HiddenInput()
+    return render(request, 'ktapp/film_subpages/film_trivias.html', {
+        'active_tab': 'trivias',
+        'film': film,
+        'trivias': film.trivia_set.all(),
+        'trivia_form': trivia_form,
+        'permission_new_trivia': kt_utils.check_permission('new_trivia', request.user),
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     })
 
 
 def film_reviews(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
-    review_form = kt_forms.ReviewForm(initial={
-        'film': film,
-    })
+    review_form = kt_forms.ReviewForm(initial={'film': film})
     review_form.fields['film'].widget = forms.HiddenInput()
     return render(request, 'ktapp/film_subpages/film_reviews.html', {
         'active_tab': 'reviews',
@@ -284,6 +285,9 @@ def film_reviews(request, id, film_slug):
         'reviews': film.review_set.filter(approved=True).all(),
         'unapproved_reviews': film.review_set.filter(approved=False).all(),
         'review_form': review_form,
+        'permission_new_review': kt_utils.check_permission('new_review', request.user),
+        'permission_approve_review': kt_utils.check_permission('approve_review', request.user),
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     })
 
 
@@ -296,15 +300,17 @@ def film_review(request, id, film_slug, review_id):
         'active_tab': 'reviews',
         'film': film,
         'review': review,
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     })
 
 
 def film_awards(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
-    return render(request, "ktapp/film_subpages/film_awards.html", {
-        "active_tab": "awards",
-        "film": film,
-        "awards": film.award_set.all().order_by('name', 'year', 'category'),
+    return render(request, 'ktapp/film_subpages/film_awards.html', {
+        'active_tab': 'awards',
+        'film': film,
+        'awards': film.award_set.all().order_by('name', 'year', 'category'),
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     })
 
 
@@ -317,6 +323,7 @@ def film_links(request, id, film_slug):
         'links_reviews': film.link_set.filter(link_type=models.Link.LINK_TYPE_REVIEWS),
         'links_interviews': film.link_set.filter(link_type=models.Link.LINK_TYPE_INTERVIEWS),
         'links_other': film.link_set.filter(link_type=models.Link.LINK_TYPE_OTHER),
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     })
 
 
@@ -336,32 +343,34 @@ def _get_next_picture(pictures, picture):
 
 def _get_selected_picture_details(film, picture, next_picture):
     return {
-        "picture": picture,
-        "next_picture": next_picture,
-        "pic_height": models.Picture.THUMBNAIL_SIZES['max'][1],
-        "artists": picture.artists.all(),
-        "film_title_article": "az" if film.orig_title[:1].lower() in u"aáeéiíoóöőuúüű" else "a",
+        'picture': picture,
+        'next_picture': next_picture,
+        'pic_height': models.Picture.THUMBNAIL_SIZES['max'][1],
+        'artists': picture.artists.all(),
+        'film_title_article': 'az' if film.orig_title[:1].lower() in u'aáeéiíoóöőuúüű' else 'a',
     }
 
 
 def film_pictures(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
     pictures = sorted(film.picture_set.all(), key=lambda pic: (pic.order_key, pic.id))
-    upload_form = kt_forms.PictureUploadForm(initial={
-        "film": film,
-    })
-    upload_form.fields["film"].widget = forms.HiddenInput()
+    upload_form = kt_forms.PictureUploadForm(initial={'film': film})
+    upload_form.fields['film'].widget = forms.HiddenInput()
     context = {
-        "active_tab": "pictures",
-        "film": film,
-        "pictures": pictures,
-        "upload_form": upload_form,
+        'active_tab': 'pictures',
+        'film': film,
+        'pictures': pictures,
+        'upload_form': upload_form,
         'all_artists_in_film': film.artists.all(),
+        'permission_new_picture': kt_utils.check_permission('new_picture', request.user),
+        'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
+        'permission_delete_picture': kt_utils.check_permission('delete_picture', request.user),
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     }
     if len(pictures) == 1:
         next_picture = _get_next_picture(pictures, pictures[0])
         context.update(_get_selected_picture_details(film, pictures[0], next_picture))
-    return render(request, "ktapp/film_subpages/film_pictures.html", context)
+    return render(request, 'ktapp/film_subpages/film_pictures.html', context)
 
 
 def film_picture(request, id, film_slug, picture_id):
@@ -371,19 +380,21 @@ def film_picture(request, id, film_slug, picture_id):
         raise Http404
     pictures = sorted(film.picture_set.all(), key=lambda pic: (pic.order_key, pic.id))
     next_picture = _get_next_picture(pictures, picture)
-    upload_form = kt_forms.PictureUploadForm(initial={
-        "film": film,
-    })
-    upload_form.fields["film"].widget = forms.HiddenInput()
+    upload_form = kt_forms.PictureUploadForm(initial={'film': film})
+    upload_form.fields['film'].widget = forms.HiddenInput()
     context = {
-        "active_tab": "pictures",
-        "film": film,
-        "pictures": pictures,
-        "upload_form": upload_form,
+        'active_tab': 'pictures',
+        'film': film,
+        'pictures': pictures,
+        'upload_form': upload_form,
         'all_artists_in_film': film.artists.all(),
+        'permission_new_picture': kt_utils.check_permission('new_picture', request.user),
+        'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
+        'permission_delete_picture': kt_utils.check_permission('delete_picture', request.user),
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     }
     context.update(_get_selected_picture_details(film, picture, next_picture))
-    return render(request, "ktapp/film_subpages/film_pictures.html", context)
+    return render(request, 'ktapp/film_subpages/film_pictures.html', context)
 
 
 def film_keywords(request, id, film_slug):
@@ -405,6 +416,7 @@ def film_keywords(request, id, film_slug):
         'film': film,
         'major_keywords': [(x.keyword, x.spoiler) for x in major_keywords.order_by('keyword__name', 'keyword__id')],
         'other_keywords': [(x.keyword, x.spoiler) for x in other_keywords.order_by('keyword__name', 'keyword__id')],
+        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     })
 
 
@@ -852,7 +864,7 @@ def edit_keywords(request):
 def artist_main(request, id, name_slug):
     artist = get_object_or_404(models.Artist, pk=id)
     if request.POST:
-        if request.user.is_authenticated() and kt_utils.check_permission('edit_artist', request.user):
+        if kt_utils.check_permission('edit_artist', request.user):
             artist_name = kt_utils.strip_whitespace(request.POST.get('artist_name', ''))
             artist_gender = kt_utils.strip_whitespace(request.POST.get('artist_gender', ''))
             if artist_gender in ['U', 'M', 'F']:
@@ -904,6 +916,9 @@ def artist_main(request, id, name_slug):
         'biographies': models.Biography.objects.filter(artist=artist, approved=True),
         'unapproved_biographies': models.Biography.objects.filter(artist=artist, approved=False),
         'similar_artists': similar_artists,
+        'permission_edit_artist': kt_utils.check_permission('edit_artist', request.user),
+        'permission_merge_artist': kt_utils.check_permission('merge_artist', request.user),
+        'permission_approve_bio': kt_utils.check_permission('approve_bio', request.user),
     })
 
 
@@ -945,7 +960,7 @@ def merge_artist(request):
 def role(request, id, name_slug):
     role = get_object_or_404(models.FilmArtistRelationship, pk=id)
     if request.POST:
-        if request.user.is_authenticated() and kt_utils.check_permission('edit_role', request.user):
+        if kt_utils.check_permission('edit_role', request.user):
             role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))
             role_type = kt_utils.strip_whitespace(request.POST.get('role_type', ''))
             if role_name != '' and role_type in ['F', 'V']:
@@ -955,6 +970,8 @@ def role(request, id, name_slug):
             return HttpResponseRedirect(reverse('role', args=(role.id, role.slug_cache)))
     return render(request, 'ktapp/role.html', {
         'role': role,
+        'permission_edit_role': kt_utils.check_permission('edit_role', request.user),
+        'permission_delete_role': kt_utils.check_permission('delete_role', request.user),
     })
 
 
@@ -1002,9 +1019,10 @@ def delete_role(request):
 
 
 def list_of_topics(request):
-    return render(request, "ktapp/list_of_topics.html", {
-        "topics": models.Topic.objects.all(),
-        "topic_form": kt_forms.TopicForm(),
+    return render(request, 'ktapp/list_of_topics.html', {
+        'topics': models.Topic.objects.all(),
+        'topic_form': kt_forms.TopicForm(),
+        'permission_new_topic': kt_utils.check_permission('new_topic', request.user),
     })
 
 

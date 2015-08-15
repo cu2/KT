@@ -11,10 +11,8 @@
         <p>{% for keyword, spoiler in major_keywords %}{{ keyword.name }}{% if spoiler %}*{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
         <h3>Egyéb</h3>
         <p>{% for keyword, spoiler in other_keywords %}{{ keyword.name }}{% if spoiler %}*{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
-        {% if user.is_authenticated %}
+        {% if permission_edit_film %}
             <p><span class="hover_show_button button small_button" id="show_keyword_form">kulcsszavak szerkesztése</span></p>
-        {% endif %}
-        {% if user.is_authenticated %}
             <div id="keyword_form" style="display: none">
                 <h3>Kulcsszavak szerkesztése</h3>
                 <form action="{% url 'edit_keywords' %}" method="post" class="inline">

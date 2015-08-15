@@ -28,7 +28,7 @@
     </table>
     {% endif %}
 
-    {% if user.is_authenticated %}
+    {% if permission_new_topic %}
         <h2>Új topik létrehozása</h2>
         <form action="{% url 'new_topic' %}" method="post">
             {% csrf_token %}

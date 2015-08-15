@@ -16,8 +16,19 @@
                 </div>
             </div>
         {% endfor %}
-        {% include 'ktapp/blocks/new_review_block.html' %}
-        {% if user.is_staff %}
+        {% if permission_new_review %}
+            <h3>Új elemzés beküldése</h3>
+            <form action="{% url 'new_review' %}" method="post">
+                {% csrf_token %}
+                {% for hidden in review_form.hidden_fields %}
+                    {{ hidden }}
+                {% endfor %}
+                {{ review_form.content.errors }}
+                {{ review_form.content }}
+                <p class="center"><input type="submit" value="Elemzés beküldése" /></p>
+            </form>
+        {% endif %}
+        {% if permission_approve_review and unapproved_reviews %}
             <h2>Elfogadásra váró elemzés{% if unapproved_reviews.count > 1 %}ek{% endif %}</h2>
             {% for r in unapproved_reviews %}
                 <div class="film_addon">

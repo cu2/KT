@@ -24,8 +24,8 @@
                     <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
                 {% endif %}
             </p>
-            {% if user.is_authenticated %}
-                <p style="text-align: center; font-size: 8pt">(<span class="action_text" id="show_picture_edit_button">kép szerkesztése/törlése</span>)</p>
+            {% if permission_edit_picture %}
+                <p style="text-align: center; font-size: 8pt">(<span class="action_text" id="show_picture_edit_button">kép szerkesztése</span>)</p>
                 <div class="picture_edit_block" style="display: none">
                     <form action="{% url 'edit_picture' %}" method="post">
                         {% csrf_token %}
@@ -44,6 +44,11 @@
                         </p>
                         <p class="center"><input type="submit" value="Kép adatainak mentése" /></p>
                     </form>
+                </div>
+            {% endif %}
+            {% if permission_delete_picture %}
+                <p style="text-align: center; font-size: 8pt">(<span class="action_text" id="show_picture_delete_button">kép törlése</span>)</p>
+                <div class="picture_delete_block" style="display: none">
                     <form action="{% url 'delete_picture' %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="picture" value="{{ picture.id }}" />
@@ -55,8 +60,7 @@
         {% for picture in pictures %}
             <a href="{% url 'film_picture' film.id film.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="thumbnail" /></a>
         {% endfor %}
-        </p>
-        {% if user.is_authenticated %}
+        {% if permission_new_picture %}
             <h3>Új kép feltöltése</h3>
             <form action="{% url 'new_picture' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
@@ -76,8 +80,6 @@
                 </p>
                 <p class="center"><input type="submit" value="Kép feltöltése" /></p>
             </form>
-        {% else %}
-            <p>Ahhoz, hogy képet tudj feltölteni, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
         {% endif %}
     </div>
 
