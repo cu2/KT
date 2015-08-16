@@ -79,7 +79,7 @@
                 </p>
                 <p>
                     <label for="id_film_directors">Rendező(k) (vesszővel elválasztva):</label><br />
-                    <input type="text" name="film_directors" id="id_film_directors" value="{% for d in film.directors %}{{ d }}{% if not forloop.last %}, {% endif %}{% endfor %}" />
+                    <input type="text" name="film_directors" id="id_film_directors" class="input_for_artists" value="{% for d in film.directors %}{{ d }}{% if not forloop.last %}, {% endif %}{% endfor %}" />
                 </p>
                 <p>
                     <label for="id_film_imdb_link">IMDb link (a film imdb-s oldalának teljes url-je):</label><br />

@@ -272,6 +272,11 @@ input.inactive_action {
     font-size: 11pt;
 }
 
+.input_format {
+    background: rgb(239,233,207);
+    padding: 2px;
+}
+
 .thumbnail {
     border: solid 1px rgb(0,0,0);
     margin: 5px;

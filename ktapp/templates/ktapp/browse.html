@@ -1,0 +1,51 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Böngészés</h1>
+{% endblock %}
+
+{% block main %}
+
+    <form action="{% url 'browse' %}" method="get">
+        <p>Cím: <input type="text" tabindex="2" name="title" value="{{ title }}" class="search_input focus_this" /></p>
+        <p>Év: <input type="text" tabindex="3" name="year" value="{{ year }}" class="search_input" /> (formátum: <span class="input_format">ÉÉÉÉ</span>, <span class="input_format">ÉÉÉÉ-</span>, <span class="input_format">-ÉÉÉÉ</span>, <span class="input_format">ÉÉÉÉ-ÉÉÉÉ</span>)</p>
+        <p>Rendező(k): <input type="text" tabindex="4" name="directors" value="{{ directors }}" class="search_input input_for_artists" /></p>
+        <p>Színész(ek): <input type="text" tabindex="5" name="actors" value="{{ actors }}" class="search_input input_for_artists" /></p>
+        <p>Ország(ok): <input type="text" tabindex="6" name="countries" id="id_countries" value="{{ countries }}" class="search_input input_for_keywords" /></p>
+        <p>Műfaj(ok): <input type="text" tabindex="7" name="genres" id="id_genres" value="{{ genres }}" class="search_input input_for_keywords" /></p>
+        <p>Kulcsszó/szavak: <input type="text" tabindex="8" name="keywords" id="id_keywords" value="{{ keywords }}" class="search_input input_for_keywords" /></p>
+        <p>Átlag: <input type="text" tabindex="9" name="avg_rating_min" value="{{ avg_rating_min }}" /> - <input type="text" tabindex="10" name="avg_rating_max" value="{{ avg_rating_max }}" /></p>
+        <p>Szavazatok száma: <input type="text" tabindex="11" name="num_rating_min" value="{{ num_rating_min }}" /> - <input type="text" tabindex="12" name="num_rating_max" value="{{ num_rating_max }}" /></p>
+        <p><input type="submit" value="Mehet" tabindex="13" /></p>
+    </form>
+
+    {% if error_type == 'too_many' %}
+        <p class="error">Túl sok találat ({{ result_count }}), szűkíts a feltételeken...</p>
+    {% elif error_type == 'ok' %}
+        {% if result_count %}
+            <p>{{ result_count }} találat:</p>
+            <table class="fullsize">
+                <tr class="header_tr">
+                    <th>Film</th>
+                    <th>Év</th>
+                    <th>Rendező</th>
+                    <th>Átlag</th>
+                </tr>
+                {% for r in results %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td>{{ r|film_url_html }}</td>
+                        <td class="center">{% if r.year %}{{ r.year }}{% endif %}</td>
+                        <td>{% for director in r.directors|slice:":3" %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %}{% if r.directors|length > 3 %} - ...{% endif %}</td>
+                        <td class="center">{{ r|film_rating_html }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Nincs találat.</p>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

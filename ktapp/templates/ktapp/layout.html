@@ -6,7 +6,7 @@
 {% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=2" />
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <base href="/" />
     </head>
@@ -56,7 +56,7 @@
             <ul>
                 <li>Filmek<br />
                     <ul class="submenu">
-                        <li>Bemutatók</li>
+                        <li><a href="{% url 'browse' %}">Böngészés</a></li>
                         {% if user.is_authenticated and user.core_member %}
                             <li><a href="{% url 'new_film' %}">Új film</a></li>
                         {% endif %}

@@ -75,7 +75,10 @@ def get_keywords(request):
         return HttpResponse(json.dumps([]), content_type='application/json')
     keywords = models.Keyword.objects
     if t != '':
-        keywords = keywords.filter(keyword_type=t)
+        if t == 'MO':
+            keywords = keywords.filter(keyword_type__in=['M', 'O'])
+        else:
+            keywords = keywords.filter(keyword_type=t)
     return HttpResponse(json.dumps(
         [keyword.name for keyword in keywords.filter(name__istartswith=q).order_by('name', 'id')[:10]]
     ), content_type='application/json')

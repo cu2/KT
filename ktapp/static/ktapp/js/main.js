@@ -127,7 +127,7 @@ $(function() {
         }
     });
 
-    $('#id_film_directors')
+    $('.input_for_artists')
         .bind('keydown', function(event) {
             if (event.keyCode === $.ui.keyCode.TAB &&
                 $(this).autocomplete('instance').menu.active) {
@@ -160,11 +160,12 @@ $(function() {
         });
 
     var keyword_type = 'C';
-    $('#id_countries, #id_genres, #id_major_keywords, #id_other_keywords')
+    $('.input_for_keywords')
         .focus(function() {
             if ($(this).attr('id') == 'id_countries') keyword_type = 'C';
             else if ($(this).attr('id') == 'id_genres') keyword_type = 'G';
             else if ($(this).attr('id') == 'id_major_keywords') keyword_type = 'M';
+            else if ($(this).attr('id') == 'id_keywords') keyword_type = 'MO';
             else keyword_type = 'O';
         })
         .bind('keydown', function(event) {
