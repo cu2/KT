@@ -775,6 +775,10 @@ def edit_premiers(request):
             film.main_premier = main_premier
             film.main_premier_year = None
             film.save()
+        elif main_premier == '':
+            film.main_premier = None
+            film.main_premier_year = None
+            film.save()
         for p in film.other_premiers():
             premier_when = kt_utils.strip_whitespace(request.POST.get('other_premier_when_%s' % p.id, ''))
             try:
