@@ -111,6 +111,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'kt.middlewares.LoggingMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
@@ -158,13 +159,27 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
-            'propagate': True,
+        },
+        'kt_pageview': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'kt_loadtime': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'kt_exception': {
+            'handlers': ['console'],
+            'level': 'INFO',
         },
     }
 }
