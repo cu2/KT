@@ -17,9 +17,13 @@ def jsonlog(logger, level, payload):
 class LoggingMiddleware(object):
 
     def process_request(self, request):
+        now = datetime.datetime.now()
+        if request.user.is_authenticated():
+            request.user.last_activity_at = now
+            request.user.save()
         ip = get_ip(request)
         jsonlog(kt_pageview_logger, logging.INFO, {
-            'datetime': datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+            'datetime': datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S'),
             'ip': ip if ip else '',
             'user_agent': request.META.get('HTTP_USER_AGENT', ''),
             'url': request.get_full_path(),

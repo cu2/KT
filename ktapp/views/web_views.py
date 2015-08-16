@@ -3,6 +3,7 @@
 import datetime
 import math
 import json
+from ipware.ip import get_ip
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
@@ -1293,6 +1294,11 @@ def registration(request):
         else:
             password = get_random_string(32)
             user = models.KTUser.objects.create_user(username, email, password)
+            ip = get_ip(request)
+            user.ip_at_registration = ip
+            user.ip_at_last_login = ip
+            user.last_activity_at = datetime.datetime.now()
+            user.save()
             token = get_random_string(64)
             models.PasswordToken.objects.create(
                 token=token,
@@ -1347,6 +1353,10 @@ def custom_login(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
+                    ip = get_ip(request)
+                    user.ip_at_last_login = ip
+                    user.last_activity_at = datetime.datetime.now()
+                    user.save()
                     return HttpResponseRedirect(next_url)
                 else:
                     error_type = 'ban'
