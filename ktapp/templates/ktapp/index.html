@@ -14,7 +14,9 @@
             <h3>{{ premier_day|date:"F j."|title }}</h3>
             {% for film in premier_films %}
                 <div class="film_block">
-                    <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} ({{ film.year }})"><img src="media/pix/tn200x1000/505/placeholder.jpg" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
+                    {% if film.main_poster %}
+                        <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} ({{ film.year }})"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
+                    {% endif %}
                     <p class="film_block_content">
                         <b><a href="{% url 'film_main' film.id film.slug_cache %}">{{ film.orig_title }}</a></b><br />
                         {% if film.second_title %}{{ film.second_title }}<br />{% endif %}

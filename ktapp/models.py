@@ -144,6 +144,7 @@ class Film(models.Model):
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     open_for_vote_from = models.DateField(blank=True, null=True)
+    main_poster = models.ForeignKey('Picture', blank=True, null=True, related_name='main_poster', on_delete=models.SET_NULL)
 
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'
@@ -773,6 +774,11 @@ class Picture(models.Model):
     def save(self, *args, **kwargs):
         super(Picture, self).save(*args, **kwargs)
         self.film.number_of_pictures = self.film.picture_set.count()
+        if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
+            try:
+                self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
+            except IndexError:
+                self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
         self.film.save()
         for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
             self.generate_thumbnail(w, h)
@@ -822,6 +828,14 @@ class Picture(models.Model):
 def delete_picture(sender, instance, **kwargs):
     '''Update number_of_pictures and delete files'''
     instance.film.number_of_pictures = instance.film.picture_set.count()
+    if instance.picture_type in {instance.PICTURE_TYPE_POSTER, instance.PICTURE_TYPE_DVD}:
+        try:
+            instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_POSTER).order_by('id')[0]
+        except IndexError:
+            try:
+                instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_DVD).order_by('id')[0]
+            except IndexError:
+                instance.film.main_poster = None
     instance.film.save()
     try:
         os.remove(settings.MEDIA_ROOT + unicode(instance.img))

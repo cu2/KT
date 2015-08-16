@@ -6,12 +6,14 @@
     <div class="clearfix">
         <div id="film_main_left">
             <div class="film_block hover_show_button_context">
-                <img src="media/pix/tn200x1000/505/placeholder.jpg" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" />
-                <p class="film_block_content" id="plot_text">
+                {% if film.main_poster %}
+                    <img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" />
+                {% endif %}
+                <p{% if film.main_poster %} class="film_block_content"{% endif %} id="plot_text">
                     {{ film.plot_summary }}{% if permission_edit_film %} <span class="hover_show_button button small_button" id="show_plot_edit_form">történet szerkesztése</span>{% endif %}
                 </p>
                 {% if permission_edit_film %}
-                    <div id="plot_edit_form" style="display: none" class="film_block_content">
+                    <div id="plot_edit_form" style="display: none"{% if film.main_poster %} class="film_block_content"{% endif %}>
                         <form action="{% url 'edit_plot' %}" method="post" class="inline">
                             {% csrf_token %}
                             <input type="hidden" name="film_id" value="{{ film.pk }}" />
