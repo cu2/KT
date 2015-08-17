@@ -6,7 +6,7 @@
         {% for r in reviews %}
             <div class="film_addon">
                 <div class="review_author">
-                    {{ r.created_at|date:"Y-m-d" }} <a href="{% url 'user_profile' r.created_by.id r.created_by.slug_cache %}">{{ r.created_by }}</a>
+                    {{ r.created_at|date:"Y-m-d" }}{% if r.created_by %} <a href="{% url 'user_profile' r.created_by.id r.created_by.slug_cache %}">{{ r.created_by }}</a>{% endif %}
                 </div>
                 <div class="film_addon_content">
                     {% autoescape off %}

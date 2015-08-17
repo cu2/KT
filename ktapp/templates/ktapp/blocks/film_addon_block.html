@@ -6,7 +6,7 @@
     </div>
     <div class="film_addon_author">
         {% if addon.created_by %}
-        <a href="{% url 'user_profile' addon.created_by.id addon.created_by.slug_cache %}">{{ addon.created_by }}</a>
+            <a href="{% url 'user_profile' addon.created_by.id addon.created_by.slug_cache %}">{{ addon.created_by }}</a>
         {% endif %}
     </div>
 </div>
