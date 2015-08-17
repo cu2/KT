@@ -1557,6 +1557,7 @@ def messages(request):
         'messages': models.Message.objects.filter(owned_by=request.user).order_by('-sent_at')[(p-1) * MESSAGES_PER_PAGE:p * MESSAGES_PER_PAGE],
         'p': p,
         'max_pages': max_pages,
+        'staff_ids': ','.join([str(u.id) for u in models.KTUser.objects.filter(is_staff=True).order_by('id')]),
     })
 
 
@@ -1600,4 +1601,18 @@ def new_message(request):
         #         )
         #     )
         return HttpResponseRedirect(reverse('messages'))
-    return render(request, 'ktapp/new_message.html')
+    list_of_user_ids = request.GET.get('u', '')
+    users = set()
+    for raw_user_id in request.GET.get('u', '').split(','):
+        try:
+            user_id = int(raw_user_id.strip())
+        except ValueError:
+            continue
+        try:
+            user = models.KTUser.objects.get(id=user_id)
+        except models.KTUser.DoesNotExist:
+            continue
+        users.add(user)
+    return render(request, 'ktapp/new_message.html', {
+        'list_of_recipients': sorted(list(users), key=lambda u: u.username.upper()),
+    })

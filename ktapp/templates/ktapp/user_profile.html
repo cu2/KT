@@ -63,6 +63,9 @@
                 {% else %}<i>nem publikus</i>{% endif %}<br />
                 Regisztráció: {{ selected_user.date_joined|date:"Y. F j." }} ({{ selected_user.date_joined|timesince }})
             </p>
+            {% if user.validated_email %}
+                <p><a href="{% url 'new_message' %}?u={{ selected_user.id }}">Üzenet küldése</a></p>
+            {% endif %}
         {% endif %}
 
         {% if selected_user.id == user.id and user.validated_email %}

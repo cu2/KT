@@ -9,10 +9,10 @@
 
     <form action="{% url 'new_message' %}" method="post">
         {% csrf_token %}
-        <p>Címzett(ek): <input type="text" name="recipients" class="recipients_input" id="recipients" /></p>
+        <p>Címzett(ek): <input type="text" name="recipients" class="recipients_input{% if not list_of_recipients %} focus_this{% endif %}" id="recipients"{% if list_of_recipients %} value="{% for recipient in list_of_recipients %}{{ recipient.username }}{% if not forloop.last %}, {% endif %}{% endfor %}"{% endif %} /></p>
         <p>
             Üzenet:<br />
-            <textarea name="content" rows="10"></textarea>
+            <textarea name="content" rows="10"{% if list_of_recipients %} class="focus_this"{% endif %}></textarea>
         </p>
         <p class="center"><input type="submit" value="Üzenet elküldése" /></p>
     </form>
