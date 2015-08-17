@@ -58,6 +58,9 @@
                 <li>Filmek<br />
                     <ul class="submenu">
                         <li><a href="{% url 'browse' %}">Böngészés</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'wishlist' user.id user.slug_cache %}">Kívánságaid</a></li>
+                        {% endif %}
                         {% if user.is_authenticated and user.core_member %}
                             <li><a href="{% url 'new_film' %}">Új film</a></li>
                         {% endif %}

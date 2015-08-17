@@ -1381,6 +1381,16 @@ def user_profile(request, id, name_slug):
     })
 
 
+def wishlist(request, id, name_slug):
+    selected_user = get_object_or_404(models.KTUser, pk=id)
+    qs = models.Wishlist.objects.select_related('film').filter(wished_by=selected_user).order_by('film__orig_title', 'film__id')
+    return render(request, 'ktapp/wishlist.html', {
+        'selected_user': selected_user,
+        'wishlist_yes': qs.filter(wish_type=models.Wishlist.WISH_TYPE_YES),
+        'wishlist_get': qs.filter(wish_type=models.Wishlist.WISH_TYPE_GET),
+    })
+
+
 def verify_email(request, token):
     error_type = ''
     new_password1 = request.POST.get('new_password1', '')

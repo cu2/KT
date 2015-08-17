@@ -1,0 +1,52 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    {% if selected_user.id == user.id %}
+        <h1>Kívánságaid</h1>
+    {% else %}
+        <h1>{{ selected_user.username }} kívánságlistája</h1>
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+
+    <div class="centered_content">
+
+        <h2>Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} nézni</h2>
+        <table class="fullsize">
+            <tr class="header_tr">
+                <th>Film</th>
+                <th>Év</th>
+                <th>Átlag</th>
+            </tr>
+            {% for w in wishlist_yes %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td>{{ w.film|film_url_html }}</td>
+                    <td class="center">{% if w.film.year %}{{ w.film.year }}{% endif %}</td>
+                    <td class="center">{{ w.film|film_rating_html }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <h2>Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} szerezni</h2>
+        <table class="fullsize">
+            <tr class="header_tr">
+                <th>Film</th>
+                <th>Év</th>
+                <th>Átlag</th>
+            </tr>
+            {% for w in wishlist_get %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td>{{ w.film|film_url_html }}</td>
+                    <td class="center">{% if w.film.year %}{{ w.film.year }}{% endif %}</td>
+                    <td class="center">{{ w.film|film_rating_html }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+
+{% endblock %}
