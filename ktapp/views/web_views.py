@@ -1540,8 +1540,27 @@ def change_password(request):
 
 @login_required
 def messages(request):
-    number_of_messages = models.Message.objects.filter(owned_by=request.user).count()
-    p = int(request.GET.get('p', 0))
+    try:
+        user_id = int(request.GET.get('u', 0))
+    except ValueError:
+        user_id = 0
+    messages_qs = models.Message.objects.filter(owned_by=request.user)
+    other_user = None
+    if user_id:
+        try:
+            other_user = models.KTUser.objects.get(id=user_id)
+        except models.KTUser.DoesNotExist:
+            pass
+    if other_user:
+        messages_qs = messages_qs.filter(private=True).filter(
+            Q(sent_by=other_user)
+            | Q(sent_to=other_user)
+        )
+    number_of_messages = messages_qs.count()
+    try:
+        p = int(request.GET.get('p', 0))
+    except ValueError:
+        p = 0
     if p == 1:
         return HttpResponseRedirect(reverse('messages'))
     max_pages = int(math.ceil(1.0 * number_of_messages / MESSAGES_PER_PAGE))
@@ -1553,11 +1572,16 @@ def messages(request):
         return HttpResponseRedirect(reverse('messages') + '?p=' + str(max_pages))
     request.user.last_message_checking_at = datetime.datetime.now()
     request.user.save()
+    if request.user.is_staff:
+        staff_ids = ','.join([str(u.id) for u in models.KTUser.objects.filter(is_staff=True).order_by('id')])
+    else:
+        staff_ids = ''
     return render(request, 'ktapp/messages.html', {
-        'messages': models.Message.objects.filter(owned_by=request.user).order_by('-sent_at')[(p-1) * MESSAGES_PER_PAGE:p * MESSAGES_PER_PAGE],
+        'messages': messages_qs.order_by('-sent_at')[(p-1) * MESSAGES_PER_PAGE:p * MESSAGES_PER_PAGE],
         'p': p,
+        'other_user': other_user,
         'max_pages': max_pages,
-        'staff_ids': ','.join([str(u.id) for u in models.KTUser.objects.filter(is_staff=True).order_by('id')]),
+        'staff_ids': staff_ids,
     })
 
 
