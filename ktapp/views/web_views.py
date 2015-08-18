@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import hashlib
 import math
 import json
 from ipware.ip import get_ip
@@ -28,22 +29,36 @@ MESSAGES_PER_PAGE = 50
 
 
 def index(request):
-    today = datetime.date.today()
-    offset = (today.weekday() - 3) % 7  # last Thursday = premier day
-    from_date = today - datetime.timedelta(days=offset+7)
-    until_date = today - datetime.timedelta(days=offset-7)
-    premier_list = []
-    # TODO: add alternative premier dates
-    for film in models.Film.objects.filter(main_premier__gte=from_date, main_premier__lte=until_date).order_by('-main_premier', 'orig_title'):
-        if premier_list:
-            if premier_list[-1][0] != film.main_premier:
-                premier_list.append([film.main_premier, []])
+    hash_of_the_day = int(hashlib.md5(datetime.datetime.now().strftime('%Y-%m-%d')).hexdigest(), 16)
+    # film of the day
+    number_of_films = models.Film.objects.filter(main_poster__isnull=False, number_of_ratings__gte=10).count()
+    film_no_of_the_day = hash_of_the_day % number_of_films
+    try:
+        film_of_the_day = models.Film.objects.filter(main_poster__isnull=False, number_of_ratings__gte=10).order_by('id')[film_no_of_the_day]
+    except models.Film.DoesNotExist:
+        film_of_the_day = models.Film.objects.get(id=1)
+    # toplist of the day
+    number_of_toplists = models.UserToplist.objects.filter(quality=True).count()
+    toplist_no_of_the_day = hash_of_the_day % number_of_toplists
+    try:
+        toplist_of_the_day = models.UserToplist.objects.filter(quality=True).order_by('id')[toplist_no_of_the_day]
+    except models.Film.DoesNotExist:
+        toplist_of_the_day = models.UserToplist.objects.get(id=1)
+    # buzz
+    buzz_comment_domains = {}
+    for comment in models.Comment.objects.all()[:100]:
+        key = (comment.domain, comment.film_id, comment.topic_id, comment.poll_id)
+        if key not in buzz_comment_domains:
+            buzz_comment_domains[key] = (comment.id, comment.created_at)
         else:
-            premier_list.append([film.main_premier, []])
-        premier_list[-1][1].append(film)
+            if comment.created_at > buzz_comment_domains[key][1]:
+                buzz_comment_domains[key] = (comment.id, comment.created_at)
+    buzz_comment_ids = [id for id, _ in sorted(buzz_comment_domains.values(), key=lambda x: x[1], reverse=True)[:10]]
     return render(request, 'ktapp/index.html', {
-        'premier_list': premier_list,
-        'comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to').all()[:20],
+        'film': film_of_the_day,
+        'toplist': toplist_of_the_day,
+        'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
+        'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to').filter(id__in=buzz_comment_ids),
     })
 
 

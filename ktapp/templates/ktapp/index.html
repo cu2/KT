@@ -1,46 +1,70 @@
 {% extends "ktapp/layout.html" %}
+{% load kt_extras %}
 
 {% block title %}Kritikus Tömeg{% endblock %}
-
-{% block header %}
-    <h1>Kritikus Tömeg</h1>
-{% endblock %}
 
 {% block main %}
 
     <div class="left_content">
-        <h2>Filmbemutatók</h2>
-        {% for premier_day, premier_films in premier_list %}
-            <h3>{{ premier_day|date:"F j."|title }}</h3>
-            {% for film in premier_films %}
-                <div class="film_block">
-                    {% if film.main_poster %}
-                        <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} ({{ film.year }})"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
-                    {% endif %}
-                    <p class="film_block_content">
-                        <b><a href="{% url 'film_main' film.id film.slug_cache %}">{{ film.orig_title }}</a></b><br />
-                        {% if film.second_title %}{{ film.second_title }}<br />{% endif %}
-                        ({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
-                        <br />
-                        {% for country in film.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
-                        {% for genre in film.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                    </p>
-                    <p class="film_block_content">
-                        {{ film.plot_summary }}
-                    </p>
-                    <br class="clear" />
-                </div>
-            {% endfor %}
-        {% endfor %}
+        <h2>A nap filmje</h2>
+        <div class="film_block">
+            {% if film.main_poster %}
+                <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} ({{ film.year }})"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
+            {% endif %}
+            <p class="film_block_content">
+                <b><a href="{% url 'film_main' film.id film.slug_cache %}">{{ film.orig_title }}</a></b><br />
+                {% if film.second_title %}{{ film.second_title }}<br />{% endif %}
+                ({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+                <br />
+                {% for country in film.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
+                {% for genre in film.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            </p>
+            <p class="film_block_content">
+                {{ film.plot_summary }}
+            </p>
+            <br class="clear" />
+        </div>
+        <h2>A nap toplistája</h2>
+        <p><b>{{ toplist.title }}</b>{% if toplist.created_by %}<br />{{ toplist.created_at|date:"Y-m-d" }} <a href="{% url 'user_profile' toplist.created_by.id toplist.created_by.slug_cache %}">{{ toplist.created_by.username }}</a>{% endif %}</p>
+        {% if toplist.toplist_type == 'F' %}
+            <table class="fullsize">
+                <tr class="header_tr">
+                    <th style="width: 30%">Film</th>
+                    <th>Átlag</th>
+                    <th>Megjegyzés</th>
+                </tr>
+                {% for item in toplist_list %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td>{{ item.film|film_url_html_w_year }}</td>
+                        <td class="center">{{ item.film|film_rating_html }}</td>
+                        <td>{{ item.comment }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <table class="fullsize">
+                <tr class="header_tr">
+                    <th style="width: 30%">{% if toplist.toplist_type == 'A' %}Színész{% else %}Rendező{% endif %}</th>
+                    <th>Megjegyzés</th>
+                </tr>
+                {% for item in toplist_list %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        {% if toplist.toplist_type == 'A' %}
+                            <td><a href="{% url 'artist' item.actor.id item.actor.slug_cache %}">{{ item.actor.name }}</a></td>
+                        {% else %}
+                            <td><a href="{% url 'artist' item.director.id item.director.slug_cache %}">{{ item.director.name }}</a></td>
+                        {% endif %}
+                        <td>{{ item.comment }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
     </div>
     <div class="right_content">
-        <h2>Legfrissebb kommentek</h2>
-        {% if comments %}
-            {% for c in comments %}
-                {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
-            {% endfor %}
-        {% endif %}
-        <p><b><a href="{% url 'latest_comments' %}">További kommentek...</a></b></p>
+        <h2>Buzz</h2>
+        {% for c in buzz_comments %}
+            {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
+        {% endfor %}
     </div>
     <br class="clear" />
 

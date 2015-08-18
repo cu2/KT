@@ -20,6 +20,20 @@ def film_url_html(film, subpage='film_main'):
 
 
 @register.filter
+def film_url_html_w_year(film, subpage='film_main'):
+    if film.second_title:
+        second_row = film.second_title
+    else:
+        second_row = '&nbsp;'
+    return mark_safe(u'<a href="{url}">{orig_title}</a>{year}<br />\n<span class="td_sub">{second_row}</span>'.format(
+        url=reverse(subpage, args=(film.id, film.slug_cache)),
+        orig_title=film.orig_title,
+        year=' (%s)' % film.year if film.year else '',
+        second_row=second_row,
+    ))
+
+
+@register.filter
 def film_rating_html(film, with_count=True):
     if film.number_of_ratings == 0:
         return ''

@@ -331,9 +331,11 @@ tr.header_tr {
 th {
     padding: 3px;
     text-align: center;
+    vertical-align: top;
 }
 td {
     padding: 3px;
+    vertical-align: top;
 }
 table.fullsize {
     width: 100%;
