@@ -34,7 +34,7 @@
                     <th>Megjegyzés</th>
                 </tr>
                 {% for item in toplist_list %}
-                    <tr class="{% cycle '' 'odd' %}">
+                    <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
                         <td>{{ item.film|film_url_html_w_year }}</td>
                         <td class="center">{{ item.film|film_rating_html }}</td>
                         <td>{{ item.comment }}</td>
@@ -48,7 +48,7 @@
                     <th>Megjegyzés</th>
                 </tr>
                 {% for item in toplist_list %}
-                    <tr class="{% cycle '' 'odd' %}">
+                    <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
                         {% if toplist.toplist_type == 'A' %}
                             <td><a href="{% url 'artist' item.actor.id item.actor.slug_cache %}">{{ item.actor.name }}</a></td>
                         {% else %}
