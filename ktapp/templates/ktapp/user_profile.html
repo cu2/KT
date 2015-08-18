@@ -75,6 +75,7 @@
         {% endif %}
 
         <h2>Legutóbbi szavazat{% if selected_user.id == user.id %}aid{% else %}ok{% endif %}</h2>
+        <p><a href="{% url 'user_films' selected_user.id selected_user.slug_cache %}">Összes {% if selected_user.id == user.id %}filmed{% else %}filmje{% endif %}</a></p>
         <table>
             <tr class="header_tr">
                 <th>Film</th>

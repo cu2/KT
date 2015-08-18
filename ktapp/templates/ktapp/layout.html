@@ -29,19 +29,19 @@
                         <li><a href="{% url 'messages' %}">Üzenetek{% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %} <span class="new_message_warning">új</span>{% endif %}</a></li>
                         <li><form action="{% url 'logout' %}" method="post" class="inline">
                             {% csrf_token %}
-                            <input type="hidden" name="next" value="{{ request.path }}" />
+                            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
                             <input type="submit" value="Kijelentkezés" class="small_button" />
                         </form></li>
                     {% else %}
                         <li id="login_menu"><form action="{% url 'login' %}" method="post" class="inline">
                             {% csrf_token %}
-                            <input type="hidden" name="next" value="{{ request.path }}" />
+                            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
                             <input type="text" name="username" value="" id="login_username" placeholder="név vagy email" tabindex="2" />
                             <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
                             <span class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></span>
                             <input type="submit" value="Bejelentkezés" class="small_button" tabindex="4" />
                         </form> <a href="{% url 'reset_password' '' %}" style="font-size: 9pt">Mi a jelszavam?</a></li>
-                        <li><a href="{% url 'registration' %}?next={{ request.path }}">Regisztráció</a></li>
+                        <li><a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">Regisztráció</a></li>
                     {% endif %}
                 </ul>
             </div>
@@ -61,6 +61,7 @@
                         <li><a href="{% url 'premiers' %}">Bemutatók</a></li>
                         {% if user.is_authenticated %}
                             <li><a href="{% url 'wishlist' user.id user.slug_cache %}">Kívánságaid</a></li>
+                            <li><a href="{% url 'user_films' user.id user.slug_cache %}">Filmjeid</a></li>
                         {% endif %}
                     </ul>
                 </li>

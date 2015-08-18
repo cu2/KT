@@ -10,16 +10,16 @@
 {% block main %}
 
     <form action="{% url 'browse' %}" method="get">
-        <p>Cím: <input type="text" tabindex="2" name="title" value="{{ title }}" class="search_input focus_this" /></p>
-        <p>Év: <input type="text" tabindex="3" name="year" value="{{ year }}" class="search_input" /> (formátum: <span class="input_format">ÉÉÉÉ</span>, <span class="input_format">ÉÉÉÉ-</span>, <span class="input_format">-ÉÉÉÉ</span>, <span class="input_format">ÉÉÉÉ-ÉÉÉÉ</span>)</p>
-        <p>Rendező(k): <input type="text" tabindex="4" name="directors" value="{{ directors }}" class="search_input input_for_artists" /></p>
-        <p>Színész(ek): <input type="text" tabindex="5" name="actors" value="{{ actors }}" class="search_input input_for_artists" /></p>
-        <p>Ország(ok): <input type="text" tabindex="6" name="countries" id="id_countries" value="{{ countries }}" class="search_input input_for_keywords" /></p>
-        <p>Műfaj(ok): <input type="text" tabindex="7" name="genres" id="id_genres" value="{{ genres }}" class="search_input input_for_keywords" /></p>
-        <p>Kulcsszó/szavak: <input type="text" tabindex="8" name="keywords" id="id_keywords" value="{{ keywords }}" class="search_input input_for_keywords" /></p>
-        <p>Átlag: <input type="text" tabindex="9" name="avg_rating_min" value="{{ avg_rating_min }}" /> - <input type="text" tabindex="10" name="avg_rating_max" value="{{ avg_rating_max }}" /></p>
-        <p>Szavazatok száma: <input type="text" tabindex="11" name="num_rating_min" value="{{ num_rating_min }}" /> - <input type="text" tabindex="12" name="num_rating_max" value="{{ num_rating_max }}" /></p>
-        <p><input type="submit" value="Mehet" tabindex="13" /></p>
+        <p>Cím: <input type="text" tabindex="12" name="title" value="{{ title }}" class="search_input focus_this" /></p>
+        <p>Év: <input type="text" tabindex="13" name="year" value="{{ year }}" class="search_input" /> (formátum: <span class="input_format">ÉÉÉÉ</span>, <span class="input_format">ÉÉÉÉ-</span>, <span class="input_format">-ÉÉÉÉ</span>, <span class="input_format">ÉÉÉÉ-ÉÉÉÉ</span>)</p>
+        <p>Rendező(k): <input type="text" tabindex="14" name="directors" value="{{ directors }}" class="search_input input_for_artists" /></p>
+        <p>Színész(ek): <input type="text" tabindex="15" name="actors" value="{{ actors }}" class="search_input input_for_artists" /></p>
+        <p>Ország(ok): <input type="text" tabindex="16" name="countries" id="id_countries" value="{{ countries }}" class="search_input input_for_keywords" /></p>
+        <p>Műfaj(ok): <input type="text" tabindex="17" name="genres" id="id_genres" value="{{ genres }}" class="search_input input_for_keywords" /></p>
+        <p>Kulcsszó/szavak: <input type="text" tabindex="18" name="keywords" id="id_keywords" value="{{ keywords }}" class="search_input input_for_keywords" /></p>
+        <p>Átlag: <input type="text" tabindex="19" name="avg_rating_min" value="{{ avg_rating_min }}" /> - <input type="text" tabindex="20" name="avg_rating_max" value="{{ avg_rating_max }}" /></p>
+        <p>Szavazatok száma: <input type="text" tabindex="21" name="num_rating_min" value="{{ num_rating_min }}" /> - <input type="text" tabindex="22" name="num_rating_max" value="{{ num_rating_max }}" /></p>
+        <p><input type="submit" value="Mehet" tabindex="23" /></p>
     </form>
 
     {% if error_type == 'too_many' %}

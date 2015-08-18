@@ -94,3 +94,42 @@ def kt_permission_required(perm):
     def check_perms(user):
         return check_permission(perm, user, False)
     return user_passes_test(check_perms)
+
+
+def coalesce(value, default_value):
+    if value is None:
+        return default_value
+    return value
+
+
+def minmax2interval(min_value, max_value, default_min, default_max):
+    if min_value is None:
+        if max_value is None:
+            return None
+        else:
+            return (default_min, max_value)
+    else:
+        if max_value is None:
+            return (min_value, default_max)
+        else:
+            return (min_value, max_value)
+
+
+def str2interval(value, default_type, default_min=0, default_max=9999):
+    if '-' in value:
+        min_value, max_value = value.split('-')[:2]
+        try:
+            min_value = default_type(min_value.strip())
+        except:
+            min_value = None
+        try:
+            max_value = default_type(max_value.strip())
+        except:
+            max_value = None
+        return minmax2interval(min_value, max_value, default_min, default_max)
+
+    try:
+        value = default_type(value.strip())
+    except:
+        return None
+    return (value, value)
