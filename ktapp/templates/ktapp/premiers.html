@@ -1,0 +1,56 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Filmbemutatók - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Filmbemutatók</h1>
+{% endblock %}
+
+{% block main %}
+
+    <div class="left_content">
+        <h2>Mostanában</h2>
+        {% for premier_day, premier_films in premier_list %}
+            <h3>{{ premier_day|date:"F j."|title }}</h3>
+            {% for film in premier_films %}
+                <div class="film_block">
+                    {% if film.main_poster %}
+                        <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} ({{ film.year }})"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
+                    {% endif %}
+                    <p class="film_block_content">
+                        <b><a href="{% url 'film_main' film.id film.slug_cache %}">{{ film.orig_title }}</a></b><br />
+                        {% if film.second_title %}{{ film.second_title }}<br />{% endif %}
+                        ({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+                        <br />
+                        {% for country in film.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
+                        {% for genre in film.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                    </p>
+                    <p class="film_block_content">
+                        {{ film.plot_summary }}
+                    </p>
+                    <br class="clear" />
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+    <div class="right_content">
+        <h2>Idén</h2>
+        <table class="fullsize">
+            <tr class="header_tr">
+                <th>Bemutató</th>
+                <th>Film</th>
+                <th>Átlag</th>
+            </tr>
+            {% for film in premier_list_full %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td>{{ film.main_premier|date:"F j." }}</td>
+                    <td>{{ film|film_url_html_w_year }}</td>
+                    <td class="center">{{ film|film_rating_html }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <br class="clear" />
+
+{% endblock %}

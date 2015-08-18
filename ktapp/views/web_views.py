@@ -62,6 +62,27 @@ def index(request):
     })
 
 
+def premiers(request):
+    today = datetime.date.today()
+    this_year = today.year
+    offset = (today.weekday() - 3) % 7  # last Thursday = premier day
+    from_date = today - datetime.timedelta(days=offset+14)
+    until_date = today - datetime.timedelta(days=offset-7)
+    premier_list = []
+    # TODO: add alternative premier dates
+    for film in models.Film.objects.filter(main_premier__gte=from_date, main_premier__lte=until_date).order_by('-main_premier', 'orig_title', 'id'):
+        if premier_list:
+            if premier_list[-1][0] != film.main_premier:
+                premier_list.append([film.main_premier, []])
+        else:
+            premier_list.append([film.main_premier, []])
+        premier_list[-1][1].append(film)
+    return render(request, 'ktapp/premiers.html', {
+        'premier_list': premier_list,
+        'premier_list_full': models.Film.objects.filter(main_premier__gte='%s-01-01' % this_year, main_premier__lte='%s-12-31' % this_year).order_by('main_premier', 'orig_title', 'id'),
+    })
+
+
 def browse(request):
 
     def coalesce(value, default_value):
