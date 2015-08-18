@@ -62,9 +62,6 @@
                         {% if user.is_authenticated %}
                             <li><a href="{% url 'wishlist' user.id user.slug_cache %}">Kívánságaid</a></li>
                         {% endif %}
-                        {% if user.is_authenticated and user.core_member %}
-                            <li><a href="{% url 'new_film' %}">Új film</a></li>
-                        {% endif %}
                     </ul>
                 </li>
                 <li>Toplisták<br />
@@ -95,10 +92,15 @@
                         <li>Lefutott</li>
                     </ul>
                 </li>
-                {% if user.is_authenticated and user.is_superuser %}
+                {% if user.is_authenticated and user.core_member %}
                     <li>Szerk<br />
                         <ul class="submenu">
-                            <li><a href="{% url 'admin:index' %}">Admin</a></li>
+                            {% if user.core_member %}
+                                <li><a href="{% url 'new_film' %}">Filmfeltöltés</a></li>
+                            {% endif %}
+                            {% if user.is_superuser %}
+                                <li><a href="{% url 'admin:index' %}">Admin</a></li>
+                            {% endif %}
                         </ul>
                     </li>
                 {% endif %}

@@ -3,7 +3,10 @@
 
 {% block title %}Kritikus Tömeg{% endblock %}
 
-{% block header %}<h1>Új film felvétele</h1>{% endblock %}
+{% block header %}
+    <h1>Új film felvétele</h1>
+    <p class="centered_content">Fontos: ez <i>nem</i> a <a href="{% url 'browse' %}">kereső</a>, csak akkor vegyél fel új filmet, ha még nincs fent az adatbázisunkban.</p>
+{% endblock %}
 
 {% block main %}
 
