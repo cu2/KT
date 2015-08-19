@@ -926,7 +926,9 @@ def new_film(request):
     if request.POST:
         film_orig_title = kt_utils.strip_whitespace(request.POST.get('film_orig_title', ''))
         if film_orig_title == '':
-            return render(request, 'ktapp/new_film.html')
+            return render(request, 'ktapp/new_film.html', {
+                'permission_edit_premiers': kt_utils.check_permission('edit_premiers', request.user),
+            })
         state_before = {}
         film = models.Film.objects.create(
             orig_title=film_orig_title,
@@ -942,13 +944,14 @@ def new_film(request):
             film_year = None
         film.year = film_year
 
-        main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
-        if len(main_premier) == 4 and main_premier.isdigit():
-            film.main_premier_year = main_premier
-            film.main_premier = None
-        elif len(main_premier) == 10 and kt_utils.is_date(main_premier):
-            film.main_premier = main_premier
-            film.main_premier_year = None
+        if kt_utils.check_permission('edit_premiers', request.user):
+            main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
+            if len(main_premier) == 4 and main_premier.isdigit():
+                film.main_premier_year = main_premier
+                film.main_premier = None
+            elif len(main_premier) == 10 and kt_utils.is_date(main_premier):
+                film.main_premier = main_premier
+                film.main_premier_year = None
 
         directors = set()
         for director_name in kt_utils.strip_whitespace(request.POST.get('film_directors', '')).split(','):
@@ -1040,7 +1043,9 @@ def new_film(request):
             state_before, state_after
         )
         return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
-    return render(request, 'ktapp/new_film.html')
+    return render(request, 'ktapp/new_film.html', {
+        'permission_edit_premiers': kt_utils.check_permission('edit_premiers', request.user),
+    })
 
 
 @login_required

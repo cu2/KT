@@ -28,10 +28,12 @@
                     <label for="id_film_year">Gyártás éve (ÉÉÉÉ):</label><br />
                     <input type="text" name="film_year" id="id_film_year" tabindex="13" />
                 </p>
+                {% if permission_edit_premiers %}
                 <p>
                     <label for="id_main_premier">Bemutató dátuma (ÉÉÉÉ-HH-NN):</label><br />
                     <input type="text" name="main_premier" id="id_main_premier" tabindex="14" />
                 </p>
+                {% endif %}
                 <p>
                     <label for="id_film_directors">Rendező(k) (vesszővel elválasztva):</label><br />
                     <input type="text" name="film_directors" id="id_film_directors" class="input_for_artists" tabindex="15" />
