@@ -60,10 +60,9 @@ class LoggingMiddleware(object):
         return response
 
     def process_exception(self, request, exc):
-        kt_exception_logger.exception(u'-----\nDATETIME={dt}\nURL={url}\nUSER_ID={user_id}\nUSER_NAME={user_name}\nEXCEPTION={exc}'.format(
+        kt_exception_logger.exception(u'-----\nDATETIME={dt}\nURL={url}\nUSER_ID={user_id}\nUSER_NAME={user_name}'.format(
             dt=datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
             url=request.get_full_path(),
             user_id=request.user.id if request.user.id else 0,
             user_name=request.user.username,
-            exc=exc,
-        ).encode('utf-8'))
+        ).encode('utf-8', errors='ignore'))

@@ -522,6 +522,7 @@ def film_main(request, id, film_slug):
         'utls': utls,
         'premier_types': models.PremierType.objects.all().order_by('name'),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
+        'permission_edit_premiers': kt_utils.check_permission('edit_premiers', request.user),
         'permission_new_role': kt_utils.check_permission('new_role', request.user),
     })
 
@@ -926,6 +927,7 @@ def new_film(request):
         film_orig_title = kt_utils.strip_whitespace(request.POST.get('film_orig_title', ''))
         if film_orig_title == '':
             return render(request, 'ktapp/new_film.html')
+        state_before = {}
         film = models.Film.objects.create(
             orig_title=film_orig_title,
             created_by=request.user,
@@ -1017,15 +1019,25 @@ def new_film(request):
         film.wikipedia_link_en = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_en', ''))
         film.wikipedia_link_hu = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_hu', ''))
         film.save()
-        models.Change.objects.create(
-            created_by=request.user,
-            action='new_film',
-            object='film:%s' % film.id,
-            state_after=json.dumps({
-                'orig_title': film.orig_title,
-                'year': film.year,
-                'plot_summary': film.plot_summary,
-            }, sort_keys=True),
+        state_after = {
+            'orig_title': film.orig_title,
+            'second_title': film.second_title,
+            'third_title': film.third_title,
+            'year': film.year,
+            'main_premier': film.main_premier,
+            'main_premier_year': film.main_premier_year,
+            'plot_summary': film.plot_summary,
+            'imdb_link': film.imdb_link,
+            'porthu_link': film.porthu_link,
+            'wikipedia_link_en': film.wikipedia_link_en,
+            'wikipedia_link_hu': film.wikipedia_link_hu,
+        }
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            'new_film',
+            'film:%s' % film.id,
+            state_before, state_after
         )
         return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
     return render(request, 'ktapp/new_film.html')
@@ -1036,9 +1048,15 @@ def new_film(request):
 def edit_film(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
-        before = {
+        state_before = {
             'orig_title': film.orig_title,
+            'second_title': film.second_title,
+            'third_title': film.third_title,
             'year': film.year,
+            'imdb_link': film.imdb_link,
+            'porthu_link': int(film.porthu_link) if film.porthu_link else None,
+            'wikipedia_link_en': film.wikipedia_link_en,
+            'wikipedia_link_hu': film.wikipedia_link_hu,
         }
         film_orig_title = kt_utils.strip_whitespace(request.POST.get('film_orig_title', ''))
         if film_orig_title:
@@ -1088,15 +1106,22 @@ def edit_film(request):
         film.wikipedia_link_en = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_en', ''))
         film.wikipedia_link_hu = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_hu', ''))
         film.save()
-        models.Change.objects.create(
-            created_by=request.user,
-            action='edit_film',
-            object='film:%s' % film.id,
-            state_before=json.dumps(before, sort_keys=True),
-            state_after=json.dumps({
-                'orig_title': film.orig_title,
-                'year': film.year,
-            }, sort_keys=True),
+        state_after = {
+            'orig_title': film.orig_title,
+            'second_title': film.second_title,
+            'third_title': film.third_title,
+            'year': film.year,
+            'imdb_link': film.imdb_link,
+            'porthu_link': int(film.porthu_link) if film.porthu_link else None,
+            'wikipedia_link_en': film.wikipedia_link_en,
+            'wikipedia_link_hu': film.wikipedia_link_hu,
+        }
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            'edit_film',
+            'film:%s' % film.id,
+            state_before, state_after
         )
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
@@ -1106,29 +1131,34 @@ def edit_film(request):
 def edit_plot(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
-        plot_before = film.plot_summary
+        state_before = {
+            'plot_summary': film.plot_summary,
+        }
         plot = request.POST.get('plot', '').strip()
         film.plot_summary = plot
         film.save()
-        models.Change.objects.create(
-            created_by=request.user,
-            action='edit_film',
-            object='film:%s' % film.id,
-            state_before=json.dumps({
-               'plot_summary': plot_before,
-            }, sort_keys=True),
-            state_after=json.dumps({
-                'plot_summary': film.plot_summary,
-            }, sort_keys=True),
+        state_after = {
+            'plot_summary': film.plot_summary,
+        }
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            'edit_film',
+            'film:%s' % film.id,
+            state_before, state_after
         )
     return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
 
 
 @login_required
-@kt_utils.kt_permission_required('edit_film')
+@kt_utils.kt_permission_required('edit_premiers')
 def edit_premiers(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
+        state_before = {
+            'main_premier': film.main_premier.strftime('%Y-%m-%d') if film.main_premier else None,
+            'main_premier_year': film.main_premier_year,
+        }
         main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
         if len(main_premier) == 4 and main_premier.isdigit():
             film.main_premier_year = main_premier
@@ -1142,6 +1172,18 @@ def edit_premiers(request):
             film.main_premier = None
             film.main_premier_year = None
             film.save()
+        state_after = {
+            'main_premier': film.main_premier,
+            'main_premier_year': film.main_premier_year,
+        }
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            'edit_premiers',
+            'film:%s' % film.id,
+            state_before, state_after
+        )
+
         for p in film.other_premiers():
             premier_when = kt_utils.strip_whitespace(request.POST.get('other_premier_when_%s' % p.id, ''))
             try:
@@ -1149,16 +1191,43 @@ def edit_premiers(request):
             except ValueError:
                 continue
             if premier_when == '':
+                state_before = {
+                    'premier_type': unicode(p.premier_type),
+                    'when': p.when,
+                }
                 p.delete()
+                state_after = {}
+                kt_utils.changelog(
+                    models.Change,
+                    request.user,
+                    'edit_premiers',
+                    'film:%s' % film.id,
+                    state_before, state_after
+                )
             elif len(premier_when) == 10 and kt_utils.is_date(premier_when):
                 try:
                     pt = models.PremierType.objects.get(id=premier_type)
                 except models.PremierType.DoesNotExist:
                     pt = None
                 if pt:
+                    state_before = {
+                        'premier_type': unicode(p.premier_type),
+                        'when': p.when.strftime('%Y-%m-%d') if p.when else None,
+                    }
                     p.when = premier_when
                     p.premier_type = pt
                     p.save()
+                    state_after = {
+                        'premier_type': unicode(p.premier_type),
+                        'when': p.when,
+                    }
+                    kt_utils.changelog(
+                        models.Change,
+                        request.user,
+                        'edit_premiers',
+                        'film:%s' % film.id,
+                        state_before, state_after
+                    )
         for idx in xrange(1, 2):
             premier_when = kt_utils.strip_whitespace(request.POST.get('new_other_premier_when_%s' % idx, ''))
             try:
@@ -1173,10 +1242,22 @@ def edit_premiers(request):
                 except models.PremierType.DoesNotExist:
                     pt = None
                 if pt:
+                    state_before = {}
                     models.Premier.objects.create(
                         film=film,
                         when=premier_when,
                         premier_type=pt,
+                    )
+                    state_after = {
+                        'premier_type': unicode(pt),
+                        'when': premier_when,
+                    }
+                    kt_utils.changelog(
+                        models.Change,
+                        request.user,
+                        'edit_premiers',
+                        'film:%s' % film.id,
+                        state_before, state_after
                     )
     return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
 
@@ -1861,7 +1942,9 @@ def changes(request):
             'created_at': c.created_at,
             'action': c.action,
             'object': c.object,
-            'state_before': json.loads(c.state_before) if c.state_before else {},
-            'state_after': json.loads(c.state_after) if c.state_after else {},
+            'object_type': c.object.split(':')[0],
+            'object_id': c.object.split(':')[1],
+            'state_before': sorted([(key, val) for key, val in json.loads(c.state_before).iteritems()]) if c.state_before else {},
+            'state_after': sorted([(key, val) for key, val in json.loads(c.state_after).iteritems()]) if c.state_after else {},
         } for c in models.Change.objects.all().order_by('-id')[:100]],
     })

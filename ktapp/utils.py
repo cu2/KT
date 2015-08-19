@@ -1,4 +1,5 @@
 import datetime
+import json
 import re
 
 from django.contrib.auth import authenticate
@@ -67,6 +68,7 @@ def check_permission(perm, user, silent=True):
             'delete_picture': 'admin',
             'new_film': 'core',
             'edit_film': 'core',
+            'edit_premiers': 'admin',
             'edit_artist': 'core',
             'merge_artist': 'admin',
             'approve_bio': 'admin',
@@ -128,3 +130,33 @@ def str2interval(value, default_type, default_min=0, default_max=9999):
     except:
         return None
     return (value, value)
+
+
+def myjsondumps(value):
+    if value is None:
+        return ''
+    ret = {}
+    for key, val in value.iteritems():
+        if isinstance(val, unicode):
+            ret[key] = val.encode('utf-8')
+        if isinstance(val, datetime.date):
+            ret[key] = val.strftime('%Y-%m-%d')
+        else:
+            ret[key] = val
+    return json.dumps(ret, sort_keys=True)
+
+
+def changelog(model, created_by, action, object, state_before, state_after):
+    common_keys = set(state_before.keys()) & set(state_after.keys())
+    for key in common_keys:
+        if state_after[key] == state_before[key]:
+            del state_before[key]
+            del state_after[key]
+    if len(state_before) + len(state_after):
+        model.objects.create(
+            created_by=created_by,
+            action=action,
+            object=object,
+            state_before=myjsondumps(state_before),
+            state_after=myjsondumps(state_after),
+        )

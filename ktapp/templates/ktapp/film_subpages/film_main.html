@@ -92,7 +92,7 @@
                 {% endfor %}
             {% endif %}
             <div class="hover_show_button_context">
-                <h3>Bemutató{% if film.main_premier or film.main_premier_year %}{% if film.other_premiers %}k{% endif %}{% endif %}{% if permission_edit_film %} <span class="hover_show_button button small_button" id="show_premier_form">bemutatók szerkesztése</span>{% endif %}</h3>
+                <h3>Bemutató{% if film.main_premier or film.main_premier_year %}{% if film.other_premiers %}k{% endif %}{% endif %}{% if permission_edit_premiers %} <span class="hover_show_button button small_button" id="show_premier_form">bemutatók szerkesztése</span>{% endif %}</h3>
                 <ul class="mini_list">
                 {% if film.main_premier or film.main_premier_year %}
                     <li>
@@ -108,7 +108,7 @@
                 {% endfor %}
                 </ul>
             </div>
-            {% if permission_edit_film %}
+            {% if permission_edit_premiers %}
                 <div id="premier_form" style="display: none">
                     <h3>Bemutatók szerkesztése</h3>
                     <form action="{% url 'edit_premiers' %}" method="post" class="inline">
