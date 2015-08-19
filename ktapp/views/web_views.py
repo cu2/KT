@@ -1036,6 +1036,10 @@ def new_film(request):
 def edit_film(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
+        before = {
+            'orig_title': film.orig_title,
+            'year': film.year,
+        }
         film_orig_title = kt_utils.strip_whitespace(request.POST.get('film_orig_title', ''))
         if film_orig_title:
             film.orig_title = film_orig_title
@@ -1084,6 +1088,16 @@ def edit_film(request):
         film.wikipedia_link_en = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_en', ''))
         film.wikipedia_link_hu = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_hu', ''))
         film.save()
+        models.Change.objects.create(
+            created_by=request.user,
+            action='edit_film',
+            object='film:%s' % film.id,
+            state_before=json.dumps(before, sort_keys=True),
+            state_after=json.dumps({
+                'orig_title': film.orig_title,
+                'year': film.year,
+            }, sort_keys=True),
+        )
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
@@ -1092,9 +1106,21 @@ def edit_film(request):
 def edit_plot(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
+        plot_before = film.plot_summary
         plot = request.POST.get('plot', '').strip()
         film.plot_summary = plot
         film.save()
+        models.Change.objects.create(
+            created_by=request.user,
+            action='edit_film',
+            object='film:%s' % film.id,
+            state_before=json.dumps({
+               'plot_summary': plot_before,
+            }, sort_keys=True),
+            state_after=json.dumps({
+                'plot_summary': film.plot_summary,
+            }, sort_keys=True),
+        )
     return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
 
 
@@ -1828,6 +1854,14 @@ def new_message(request):
 @login_required
 @kt_utils.kt_permission_required('check_changes')
 def changes(request):
+
     return render(request, 'ktapp/changes.html', {
-        'changes': models.Change.objects.all().order_by('-id')[:100],
+        'changes': [{
+            'created_by': c.created_by,
+            'created_at': c.created_at,
+            'action': c.action,
+            'object': c.object,
+            'state_before': json.loads(c.state_before) if c.state_before else {},
+            'state_after': json.loads(c.state_after) if c.state_after else {},
+        } for c in models.Change.objects.all().order_by('-id')[:100]],
     })
