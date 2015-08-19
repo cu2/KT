@@ -7,18 +7,12 @@ from django.core.exceptions import PermissionDenied
 
 
 def bbcode_to_html(value):
-    value = re.sub('\[link=([^\]]*)\]', '<a href="\\1">', value)
-    value = value.replace('[/link]', '</a>')
-    value = value.replace('[b]', '<b>')
-    value = value.replace('[/b]', '</b>')
-    value = value.replace('[i]', '<i>')
-    value = value.replace('[/i]', '</i>')
-    value = value.replace('[u]', '<u>')
-    value = value.replace('[/u]', '</u>')
-    value = value.replace('[del]', '<del>')
-    value = value.replace('[/del]', '</del>')
-    value = value.replace('[spoiler]', '<span class="spoiler">')
-    value = value.replace('[/spoiler]', '</span>')
+    value = re.sub('\[link=([^\]]*)\](.*)\[/link\]', '<a href="\\1">\\2</a>', value)
+    value = re.sub('\[b\](.*)\[/b\]', '<b>\\1</b>', value)
+    value = re.sub('\[i\](.*)\[/i\]', '<i>\\1</i>', value)
+    value = re.sub('\[u\](.*)\[/u\]', '<u>\\1</u>', value)
+    value = re.sub('\[del\](.*)\[/del\]', '<del>\\1</del>', value)
+    value = re.sub('\[spoiler\](.*)\[/spoiler\]', '<span class="spoiler">\\1</span>', value)
     value = re.sub('\[img\]([^\]]*)\[/img\]', '<img src="\\1" class="comment_img" />', value)
     return value
 
