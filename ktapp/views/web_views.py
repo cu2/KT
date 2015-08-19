@@ -65,9 +65,9 @@ def index(request):
 def premiers(request):
     today = datetime.date.today()
     this_year = today.year
-    offset = (today.weekday() - 3) % 7  # last Thursday = premier day
+    offset = today.weekday()  # this Monday
     from_date = today - datetime.timedelta(days=offset+14)
-    until_date = today - datetime.timedelta(days=offset-7)
+    until_date = today - datetime.timedelta(days=offset-6)
     premier_list = []
     # TODO: add alternative premier dates
     for film in models.Film.objects.filter(main_premier__gte=from_date, main_premier__lte=until_date).order_by('-main_premier', 'orig_title', 'id'):
