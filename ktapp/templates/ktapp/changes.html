@@ -1,0 +1,32 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Változások</h1>
+{% endblock %}
+
+{% block main %}
+
+    <table class="fullsize">
+        <tr class="header_tr">
+            <th>Ki</th>
+            <th>Mikor</th>
+            <th colspan="2">Mit</th>
+            <th>Miről</th>
+            <th>Mire</th>
+        </tr>
+        {% for change in changes %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td>{{ change.created_by.username }}</td>
+                <td>{{ change.created_at|date:"Y-m-d H:i:s" }}</td>
+                <td>{{ change.action }}</td>
+                <td>{{ change.object }}</td>
+                <td>{{ change.state_before }}</td>
+                <td>{{ change.state_after }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

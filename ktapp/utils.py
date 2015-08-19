@@ -74,6 +74,7 @@ def check_permission(perm, user, silent=True):
             'new_role': 'core',
             'delete_role': 'core',
             'new_topic': 'core',
+            'check_changes': 'admin',
         }.get(perm, perm)
         if grp == 'admin' and user.is_staff:
             return True

@@ -1017,6 +1017,16 @@ def new_film(request):
         film.wikipedia_link_en = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_en', ''))
         film.wikipedia_link_hu = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_hu', ''))
         film.save()
+        models.Change.objects.create(
+            created_by=request.user,
+            action='new_film',
+            object='film:%s' % film.id,
+            state_after=json.dumps({
+                'orig_title': film.orig_title,
+                'year': film.year,
+                'plot_summary': film.plot_summary,
+            }, sort_keys=True),
+        )
         return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
     return render(request, 'ktapp/new_film.html')
 
@@ -1812,4 +1822,12 @@ def new_message(request):
         users.add(user)
     return render(request, 'ktapp/new_message.html', {
         'list_of_recipients': sorted(list(users), key=lambda u: u.username.upper()),
+    })
+
+
+@login_required
+@kt_utils.kt_permission_required('check_changes')
+def changes(request):
+    return render(request, 'ktapp/changes.html', {
+        'changes': models.Change.objects.all().order_by('-id')[:100],
     })

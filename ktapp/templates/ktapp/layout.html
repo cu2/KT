@@ -107,6 +107,9 @@
                             {% if user.core_member %}
                                 <li><a href="{% url 'new_film' %}">Filmfeltöltés</a></li>
                             {% endif %}
+                            {% if user.is_staff %}
+                                <li><a href="{% url 'changes' %}">Változások</a></li>
+                            {% endif %}
                             {% if user.is_superuser %}
                                 <li><a href="{% url 'admin:index' %}">Admin</a></li>
                             {% endif %}

@@ -68,6 +68,8 @@ urlpatterns += patterns(
     url(r'^szerk_bemutatok$', web_views.edit_premiers, name='edit_premiers'),
     url(r'^szerk_kulcsszavak$', web_views.edit_keywords, name='edit_keywords'),
 
+    url(r'^valtozasok/$', web_views.changes, name='changes'),
+
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.artist_main, name='artist'),
     url(r'^szereplo/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.role, name='role'),
     url(r'^uj_szereplo$', web_views.new_role, name='new_role'),

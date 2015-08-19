@@ -971,3 +971,12 @@ class PasswordToken(models.Model):
         if token_list:
             return token_list[0]
         return None
+
+
+class Change(models.Model):
+    created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    action = models.CharField(max_length=250)
+    object = models.CharField(max_length=250)
+    state_before = models.TextField(blank=True)
+    state_after = models.TextField(blank=True)
