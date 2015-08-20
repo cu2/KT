@@ -16,35 +16,47 @@
     <div class="centered_content">
 
         <h2>Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} nézni</h2>
-        <table class="fullsize">
-            <tr class="header_tr">
-                <th>Film</th>
-                <th>Év</th>
-                <th>Átlag</th>
-            </tr>
+        <table class="fullsize sortable">
+            <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Film</th>
+                    <th data-sort="int">Év</th>
+                    <th data-sort="float" data-sort-default="desc">Átlag</th>
+                    <th data-sort="int" data-sort-default="desc">Szavazatszám</th>
+                </tr>
+            </thead>
+            <tbody>
             {% for w in wishlist_yes %}
                 <tr class="{% cycle '' 'odd' %}">
                     <td>{{ w.film|film_url_html }}</td>
                     <td class="center">{% if w.film.year %}{{ w.film.year }}{% endif %}</td>
-                    <td class="center">{{ w.film|film_rating_html }}</td>
+                    <td class="center" data-sort-value="{{ w.film|film_rating_sort_value }}">{{ w.film|film_avg_rating_html }}</td>
+                    <td class="center" data-sort-value="{{ w.film.number_of_ratings }}">{{ w.film|film_num_rating_html }}</td>
                 </tr>
             {% endfor %}
+            </tbody>
         </table>
 
         <h2>Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} szerezni</h2>
-        <table class="fullsize">
-            <tr class="header_tr">
-                <th>Film</th>
-                <th>Év</th>
-                <th>Átlag</th>
-            </tr>
+        <table class="fullsize sortable">
+            <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Film</th>
+                    <th data-sort="int">Év</th>
+                    <th data-sort="float" data-sort-default="desc">Átlag</th>
+                    <th data-sort="int" data-sort-default="desc">Szavazatszám</th>
+                </tr>
+            </thead>
+            <tbody>
             {% for w in wishlist_get %}
                 <tr class="{% cycle '' 'odd' %}">
                     <td>{{ w.film|film_url_html }}</td>
                     <td class="center">{% if w.film.year %}{{ w.film.year }}{% endif %}</td>
-                    <td class="center">{{ w.film|film_rating_html }}</td>
+                    <td class="center" data-sort-value="{{ w.film|film_rating_sort_value }}">{{ w.film|film_avg_rating_html }}</td>
+                    <td class="center" data-sort-value="{{ w.film.number_of_ratings }}">{{ w.film|film_num_rating_html }}</td>
                 </tr>
             {% endfor %}
+            </tbody>
         </table>
 
     </div>

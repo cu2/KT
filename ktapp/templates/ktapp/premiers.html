@@ -36,19 +36,25 @@
     </div>
     <div class="right_content">
         <h2>Idén</h2>
-        <table class="fullsize">
-            <tr class="header_tr">
-                <th>Bemutató</th>
-                <th>Film</th>
-                <th>Átlag</th>
-            </tr>
+        <table class="fullsize sortable">
+            <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Bemutató</th>
+                    <th data-sort="string">Film</th>
+                    <th data-sort="float" data-sort-default="desc">Átlag</th>
+                    <th data-sort="int" data-sort-default="desc">Szavazatszám</th>
+                </tr>
+            </thead>
+            <tbody>
             {% for film in premier_list_full %}
                 <tr class="{% cycle '' 'odd' %}">
-                    <td>{{ film.main_premier|date:"F j." }}</td>
+                    <td data-sort-value="{{ film.main_premier|date:"Y-m-d" }}">{{ film.main_premier|date:"F j." }}</td>
                     <td>{{ film|film_url_html_w_year }}</td>
-                    <td class="center">{{ film|film_rating_html }}</td>
+                    <td class="center" data-sort-value="{{ film|film_rating_sort_value }}">{{ film|film_avg_rating_html }}</td>
+                    <td class="center" data-sort-value="{{ film.number_of_ratings }}">{{ film|film_num_rating_html }}</td>
                 </tr>
             {% endfor %}
+            </tbody>
         </table>
     </div>
     <br class="clear" />

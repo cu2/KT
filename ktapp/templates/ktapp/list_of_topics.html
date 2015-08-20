@@ -12,19 +12,23 @@
     <p>Ha egy konkrét filmről akarsz valamit mondani, azt megteheted ott. Ha egyéb témáról szeretnél beszélgetni, arra való ez a fórum. A legfrissebb hozzászólásokat <a href="{% url 'latest_comments' %}">itt találod</a>.</p>
 
     {% if topics %}
-    <table class="fullsize">
-        <tr class="header_tr">
-            <th>Cím</th>
-            <th>Vélemény</th>
-            <th>Utolsó</th>
-        </tr>
-    {% for t in topics %}
-        <tr class="{% cycle '' 'odd' %}">
-            <td><a href="{% url 'forum' t.id t.slug_cache %}">{{ t.title }}</a></td>
-            <td class="center">{{ t.number_of_comments }}</td>
-            <td class="nowrap">{% if t.last_comment %}{{ t.last_comment.created_at|date:"Y-m-d H:i:s" }} <a href="{% url 'user_profile' t.last_comment.created_by.id t.last_comment.created_by.slug_cache %}">{{ t.last_comment.created_by.username }}</a>{% endif %}</td>
-        </tr>
-    {% endfor %}
+    <table class="fullsize sortable">
+        <thead>
+            <tr class="header_tr">
+                <th data-sort="string">Cím</th>
+                <th data-sort="int" data-sort-default="desc">Vélemény</th>
+                <th data-sort="string" data-sort-default="desc">Utolsó</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for t in topics %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td><a href="{% url 'forum' t.id t.slug_cache %}">{{ t.title }}</a></td>
+                <td class="center">{{ t.number_of_comments }}</td>
+                <td class="nowrap">{% if t.last_comment %}{{ t.last_comment.created_at|date:"Y-m-d H:i:s" }} <a href="{% url 'user_profile' t.last_comment.created_by.id t.last_comment.created_by.slug_cache %}">{{ t.last_comment.created_by.username }}</a>{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
     </table>
     {% endif %}
 

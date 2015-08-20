@@ -453,6 +453,9 @@ tr.selected_film_tr {
 .half_td {
     width: 50%;
 }
+table.sortable tr.header_tr {
+    cursor: pointer;
+}
 
 
 /* MISC */

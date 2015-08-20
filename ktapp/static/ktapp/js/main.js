@@ -1,4 +1,14 @@
 $(function() {
+    var sortable_table = $('table.sortable').stupidtable();
+    sortable_table.on("aftertablesort", function (event, data) {
+        var th = $(this).find("th");
+        th.find(".arrow").remove();
+        var dir = $.fn.stupidtable.dir;
+        var arrow = data.direction === dir.ASC ? "&uarr;" : "&darr;";
+        th.eq(data.column).append('<span class="arrow">' + arrow +'</span>');
+        $(this).find('tr:nth-child(odd)').removeClass('odd');
+        $(this).find('tr:nth-child(even)').addClass('odd');
+    });
     $('.insert_bbcode').click(function() {
         var target_textarea = $('.insert_bbcode_b').closest('.form_container').find('textarea');
         var selected_text = target_textarea.getSelection().text;

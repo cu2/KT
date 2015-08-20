@@ -1,15 +1,21 @@
 {% load kt_extras %}
-<table class="fullsize">
-    <tr class="header_tr">
-        <th>Film</th>
-        <th>Év</th>
-        <th>Átlag</th>
-    </tr>
-{% for direction in directions %}
-    <tr class="{% cycle '' 'odd' %}">
-        <td>{{ direction.film|film_url_html }}</td>
-        <td class="center">{% if direction.film.year %}{{ direction.film.year }}{% endif %}</td>
-        <td class="center">{{ direction.film|film_rating_html }}</td>
-    </tr>
-{% endfor %}
+<table class="fullsize sortable">
+    <thead>
+        <tr class="header_tr">
+            <th data-sort="string">Film</th>
+            <th data-sort="int">Év</th>
+            <th data-sort="float" data-sort-default="desc">Átlag</th>
+            <th data-sort="int" data-sort-default="desc">Szavazatszám</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for direction in directions %}
+        <tr class="{% cycle '' 'odd' %}">
+            <td>{{ direction.film|film_url_html }}</td>
+            <td class="center">{% if direction.film.year %}{{ direction.film.year }}{% endif %}</td>
+            <td class="center" data-sort-value="{{ direction.film|film_rating_sort_value }}">{{ direction.film|film_avg_rating_html }}</td>
+            <td class="center" data-sort-value="{{ direction.film.number_of_ratings }}">{{ direction.film|film_num_rating_html }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
 </table>
