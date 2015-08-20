@@ -1,7 +1,7 @@
 /* GENERAL LAYOUT */
 
 #toptopmenu {
-    position: fixed;
+    display: none;
     z-index: 10;
     top: 0;
     width: 100%;
@@ -34,15 +34,23 @@
     margin: 0 10px;
 }
 
+@media (min-width: 800px) {
+    #toptopmenu {
+        display: block;
+        position: fixed;
+    }
+}
+
+
 
 
 #leftmenu {
-    position: fixed;
-    left: 0; width: 160px;
-    top: 45px; bottom: 0;
-    z-index: 20;
+    position: absolute;
+    left: 0; width: 100px;
+    top: 0;
+    z-index: 5;
     box-sizing: border-box;
-    font-size: 12pt;
+    font-size: 9pt;
     overflow: hidden;
     border-right: solid rgba(109,106,92,0.5) 1px;
     padding: 10px 0 0 10px;
@@ -55,8 +63,29 @@
     line-height: 1.6;
     font-weight: bold;
 }
+#leftmenu ul.mobilemenu li {
+    font-weight: normal;
+}
 #leftmenu ul li ul.submenu li {
     font-weight: normal;
+}
+@media (min-width: 800px) {
+    #leftmenu {
+        position: fixed;
+        z-index: 20;
+        top: 45px; bottom: 0;
+        width: 160px;
+        font-size: 12pt;
+    }
+}
+
+
+
+
+@media (min-width: 800px) {
+    .mobilemenu {
+        display: none;
+    }
 }
 
 
@@ -70,24 +99,45 @@
     font-weight: bold;
     font-size: 15pt;
 }
+#mobilelogo a {
+    display: inline-block;
+    height: 36px;
+    background: url(/static/ktapp/images/logo_30x32.png) no-repeat 0 0;
+    margin-top: -8px;
+    padding-top: 4px;
+    padding-left: 35px;
+    font-weight: bold;
+    font-size: 15pt;
+}
 
 
 header {
-    margin-top: 55px;
-    margin-left: 160px;
+    margin-left: 100px;
     padding: 0 10px;
 }
+@media (min-width: 800px) {
+    header {
+        margin-top: 55px;
+        margin-left: 160px;
+    }
+}
+
 
 #main {
-    margin-left: 160px;
+    margin-left: 100px;
     padding: 0 10px;
+}
+@media (min-width: 800px) {
+    #main {
+        margin-left: 160px;
+    }
 }
 
 footer {
-    margin: 50px 0 20px 160px;
+    margin: 50px 0 20px 100px;
 }
 footer ul {
-    width: 60%;
+    width: 100%;
     margin: 0 auto;
     padding: 0;
     list-style: none;
@@ -97,6 +147,14 @@ footer ul li {
     text-align: center;
     width: 20%;
     float: left;
+}
+@media (min-width: 800px) {
+    footer {
+        margin: 50px 0 20px 160px;
+    }
+    #footer ul {
+        width: 60%;
+    }
 }
 
 .jumptarget_wrapper {
@@ -108,7 +166,12 @@ footer ul li {
 
 .centered_content {
     margin: 0 auto;
-    width: 70%;
+    width: 100%;
+}
+@media (min-width: 800px) {
+    .centered_content {
+        width: 70%;
+    }
 }
 
 .left_content {
@@ -119,23 +182,33 @@ footer ul li {
     float: right;
     width: 49%;
 }
-#film_title {
-    margin-left: 150px;
-    margin-right: 200px;
+@media (min-width: 800px) {
+    #film_title {
+        margin-left: 150px;
+        margin-right: 200px;
+    }
 }
 .film_block {
     background: rgb(249,244,218);
     margin-bottom: 20px;
     padding: 10px;
 }
-.film_block_content {
-    margin-left: 210px;
-}
 .film_block_picture {
-    float: left;
-    width: 200px;
-    margin-top: 5px;
+    display: none;
 }
+@media (min-width: 800px) {
+    .film_block_content {
+        margin-left: 210px;
+    }
+    .film_block_picture {
+        display: block;
+        float: left;
+        width: 200px;
+        margin-top: 5px;
+    }
+}
+
+
 #film_edit_form {
     background: rgb(218,211,184);
     width: 70%;
@@ -164,7 +237,12 @@ html {
 }
 body {
     font-family: verdana, sans-serif;
-    font-size: 12pt;
+    font-size: 9pt;
+}
+@media (min-width: 800px) {
+    body {
+        font-size: 12pt;
+    }
 }
 
 #toptopmenu {
@@ -191,18 +269,30 @@ footer ul {
 
 
 h1 {
-    font-size: 20pt;
+    font-size: 15pt;
     font-weight: bold;
 }
 h2 {
-    font-size: 16pt;
+    font-size: 13pt;
     font-weight: bold;
 }
 h3 {
-    font-size: 12pt;
+    font-size: 9pt;
     font-weight: bold;
     margin-bottom: 6px;
 }
+@media (min-width: 800px) {
+    h1 {
+        font-size: 20pt;
+    }
+    h2 {
+        font-size: 16pt;
+    }
+    h3 {
+        font-size: 12pt;
+    }
+}
+
 
 .title_comment {
     margin-top: -17px;
@@ -286,8 +376,18 @@ input.inactive_action {
 }
 
 .spoiler {
-    background: rgb(0,0,0);
-    color: rgb(0,0,0);
+    background: rgb(249,244,218);
+    color: rgb(249,244,218);
+    border: solid 1px rgb(0, 0, 0);
+    padding: 2px;
+}
+@media (min-width: 800px) {
+    .spoiler {
+        background: rgb(0,0,0);
+        color: rgb(0,0,0);
+        border: none;
+        padding: 0;
+    }
 }
 .comment_img {
     max-width: 500px;
@@ -416,7 +516,7 @@ ul.nobullet {
     float: left;
     margin: 0;
     padding: 3px 0;
-    font-size: 11pt;
+    font-size: 7pt;
     border-color: rgb(128,128,128);
     border-width: 1px;
     border-style: none none solid none;
@@ -425,13 +525,23 @@ ul.nobullet {
     border-style: solid solid none solid !important;
 }
 .tab_count {
-    font-size: 8pt;
+    font-size: 6pt;
     font-weight: normal;
 }
+@media (min-width: 800px) {
+    #tabs ul li {
+        font-size: 11pt;
+    }
+    .tab_count {
+        font-size: 8pt;
+    }
+}
 
-#film_centered {
-    margin: 0 auto;
-    width: 70%;
+@media (min-width: 800px) {
+    #film_centered {
+        margin: 0 auto;
+        width: 70%;
+    }
 }
 
 #film_main_left {
@@ -548,12 +658,6 @@ ul.nobullet {
 #film_header p {
     margin: 0;
 }
-#film_header h1 {
-    font-size: 16pt;
-}
-#film_header h2 {
-    font-size: 12pt;
-}
 #film_header h3 {
     font-weight: normal;
     font-style: italic;
@@ -564,28 +668,55 @@ ul.nobullet {
     min-height: 90px;
 }
 
+@media (min-width: 800px) {
+    #film_header h1 {
+        font-size: 16pt;
+    }
+    #film_header h2 {
+        font-size: 12pt;
+    }
+}
+
 .sequels {
     font-size: 10pt;
 }
 
 #film_rating {
-    position: absolute;
-    left: 50px; top: 10px;
-    padding: 8px 16px;
+    float: left;
+    padding: 4px 8px;
     background: rgb(249,244,218);
     border-radius: 12px;
+    margin-right: 20px;
 }
 #film_rating_num {
-    font-size: 8pt;
+    font-size: 7pt;
 }
 #film_rating_avg {
     margin-top: 5px;
-    font-size: 16pt;
+    font-size: 13pt;
     font-weight: bold;
 }
-#film_misc_info {
-    position: absolute;
-    right: 0; top: 0px;
+@media (min-width: 800px) {
+    #film_rating {
+        float: none;
+        position: absolute;
+        left: 50px; top: 10px;
+        padding: 8px 16px;
+        margin-right: 0;
+    }
+    #film_rating_num {
+        font-size: 8pt;
+    }
+    #film_rating_avg {
+        font-size: 16pt;
+    }
+}
+
+@media (min-width: 800px) {
+    #film_misc_info {
+        position: absolute;
+        right: 0; top: 0px;
+    }
 }
 #film_misc_info ul {
     list-style: none;
@@ -704,7 +835,12 @@ ul.nobullet {
 
 
 .search_input {
-    width: 300px;
+    width: 80px;
+}
+@media (min-width: 800px) {
+    .search_input {
+        width: 300px;
+    }
 }
 
 #search_results {

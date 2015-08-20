@@ -4,9 +4,10 @@
         <meta charset="utf-8">
         <title>{% block title %}{% endblock %}</title>
 {% load staticfiles %}
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=4" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=5" />
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <base href="/" />
         <script>
@@ -62,6 +63,29 @@
         </nav>
 
         <nav id="leftmenu">
+            <ul class="mobilemenu">
+                <li id="mobilelogo"><a href="{% url 'index' %}">KT</a></li>
+                {% if user.is_authenticated %}
+                    <li><b><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></b></li>
+                    <li><a href="{% url 'messages' %}">Üzenetek{% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %} <span class="new_message_warning">új</span>{% endif %}</a></li>
+                {% else %}
+                    <li id="login_menu"><form action="{% url 'login' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+                        <input type="text" name="username" value="" id="login_username" placeholder="név vagy email" tabindex="2" />
+                        <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
+                        <span class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></span>
+                        <input type="submit" value="Bejelentkezés" class="small_button" tabindex="4" />
+                    </form> <a href="{% url 'reset_password' '' %}" style="font-size: 7pt">Mi a jelszavam?</a></li>
+                    <li><a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">Regisztráció</a></li>
+                {% endif %}
+                <li>
+                    <form class="inline" action="{% url 'search' %}" method="get">
+                        <input type="text" placeholder="Keresés..." tabindex="1" name="q" class="search_input" />
+                        <input type="submit" value="Keresés" class="small_button" />
+                    </form>
+                </li>
+            </ul>
             <ul>
                 <li>Filmek<br />
                     <ul class="submenu">

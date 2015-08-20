@@ -72,6 +72,13 @@
 
         {% if selected_user.id == user.id and user.validated_email %}
             <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
+            <div class="mobilemenu">
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+                    <p><input type="submit" value="Kijelentkezés" class="small_button" /></p>
+                </form>
+            </div>
         {% endif %}
 
         <h2>Legutóbbi szavazat{% if selected_user.id == user.id %}aid{% else %}ok{% endif %}</h2>
