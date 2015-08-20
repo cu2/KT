@@ -1,4 +1,32 @@
 $(function() {
+    $('.insert_bbcode').click(function() {
+        var target_textarea = $('.insert_bbcode_b').closest('.form_container').find('textarea');
+        var selected_text = target_textarea.getSelection().text;
+        if ($(this).hasClass('insert_bbcode_b')) {
+            target_textarea.replaceSelectedText('[b]' + selected_text + '[/b]');
+        }
+        if ($(this).hasClass('insert_bbcode_i')) {
+            target_textarea.replaceSelectedText('[i]' + selected_text + '[/i]');
+        }
+        if ($(this).hasClass('insert_bbcode_u')) {
+            target_textarea.replaceSelectedText('[u]' + selected_text + '[/u]');
+        }
+        if ($(this).hasClass('insert_bbcode_del')) {
+            target_textarea.replaceSelectedText('[del]' + selected_text + '[/del]');
+        }
+        if ($(this).hasClass('insert_bbcode_img')) {
+            target_textarea.replaceSelectedText('[img]' + selected_text + '[/img]');
+        }
+        if ($(this).hasClass('insert_bbcode_link')) {
+            target_textarea.replaceSelectedText('[link=]' + selected_text + '[/link]');
+        }
+        if ($(this).hasClass('insert_bbcode_spoiler')) {
+            target_textarea.replaceSelectedText('[spoiler]' + selected_text + '[/spoiler]');
+        }
+    });
+    $('.show_bbcode_help_button').click(function () {
+        $('.bbcode_help').toggle();
+    });
     $('#show_rating_details_button').click(function () {
         $('.rating_details').toggle();
     });

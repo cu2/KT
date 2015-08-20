@@ -375,6 +375,12 @@ input.inactive_action {
     border: solid 1px rgb(0,0,0);
 }
 
+.underlined {
+    text-decoration: underline;
+}
+.deleted {
+    text-decoration: line-through;
+}
 .spoiler {
     background: rgb(249,244,218);
     color: rgb(249,244,218);
