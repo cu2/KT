@@ -9,19 +9,13 @@
             {% elif comment.domain == 'P' %}
                 {{ comment.poll }}
             {% endif %}</span>
-            <span class="comment_block_author_right"><a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}</span>
+            <span class="comment_block_author_right"><a href="{% if comment.domain == 'F' %}{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'T' %}{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}{% endif %}">&larr;</a>&nbsp; <a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}</span>
         {% else %}
             {{ comment.created_at|date:"Y-m-d H:i:s" }} <a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}
-            <span class="comment_block_author_right">#{{ comment.serial_number }}</span>
+            <span class="comment_block_author_right"><a href="{% if comment.domain == 'F' %}{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'T' %}{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}{% endif %}">&larr;</a>&nbsp; #{{ comment.serial_number }}</span>
         {% endif %}
     </div>
-    <div class="comment_block_content hover_show_button_context">
-        {% if comment.domain == 'F' %}
-            <a href="{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}" class="comment_button_reply hover_show_button button small_button">Válasz erre a kommentre</a>
-        {% elif comment.domain == 'T' %}
-            <a href="{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}" class="comment_button_reply hover_show_button button small_button">Válasz erre a kommentre</a>
-        {% elif comment.domain == 'P' %}
-        {% endif %}
+    <div class="comment_block_content">
         {% autoescape off %}
             <p>{{ comment.content_html|linebreaksbr }}</p>
         {% endautoescape %}
