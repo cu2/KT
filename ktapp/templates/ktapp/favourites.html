@@ -1,0 +1,53 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kedvenceid - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Kedvenceid</h1>
+{% endblock %}
+
+{% block main %}
+
+    {% if favourites %}
+        <p>Kedvenceid: {% for fav in favourites %}<a href="">{{ fav.username }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+    {% endif %}
+
+    <div class="left_content">
+
+        {% if latest_votes %}
+            <h2>Legutóbbi szavazataik</h2>
+            <table class="fullsize">
+                <tr class="header_tr">
+                    <th>Mikor</th>
+                    <th>Ki</th>
+                    <th>Film</th>
+                    <th>Szavazat</th>
+                    <th>Átlag</th>
+                </tr>
+                {% for vote in latest_votes %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td class="center">{{ vote.when|date:"m-d" }}</td>
+                        <td><a href="{% url 'user_profile' vote.user.id vote.user.slug_cache %}">{{ vote.user.username }}</a></td>
+                        <td>{{ vote.film|film_url_html }}</td>
+                        <td class="center">{{ vote.rating }}</td>
+                        <td class="center">{{ vote.film|film_rating_html }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+
+    </div>
+    <div class="right_content">
+
+        {% if latest_comments %}
+            <h2>Legutóbbi kommentjeik</h2>
+            {% for c in latest_comments %}
+                {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
+            {% endfor %}
+        {% endif %}
+
+    </div>
+    <br class="clear" />
+
+{% endblock %}

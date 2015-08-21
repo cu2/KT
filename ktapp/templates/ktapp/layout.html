@@ -9,7 +9,7 @@
 {% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=8" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=9" />
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <base href="/" />
         <script>
@@ -110,21 +110,16 @@
                 <li>Közösség<br />
                     <ul class="submenu">
                         <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
-                        <li><a href="{% url 'latest_comments' %}">Beszólások</a></li>
-                    </ul>
-                </li>
-                <li>Ajánlók<br />
-                    <ul class="submenu">
-                        <li>Kedvenceid</li>
-                        <li>Emberi</li>
-                        <li>Gépi</li>
+                        <li><a href="{% url 'latest_comments' %}">Kommentek</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
+                        {% endif %}
                     </ul>
                 </li>
                 <li>Közkérdések<br />
                     <ul class="submenu">
-                        <li>Leendő</li>
-                        <li>Aktív</li>
-                        <li>Lefutott</li>
+                        <li>Aktuális</li>
+                        <li>Régi</li>
                     </ul>
                 </li>
                 {% if user.is_authenticated and user.core_member %}
@@ -148,8 +143,8 @@
         <footer>
             <ul class="clearfix">
                 <li>Impresszum</li>
+                <li><a href="https://www.facebook.com/kritikustomeg">Facebook</a></li>
                 <li>Rulez</li>
-                <li>Facebook</li>
                 <li>Kassza</li>
                 <li>Üzenet a szerk-nek</li>
             </ul>

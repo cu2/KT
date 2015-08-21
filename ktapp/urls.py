@@ -83,6 +83,7 @@ urlpatterns += patterns(
     url(r'^forum/$', web_views.list_of_topics, name='list_of_topics'),
     url(r'^uj_topik$', web_views.new_topic, name='new_topic'),
     url(r'^legfrissebb_kommentek/$', web_views.latest_comments, name='latest_comments'),
+    url(r'^kedvencek/$', web_views.favourites, name='favourites'),
 
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', web_views.user_films, name='user_films'),
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', web_views.user_comments, name='user_comments'),

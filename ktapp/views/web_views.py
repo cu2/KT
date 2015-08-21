@@ -1469,6 +1469,20 @@ def new_topic(request):
     return HttpResponseRedirect(reverse("list_of_topics"))
 
 
+@login_required
+def favourites(request):
+    favourites = []
+    favourite_ids = []
+    for fav in request.user.get_follows().order_by('username', 'id'):
+        favourites.append(fav)
+        favourite_ids.append(fav.id)
+    return render(request, 'ktapp/favourites.html', {
+        'favourites': favourites,
+        'latest_votes': models.Vote.objects.filter(user__in=favourite_ids).select_related('user', 'film').order_by('-when', '-id')[:50],
+        'latest_comments': models.Comment.objects.filter(created_by__in=favourite_ids).select_related('film', 'topic', 'created_by', 'reply_to', 'reply_to__created_by').all()[:20],
+    })
+
+
 def registration(request):
 
     def is_valid_email(email):

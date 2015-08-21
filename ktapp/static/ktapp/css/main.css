@@ -137,7 +137,6 @@ footer {
     margin: 50px 0 20px 100px;
 }
 footer ul {
-    width: 100%;
     margin: 0 auto;
     padding: 0;
     list-style: none;
@@ -152,7 +151,7 @@ footer ul li {
     footer {
         margin: 50px 0 20px 160px;
     }
-    #footer ul {
+    footer ul {
         width: 60%;
     }
 }
