@@ -8,13 +8,13 @@ from django.core.exceptions import PermissionDenied
 
 
 def bbcode_to_html(value):
-    value = re.sub('\[link=([^\]]*)\](.*)\[/link\]', '<a href="\\1">\\2</a>', value)
-    value = re.sub('\[b\](.*)\[/b\]', '<b>\\1</b>', value)
-    value = re.sub('\[i\](.*)\[/i\]', '<i>\\1</i>', value)
-    value = re.sub('\[u\](.*)\[/u\]', '<span class="underlined">\\1</span>', value)
-    value = re.sub('\[del\](.*)\[/del\]', '<span class="deleted">\\1</span>', value)
-    value = re.sub('\[spoiler\](.*)\[/spoiler\]', '<span class="spoiler">\\1</span>', value)
-    value = re.sub('\[img\]([^\]]*)\[/img\]', '<img src="\\1" class="comment_img" />', value)
+    value = re.sub('\[link=([^\]]*)\](.*?)\[/link\]', '<a href="\\1">\\2</a>', value, flags=re.S)
+    value = re.sub('\[b\](.*?)\[/b\]', '<b>\\1</b>', value, flags=re.S)
+    value = re.sub('\[i\](.*?)\[/i\]', '<i>\\1</i>', value, flags=re.S)
+    value = re.sub('\[u\](.*?)\[/u\]', '<span class="underlined">\\1</span>', value, flags=re.S)
+    value = re.sub('\[del\](.*?)\[/del\]', '<span class="deleted">\\1</span>', value, flags=re.S)
+    value = re.sub('\[spoiler\](.*?)\[/spoiler\]', '<span class="spoiler">\\1</span>', value, flags=re.S)
+    value = re.sub('\[img\]([^\]]*?)\[/img\]', '<img src="\\1" class="comment_img" />', value, flags=re.S)
     return value
 
 
