@@ -3,8 +3,10 @@
     <head>
         <meta charset="utf-8">
         <title>{% block title %}{% endblock %}</title>
-{% load staticfiles %}
+
+        <meta name="description" content="{% block meta_description %}{% endblock %}" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
+{% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=8" />
