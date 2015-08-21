@@ -58,7 +58,7 @@ def index(request):
         'film': film_of_the_day,
         'toplist': toplist_of_the_day,
         'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
-        'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to').filter(id__in=buzz_comment_ids),
+        'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids),
     })
 
 
@@ -399,12 +399,13 @@ def film_comments(request, id, film_slug):
         p = 1
     if p > max_pages:
         return HttpResponseRedirect(reverse('film_comments', args=(film.id, film.slug_cache)) + '?p=' + str(max_pages))
+    comments_qs = film.comment_set.select_related('created_by', 'reply_to', 'reply_to__created_by')
     if max_pages > 1:
         first_comment = film.number_of_comments - COMMENTS_PER_PAGE * (p - 1) - (COMMENTS_PER_PAGE - 1)
         last_comment = film.number_of_comments - COMMENTS_PER_PAGE * (p - 1)
-        comments = film.comment_set.filter(serial_number__lte=last_comment, serial_number__gte=first_comment)
+        comments = comments_qs.filter(serial_number__lte=last_comment, serial_number__gte=first_comment)
     else:
-        comments = film.comment_set.all()
+        comments = comments_qs.all()
     try:
         reply_to_comment = models.Comment.objects.get(id=request.GET.get('valasz'))
         reply_to_id = reply_to_comment.id
@@ -1388,12 +1389,13 @@ def forum(request, id, title_slug):
         p = 1
     if p > max_pages:
         return HttpResponseRedirect(reverse('forum', args=(topic.id, topic.slug_cache)) + '?p=' + str(max_pages))
+    comments_qs = topic.comment_set.select_related('created_by', 'reply_to', 'reply_to__created_by')
     if max_pages > 1:
         first_comment = topic.number_of_comments - COMMENTS_PER_PAGE * (p - 1) - (COMMENTS_PER_PAGE - 1)
         last_comment = topic.number_of_comments - COMMENTS_PER_PAGE * (p - 1)
-        comments = topic.comment_set.filter(serial_number__lte=last_comment, serial_number__gte=first_comment)
+        comments = comments_qs.filter(serial_number__lte=last_comment, serial_number__gte=first_comment)
     else:
-        comments = topic.comment_set.all()
+        comments = comments_qs.all()
     try:
         reply_to_comment = models.Comment.objects.get(id=request.GET.get('valasz'))
         reply_to_id = reply_to_comment.id
@@ -1424,7 +1426,7 @@ def forum(request, id, title_slug):
 
 def latest_comments(request):
     return render(request, 'ktapp/latest_comments.html', {
-        'comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to').all()[:100],
+        'comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to', 'reply_to__created_by').all()[:100],
     })
 
 
@@ -1570,8 +1572,8 @@ def user_profile(request, id, name_slug):
         'number_of_vapiti_votes': number_of_vapiti_votes,
         'vapiti_weight': number_of_votes + 25 * number_of_vapiti_votes,
         'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
-        'latest_votes': selected_user.votes().order_by('-when', '-id')[:10],
-        'latest_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to').filter(created_by=selected_user)[:10],
+        'latest_votes': selected_user.votes().select_related('film').order_by('-when', '-id')[:10],
+        'latest_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to', 'reply_to__created_at').filter(created_by=selected_user)[:10],
     })
 
 
@@ -1740,7 +1742,7 @@ def user_comments(request, id, name_slug):
         'number_of_wishes': selected_user.wishlist_set.count(),
         'number_of_messages': number_of_messages,
         'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
-        'comments': selected_user.comment_set.select_related('film', 'topic', 'reply_to').all().order_by('-created_at')[(p-1) * COMMENTS_PER_PAGE:p * COMMENTS_PER_PAGE],
+        'comments': selected_user.comment_set.select_related('film', 'topic', 'reply_to', 'reply_to__created_by').all().order_by('-created_at')[(p-1) * COMMENTS_PER_PAGE:p * COMMENTS_PER_PAGE],
         'p': p,
         'max_pages': max_pages,
     })
