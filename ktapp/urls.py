@@ -70,6 +70,8 @@ urlpatterns += patterns(
 
     url(r'^valtozasok/$', web_views.changes, name='changes'),
 
+    url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)/kepek/$', web_views.artist_pictures, name='artist_pictures'),
+    url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)/kepek/(?P<picture_id>\d+)$', web_views.artist_picture, name='artist_picture'),
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.artist_main, name='artist'),
     url(r'^szereplo/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.role, name='role'),
     url(r'^uj_szereplo$', web_views.new_role, name='new_role'),

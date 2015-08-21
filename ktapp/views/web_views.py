@@ -1316,6 +1316,10 @@ def edit_keywords(request):
 
 def artist_main(request, id, name_slug):
     artist = get_object_or_404(models.Artist, pk=id)
+    try:
+        random_picture = artist.picture_set.all().order_by('?')[0]
+    except IndexError:
+        random_picture = None
     if request.POST:
         if kt_utils.check_permission('edit_artist', request.user):
             artist_name = kt_utils.strip_whitespace(request.POST.get('artist_name', ''))
@@ -1359,6 +1363,7 @@ def artist_main(request, id, name_slug):
         similar_artists = set(similar_artists)
     return render(request, 'ktapp/artist.html', {
         'artist': artist,
+        'random_picture': random_picture,
         'directions': directions,
         'roles': roles,
         'director_vote_count': director_vote_count,
@@ -1373,6 +1378,35 @@ def artist_main(request, id, name_slug):
         'permission_merge_artist': kt_utils.check_permission('merge_artist', request.user),
         'permission_approve_bio': kt_utils.check_permission('approve_bio', request.user),
     })
+
+
+def artist_pictures(request, id, name_slug):
+    artist = get_object_or_404(models.Artist, pk=id)
+    pictures = sorted(artist.picture_set.all(), key=lambda pic: (-pic.film.year, pic.film.orig_title, pic.id))
+    context = {
+        'artist': artist,
+        'pictures': pictures,
+    }
+    if len(pictures) == 1:
+        picture = pictures[0]
+        next_picture = _get_next_picture(pictures, picture)
+        context.update(_get_selected_picture_details(picture.film, picture, next_picture))
+        context.update({'film': picture.film})
+    return render(request, 'ktapp/artist_pictures.html', context)
+
+
+def artist_picture(request, id, name_slug, picture_id):
+    artist = get_object_or_404(models.Artist, pk=id)
+    picture = get_object_or_404(models.Picture, pk=picture_id)
+    pictures = sorted(artist.picture_set.all(), key=lambda pic: (-pic.film.year, pic.film.orig_title, pic.id))
+    next_picture = _get_next_picture(pictures, picture)
+    context = {
+        'artist': artist,
+        'film': picture.film,
+        'pictures': pictures,
+    }
+    context.update(_get_selected_picture_details(picture.film, picture, next_picture))
+    return render(request, 'ktapp/artist_pictures.html', context)
 
 
 @login_required

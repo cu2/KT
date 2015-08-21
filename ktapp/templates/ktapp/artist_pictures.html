@@ -1,0 +1,27 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}{{ artist.name }} - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>{{ artist.name }}</h1>
+{% endblock %}
+
+{% block main %}
+    <div class="centered_content">
+        {% if picture %}
+            <p class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
+                <a href="{% url 'artist_picture' artist.id artist.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_urls.max }}" style="width: {{ picture.get_widths.max }}px; height: {{ picture.get_heights.max }}px" class="picture" /></a>
+                <a name="pix" class="jumptarget"></a>
+                <br />
+                {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} <a href="{% url 'film_pictures' film.id film.slug_cache %}">{{ film.orig_title }}</a>{% if film.year %} ({{ film.year }}){% endif %} című filmben
+                {% if picture.source_url %}
+                    <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
+                {% endif %}
+            </p>
+        {% endif %}
+        {% for picture in pictures %}
+            <a href="{% url 'artist_picture' artist.id artist.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="thumbnail" /></a>
+        {% endfor %}
+    </div>
+
+{% endblock %}
