@@ -844,15 +844,25 @@ def new_film(request):
                     continue
                 if type_code not in {'M', 'O'}:
                     spoiler = False
-                keyword, created = models.Keyword.objects.get_or_create(
-                    name=keyword_name,
-                    keyword_type=type_code,
-                )
-                if created:
-                    keyword.created_by = request.user
-                    keyword.save()
-                new_keywords.add(keyword.id)
-                new_keyword_spoiler[keyword.id] = spoiler
+                if request.user.is_staff:
+                    keyword, created = models.Keyword.objects.get_or_create(
+                        name=keyword_name,
+                        keyword_type=type_code,
+                    )
+                    if created:
+                        keyword.created_by = request.user
+                        keyword.save()
+                else:
+                    try:
+                        keyword = models.Keyword.objects.get(
+                            name=keyword_name,
+                            keyword_type=type_code,
+                        )
+                    except models.Keyword.DoesNotExist:
+                        keyword = None
+                if keyword:
+                    new_keywords.add(keyword.id)
+                    new_keyword_spoiler[keyword.id] = spoiler
             for keyword_id in new_keywords:
                 models.FilmKeywordRelationship.objects.create(
                     film=film,
@@ -1150,15 +1160,25 @@ def edit_keywords(request):
                     continue
                 if type_code not in {'M', 'O'}:
                     spoiler = False
-                keyword, created = models.Keyword.objects.get_or_create(
-                    name=keyword_name,
-                    keyword_type=type_code,
-                )
-                if created:
-                    keyword.created_by = request.user
-                    keyword.save()
-                new_keywords.add(keyword.id)
-                new_keyword_spoiler[keyword.id] = spoiler
+                if type_code in {'C', 'G'} and not request.user.is_staff:
+                    try:
+                        keyword = models.Keyword.objects.get(
+                            name=keyword_name,
+                            keyword_type=type_code,
+                        )
+                    except models.Keyword.DoesNotExist:
+                        keyword = None
+                else:
+                    keyword, created = models.Keyword.objects.get_or_create(
+                        name=keyword_name,
+                        keyword_type=type_code,
+                    )
+                    if created:
+                        keyword.created_by = request.user
+                        keyword.save()
+                if keyword:
+                    new_keywords.add(keyword.id)
+                    new_keyword_spoiler[keyword.id] = spoiler
             for keyword_id in old_keywords - new_keywords:
                 models.FilmKeywordRelationship.objects.filter(film=film, keyword__id=keyword_id).delete()
             for keyword_id in new_keywords - old_keywords:
