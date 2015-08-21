@@ -1,20 +1,11 @@
-{% extends "ktapp/layout.html" %}
+{% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
 {% load kt_extras %}
 
-{% block title %}Kritikus Tömeg{% endblock %}
-
-{% block header %}
-    {% if selected_user.id == user.id %}
-        <h1>Kívánságaid</h1>
-    {% else %}
-        <h1>{{ selected_user.username }} kívánságlistája</h1>
-    {% endif %}
-{% endblock %}
-
-{% block main %}
+{% block user_profile_main %}
 
     <div class="centered_content">
 
+    {% if wishlist_yes %}
         <h2>Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} nézni</h2>
         <table class="fullsize sortable">
             <thead>
@@ -36,7 +27,9 @@
             {% endfor %}
             </tbody>
         </table>
+    {% endif %}
 
+    {% if wishlist_get %}
         <h2>Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} szerezni</h2>
         <table class="fullsize sortable">
             <thead>
@@ -58,6 +51,7 @@
             {% endfor %}
             </tbody>
         </table>
+    {% endif %}
 
     </div>
 

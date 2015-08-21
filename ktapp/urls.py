@@ -84,7 +84,9 @@ urlpatterns += patterns(
     url(r'^legfrissebb_kommentek/$', web_views.latest_comments, name='latest_comments'),
 
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', web_views.user_films, name='user_films'),
-    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', web_views.wishlist, name='wishlist'),
+    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', web_views.user_comments, name='user_comments'),
+    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', web_views.user_wishlist, name='user_wishlist'),
+    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', web_views.user_messages, name='user_messages'),
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.user_profile, name='user_profile'),
     url(r'^jelszo_modositasa$', web_views.change_password, name='change_password'),
     url(r'^bejelentkezes$', web_views.custom_login, name='login'),

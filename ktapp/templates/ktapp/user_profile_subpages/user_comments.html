@@ -1,0 +1,58 @@
+{% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
+{% load kt_extras %}
+
+{% block user_profile_main %}
+
+    <div class="centered_content">
+
+        {% if max_pages >= 2 %}
+            <ul class="paging">
+                <li>{% if p == 1 %}<b>1</b>{% else %}<a href="{% url 'user_comments' selected_user.id selected_user.slug_cache %}">1</a>{% endif %}</li>
+                {% if p >= 4 %}
+                    <li class="paging_ellipsis">...</li>
+                {% endif %}
+                {% if p >= 3 %}
+                    <li><a href="{% url 'user_comments' selected_user.id selected_user.slug_cache %}?p={{ p|add:"-1" }}">{{ p|add:"-1" }}</a></li>
+                {% endif %}
+                {% if 2 <= p and p <= max_pages|add:"-1" %}
+                    <li><b>{{ p }}</b></li>
+                {% endif %}
+                {% if p <= max_pages|add:"-2" %}
+                    <li><a href="{% url 'user_comments' selected_user.id selected_user.slug_cache %}?p={{ p|add:"1" }}">{{ p|add:"1" }}</a></li>
+                {% endif %}
+                {% if p <= max_pages|add:"-3" %}
+                    <li class="paging_ellipsis">...</li>
+                {% endif %}
+                <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'user_comments' selected_user.id selected_user.slug_cache %}?p={{ max_pages }}">{{ max_pages }}</a>{% endif %}</li>
+            </ul>
+        {% endif %}
+
+        {% for c in comments %}
+            {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
+        {% endfor %}
+
+        {% if max_pages >= 2 %}
+            <ul class="paging">
+                <li>{% if p == 1 %}<b>1</b>{% else %}<a href="{% url 'user_comments' selected_user.id selected_user.slug_cache %}">1</a>{% endif %}</li>
+                {% if p >= 4 %}
+                    <li class="paging_ellipsis">...</li>
+                {% endif %}
+                {% if p >= 3 %}
+                    <li><a href="{% url 'user_comments' selected_user.id selected_user.slug_cache %}?p={{ p|add:"-1" }}">{{ p|add:"-1" }}</a></li>
+                {% endif %}
+                {% if 2 <= p and p <= max_pages|add:"-1" %}
+                    <li><b>{{ p }}</b></li>
+                {% endif %}
+                {% if p <= max_pages|add:"-2" %}
+                    <li><a href="{% url 'user_comments' selected_user.id selected_user.slug_cache %}?p={{ p|add:"1" }}">{{ p|add:"1" }}</a></li>
+                {% endif %}
+                {% if p <= max_pages|add:"-3" %}
+                    <li class="paging_ellipsis">...</li>
+                {% endif %}
+                <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'user_comments' selected_user.id selected_user.slug_cache %}?p={{ max_pages }}">{{ max_pages }}</a>{% endif %}</li>
+            </ul>
+        {% endif %}
+
+    </div>
+
+{% endblock %}

@@ -1,17 +1,7 @@
-{% extends "ktapp/layout.html" %}
+{% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
 {% load kt_extras %}
 
-{% block title %}Kritikus Tömeg{% endblock %}
-
-{% block header %}
-    {% if selected_user.id == user.id %}
-        <h1>Filmek, amiket láttál</h1>
-    {% else %}
-        <h1>Filmek, amiket {{ selected_user.username }} látott</h1>
-    {% endif %}
-{% endblock %}
-
-{% block main %}
+{% block user_profile_main %}
 
     <form action="{% url 'user_films' selected_user.id selected_user.slug_cache %}" method="get">
         <p>Cím: <input type="text" tabindex="12" name="title" value="{{ querystring.title }}" class="search_input" /></p>

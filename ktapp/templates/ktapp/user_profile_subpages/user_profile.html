@@ -1,11 +1,7 @@
-{% extends "ktapp/layout.html" %}
+{% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
 {% load kt_extras %}
 
-{% block title %}{{ selected_user.username }} - Kritikus Tömeg{% endblock %}
-
-{% block header %}<h1>{{ selected_user.username }}</h1>{% endblock %}
-
-{% block main %}
+{% block user_profile_main %}
 
     <div class="left_content">
 
@@ -63,11 +59,6 @@
                 {% else %}<i>nem publikus</i>{% endif %}<br />
                 Regisztráció: {{ selected_user.date_joined|date:"Y. F j." }} ({{ selected_user.date_joined|timesince }})
             </p>
-            {% if user.validated_email %}
-                <p><a href="{% url 'messages' %}?u={{ selected_user.id }}">Üzeneteid vele</a></p>
-                <p><a href="{% url 'new_message' %}?u={{ selected_user.id }}">Üzenet küldése neki</a></p>
-            {% endif %}
-            <p><a href="{% url 'wishlist' selected_user.id selected_user.slug_cache %}">Kívánságai</a></p>
         {% endif %}
 
         {% if selected_user.id == user.id and user.validated_email %}
@@ -82,7 +73,6 @@
         {% endif %}
 
         <h2>Legutóbbi szavazat{% if selected_user.id == user.id %}aid{% else %}ok{% endif %}</h2>
-        <p><a href="{% url 'user_films' selected_user.id selected_user.slug_cache %}">Összes {% if selected_user.id == user.id %}filmed{% else %}filmje{% endif %}</a></p>
         <table>
             <tr class="header_tr">
                 <th>Film</th>

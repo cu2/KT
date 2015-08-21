@@ -3,19 +3,37 @@
 
 {% block title %}Kritikus Tömeg{% endblock %}
 
-{% block header %}<h1>Privát üzenetek{% if other_user %} vele: {{ other_user.username }}{% endif %}</h1>{% endblock %}
+{% block header %}<h1>Privát üzeneteid</h1>{% endblock %}
 
 {% block main %}
 
     {% if user.validated_email %}
-        {% if other_user %}
-            <p><a href="{% url 'new_message' %}?u={{ other_user.id }}">Új üzenet küldése</a></p>
-        {% else %}
-            <p><a href="{% url 'new_message' %}">Új üzenet küldése</a></p>
-            {% if user.is_staff %}
-                <p><a href="{% url 'new_message' %}?u={{ staff_ids }}">Szerkesztőségi üzenet küldése</a></p>
-            {% endif %}
+        <p><a href="{% url 'new_message' %}">Új üzenet küldése</a></p>
+        {% if user.is_staff %}
+            <p><a href="{% url 'new_message' %}?u={{ staff_ids }}">Szerkesztőségi üzenet küldése</a></p>
         {% endif %}
+    {% endif %}
+
+    {% if max_pages >= 2 %}
+        <ul class="paging">
+            <li>{% if p == 1 %}<b>1</b>{% else %}<a href="{% url 'messages' %}">1</a>{% endif %}</li>
+            {% if p >= 4 %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            {% if p >= 3 %}
+                <li><a href="{% url 'messages' %}?p={{ p|add:"-1" }}">{{ p|add:"-1" }}</a></li>
+            {% endif %}
+            {% if 2 <= p and p <= max_pages|add:"-1" %}
+                <li><b>{{ p }}</b></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-2" %}
+                <li><a href="{% url 'messages' %}?p={{ p|add:"1" }}">{{ p|add:"1" }}</a></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-3" %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'messages' %}?p={{ max_pages }}">{{ max_pages }}</a>{% endif %}</li>
+        </ul>
     {% endif %}
 
     {% for message in messages %}
@@ -24,23 +42,23 @@
 
     {% if max_pages >= 2 %}
         <ul class="paging">
-            <li>{% if p == 1 %}<b>1</b>{% else %}<a href="{% url 'messages' %}{% if other_user %}?u={{ other_user.id }}{% endif %}">1</a>{% endif %}</li>
+            <li>{% if p == 1 %}<b>1</b>{% else %}<a href="{% url 'messages' %}">1</a>{% endif %}</li>
             {% if p >= 4 %}
                 <li class="paging_ellipsis">...</li>
             {% endif %}
             {% if p >= 3 %}
-                <li><a href="{% url 'messages' %}?p={{ p|add:"-1" }}{% if other_user %}&u={{ other_user.id }}{% endif %}">{{ p|add:"-1" }}</a></li>
+                <li><a href="{% url 'messages' %}?p={{ p|add:"-1" }}">{{ p|add:"-1" }}</a></li>
             {% endif %}
             {% if 2 <= p and p <= max_pages|add:"-1" %}
                 <li><b>{{ p }}</b></li>
             {% endif %}
             {% if p <= max_pages|add:"-2" %}
-                <li><a href="{% url 'messages' %}?p={{ p|add:"1" }}{% if other_user %}&u={{ other_user.id }}{% endif %}">{{ p|add:"1" }}</a></li>
+                <li><a href="{% url 'messages' %}?p={{ p|add:"1" }}">{{ p|add:"1" }}</a></li>
             {% endif %}
             {% if p <= max_pages|add:"-3" %}
                 <li class="paging_ellipsis">...</li>
             {% endif %}
-            <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'messages' %}?p={{ max_pages }}{% if other_user %}&u={{ other_user.id }}{% endif %}">{{ max_pages }}</a>{% endif %}</li>
+            <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'messages' %}?p={{ max_pages }}">{{ max_pages }}</a>{% endif %}</li>
         </ul>
     {% endif %}
 
