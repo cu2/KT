@@ -79,7 +79,7 @@ def premiers(request):
         premier_list[-1][1].append(film)
     return render(request, 'ktapp/premiers.html', {
         'premier_list': premier_list,
-        'premier_list_full': models.Film.objects.filter(main_premier__gte='%s-01-01' % this_year, main_premier__lte='%s-12-31' % this_year).order_by('main_premier', 'orig_title', 'id'),
+        'premier_list_full': models.Film.objects.filter(main_premier_year=this_year).order_by('main_premier', 'orig_title', 'id'),
     })
 
 
@@ -814,11 +814,11 @@ def new_film(request):
         if kt_utils.check_permission('edit_premiers', request.user):
             main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
             if len(main_premier) == 4 and main_premier.isdigit():
-                film.main_premier_year = main_premier
                 film.main_premier = None
+                film.main_premier_year = int(main_premier)
             elif len(main_premier) == 10 and kt_utils.is_date(main_premier):
                 film.main_premier = main_premier
-                film.main_premier_year = None
+                film.main_premier_year = int(main_premier[:4])
 
         directors = set()
         for director_name in kt_utils.strip_whitespace(request.POST.get('film_directors', '')).split(','):
@@ -1043,12 +1043,12 @@ def edit_premiers(request):
         }
         main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
         if len(main_premier) == 4 and main_premier.isdigit():
-            film.main_premier_year = main_premier
             film.main_premier = None
+            film.main_premier_year = main_premier
             film.save()
         elif len(main_premier) == 10 and kt_utils.is_date(main_premier):
             film.main_premier = main_premier
-            film.main_premier_year = None
+            film.main_premier_year = int(main_premier[:4])
             film.save()
         elif main_premier == '':
             film.main_premier = None
@@ -1587,7 +1587,7 @@ def user_profile(request, id, name_slug):
         number_of_messages = 0
     this_year = datetime.date.today().year
     number_of_votes = selected_user.vote_set.count()
-    number_of_vapiti_votes = selected_user.vote_set.filter(film__main_premier__gte='%s-01-01' % this_year, film__main_premier__lte='%s-12-31' % this_year).count()
+    number_of_vapiti_votes = selected_user.vote_set.filter(film__main_premier_year=this_year).count()
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,
