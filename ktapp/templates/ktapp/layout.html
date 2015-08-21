@@ -111,9 +111,6 @@
                     <ul class="submenu">
                         <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
                         <li><a href="{% url 'latest_comments' %}">Kommentek</a></li>
-                        {% if user.is_authenticated %}
-                            <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
-                        {% endif %}
                     </ul>
                 </li>
                 <li>Közkérdések<br />
