@@ -335,6 +335,12 @@ def search(request):
     })
 
 
+def top_films(request):
+    return render(request, 'ktapp/top_films.html', {
+        'films': models.Film.objects.filter(number_of_ratings__gte=100).order_by('-average_rating')[:250],
+    })
+
+
 def film_main(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
     rating = 0

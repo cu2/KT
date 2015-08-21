@@ -1,0 +1,37 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Legjobb filmek - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Legjobb filmek</h1>
+{% endblock %}
+
+{% block main %}
+<div class="centered_content">
+
+    <table class="fullsize">
+        <thead>
+        <tr class="header_tr">
+            <th>#</th>
+            <th>Film</th>
+            <th>Év</th>
+            <th>Átlag</th>
+            <th>Szavazatszám</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for film in films %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td class="center">{{ forloop.counter }}</td>
+                <td>{{ film|film_url_html }}</td>
+                <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
+                <td class="center">{{ film|film_avg_rating_html }}</td>
+                <td class="center">{{ film|film_num_rating_html }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}
