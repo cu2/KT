@@ -5,6 +5,13 @@
 
     <div class="left_content">
 
+        <p>
+            Tapasztalat{% if selected_user.id == user.id %}od{% endif %}: {{ number_of_votes }} film
+            <br />
+            Kompetenci{% if selected_user.id == user.id %}ád{% else %}a{% endif %}: {{ number_of_vapiti_votes }} film
+            <br />
+            Súly{% if selected_user.id == user.id %}od{% endif %}: {{ vapiti_weight }}
+        </p>
         {% if selected_user.id == user.id %}
             <p>
                 Nemed:
@@ -72,26 +79,27 @@
             </div>
         {% endif %}
 
+    </div>
+    <div class="right_content">
+
         <h2>Legutóbbi szavazat{% if selected_user.id == user.id %}aid{% else %}ok{% endif %}</h2>
-        <table>
+        <table class="fullsize">
             <tr class="header_tr">
                 <th>Film</th>
                 <th>Szavazat</th>
                 <th>Mikor</th>
                 <th>Átlag</th>
             </tr>
-        {% for vote in latest_votes %}
-            <tr class="{% cycle '' 'odd' %}">
-                <td>{{ vote.film|film_url_html }}</td>
-                <td class="center">{{ vote.rating }}</td>
-                <td class="center">{{ vote.when|date:"Y-m-d" }}</td>
-                <td class="center">{{ vote.film|film_rating_html }}</td>
-            </tr>
-        {% endfor %}
+            {% for vote in latest_votes %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td>{{ vote.film|film_url_html }}</td>
+                    <td class="center">{{ vote.rating }}</td>
+                    <td class="center">{{ vote.when|date:"Y-m-d" }}</td>
+                    <td class="center">{{ vote.film|film_rating_html }}</td>
+                </tr>
+            {% endfor %}
         </table>
-
-    </div>
-    <div class="right_content">
+        <p><a href="{% url 'user_films' selected_user.id selected_user.slug_cache %}">Összes szavazat...</a></p>
 
         <h2>Legutóbbi komment{% if selected_user.id == user.id %}jeid{% else %}ek{% endif %}</h2>
         {% if latest_comments %}
@@ -99,6 +107,7 @@
                 {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
             {% endfor %}
         {% endif %}
+        <p><a href="{% url 'user_comments' selected_user.id selected_user.slug_cache %}">Összes komment...</a></p>
 
     </div>
     <br class="clear" />

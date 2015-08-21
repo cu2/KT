@@ -1557,16 +1557,21 @@ def user_profile(request, id, name_slug):
         number_of_messages = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(Q(sent_by=selected_user) | Q(sent_to=selected_user)).count()
     else:
         number_of_messages = 0
+    this_year = datetime.date.today().year
+    number_of_votes = selected_user.vote_set.count()
+    number_of_vapiti_votes = selected_user.vote_set.filter(film__main_premier__gte='%s-01-01' % this_year, film__main_premier__lte='%s-12-31' % this_year).count()
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,
-        'number_of_votes': selected_user.vote_set.count(),
+        'number_of_votes': number_of_votes,
         'number_of_comments': selected_user.comment_set.count(),
         'number_of_wishes': selected_user.wishlist_set.count(),
         'number_of_messages': number_of_messages,
+        'number_of_vapiti_votes': number_of_vapiti_votes,
+        'vapiti_weight': number_of_votes + 25 * number_of_vapiti_votes,
         'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
-        'latest_votes': selected_user.votes().order_by('-when', '-id')[:50],
-        'latest_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to').filter(created_by=selected_user)[:20],
+        'latest_votes': selected_user.votes().order_by('-when', '-id')[:10],
+        'latest_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to').filter(created_by=selected_user)[:10],
     })
 
 
