@@ -1,37 +1,84 @@
 {% extends "ktapp/layout.html" %}
 {% load kt_extras %}
 
-{% block title %}Legjobb filmek - Kritikus Tömeg{% endblock %}
+{% block title %}Top filmek - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>Legjobb filmek</h1>
+    <h1>Top filmek</h1>
+    <h3>
+        {% if type == 'legjobb' %}<b>legjobbak</b>{% else %}<a href="{% url 'top_films' %}?tipus=legjobb{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">legjobbak</a>{% endif %}
+        /
+        {% if type == 'ismeretlen' %}<b>ismeretlen gyöngyszemek</b>{% else %}<a href="{% url 'top_films' %}?tipus=ismeretlen{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">ismeretlen gyöngyszemek</a>{% endif %}
+        /
+        {% if type == 'legrosszabb' %}<b>legrosszabb</b>{% else %}<a href="{% url 'top_films' %}?tipus=legrosszabb{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">legrosszabb</a>{% endif %}
+        /
+        {% if type == 'legerdekesebb' %}<b>legérdekesebb</b>{% else %}<a href="{% url 'top_films' %}?tipus=legerdekesebb{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">legérdekesebb</a>{% endif %}
+        /
+        {% if type == 'legnezettebb' %}<b>legnézettebb</b>{% else %}<a href="{% url 'top_films' %}?tipus=legnezettebb{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">legnézettebb</a>{% endif %}
+    </h3>
 {% endblock %}
 
 {% block main %}
-<div class="centered_content">
 
-    <table class="fullsize">
-        <thead>
-        <tr class="header_tr">
-            <th>#</th>
-            <th>Film</th>
-            <th>Év</th>
-            <th>Átlag</th>
-            <th>Szavazatszám</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for film in films %}
-            <tr class="{% cycle '' 'odd' %}">
-                <td class="center">{{ forloop.counter }}</td>
-                <td>{{ film|film_url_html }}</td>
-                <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
-                <td class="center">{{ film|film_avg_rating_html }}</td>
-                <td class="center">{{ film|film_num_rating_html }}</td>
+    <nav id="tabs" class="clearfix">
+        <ul>
+            <li style="width: 20%"{% if active_tab == '' %} class="active_tab"{% endif %}><a href="{% url 'top_films' %}?tipus={{ type }}">mindenkori</a></li>
+            <li style="width: 20%"{% if active_tab == 'ev' %} class="active_tab"{% endif %}><a href="{% url 'top_films' %}?tipus={{ type }}&ev={{ default_filter_values.ev }}">gyártás évtizede</a></li>
+            <li style="width: 20%"{% if active_tab == 'bemutato' %} class="active_tab"{% endif %}><a href="{% url 'top_films' %}?tipus={{ type }}&bemutato={{ default_filter_values.bemutato }}">bemutató éve</a></li>
+            <li style="width: 20%"{% if active_tab == 'orszag' %} class="active_tab"{% endif %}><a href="{% url 'top_films' %}?tipus={{ type }}&orszag={{ default_filter_values.orszag }}">ország</a></li>
+            <li style="width: 20%"{% if active_tab == 'mufaj' %} class="active_tab"{% endif %}><a href="{% url 'top_films' %}?tipus={{ type }}&mufaj={{ default_filter_values.mufaj }}">mufaj</a></li>
+        </ul>
+    </nav>
+
+    <div class="centered_content">
+
+        {% if links %}
+            <p>
+                {% for link_filter_value, link_text in links %}
+                    {% if link_filter_value == filter_value %}
+                        <b>{{ link_text }}</b>
+                    {% else %}
+                        <a href="{% url 'top_films' %}?tipus={{ type }}&{{ filter_type }}={{ link_filter_value }}">{{ link_text }}</a>
+                    {% endif %}
+                {% endfor %}
+            </p>
+        {% endif %}
+
+        <table class="fullsize">
+            <thead>
+            <tr class="header_tr">
+                <th>#</th>
+                <th>Film</th>
+                <th>Év</th>
+                <th>Átlag</th>
+                <th>Szavazatszám</th>
+                {% if type == 'legerdekesebb' %}
+                    <th>Kommentek száma</th>
+                {% endif %}
+                {% if filter_type == 'bemutato' %}
+                    <th>Bemutató</th>
+                {% endif %}
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for film in films %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td class="center">{{ forloop.counter }}</td>
+                    <td>{{ film|film_url_html }}</td>
+                    <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
+                    <td class="center">{{ film|film_avg_rating_html }}</td>
+                    <td class="center">{{ film|film_num_rating_html }}</td>
+                    {% if type == 'legerdekesebb' %}
+                        <td class="center">{{ film.number_of_comments }}</td>
+                    {% endif %}
+                    {% if filter_type == 'bemutato' %}
+                        <td>{{ film.main_premier|date:"F j." }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-</div>
+    </div>
+
 {% endblock %}
