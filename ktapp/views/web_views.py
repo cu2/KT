@@ -533,7 +533,7 @@ def film_main(request, id, film_slug):
                 votes[idx][0].append(u)
             else:
                 votes[idx][1].append(u)
-    utls = models.UserToplistItem.objects.filter(film=film).select_related('usertoplist', 'usertoplist__created_by').order_by('serial_number', 'usertoplist__title', 'usertoplist__id')
+    utls = models.UserToplistItem.objects.filter(film=film).select_related('usertoplist', 'usertoplist__created_by').order_by('-usertoplist__ordered', 'serial_number', 'usertoplist__title', 'usertoplist__id')
     my_wishes = dict((wish_type[0], False) for wish_type in models.Wishlist.WISH_TYPES)
     wish_count = [0, 0]
     for wish in models.Wishlist.objects.filter(film=film):
@@ -541,7 +541,7 @@ def film_main(request, id, film_slug):
             wish_count[0] += 1
         if wish.wish_type == models.Wishlist.WISH_TYPE_NO:
             wish_count[1] += 1
-        if wish.wished_by == request.user:
+        if wish.wished_by.id == request.user.id:
             my_wishes[wish.wish_type] = True
     return render(request, 'ktapp/film_subpages/film_main.html', {
         'active_tab': 'main',
@@ -1651,6 +1651,27 @@ def favourites(request):
         'favourites': favourites,
         'latest_votes': models.Vote.objects.filter(user__in=favourite_ids).select_related('user', 'film').order_by('-when', '-id')[:50],
         'latest_comments': models.Comment.objects.filter(created_by__in=favourite_ids).select_related('film', 'topic', 'created_by', 'reply_to', 'reply_to__created_by').all()[:20],
+    })
+
+
+def usertoplists(request):
+    return render(request, 'ktapp/usertoplists.html', {
+        'usertoplists': models.UserToplist.objects.all().select_related('created_by').order_by('-created_at'),
+    })
+
+
+def usertoplist(request, id, title_slug):
+    toplist = get_object_or_404(models.UserToplist, pk=id)
+    toplist_list = []
+    with_comments = False
+    for item in models.UserToplistItem.objects.filter(usertoplist=toplist).select_related('film', 'director', 'actor').order_by('serial_number'):
+        toplist_list.append(item)
+        if item.comment:
+            with_comments = True
+    return render(request, 'ktapp/usertoplist.html', {
+        'toplist': toplist,
+        'toplist_list': toplist_list,
+        'with_comments': with_comments,
     })
 
 

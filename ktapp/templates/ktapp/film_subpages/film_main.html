@@ -264,8 +264,8 @@
                         {% with u=utl.usertoplist.created_by %}
                         <tr class="{% cycle 'odd' '' %}">
                             <td><a href="{% url 'user_profile' u.id u.slug_cache %}"{% if u.id in special_users %} style="font-weight: bold"{% endif %}>{{ u.username }}</a></td>
-                            <td>{{ utl.usertoplist.title }}</td>
-                            <td>#{{ utl.serial_number }}</td>
+                            <td><a href="{% url 'usertoplist' utl.usertoplist.id utl.usertoplist.slug_cache %}">{{ utl.usertoplist.title }}</a></td>
+                            <td>{% if utl.usertoplist.ordered %}#{{ utl.serial_number }}{% endif %}</td>
                         </tr>
                         {% endwith %}
                     {% endfor %}

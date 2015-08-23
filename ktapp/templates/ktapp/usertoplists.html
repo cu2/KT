@@ -1,0 +1,32 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Felhasználói toplisták - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Felhasználói toplisták</h1>
+{% endblock %}
+
+{% block main %}
+    <div class="centered_content">
+
+        <table class="fullsize sortable">
+            <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Toplista</th>
+                    <th data-sort="string">Felhasználó</th>
+                    <th data-sort="string" data-sort-default="desc">Mikor</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for utl in usertoplists %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td><a href="{% url 'usertoplist' utl.id utl.slug_cache %}">{{ utl.title }}</a></td>
+                    <td><a href="{% url 'user_profile' utl.created_by.id utl.created_by.slug_cache %}">{{ utl.created_by }}</a></td>
+                    <td class="nowrap">{{ utl.created_at|date:"Y-m-d" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}
