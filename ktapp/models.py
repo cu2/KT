@@ -217,6 +217,7 @@ class Vote(models.Model):
     def save(self, *args, **kwargs):
         super(Vote, self).save(*args, **kwargs)
         self.film.comment_set.filter(created_by=self.user).update(rating=self.rating)
+        Wishlist.objects.filter(film=self.film, wished_by=self.user, wish_type=Wishlist.WISH_TYPE_YES).delete()
 
 
 @receiver(post_delete, sender=Vote)
