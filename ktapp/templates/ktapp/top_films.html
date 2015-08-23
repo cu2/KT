@@ -26,7 +26,7 @@
             <li style="width: 20%"{% if active_tab == 'ev' %} class="active_tab"{% endif %}><a href="{% url 'top_films' %}?tipus={{ type }}&ev={{ default_filter_values.ev }}">gyártás évtizede</a></li>
             <li style="width: 20%"{% if active_tab == 'bemutato' %} class="active_tab"{% endif %}><a href="{% url 'top_films' %}?tipus={{ type }}&bemutato={{ default_filter_values.bemutato }}">bemutató éve</a></li>
             <li style="width: 20%"{% if active_tab == 'orszag' %} class="active_tab"{% endif %}><a href="{% url 'top_films' %}?tipus={{ type }}&orszag={{ default_filter_values.orszag }}">ország</a></li>
-            <li style="width: 20%"{% if active_tab == 'mufaj' %} class="active_tab"{% endif %}><a href="{% url 'top_films' %}?tipus={{ type }}&mufaj={{ default_filter_values.mufaj }}">mufaj</a></li>
+            <li style="width: 20%"{% if active_tab == 'mufaj' %} class="active_tab"{% endif %}><a href="{% url 'top_films' %}?tipus={{ type }}&mufaj={{ default_filter_values.mufaj }}">műfaj</a></li>
         </ul>
     </nav>
 

@@ -1,0 +1,37 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}{{ poll.title }} - Közkérdés - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>{{ poll.title }}</h1>
+    {% if poll.state == 'O' %}
+        <p>{% if poll.created_by %}<a href="{% url 'user_profile' poll.created_by.id poll.created_by.slug_cache %}">{{ poll.created_by.username }}</a> kérdése, {% endif %}{{ poll.open_from|date:"Y. F j." }}</p>
+    {% else %}
+        <p>{% if poll.created_by %}<a href="{% url 'user_profile' poll.created_by.id poll.created_by.slug_cache %}">{{ poll.created_by.username }}</a> kérdése, {% endif %}{{ poll.open_from|date:"Y. F j." }}-{{ poll.open_until|date:"Y. F j." }}</p>
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <div class="centered_content">
+
+        <ul class="poll">
+            {% for pollchoice, pollchoice_percent, pollchoice_px in pollchoices %}
+                {% if poll.state == 'O' %}
+                    <li>
+                        [{{ pollchoice.number_of_votes }}] {{ pollchoice.choice }}
+                        {% if user.is_authenticated %}
+                        {% endif %}
+                    </li>
+                {% else %}
+                    <li><span style="display: inline-block; width: {{ pollchoice_px }}px; background: rgb(0,0,0)">&nbsp;</span> {% if pollchoice.number_of_votes %}<span class="pollstat">{{ pollchoice_percent|floatformat:"0" }}% ({{ pollchoice.number_of_votes }})</span>{% endif %} {{ pollchoice.choice }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+
+        {% for c in comments %}
+            {% include 'ktapp/blocks/comment_block.html' with comment=c %}
+        {% endfor %}
+
+    </div>
+{% endblock %}

@@ -498,6 +498,18 @@ ul.nobullet {
 }
 
 
+ul.poll {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 40px;
+}
+ul.poll li {
+    margin-bottom: 5px;
+}
+.pollstat {
+    font-size: 9pt;
+    vertical-align: 2px;
+}
 
 
 

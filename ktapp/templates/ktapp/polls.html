@@ -1,0 +1,45 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}{% if poll_type == 'aktualis' %}Aktuális{% else %}Régi{% endif %} közkérdések - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>{% if poll_type == 'aktualis' %}Aktuális{% else %}Régi{% endif %} közkérdések</h1>
+{% endblock %}
+
+{% block main %}
+    <div class="centered_content">
+
+        <table class="fullsize sortable">
+            <thead>
+                <tr class="header_tr">
+                    {% if poll_type == 'aktualis' %}
+                        <th data-sort="int">Mettől</th>
+                    {% else %}
+                        <th data-sort="string">Mettől</th>
+                        <th data-sort="string">Meddig</th>
+                    {% endif %}
+                    <th data-sort="string">Kérdés</th>
+                    <th data-sort="int">Válasz<sup>*</sup></th>
+                    <th data-sort="int">Komment</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for poll in polls %}
+                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                    {% if poll_type == 'aktualis' %}
+                        <td class="nowrap">{{ poll.open_from|date:"Y-m-d" }}</td>
+                    {% else %}
+                        <td class="nowrap">{{ poll.open_from|date:"Y-m-d" }}</td>
+                        <td class="nowrap">{{ poll.open_until|date:"Y-m-d" }}</td>
+                    {% endif %}
+                    <td><a href="{% url 'poll' poll.id poll.slug_cache %}">{{ poll.title }}</a></td>
+                    <td class="center nowrap">{{ poll.number_of_votes }} ({{ poll.number_of_people }})</td>
+                    <td class="center">{{ poll.number_of_comments }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <p style="font-size: 8pt"><sup>*</sup>Egyedi válaszok száma, zárójelben a válaszolt felhasználók száma.</p>
+
+    </div>
+{% endblock %}

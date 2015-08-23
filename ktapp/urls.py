@@ -88,6 +88,9 @@ urlpatterns += patterns(
     url(r'^felhasznaloi_toplista/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.usertoplist, name='usertoplist'),
     url(r'^felhasznaloi_toplistak/$', web_views.usertoplists, name='usertoplists'),
 
+    url(r'^kozkerdes/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.poll, name='poll'),
+    url(r'^kozkerdesek/$', web_views.polls, name='polls'),
+
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', web_views.user_films, name='user_films'),
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', web_views.user_comments, name='user_comments'),
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', web_views.user_wishlist, name='user_wishlist'),

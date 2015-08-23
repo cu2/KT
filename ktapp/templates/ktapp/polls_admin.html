@@ -1,0 +1,57 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Leendő közkérdések - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Leendő közkérdések</h1>
+{% endblock %}
+
+{% block main %}
+    <div class="centered_content">
+
+        <h2>Jelölésre vár</h2>
+        <table class="fullsize sortable">
+            <thead>
+            <tr class="header_tr">
+                <th data-sort="string">Ki</th>
+                <th data-sort="string">Mikor</th>
+                <th data-sort="string">Kérdés</th>
+                <th data-sort="string">Jelölték</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for poll in polls_w %}
+                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                    <td class="nowrap">{{ poll.created_at|date:"Y-m-d" }}</td>
+                    <td>{% if poll.created_by %}<a href="{% url 'user_profile' poll.created_by.id poll.created_by.slug_cache %}">{{ poll.created_by.username }}</a>{% endif %}</td>
+                    <td>{{ poll.title }}</td>
+                    <td>{{ poll.nominated_by }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Aktiválásra vár</h2>
+        <table class="fullsize sortable">
+            <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Ki</th>
+                    <th data-sort="string">Mikor</th>
+                    <th data-sort="string">Kérdés</th>
+                    <th data-sort="string">Jelölték</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for poll in polls_a %}
+                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                    <td class="nowrap">{{ poll.created_at|date:"Y-m-d" }}</td>
+                    <td>{% if poll.created_by %}<a href="{% url 'user_profile' poll.created_by.id poll.created_by.slug_cache %}">{{ poll.created_by.username }}</a>{% endif %}</td>
+                    <td>{{ poll.title }}</td>
+                    <td>{{ poll.nominated_by }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}

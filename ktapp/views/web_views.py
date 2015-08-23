@@ -340,9 +340,9 @@ def _get_type_and_filter(request):
     this_year = today.year
     minimum_year = 1900
     minimum_premier = 1970
-    type = request.GET.get('tipus', '')
-    if type not in {'legjobb', 'ismeretlen', 'legrosszabb', 'legerdekesebb', 'legnezettebb'}:
-        type = 'legjobb'
+    toplist_type = request.GET.get('tipus', '')
+    if toplist_type not in {'legjobb', 'ismeretlen', 'legrosszabb', 'legerdekesebb', 'legnezettebb'}:
+        toplist_type = 'legjobb'
     try:
         year = int(request.GET.get('ev', '')) / 10 * 10
     except ValueError:
@@ -352,7 +352,7 @@ def _get_type_and_filter(request):
             year = this_year / 10 * 10
         if year < minimum_year:
             year = minimum_year - 10
-        return type, 'ev', year
+        return toplist_type, 'ev', year
     try:
         premier = int(request.GET.get('bemutato', ''))
     except ValueError:
@@ -362,23 +362,23 @@ def _get_type_and_filter(request):
             premier = this_year
         if premier < minimum_premier:
             premier = minimum_premier
-        return type, 'bemutato', premier
+        return toplist_type, 'bemutato', premier
     try:
         country = models.Keyword.objects.get(slug_cache=request.GET.get('orszag', ''), keyword_type=models.Keyword.KEYWORD_TYPE_COUNTRY)
     except models.Keyword.DoesNotExist:
         country = None
     if country:
-        return type, 'orszag', country
+        return toplist_type, 'orszag', country
     try:
         genre = models.Keyword.objects.get(slug_cache=request.GET.get('mufaj', ''), keyword_type=models.Keyword.KEYWORD_TYPE_GENRE)
     except models.Keyword.DoesNotExist:
         genre = None
     if genre:
-        return type, 'mufaj', genre
-    return type, '', ''
+        return toplist_type, 'mufaj', genre
+    return toplist_type, '', ''
 
 
-def _get_film_list(type, filter_type, filter_value):
+def _get_film_list(toplist_type, filter_type, filter_value):
     thresholds = {
         'legjobb': 100,
         'ismeretlen': 30,
@@ -395,74 +395,74 @@ def _get_film_list(type, filter_type, filter_value):
         qs = models.FilmKeywordRelationship.objects.filter(keyword__id=filter_value.id)
 
     if filter_type in {'orszag', 'mufaj'}:
-        if type == 'legjobb':
-            if qs.filter(film__number_of_ratings__gte=thresholds[type]).filter(film__average_rating__gte=3.5).count() >= 50:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[type]).filter(film__average_rating__gte=3.5)
-            elif qs.filter(film__number_of_ratings__gte=thresholds[type]/2).filter(film__average_rating__gte=3.5).count() >= 20:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[type]/2).filter(film__average_rating__gte=3.5)
+        if toplist_type == 'legjobb':
+            if qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]).filter(film__average_rating__gte=3.5).count() >= 50:
+                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]).filter(film__average_rating__gte=3.5)
+            elif qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2).filter(film__average_rating__gte=3.5).count() >= 20:
+                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2).filter(film__average_rating__gte=3.5)
             else:
                 qs = qs.filter(film__number_of_ratings__gte=10).filter(film__average_rating__gte=3.5)
             qs = qs.order_by('-film__average_rating')
-        elif type == 'ismeretlen':
-            qs = qs.filter(film__number_of_ratings__lt=thresholds[type]).filter(film__number_of_ratings__gte=10)
+        elif toplist_type == 'ismeretlen':
+            qs = qs.filter(film__number_of_ratings__lt=thresholds[toplist_type]).filter(film__number_of_ratings__gte=10)
             qs = qs.order_by('-film__average_rating')
-        elif type == 'legrosszabb':
-            if qs.filter(film__number_of_ratings__gte=thresholds[type]).filter(film__average_rating__lte=2.5).count() >= 50:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[type]).filter(film__average_rating__lte=2.5)
-            elif qs.filter(film__number_of_ratings__gte=thresholds[type]/2).filter(film__average_rating__lte=2.5).count() >= 20:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[type]/2).filter(film__average_rating__lte=2.5)
+        elif toplist_type == 'legrosszabb':
+            if qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]).filter(film__average_rating__lte=2.5).count() >= 50:
+                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]).filter(film__average_rating__lte=2.5)
+            elif qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2).filter(film__average_rating__lte=2.5).count() >= 20:
+                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2).filter(film__average_rating__lte=2.5)
             else:
                 qs = qs.filter(film__number_of_ratings__gte=10).filter(film__average_rating__lte=2.5)
             qs = qs.order_by('film__average_rating')
-        elif type == 'legerdekesebb':
-            if qs.filter(film__number_of_comments__gte=thresholds[type]).count() >= 50:
-                qs = qs.filter(film__number_of_comments__gte=thresholds[type])
-            elif qs.filter(film__number_of_comments__gte=thresholds[type]/2).count() >= 20:
-                qs = qs.filter(film__number_of_comments__gte=thresholds[type]/2)
+        elif toplist_type == 'legerdekesebb':
+            if qs.filter(film__number_of_comments__gte=thresholds[toplist_type]).count() >= 50:
+                qs = qs.filter(film__number_of_comments__gte=thresholds[toplist_type])
+            elif qs.filter(film__number_of_comments__gte=thresholds[toplist_type]/2).count() >= 20:
+                qs = qs.filter(film__number_of_comments__gte=thresholds[toplist_type]/2)
             else:
                 qs = qs.filter(film__number_of_comments__gte=10)
             qs = qs.order_by('-film__number_of_comments')
-        elif type == 'legnezettebb':
-            if qs.filter(film__number_of_ratings__gte=thresholds[type]).count() >= 50:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[type])
-            elif qs.filter(film__number_of_ratings__gte=thresholds[type]/2).count() >= 20:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[type]/2)
+        elif toplist_type == 'legnezettebb':
+            if qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]).count() >= 50:
+                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type])
+            elif qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2).count() >= 20:
+                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2)
             else:
                 qs = qs.filter(film__number_of_ratings__gte=10)
             qs = qs.order_by('-film__number_of_ratings')
     else:
-        if type == 'legjobb':
-            if qs.filter(number_of_ratings__gte=thresholds[type]).filter(average_rating__gte=3.5).count() >= 50:
-                qs = qs.filter(number_of_ratings__gte=thresholds[type]).filter(average_rating__gte=3.5)
-            elif qs.filter(number_of_ratings__gte=thresholds[type]/2).filter(average_rating__gte=3.5).count() >= 20:
-                qs = qs.filter(number_of_ratings__gte=thresholds[type]/2).filter(average_rating__gte=3.5)
+        if toplist_type == 'legjobb':
+            if qs.filter(number_of_ratings__gte=thresholds[toplist_type]).filter(average_rating__gte=3.5).count() >= 50:
+                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type]).filter(average_rating__gte=3.5)
+            elif qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2).filter(average_rating__gte=3.5).count() >= 20:
+                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2).filter(average_rating__gte=3.5)
             else:
                 qs = qs.filter(number_of_ratings__gte=10).filter(average_rating__gte=3.5)
             qs = qs.order_by('-average_rating')
-        elif type == 'ismeretlen':
-            qs = qs.filter(number_of_ratings__lt=thresholds[type]).filter(number_of_ratings__gte=10)
+        elif toplist_type == 'ismeretlen':
+            qs = qs.filter(number_of_ratings__lt=thresholds[toplist_type]).filter(number_of_ratings__gte=10)
             qs = qs.order_by('-average_rating')
-        elif type == 'legrosszabb':
-            if qs.filter(number_of_ratings__gte=thresholds[type]).filter(average_rating__lte=2.5).count() >= 50:
-                qs = qs.filter(number_of_ratings__gte=thresholds[type]).filter(average_rating__lte=2.5)
-            elif qs.filter(number_of_ratings__gte=thresholds[type]/2).filter(average_rating__lte=2.5).count() >= 20:
-                qs = qs.filter(number_of_ratings__gte=thresholds[type]/2).filter(average_rating__lte=2.5)
+        elif toplist_type == 'legrosszabb':
+            if qs.filter(number_of_ratings__gte=thresholds[toplist_type]).filter(average_rating__lte=2.5).count() >= 50:
+                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type]).filter(average_rating__lte=2.5)
+            elif qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2).filter(average_rating__lte=2.5).count() >= 20:
+                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2).filter(average_rating__lte=2.5)
             else:
                 qs = qs.filter(number_of_ratings__gte=10).filter(average_rating__lte=2.5)
             qs = qs.order_by('average_rating')
-        elif type == 'legerdekesebb':
-            if qs.filter(number_of_comments__gte=thresholds[type]).count() >= 50:
-                qs = qs.filter(number_of_comments__gte=thresholds[type])
-            elif qs.filter(number_of_comments__gte=thresholds[type]/2).count() >= 20:
-                qs = qs.filter(number_of_comments__gte=thresholds[type]/2)
+        elif toplist_type == 'legerdekesebb':
+            if qs.filter(number_of_comments__gte=thresholds[toplist_type]).count() >= 50:
+                qs = qs.filter(number_of_comments__gte=thresholds[toplist_type])
+            elif qs.filter(number_of_comments__gte=thresholds[toplist_type]/2).count() >= 20:
+                qs = qs.filter(number_of_comments__gte=thresholds[toplist_type]/2)
             else:
                 qs = qs.filter(number_of_comments__gte=10)
             qs = qs.order_by('-number_of_comments')
-        elif type == 'legnezettebb':
-            if qs.filter(number_of_ratings__gte=thresholds[type]).count() >= 50:
-                qs = qs.filter(number_of_ratings__gte=thresholds[type])
-            elif qs.filter(number_of_ratings__gte=thresholds[type]/2).count() >= 20:
-                qs = qs.filter(number_of_ratings__gte=thresholds[type]/2)
+        elif toplist_type == 'legnezettebb':
+            if qs.filter(number_of_ratings__gte=thresholds[toplist_type]).count() >= 50:
+                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type])
+            elif qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2).count() >= 20:
+                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2)
             else:
                 qs = qs.filter(number_of_ratings__gte=10)
             qs = qs.order_by('-number_of_ratings')
@@ -474,8 +474,8 @@ def top_films(request):
     this_year = today.year
     minimum_year = 1900
     minimum_premier = 1970
-    type, filter_type, filter_value = _get_type_and_filter(request)
-    qs = _get_film_list(type, filter_type, filter_value)
+    toplist_type, filter_type, filter_value = _get_type_and_filter(request)
+    qs = _get_film_list(toplist_type, filter_type, filter_value)
     if filter_type in {'orszag', 'mufaj'}:
         films = [x.film for x in qs[:250]]
     else:
@@ -498,7 +498,7 @@ def top_films(request):
             links.append((g.slug_cache, g.name))
     return render(request, 'ktapp/top_films.html', {
         'active_tab': filter_type,
-        'type': type,
+        'type': toplist_type,
         'filter_type': filter_type,
         'filter_value': filter_value.slug_cache if filter_type in {'orszag', 'mufaj'} else filter_value,
         'default_filter_values': {
@@ -1568,7 +1568,7 @@ def delete_role(request):
 
 def list_of_topics(request):
     return render(request, 'ktapp/list_of_topics.html', {
-        'topics': models.Topic.objects.all(),
+        'topics': models.Topic.objects.all().select_related('last_comment', 'last_comment__created_by'),
         'topic_form': kt_forms.TopicForm(),
         'permission_new_topic': kt_utils.check_permission('new_topic', request.user),
     })
@@ -1675,6 +1675,59 @@ def usertoplist(request, id, title_slug):
         'toplist': toplist,
         'toplist_list': toplist_list,
         'with_comments': with_comments,
+    })
+
+
+def polls(request):
+    poll_type = kt_utils.strip_whitespace(request.GET.get('tipus', ''))
+    if poll_type not in {'aktualis', 'regi', 'leendo'}:
+        poll_type = 'aktualis'
+    polls_qs = models.Poll.objects.select_related('created_by')
+
+    if poll_type == 'leendo':
+        polls_w = polls_qs.filter(state=models.Poll.STATE_WAITING_FOR_APPROVAL)
+        polls_a = polls_qs.filter(state=models.Poll.STATE_APPROVED)
+        return render(request, 'ktapp/polls_admin.html', {
+            'polls_w': polls_w.order_by('-created_at'),
+            'polls_a': polls_a.order_by('-created_at'),
+        })
+
+    if poll_type == 'aktualis':
+        polls = polls_qs.filter(state=models.Poll.STATE_OPEN).order_by('-open_from')
+    else:
+        polls = polls_qs.filter(state=models.Poll.STATE_CLOSED).order_by('-open_until')
+    return render(request, 'ktapp/polls.html', {
+        'poll_type': poll_type,
+        'polls': polls,
+    })
+
+
+def poll(request, id, title_slug):
+    selected_poll = get_object_or_404(models.Poll, pk=id, state__in=['O', 'C'])
+    pollchoices_qs = models.PollChoice.objects.filter(poll=selected_poll)
+    if selected_poll.state == 'O':
+        pollchoices_qs = pollchoices_qs.order_by('serial_number')
+    else:
+        pollchoices_qs = pollchoices_qs.order_by('-number_of_votes', 'choice', 'id')
+    pollchoices_raw = []
+    sum_number_of_votes = 0
+    max_number_of_votes = 0
+    for pollchoice in pollchoices_qs:
+        pollchoices_raw.append(pollchoice)
+        sum_number_of_votes += pollchoice.number_of_votes
+        max_number_of_votes = max(max_number_of_votes, pollchoice.number_of_votes)
+    pollchoices = []
+    for pollchoice in pollchoices_raw:
+        pollchoices.append((
+            pollchoice,
+            100.0 * pollchoice.number_of_votes / sum_number_of_votes if sum_number_of_votes > 0 else None,
+            int(300.0 * pollchoice.number_of_votes / max_number_of_votes) if max_number_of_votes > 0 else 0,
+        ))
+    return render(request, 'ktapp/poll.html', {
+        'poll': selected_poll,
+        'pollchoices': pollchoices,
+        'sum_number_of_votes': sum_number_of_votes,
+        'comments': models.Comment.objects.filter(domain=models.Comment.DOMAIN_POLL, poll=selected_poll).select_related('created_by', 'reply_to', 'reply_to__created_by'),
     })
 
 

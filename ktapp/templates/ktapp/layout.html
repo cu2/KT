@@ -9,7 +9,7 @@
 {% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=9" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=10" />
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <base href="/" />
         <script>
@@ -113,8 +113,9 @@
                 </li>
                 <li>Közkérdések<br />
                     <ul class="submenu">
-                        <li>Aktuális</li>
-                        <li>Régi</li>
+                        <li><a href="{% url 'polls' %}?tipus=aktualis">Aktuális</a></li>
+                        <li><a href="{% url 'polls' %}?tipus=regi">Régi</a></li>
+                        <li><a href="{% url 'polls' %}?tipus=leendo">Leendő</a></li>
                     </ul>
                 </li>
                 {% if user.is_authenticated and user.core_member %}
