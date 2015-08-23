@@ -58,7 +58,7 @@ def index(request):
         'film': film_of_the_day,
         'toplist': toplist_of_the_day,
         'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
-        'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids),
+        'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids),
     })
 
 
@@ -541,14 +541,14 @@ def film_main(request, id, film_slug):
             wish_count[0] += 1
         if wish.wish_type == models.Wishlist.WISH_TYPE_NO:
             wish_count[1] += 1
-        if wish.wished_by.id == request.user.id:
+        if wish.wished_by_id == request.user.id:
             my_wishes[wish.wish_type] = True
     return render(request, 'ktapp/film_subpages/film_main.html', {
         'active_tab': 'main',
         'film': film,
         'rating': rating,
         'ratings': range(1, 6),
-        'roles': film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).order_by('role_name'),
+        'roles': film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).select_related('artist').order_by('role_name'),
         'votes': zip(
             [film.num_specific_rating(r) for r in range(5, 0, -1)],
             votes,
@@ -558,6 +558,7 @@ def film_main(request, id, film_slug):
         'wish_count': wish_count,
         'utls': utls,
         'premier_types': models.PremierType.objects.all().order_by('name'),
+        'other_premiers': film.other_premiers(),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
         'permission_edit_premiers': kt_utils.check_permission('edit_premiers', request.user),
         'permission_new_role': kt_utils.check_permission('new_role', request.user),
@@ -583,12 +584,14 @@ def film_comments(request, id, film_slug):
         comments = comments_qs.filter(serial_number__lte=last_comment, serial_number__gte=first_comment)
     else:
         comments = comments_qs.all()
-    try:
-        reply_to_comment = models.Comment.objects.get(id=request.GET.get('valasz'))
-        reply_to_id = reply_to_comment.id
-    except models.Comment.DoesNotExist:
-        reply_to_comment = None
-        reply_to_id = None
+    reply_to_comment = None
+    reply_to_id = None
+    if request.GET.get('valasz'):
+        try:
+            reply_to_comment = models.Comment.objects.get(id=request.GET.get('valasz'))
+            reply_to_id = reply_to_comment.id
+        except models.Comment.DoesNotExist:
+            pass
     comment_form = kt_forms.CommentForm(initial={
         'domain': models.Comment.DOMAIN_FILM,
         'film': film,
@@ -1623,7 +1626,7 @@ def forum(request, id, title_slug):
 
 def latest_comments(request):
     return render(request, 'ktapp/latest_comments.html', {
-        'comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to', 'reply_to__created_by').all()[:100],
+        'comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').all()[:100],
     })
 
 
@@ -1650,7 +1653,7 @@ def favourites(request):
     return render(request, 'ktapp/favourites.html', {
         'favourites': favourites,
         'latest_votes': models.Vote.objects.filter(user__in=favourite_ids).select_related('user', 'film').order_by('-when', '-id')[:50],
-        'latest_comments': models.Comment.objects.filter(created_by__in=favourite_ids).select_related('film', 'topic', 'created_by', 'reply_to', 'reply_to__created_by').all()[:20],
+        'latest_comments': models.Comment.objects.filter(created_by__in=favourite_ids).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').all()[:20],
     })
 
 
@@ -1805,7 +1808,7 @@ def user_profile(request, id, name_slug):
         'vapiti_weight': number_of_votes + 25 * number_of_vapiti_votes,
         'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
         'latest_votes': selected_user.votes().select_related('film').order_by('-when', '-id')[:10],
-        'latest_comments': models.Comment.objects.select_related('film', 'topic', 'created_by', 'reply_to', 'reply_to__created_at').filter(created_by=selected_user)[:10],
+        'latest_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(created_by=selected_user)[:10],
     })
 
 
@@ -1974,7 +1977,7 @@ def user_comments(request, id, name_slug):
         'number_of_wishes': selected_user.wishlist_set.count(),
         'number_of_messages': number_of_messages,
         'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
-        'comments': selected_user.comment_set.select_related('film', 'topic', 'reply_to', 'reply_to__created_by').all().order_by('-created_at')[(p-1) * COMMENTS_PER_PAGE:p * COMMENTS_PER_PAGE],
+        'comments': selected_user.comment_set.select_related('film', 'topic', 'poll', 'reply_to', 'reply_to__created_by').all().order_by('-created_at')[(p-1) * COMMENTS_PER_PAGE:p * COMMENTS_PER_PAGE],
         'p': p,
         'max_pages': max_pages,
     })
@@ -2006,7 +2009,7 @@ def user_messages(request, id, name_slug):
     messages_qs = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(
         Q(sent_by=selected_user)
         | Q(sent_to=selected_user)
-    )
+    ).select_related('sent_by')
     number_of_messages = messages_qs.count()
     try:
         p = int(request.GET.get('p', 0))
@@ -2194,7 +2197,7 @@ def change_password(request):
 
 @login_required
 def messages(request):
-    messages_qs = models.Message.objects.filter(owned_by=request.user)
+    messages_qs = models.Message.objects.filter(owned_by=request.user).select_related('sent_by')
     number_of_messages = messages_qs.count()
     try:
         p = int(request.GET.get('p', 0))

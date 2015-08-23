@@ -92,7 +92,7 @@
                 {% endfor %}
             {% endif %}
             <div class="hover_show_button_context">
-                <h3>Bemutató{% if film.main_premier or film.main_premier_year %}{% if film.other_premiers %}k{% endif %}{% endif %}{% if permission_edit_premiers %} <span class="hover_show_button button small_button" id="show_premier_form">bemutatók szerkesztése</span>{% endif %}</h3>
+                <h3>Bemutató{% if film.main_premier or film.main_premier_year %}{% if other_premiers %}k{% endif %}{% endif %}{% if permission_edit_premiers %} <span class="hover_show_button button small_button" id="show_premier_form">bemutatók szerkesztése</span>{% endif %}</h3>
                 <ul class="mini_list">
                 {% if film.main_premier or film.main_premier_year %}
                     <li>
@@ -103,7 +103,7 @@
                         {% endif %}
                     </li>
                 {% endif %}
-                {% for p in film.other_premiers %}
+                {% for p in other_premiers %}
                     <li>{{ p.premier_type }}: {{ p.when|date:"Y. F j." }}</li>
                 {% endfor %}
                 </ul>
@@ -120,7 +120,7 @@
                         </p>
                         <p>
                             További bemutatók (ÉÉÉÉ-HH-NN):<br />
-                            {% for p in film.other_premiers %}
+                            {% for p in other_premiers %}
                                 <input type="text" name="other_premier_when_{{ p.id }}" value="{{ p.when|date:"Y-m-d" }}" /> <select name="other_premier_type_{{ p.id }}">
                                     {% for pt in premier_types %}
                                         <option value="{{ pt.id }}"{% if p.premier_type.id == pt.id %} selected="selected"{% endif %}>{{ pt }}</option>

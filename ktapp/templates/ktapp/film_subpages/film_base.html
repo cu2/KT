@@ -3,6 +3,7 @@
 {% block title %}{{ film.orig_title }}{% if film.second_title %} / {{ film.second_title }}{% endif %} ({{ film.year }}) - Kritikus Tömeg{% endblock %}
 
 {% block header %}
+    {% with directors=film.directors countries=film.countries genres=film.genres %}
     <div id="film_header" class="hover_show_button_context">
         <div id="film_title">
             <h1>{{ film.orig_title }}{% if film.year %} <span class="film_year">({{ film.year }})</span>{% endif %}</h1>
@@ -15,14 +16,14 @@
                     {% endif %}
                 </h2>
             {% endif %}
-            {% if film.directors %}
-                <h3>({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
+            {% if directors %}
+                <h3>({% for director in directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
             {% endif %}
-            {% if film.countries or film.genres %}
+            {% if countries or genres %}
                 <p>
-                    {% for country in film.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
-                    {% if film.genres %}
-                        {% for genre in film.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                    {% for country in countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
+                    {% if genres %}
+                        {% for genre in genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
                     {% else %}
                         film
                     {% endif %}
@@ -79,7 +80,7 @@
                 </p>
                 <p>
                     <label for="id_film_directors">Rendező(k) (vesszővel elválasztva):</label><br />
-                    <input type="text" name="film_directors" id="id_film_directors" class="input_for_artists" value="{% for d in film.directors %}{{ d }}{% if not forloop.last %}, {% endif %}{% endfor %}" />
+                    <input type="text" name="film_directors" id="id_film_directors" class="input_for_artists" value="{% for d in directors %}{{ d }}{% if not forloop.last %}, {% endif %}{% endfor %}" />
                 </p>
                 <p>
                     <label for="id_film_imdb_link">IMDb link (a film imdb-s oldalának teljes url-je):</label><br />
@@ -104,6 +105,7 @@
             </form>
         </div>
     {% endif %}
+    {% endwith %}
 {% endblock %}
 
 {% block main %}
