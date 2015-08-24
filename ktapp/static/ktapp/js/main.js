@@ -37,6 +37,9 @@ $(function() {
     $('.show_bbcode_help_button').click(function () {
         $('.bbcode_help').toggle();
     });
+    $('#show_artist_edit_form_button').click(function () {
+        $('#artist_edit_form').toggle();
+    });
     $('#show_rating_details_button').click(function () {
         $('.rating_details').toggle();
     });

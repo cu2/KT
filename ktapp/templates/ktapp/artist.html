@@ -64,7 +64,8 @@
     {% endif %}
 
     {% if permission_edit_artist %}
-        <h3>Színész/rendező módosítása</h3>
+        <p><span class="button small_button" id="show_artist_edit_form_button">Színész/rendező módosítása</span></p>
+        <div id="artist_edit_form" style="display: none">
         <form action="" method="post">
             {% csrf_token %}
             <p>
@@ -94,6 +95,7 @@
                 </form>
             {% endfor %}
         {% endif %}
+        </div>
     {% endif %}
 
 </div>
