@@ -1390,32 +1390,99 @@ def artist_main(request, id, name_slug):
                 artist.gender = artist_gender
                 artist.save()
             return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))
-    directions = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR).order_by('-film__year', 'film__orig_title')
+
+    if request.user.is_authenticated():
+        directions = models.Film.objects.raw('''
+        SELECT f.*,
+        v.rating AS my_rating, CASE WHEN w.film_id IS NOT NULL THEN 1 ELSE 0 END AS my_wish
+        FROM ktapp_film f
+        INNER JOIN ktapp_filmartistrelationship fa ON fa.film_id = f.id AND fa.role_type = 'D'
+        LEFT JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = %(user_id)s
+        LEFT JOIN ktapp_wishlist w ON w.film_id = f.id AND w.wished_by_id = %(user_id)s AND w.wish_type = 'Y'
+        WHERE fa.artist_id = %(artist_id)s
+        ORDER BY f.year DESC, f.orig_title, f.id
+        ''', {
+            'artist_id': artist.id,
+            'user_id': request.user.id,
+        })
+    else:
+        directions = models.Film.objects.raw('''
+        SELECT f.*,
+        NULL AS my_rating, NULL AS my_wish
+        FROM ktapp_film f
+        INNER JOIN ktapp_filmartistrelationship fa ON fa.film_id = f.id AND fa.role_type = 'D'
+        WHERE fa.artist_id = %(artist_id)s
+        ORDER BY f.year DESC, f.orig_title, f.id
+        ''', {
+            'artist_id': artist.id,
+        })
+    director_vote_count = 0
     director_vote_avg = 0
     if directions:
-        director_votes = directions.aggregate(nr1=Sum('film__number_of_ratings_1'),
-                                              nr2=Sum('film__number_of_ratings_2'),
-                                              nr3=Sum('film__number_of_ratings_3'),
-                                              nr4=Sum('film__number_of_ratings_4'),
-                                              nr5=Sum('film__number_of_ratings_5'))
-        director_vote_count = director_votes.get('nr1', 0) + director_votes.get('nr2', 0) + director_votes.get('nr3', 0) + director_votes.get('nr4', 0) + director_votes.get('nr5', 0)
+        director_votes = {
+            'nr1': 0,
+            'nr2': 0,
+            'nr3': 0,
+            'nr4': 0,
+            'nr5': 0,
+        }
+        for x in directions:
+            director_votes['nr1'] += x.number_of_ratings_1
+            director_votes['nr2'] += x.number_of_ratings_2
+            director_votes['nr3'] += x.number_of_ratings_3
+            director_votes['nr4'] += x.number_of_ratings_4
+            director_votes['nr5'] += x.number_of_ratings_5
+            director_vote_count += x.number_of_ratings
         if director_vote_count:
             director_vote_avg = 1.0 * (director_votes.get('nr1', 0) + 2*director_votes.get('nr2', 0) + 3*director_votes.get('nr3', 0) + 4*director_votes.get('nr4', 0) + 5*director_votes.get('nr5', 0)) / director_vote_count
+
+    if request.user.is_authenticated():
+        roles = models.Film.objects.raw('''
+        SELECT f.*,
+        fa.id AS role_id, fa.slug_cache AS role_slug_cache, fa.role_name AS role_role_name, fa.actor_subtype AS role_actor_subtype,
+        v.rating AS my_rating, CASE WHEN w.film_id IS NOT NULL THEN 1 ELSE 0 END AS my_wish
+        FROM ktapp_film f
+        INNER JOIN ktapp_filmartistrelationship fa ON fa.film_id = f.id AND fa.role_type = 'A'
+        LEFT JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = %(user_id)s
+        LEFT JOIN ktapp_wishlist w ON w.film_id = f.id AND w.wished_by_id = %(user_id)s AND w.wish_type = 'Y'
+        WHERE fa.artist_id = %(artist_id)s
+        ORDER BY f.year DESC, f.orig_title, f.id
+        ''', {
+            'artist_id': artist.id,
+            'user_id': request.user.id,
+        })
     else:
-        director_vote_count = 0
-    roles = artist.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).order_by('-film__year', 'film__orig_title')
+        roles = models.Film.objects.raw('''
+        SELECT f.*,
+        fa.id AS role_id, fa.slug_cache AS role_slug_cache, fa.role_name AS role_role_name, fa.actor_subtype AS role_actor_subtype,
+        NULL AS my_rating, NULL AS my_wish
+        FROM ktapp_film f
+        INNER JOIN ktapp_filmartistrelationship fa ON fa.film_id = f.id AND fa.role_type = 'A'
+        WHERE fa.artist_id = %(artist_id)s
+        ORDER BY f.year DESC, f.orig_title, f.id
+        ''', {
+            'artist_id': artist.id,
+        })
+    actor_vote_count = 0
     actor_vote_avg = 0
     if roles:
-        actor_votes = roles.aggregate(nr1=Sum('film__number_of_ratings_1'),
-                                      nr2=Sum('film__number_of_ratings_2'),
-                                      nr3=Sum('film__number_of_ratings_3'),
-                                      nr4=Sum('film__number_of_ratings_4'),
-                                      nr5=Sum('film__number_of_ratings_5'))
-        actor_vote_count = actor_votes.get('nr1', 0) + actor_votes.get('nr2', 0) + actor_votes.get('nr3', 0) + actor_votes.get('nr4', 0) + actor_votes.get('nr5', 0)
+        actor_votes = {
+            'nr1': 0,
+            'nr2': 0,
+            'nr3': 0,
+            'nr4': 0,
+            'nr5': 0,
+            }
+        for x in roles:
+            actor_votes['nr1'] += x.number_of_ratings_1
+            actor_votes['nr2'] += x.number_of_ratings_2
+            actor_votes['nr3'] += x.number_of_ratings_3
+            actor_votes['nr4'] += x.number_of_ratings_4
+            actor_votes['nr5'] += x.number_of_ratings_5
+            actor_vote_count += x.number_of_ratings
         if actor_vote_count:
             actor_vote_avg = 1.0 * (actor_votes.get('nr1', 0) + 2*actor_votes.get('nr2', 0) + 3*actor_votes.get('nr3', 0) + 4*actor_votes.get('nr4', 0) + 5*actor_votes.get('nr5', 0)) / actor_vote_count
-    else:
-        actor_vote_count = 0
+
     normal_name = artist.name
     similar_artists = [a for a in models.Artist.objects.filter(name=normal_name) if a != artist]
     if ' ' in normal_name:

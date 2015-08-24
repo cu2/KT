@@ -5,16 +5,24 @@
             <th data-sort="string">Film</th>
             <th data-sort="int">Év</th>
             <th data-sort="float" data-sort-default="desc">Átlag</th>
+            {% if request.user.is_authenticated %}
+                <th data-sort="int" data-sort-default="desc">Szerinted?</th>
+                <th data-sort="string" data-sort-default="desc">Meg akarod nézni?</th>
+            {% endif %}
             <th data-sort="int" data-sort-default="desc">Szavazatszám</th>
         </tr>
     </thead>
     <tbody>
     {% for direction in directions %}
         <tr class="{% cycle '' 'odd' %}">
-            <td>{{ direction.film|film_url_html }}</td>
-            <td class="center">{% if direction.film.year %}{{ direction.film.year }}{% endif %}</td>
-            <td class="center" data-sort-value="{{ direction.film|film_rating_sort_value }}">{{ direction.film|film_avg_rating_html }}</td>
-            <td class="center" data-sort-value="{{ direction.film.number_of_ratings }}">{{ direction.film|film_num_rating_html }}</td>
+            <td>{{ direction|film_url_html }}</td>
+            <td class="center">{% if direction.year %}{{ direction.year }}{% endif %}</td>
+            <td class="center" data-sort-value="{{ direction|film_rating_sort_value }}">{{ direction|film_avg_rating_html }}</td>
+            {% if request.user.is_authenticated %}
+                <td class="center" data-sort-value="{% if direction.my_rating %}{{ direction.my_rating }}{% else %}0{% endif %}">{% if direction.my_rating %}{{ direction.my_rating }}{% endif %}</td>
+                <td class="center">{% if direction.my_wish == 1 %}IGEN{% endif %}</td>
+            {% endif %}
+            <td class="center" data-sort-value="{{ direction.number_of_ratings }}">{{ direction|film_num_rating_html }}</td>
         </tr>
     {% endfor %}
     </tbody>
