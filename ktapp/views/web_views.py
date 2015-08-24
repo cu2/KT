@@ -1340,7 +1340,7 @@ def edit_keywords(request):
                     continue
                 if type_code not in {'M', 'O'}:
                     spoiler = False
-                if type_code in {'C', 'G'} and not request.user.is_staff:
+                if type_code == 'M' or (type_code in {'C', 'G'} and not request.user.is_staff):  # don't create new
                     try:
                         keyword = models.Keyword.objects.get(
                             name=keyword_name,
