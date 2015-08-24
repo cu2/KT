@@ -386,6 +386,7 @@ input.inactive_action {
     text-decoration: line-through;
 }
 .spoiler {
+    display: inline-block;
     background: rgb(249,244,218);
     color: rgb(249,244,218);
     border: solid 1px rgb(0, 0, 0);
