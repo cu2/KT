@@ -580,6 +580,7 @@ ul.poll li {
 
 .comment_block {
     margin: 20px 0 40px 0;
+    overflow: hidden;
 }
 .comment_block_content {
     position: relative;
@@ -616,6 +617,7 @@ ul.poll li {
 
 .film_addon {
     margin: 25px 0 50px 0;
+    overflow: hidden;
 }
 .film_addon_content {
     background: rgb(249,244,218);
