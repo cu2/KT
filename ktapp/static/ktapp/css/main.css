@@ -403,7 +403,7 @@ input.inactive_action {
 }
 
 .new_message_warning {
-    background: rgb(146,23,23);
+    background: rgb(30,36,180);
     color: rgb(249,244,218);
     font-size: 9pt;
     padding: 2px 5px 3px 4px;
@@ -598,6 +598,7 @@ ul.poll li {
     margin: 0;
     padding: 2px 5px;
     font-size: 9pt;
+    overflow: auto;
 }
 .comment_block_author_right {
     float: right;
@@ -632,18 +633,21 @@ ul.poll li {
     padding: 2px 5px;
     font-size: 9pt;
     text-align: right;
+    overflow: auto;
 }
 .review_author {
     background: rgb(218,211,184);
     margin: 0;
     padding: 2px 5px;
     font-size: 9pt;
+    overflow: auto;
 }
 .portrait_author {
     background: rgb(218,211,184);
     margin: 0;
     padding: 2px 5px;
     font-size: 9pt;
+    overflow: auto;
 }
 
 
@@ -862,6 +866,16 @@ ul.poll li {
     width: 80px;
 }
 @media (min-width: 800px) {
+    .search_input {
+        width: 120px;
+    }
+}
+@media (min-width: 900px) {
+    .search_input {
+        width: 200px;
+    }
+}
+@media (min-width: 1000px) {
     .search_input {
         width: 300px;
     }
