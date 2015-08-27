@@ -2362,7 +2362,8 @@ def new_message(request):
             recipient = models.KTUser.get_user_by_name(recipient_name.strip())
             if recipient is None:
                 continue
-            recipients.add(recipient)
+            if recipient.id != request.user.id:
+                recipients.add(recipient)
         if len(recipients) == 0:
             return HttpResponseRedirect(next_url)
         owners = recipients | {request.user}
@@ -2398,7 +2399,8 @@ def new_message(request):
             user = models.KTUser.objects.get(id=user_id)
         except models.KTUser.DoesNotExist:
             continue
-        users.add(user)
+        if user.id != request.user.id:
+            users.add(user)
     return render(request, 'ktapp/new_message.html', {
         'list_of_recipients': sorted(list(users), key=lambda u: u.username.upper()),
     })
