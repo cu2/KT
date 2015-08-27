@@ -10,7 +10,7 @@
 {% block main %}
 
     <form action="{% url 'browse' %}" method="get">
-        <p>Cím: <input type="text" tabindex="12" name="title" value="{{ title }}" class="search_input focus_this" /></p>
+        <p>Cím: <input type="text" tabindex="12" name="title" value="{{ title }}" class="search_input" /></p>
         <p>Év: <input type="text" tabindex="13" name="year" value="{{ year }}" class="search_input" /> (formátum: <span class="input_format">ÉÉÉÉ</span>, <span class="input_format">ÉÉÉÉ-</span>, <span class="input_format">-ÉÉÉÉ</span>, <span class="input_format">ÉÉÉÉ-ÉÉÉÉ</span>)</p>
         <p>Rendező(k): <input type="text" tabindex="14" name="directors" value="{{ directors }}" class="search_input input_for_artists" /></p>
         <p>Színész(ek): <input type="text" tabindex="15" name="actors" value="{{ actors }}" class="search_input input_for_artists" /></p>
