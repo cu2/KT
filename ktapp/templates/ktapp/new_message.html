@@ -17,4 +17,18 @@
         <p class="center"><input type="submit" value="Üzenet elküldése" /></p>
     </form>
 
+    {% if message_to_reply_to %}
+        <p>Válasz erre:</p>
+        <div class="comment_block">
+            <div class="comment_block_author">
+                {{ message_to_reply_to.sent_at|date:"Y-m-d H:i:s" }} {% if message_to_reply_to.sent_by %}<a href="{% url 'user_profile' message_to_reply_to.sent_by.id message_to_reply_to.sent_by.slug_cache %}">{{ message_to_reply_to.sent_by }}</a>{% else %}?{% endif %} &gt; {% for recipient in message_to_reply_to.recipients %}{% if recipient %}<a href="{% url 'user_profile' recipient.id recipient.slug_cache %}">{{ recipient }}</a>{% else %}?{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
+            </div>
+            <div class="comment_block_content">
+                {% autoescape off %}
+                    <p>{{ message_to_reply_to.content_html|linebreaksbr }}</p>
+                {% endautoescape %}
+            </div>
+        </div>
+    {% endif %}
+
 {% endblock %}

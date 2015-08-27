@@ -1,8 +1,8 @@
 <div class="comment_block">
     <div class="comment_block_author">
-        {{ message.sent_at }} {% if message.sent_by %}<a href="{% url 'user_profile' message.sent_by.id message.sent_by.slug_cache %}">{{ message.sent_by }}</a>{% else %}?{% endif %} &gt; {% for recipient in message.recipients %}{% if recipient %}<a href="{% url 'user_profile' recipient.id recipient.slug_cache %}">{{ recipient }}</a>{% else %}?{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
+        {{ message.sent_at|date:"Y-m-d H:i:s" }} {% if message.sent_by %}<a href="{% url 'user_profile' message.sent_by.id message.sent_by.slug_cache %}">{{ message.sent_by }}</a>{% else %}?{% endif %} &gt; {% for recipient in message.recipients %}{% if recipient %}<a href="{% url 'user_profile' recipient.id recipient.slug_cache %}">{{ recipient }}</a>{% else %}?{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
         <div class="comment_block_author_right">
-            <a href="{% url 'new_message' %}?u={% for recipient in message.recipients %}{% if recipient %}{{ recipient.id }}{% endif %},{% endfor %}{{ message.sent_by.id }}" title="Válasz küldése">&larr;</a>
+            <a href="{% url 'new_message' %}?r={{ message.id }}" title="Válasz küldése">&larr;</a>
             &nbsp;
             <span class="delete_area">
                 <span class="delete_confirm" style="display: none">

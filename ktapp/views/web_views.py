@@ -2362,8 +2362,9 @@ def new_message(request):
             recipient = models.KTUser.get_user_by_name(recipient_name.strip())
             if recipient is None:
                 continue
-            if recipient.id != request.user.id:
-                recipients.add(recipient)
+            recipients.add(recipient)
+        if request.user in recipients and len(recipients) > 1:
+            recipients.discard(request.user)
         if len(recipients) == 0:
             return HttpResponseRedirect(next_url)
         owners = recipients | {request.user}
@@ -2388,21 +2389,31 @@ def new_message(request):
         #         )
         #     )
         return HttpResponseRedirect(next_url)
-    list_of_user_ids = request.GET.get('u', '')
+    try:
+        message_to_reply_to = models.Message.objects.get(id=request.GET.get('r', 0), owned_by=request.user)
+    except models.Message.DoesNotExist:
+        message_to_reply_to = None
     users = set()
-    for raw_user_id in request.GET.get('u', '').split(','):
-        try:
-            user_id = int(raw_user_id.strip())
-        except ValueError:
-            continue
-        try:
-            user = models.KTUser.objects.get(id=user_id)
-        except models.KTUser.DoesNotExist:
-            continue
-        if user.id != request.user.id:
+    if message_to_reply_to:
+        for recipient in message_to_reply_to.recipients():
+            users.add(recipient)
+        users.add(message_to_reply_to.sent_by)
+    else:
+        for raw_user_id in request.GET.get('u', '').split(','):
+            try:
+                user_id = int(raw_user_id.strip())
+            except ValueError:
+                continue
+            try:
+                user = models.KTUser.objects.get(id=user_id)
+            except models.KTUser.DoesNotExist:
+                continue
             users.add(user)
+    if request.user in users and len(users) > 1:  # don't send pm to yourself, if there's at least one other recipient
+        users.discard(request.user)
     return render(request, 'ktapp/new_message.html', {
         'list_of_recipients': sorted(list(users), key=lambda u: u.username.upper()),
+        'message_to_reply_to': message_to_reply_to,
     })
 
 
