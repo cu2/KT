@@ -342,12 +342,18 @@ input.inactive_action {
     font-size: 7pt;
     font-weight: normal;
     border-radius: 10px;
-    padding: 1px 10px;
+    padding: 1px 10px !important;
 }
 @media (min-width: 800px) {
     .small_button {
         font-size: 9pt;
     }
+}
+.very_small_button {
+    font-size: 7pt;
+    font-weight: normal;
+    border-radius: 10px;
+    padding: 1px 5px !important;
 }
 #toptopmenu .small_button {
     font-size: 9pt;

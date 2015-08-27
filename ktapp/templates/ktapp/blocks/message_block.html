@@ -2,7 +2,21 @@
     <div class="comment_block_author">
         {{ message.sent_at }} {% if message.sent_by %}<a href="{% url 'user_profile' message.sent_by.id message.sent_by.slug_cache %}">{{ message.sent_by }}</a>{% else %}?{% endif %} &gt; {% for recipient in message.recipients %}{% if recipient %}<a href="{% url 'user_profile' recipient.id recipient.slug_cache %}">{{ recipient }}</a>{% else %}?{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
         <div class="comment_block_author_right">
-            <a href="{% url 'new_message' %}?u={% for recipient in message.recipients %}{% if recipient %}{{ recipient.id }}{% endif %},{% endfor %}{{ message.sent_by.id }}">&larr;</a>
+            <a href="{% url 'new_message' %}?u={% for recipient in message.recipients %}{% if recipient %}{{ recipient.id }}{% endif %},{% endfor %}{{ message.sent_by.id }}" title="Válasz küldése">&larr;</a>
+            &nbsp;
+            <span class="delete_area">
+                <span class="delete_confirm" style="display: none">
+                    Biztosan?
+                    <form action="{% url 'delete_message' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+                        <input type="hidden" name="message_id" value="{{ message.id }}" />
+                        <input type="submit" value="Igen" class="very_small_button" />
+                    </form>
+                    <span class="button very_small_button toggle_delete">Nem</span>
+                </span>
+                <span class="action_text toggle_delete" title="Üzenet törlése">&empty;</span>
+            </span>
         </div>
     </div>
     <div class="comment_block_content">

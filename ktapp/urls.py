@@ -105,6 +105,7 @@ urlpatterns += patterns(
 
     url(r'^uzik/$', web_views.messages, name='messages'),
     url(r'^uj_uzenet$', web_views.new_message, name='new_message'),
+    url(r'^torol_uzenet$', web_views.delete_message, name='delete_message'),
 )
 
 

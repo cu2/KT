@@ -2407,6 +2407,18 @@ def new_message(request):
 
 
 @login_required
+def delete_message(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    if request.user.validated_email:
+        try:
+            message = models.Message.objects.get(id=request.POST.get('message_id', 0), owned_by=request.user)
+        except models.Message.DoesNotExist:
+            return HttpResponseRedirect(next_url)
+        message.delete()
+    return HttpResponseRedirect(next_url)
+
+
+@login_required
 @kt_utils.kt_permission_required('check_changes')
 def changes(request):
 

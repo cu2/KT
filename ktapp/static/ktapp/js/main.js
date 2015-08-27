@@ -1,4 +1,7 @@
 $(function() {
+    $('.toggle_delete').click(function() {
+        $(this).closest('.delete_area').find('.delete_confirm').toggle();
+    });
     var sortable_table = $('table.sortable').stupidtable();
     sortable_table.on("aftertablesort", function (event, data) {
         var th = $(this).find("th");
