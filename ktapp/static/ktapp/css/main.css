@@ -834,30 +834,21 @@ ul.poll li {
 #film_main_voting_block form input {
     margin: 0;
 }
-.show_change_vote {
-    font-size: 8pt;
+.change_vote div {
+    padding-top: 5px;
 }
-#film_main_voting_block .show_change_vote {
-    display: none;
-}
-#film_main_voting_block:hover .show_change_vote {
-    display: inline;
-}
-.small_rating {
-    font-size: 8pt;
+.my_rating {
     font-weight: bold;
 }
 .rating_details {
     font-size: 8pt;
 }
-.show_rating_details {
-    font-size: 8pt;
+#show_rating_details_button {
+    vertical-align: 2px;
 }
-#film_main_ratings_block .show_rating_details {
+#hide_rating_details_button {
+    vertical-align: 2px;
     display: none;
-}
-#film_main_ratings_block:hover .show_rating_details {
-    display: inline;
 }
 .action_text {
     color: rgb(146,23,23);

@@ -143,24 +143,14 @@
         </div>
         <div id="film_main_right">
             <div id="film_main_voting_block">
+                <h3>Szerinted?</h3>
                 {% if user.is_authenticated %}
-                    {% if rating %}
-                        <h3>Szerinted milyen?
-                            {% for r in ratings %}
-                                {% cycle 'nézhetetlen' 'rossz' 'oké/elmegy' 'jó' 'zseniális' as named_rating silent %}
-                                {% if r == rating %}
-                                    {{ named_rating }}
-                                {% endif %}
-                            {% endfor %}
-                            <span class="show_change_vote"> <span class="button small_button" id="show_change_vote_button">szavazat módosítása</span></span></h3>
-                    {% else %}
-                        <h3>Szerinted milyen?</h3>
-                    {% endif %}
-                    <div class="change_vote"{% if rating %} style="display: none"{% endif %}>
-                        {% for r in ratings %}
-                            {% cycle 'nézhetetlen' 'rossz' 'oké/elmegy' 'jó' 'zseniális' as named_rating silent %}
+                    <div class="change_vote">
+                        {% for r in ratings reversed %}
+                            {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
+                            <div>
                             {% if r == rating %}
-                                <span class="small_rating">{{ named_rating }}</span>
+                                <span class="my_rating">{{ named_rating }}</span>
                             {% else %}
                                 <form action="{% url 'vote' %}" method="post" class="inline">
                                     {% csrf_token %}
@@ -169,23 +159,25 @@
                                     <input type="submit" value="{{ named_rating }}"{% if rating %} class=""{% endif %} />
                                 </form>
                             {% endif %}
+                            </div>
                         {% endfor %}
                         {% if rating %}
+                            <div>
                             <form action="{% url 'vote' %}" method="post" class="inline">
                                 {% csrf_token %}
                                 <input type="hidden" name="film_id" value="{{ film.pk }}" />
                                 <input type="hidden" name="rating" value="0" />
-                                <input type="submit" value="???" class="" />
+                                <input type="submit" value="???" class="small_button" />
                             </form>
+                            </div>
                         {% endif %}
                     </div>
                 {% else %}
-                    <h3>Szerinted milyen?</h3>
                     <p>Ahhoz, hogy szavazhass, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
                 {% endif %}
             </div>
             <div id="film_main_ratings_block">
-                <h3>Szavazatok<span class="show_rating_details"> <span class="button small_button" id="show_rating_details_button">összes szavazat megmutatása</span></span></h3>
+                <h3>Szavazatok <span class="button very_small_button" id="show_rating_details_button">részletek &gt;</span> <span class="button very_small_button" id="hide_rating_details_button">részletek v</span></h3>
                 <ul class="mini_list">
                     {% for num_vote, vote in votes %}
                         {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
@@ -219,7 +211,7 @@
                         <input type="hidden" name="wish_type" value="Y" />
                         {% if my_wishes.Y %}
                             <input type="hidden" name="action" value="-" />
-                            <li class="hover_show_button_context">Meg akarod nézni. <input type="submit" value="Mégsem" class="small_button hover_show_button" /></li>
+                            <li><b>Meg akarod nézni.</b> <input type="submit" value="Mégsem" class="small_button" /></li>
                         {% else %}
                             <input type="hidden" name="action" value="+" />
                             <li>Meg akarod nézni? <input type="submit" value="Igen" class="small_button" /></li>
@@ -231,7 +223,7 @@
                         <input type="hidden" name="wish_type" value="N" />
                         {% if my_wishes.N %}
                             <input type="hidden" name="action" value="-" />
-                            <li class="hover_show_button_context">Nem akarod megnézni. <input type="submit" value="Mégis" class="small_button hover_show_button" /></li>
+                            <li><b>Nem akarod megnézni.</b> <input type="submit" value="Mégis" class="small_button" /></li>
                         {% else %}
                             <input type="hidden" name="action" value="+" />
                             <li>Nem akarod megnézni? <input type="submit" value="Nem" class="small_button" /></li>
@@ -243,7 +235,7 @@
                         <input type="hidden" name="wish_type" value="G" />
                         {% if my_wishes.G %}
                             <input type="hidden" name="action" value="-" />
-                            <li class="hover_show_button_context">Meg akarod szerezni. <input type="submit" value="Mégsem" class="small_button hover_show_button" /></li>
+                            <li><b>Meg akarod szerezni.</b> <input type="submit" value="Mégsem" class="small_button" /></li>
                         {% else %}
                             <input type="hidden" name="action" value="+" />
                             <li>Meg akarod szerezni? <input type="submit" value="Igen" class="small_button" /></li>

@@ -44,10 +44,14 @@ $(function() {
         $('#artist_edit_form').toggle();
     });
     $('#show_rating_details_button').click(function () {
-        $('.rating_details').toggle();
+        $('#show_rating_details_button').hide();
+        $('#hide_rating_details_button').show();
+        $('.rating_details').show();
     });
-    $('#show_change_vote_button').click(function () {
-        $('.change_vote').toggle();
+    $('#hide_rating_details_button').click(function () {
+        $('#hide_rating_details_button').hide();
+        $('#show_rating_details_button').show();
+        $('.rating_details').hide();
     });
     $('#show_picture_edit_button').click(function () {
         $('.picture_edit_block').toggle();
