@@ -31,10 +31,16 @@ MESSAGES_PER_PAGE = 50
 def index(request):
     hash_of_the_day = int(hashlib.md5(datetime.datetime.now().strftime('%Y-%m-%d')).hexdigest(), 16)
     # film of the day
-    number_of_films = models.Film.objects.filter(main_poster__isnull=False, number_of_ratings__gte=10).count()
+    film_of_the_day_qs = models.Film.objects.filter(
+        main_poster__isnull=False,
+        number_of_ratings__gte=10,
+        average_rating__gte=4,
+        number_of_comments__gte=3,
+    )
+    number_of_films = film_of_the_day_qs.count()  # cca 1600
     film_no_of_the_day = hash_of_the_day % number_of_films
     try:
-        film_of_the_day = models.Film.objects.filter(main_poster__isnull=False, number_of_ratings__gte=10).order_by('id')[film_no_of_the_day]
+        film_of_the_day = film_of_the_day_qs.order_by('id')[film_no_of_the_day]
     except models.Film.DoesNotExist:
         film_of_the_day = models.Film.objects.get(id=1)
     # toplist of the day
