@@ -43,6 +43,12 @@ $(function() {
     $('#show_artist_edit_form_button').click(function () {
         $('#artist_edit_form').toggle();
     });
+    $('#show_role_edit_form_button').click(function () {
+        $('#role_edit_form').toggle();
+    });
+    $('#show_role_delete_form_button').click(function () {
+        $('#role_delete_form').toggle();
+    });
     $('#show_rating_details_button').click(function () {
         $('#show_rating_details_button').hide();
         $('#hide_rating_details_button').show();

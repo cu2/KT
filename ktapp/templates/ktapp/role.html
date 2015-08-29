@@ -12,7 +12,8 @@
     <p>Színész: <a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}</p>
 
     {% if permission_edit_role %}
-        <h3>Szereplő módosítása</h3>
+        <p><span class="button small_button" id="show_role_edit_form_button">Szereplő módosítása</span></p>
+        <div id="role_edit_form" style="display: none">
         <form action="" method="post">
             {% csrf_token %}
             <p>
@@ -30,14 +31,17 @@
                 <input type="submit" value="Szereplő módosítása" />
             </p>
         </form>
+        </div>
     {% endif %}
     {% if permission_delete_role %}
-        <h3>Szereplő törlése</h3>
+        <p><span class="button small_button" id="show_role_delete_form_button">Szereplő törlése</span></p>
+        <div id="role_delete_form" style="display: none">
         <form action="{% url 'delete_role' %}" method="post">
             {% csrf_token %}
             <input type="hidden" name="role" value="{{ role.id }}" />
             <p><input type="submit" value="Szereplő törlése" /></p>
         </form>
+        </div>
     {% endif %}
 
 
