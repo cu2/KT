@@ -838,6 +838,10 @@ ul.poll li {
     padding-top: 5px;
 }
 .my_rating {
+    background: rgb(249,244,218);
+    border: solid 1px rgb(128,128,128);
+    border-radius: 12px;
+    padding: 1px 12px;
     font-weight: bold;
 }
 .rating_details {
