@@ -1,5 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
+from django.utils.http import urlquote_plus as urlquote_plus_function
 from django.core.urlresolvers import reverse
 
 
@@ -76,3 +77,8 @@ def film_rating_sort_value(film):
     if film.average_rating is None:
         return '0.0'
     return unicode(film.average_rating)
+
+
+@register.filter
+def urlquote_plus(value):
+    return urlquote_plus_function(value)

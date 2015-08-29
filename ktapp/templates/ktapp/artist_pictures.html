@@ -3,7 +3,8 @@
 {% block title %}{{ artist.name }} - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{{ artist.name }}</h1>
+    <h1 style="margin-bottom: 0">{{ artist.name }} képei</h1>
+    <p><a href="{% url 'artist' artist.id artist.slug_cache %}">vissza a szerepeihez</a></p>
 {% endblock %}
 
 {% block main %}

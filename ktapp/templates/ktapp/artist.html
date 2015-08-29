@@ -1,9 +1,16 @@
 {% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
 
 {% block title %}{{ artist.name }} - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{{ artist.name }}</h1>
+    <h1 style="margin-bottom: 0">{{ artist.name }}</h1>
+    <p>
+        <a href="http://imdb.com/find?s=nm&q={{ artist.name|urlquote_plus }}" title="{{ artist.name }} az IMDb-n"><img src="{% static 'ktapp/images/imdb.png' %}"></a>
+        <a href="http://en.wikipedia.org/w/wiki.phtml?search={{ artist.name|urlquote_plus }}" title="{{ artist.name }} az angol Wikipedián"><img src="{% static 'ktapp/images/wikipedia.png' %}"></a>
+        <a href="http://hu.wikipedia.org/w/wiki.phtml?search={{ artist.name|urlquote_plus }}" title="{{ artist.name }} a magyar Wikipédián"><img src="{% static 'ktapp/images/wikipedia_hu.png' %}"></a>
+    </p>
 {% endblock %}
 
 {% block main %}
