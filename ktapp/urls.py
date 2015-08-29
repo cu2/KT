@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls import patterns, url, include
 from django.conf.urls.static import static
 from django.contrib.auth.views import logout
+from django.views.generic.base import RedirectView
 from rest_framework import routers
 
 from ktapp.views import web_views, api_views
@@ -91,11 +92,12 @@ urlpatterns += patterns(
     url(r'^kozkerdes/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.poll, name='poll'),
     url(r'^kozkerdesek/$', web_views.polls, name='polls'),
 
-    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', web_views.user_films, name='user_films'),
-    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', web_views.user_comments, name='user_comments'),
-    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', web_views.user_wishlist, name='user_wishlist'),
-    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', web_views.user_messages, name='user_messages'),
-    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.user_profile, name='user_profile'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', web_views.user_films, name='user_films'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', web_views.user_comments, name='user_comments'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', web_views.user_wishlist, name='user_wishlist'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', web_views.user_messages, name='user_messages'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.user_profile, name='user_profile'),
+
     url(r'^jelszo_modositasa$', web_views.change_password, name='change_password'),
     url(r'^bejelentkezes$', web_views.custom_login, name='login'),
     url(r'^kijelentkezes$', logout, name='logout'),
@@ -107,7 +109,13 @@ urlpatterns += patterns(
     url(r'^uj_uzenet$', web_views.new_message, name='new_message'),
     url(r'^torol_uzenet$', web_views.delete_message, name='delete_message'),
 
-    url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # redirect old php urls
+    # legacy redirects:
+    url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # old php urls
+    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', RedirectView.as_view(pattern_name='user_films')),
+    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', RedirectView.as_view(pattern_name='user_comments')),
+    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', RedirectView.as_view(pattern_name='user_wishlist')),
+    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', RedirectView.as_view(pattern_name='user_messages')),
+    url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)$', RedirectView.as_view(pattern_name='user_profile')),
 )
 
 

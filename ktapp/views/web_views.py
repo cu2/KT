@@ -2485,11 +2485,17 @@ def old_url(request):
     if request.path == '/szinesz.php':
         artist = get_object_or_404(models.Artist, pk=request.GET.get('aid', 0))
         return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))
+    if request.path == '/szineszpix.php':
+        artist = get_object_or_404(models.Artist, pk=request.GET.get('aid', 0))
+        return HttpResponseRedirect(reverse('artist_pictures', args=(artist.id, artist.slug_cache)))
     if request.path == '/szereplo.php':
         role = get_object_or_404(models.FilmArtistRelationship, pk=request.GET.get('rid', 0))
         return HttpResponseRedirect(reverse('role', args=(role.id, role.slug_cache)))
     if request.path == '/usertoplistak.php':
-        usertoplist = get_object_or_404(models.UserToplist, pk=request.GET.get('tlId', 0))
+        utl_id = request.GET.get('tlId', 0)
+        if utl_id == 0:
+            return HttpResponseRedirect(reverse('usertoplists'))
+        usertoplist = get_object_or_404(models.UserToplist, pk=utl_id)
         return HttpResponseRedirect(reverse('usertoplist', args=(usertoplist.id, usertoplist.slug_cache)))
     if request.path == '/keres.php':
         q = request.GET.get('rendezo', '')
@@ -2503,4 +2509,22 @@ def old_url(request):
         else:
             q = request.GET.get('cim', '')
         return HttpResponseRedirect(reverse('search') + '?q=' + q)
+    if request.path == '/ember.php':
+        user = get_object_or_404(models.KTUser, pk=request.GET.get('uid', 0))
+        return HttpResponseRedirect(reverse('user_profile', args=(user.id, user.slug_cache)))
+    if request.path == '/beszolasok.php':
+        return HttpResponseRedirect(reverse('latest_comments'))
+    if request.path == '/forum.php':
+        topic_id = request.GET.get('tid', 0)
+        if topic_id == 0:
+            return HttpResponseRedirect(reverse('list_of_topics'))
+        topic = get_object_or_404(models.Topic, pk=topic_id)
+        return HttpResponseRedirect(reverse('forum', args=(topic.id, topic.slug_cache)))
+    if request.path == '/index.php':
+        return HttpResponseRedirect(reverse('index'))
+    if request.path == '/top.php':
+        return HttpResponseRedirect(reverse('top_films'))
+    if request.path == '/pollforum.php' or request.path == '/pollregi.php':
+        poll = get_object_or_404(models.Poll, pk=request.GET.get('pkid', 0))
+        return HttpResponseRedirect(reverse('poll', args=(poll.id, poll.slug_cache)))
     raise Http404
