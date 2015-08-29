@@ -3,6 +3,8 @@ from django.utils.safestring import mark_safe
 from django.utils.http import urlquote_plus as urlquote_plus_function
 from django.core.urlresolvers import reverse
 
+from ktapp.utils import strip_whitespace as strip_whitespace_function
+
 
 register = template.Library()
 
@@ -82,3 +84,8 @@ def film_rating_sort_value(film):
 @register.filter
 def urlquote_plus(value):
     return urlquote_plus_function(value)
+
+
+@register.filter
+def strip_whitespace(value):
+    return strip_whitespace_function(value)

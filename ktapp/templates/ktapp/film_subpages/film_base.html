@@ -3,6 +3,8 @@
 
 {% block title %}{{ film.orig_title }}{% if film.second_title %} / {{ film.second_title }}{% endif %} ({{ film.year }}) - Kritikus Tömeg{% endblock %}
 
+{% block meta_description %}{% with directors=film.directors countries=film.countries genres=film.genres %}{% if countries or genres %}{% for country in countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{% for genre in genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}film{% endif %}{% endif %}, {% if directors %}rendezte: {% for director in directors|slice:":3" %}{{ director.name }}{% if not forloop.last %} - {% endif %}{% endfor %}{% endif %}. {{ film.plot_summary|strip_whitespace }}{% endwith %}{% endblock %}
+
 {% block header %}
     {% with directors=film.directors countries=film.countries genres=film.genres %}
     <div id="film_header" class="hover_show_button_context">

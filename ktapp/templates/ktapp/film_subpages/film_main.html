@@ -10,7 +10,7 @@
                     <img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" />
                 {% endif %}
                 <p{% if film.main_poster %} class="film_block_content"{% endif %} id="plot_text">
-                    {{ film.plot_summary }}{% if permission_edit_film %} <span class="hover_show_button button small_button" id="show_plot_edit_form">történet szerkesztése</span>{% endif %}
+                    {{ film.plot_summary|linebreaksbr }}{% if permission_edit_film %} <span class="hover_show_button button small_button" id="show_plot_edit_form">történet szerkesztése</span>{% endif %}
                 </p>
                 {% if permission_edit_film %}
                     <div id="plot_edit_form" style="display: none"{% if film.main_poster %} class="film_block_content"{% endif %}>
