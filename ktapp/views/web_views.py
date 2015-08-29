@@ -2451,3 +2451,56 @@ def changes(request):
             'state_after': sorted([(key, val) for key, val in json.loads(c.state_after).iteritems()]) if c.state_after else {},
         } for c in models.Change.objects.all().order_by('-id')[:100]],
     })
+
+
+def old_url(request):
+    print request.path
+    if request.path == '/film.php':
+        film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
+        return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+    if request.path == '/filmvel.php':
+        film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
+        return HttpResponseRedirect(reverse('film_comments', args=(film.id, film.slug_cache)))
+    if request.path == '/filmpix.php':
+        film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
+        return HttpResponseRedirect(reverse('film_pictures', args=(film.id, film.slug_cache)))
+    if request.path == '/filmdij.php':
+        film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
+        return HttpResponseRedirect(reverse('film_awards', args=(film.id, film.slug_cache)))
+    if request.path == '/filmelem.php':
+        film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
+        return HttpResponseRedirect(reverse('film_reviews', args=(film.id, film.slug_cache)))
+    if request.path == '/filmid.php':
+        film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
+        return HttpResponseRedirect(reverse('film_quotes', args=(film.id, film.slug_cache)))
+    if request.path == '/filmtriv.php':
+        film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
+        return HttpResponseRedirect(reverse('film_trivias', args=(film.id, film.slug_cache)))
+    if request.path == '/filmksz.php':
+        film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
+        return HttpResponseRedirect(reverse('film_keywords', args=(film.id, film.slug_cache)))
+    if request.path == '/filmlink.php':
+        film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
+        return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+    if request.path == '/szinesz.php':
+        artist = get_object_or_404(models.Artist, pk=request.GET.get('aid', 0))
+        return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))
+    if request.path == '/szereplo.php':
+        role = get_object_or_404(models.FilmArtistRelationship, pk=request.GET.get('rid', 0))
+        return HttpResponseRedirect(reverse('role', args=(role.id, role.slug_cache)))
+    if request.path == '/usertoplistak.php':
+        usertoplist = get_object_or_404(models.UserToplist, pk=request.GET.get('tlId', 0))
+        return HttpResponseRedirect(reverse('usertoplist', args=(usertoplist.id, usertoplist.slug_cache)))
+    if request.path == '/keres.php':
+        q = request.GET.get('rendezo', '')
+        if q != '':
+            try:
+                artist = models.Artist.objects.get(name__icontains=q)
+            except models.Artist.DoesNotExist:
+                artist = None
+            if artist:
+                return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))
+        else:
+            q = request.GET.get('cim', '')
+        return HttpResponseRedirect(reverse('search') + '?q=' + q)
+    raise Http404

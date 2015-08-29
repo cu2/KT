@@ -106,6 +106,8 @@ urlpatterns += patterns(
     url(r'^uzik/$', web_views.messages, name='messages'),
     url(r'^uj_uzenet$', web_views.new_message, name='new_message'),
     url(r'^torol_uzenet$', web_views.delete_message, name='delete_message'),
+
+    url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # redirect old php urls
 )
 
 
