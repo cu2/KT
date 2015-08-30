@@ -10,7 +10,7 @@
 {% block main %}
 
     {% if favourites %}
-        <p>Kedvenceid: {% for fav in favourites %}<a href="">{{ fav.username }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+        <p>Kedvenceid: {% for fav in favourites %}<a href="{% url 'user_profile' fav.id fav.slug_cache %}">{{ fav.username }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
     {% endif %}
 
     <div class="left_content">

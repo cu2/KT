@@ -1720,14 +1720,42 @@ def new_topic(request):
 def favourites(request):
     favourites = []
     favourite_ids = []
+    latest_fav_votes = []
+    latest_fav_comments = []
     for fav in request.user.get_follows().order_by('username', 'id'):
         favourites.append(fav)
         favourite_ids.append(fav.id)
+        latest_fav_votes.append(fav.latest_votes)
+        latest_fav_comments.append(fav.latest_comments)
+    latest_fav_votes = [int(v) for v in ','.join(latest_fav_votes).split(',') if v != '']
+    latest_fav_comments = [int(c) for c in ','.join(latest_fav_comments).split(',') if c != '']
     return render(request, 'ktapp/favourites.html', {
         'favourites': favourites,
-        'latest_votes': models.Vote.objects.filter(user__in=favourite_ids).select_related('user', 'film').order_by('-when', '-id')[:50],
-        'latest_comments': models.Comment.objects.filter(created_by__in=favourite_ids).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').all()[:20],
+        'latest_votes': models.Vote.objects.filter(id__in=latest_fav_votes).select_related('user', 'film').order_by('-when', '-id')[:50],
+        'latest_comments': models.Comment.objects.filter(id__in=latest_fav_comments).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').all()[:20],
     })
+
+
+@login_required
+def follow(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    try:
+        other_user = models.KTUser.objects.get(id=request.POST.get('whom', 0))
+    except models.KTUser.DoesNotExist:
+        return HttpResponseRedirect(next_url)
+    models.Follow.objects.get_or_create(who=request.user, whom=other_user)
+    return HttpResponseRedirect(next_url)
+
+
+@login_required
+def unfollow(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    try:
+        other_user = models.KTUser.objects.get(id=request.POST.get('whom', 0))
+    except models.KTUser.DoesNotExist:
+        return HttpResponseRedirect(next_url)
+    models.Follow.objects.filter(who=request.user, whom=other_user).delete()
+    return HttpResponseRedirect(next_url)
 
 
 def usertoplists(request):
@@ -1935,6 +1963,7 @@ def user_profile(request, id, name_slug):
         'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
         'latest_votes': selected_user.votes().select_related('film').order_by('-when', '-id')[:10],
         'latest_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(created_by=selected_user)[:10],
+        'myfav': models.Follow.objects.filter(who=request.user, whom=selected_user).count() if request.user.is_authenticated() else 0,
     })
 
 

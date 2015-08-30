@@ -84,7 +84,7 @@ urlpatterns += patterns(
     url(r'^forum/$', web_views.list_of_topics, name='list_of_topics'),
     url(r'^uj_topik$', web_views.new_topic, name='new_topic'),
     url(r'^legfrissebb_kommentek/$', web_views.latest_comments, name='latest_comments'),
-    # url(r'^kedvencek/$', web_views.favourites, name='favourites'),
+    url(r'^kedvencek/$', web_views.favourites, name='favourites'),
 
     url(r'^felhasznaloi_toplista/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.usertoplist, name='usertoplist'),
     url(r'^felhasznaloi_toplistak/$', web_views.usertoplists, name='usertoplists'),
@@ -114,6 +114,9 @@ urlpatterns += patterns(
     url(r'^uzik/$', web_views.messages, name='messages'),
     url(r'^uj_uzenet$', web_views.new_message, name='new_message'),
     url(r'^torol_uzenet$', web_views.delete_message, name='delete_message'),
+
+    url(r'^uj_kedvenc$', web_views.follow, name='follow'),
+    url(r'^torol_kedvenc$', web_views.unfollow, name='unfollow'),
 
     # legacy redirects:
     url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # old php urls

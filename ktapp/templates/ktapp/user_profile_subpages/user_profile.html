@@ -68,6 +68,28 @@
             </p>
         {% endif %}
 
+        {% if user.is_authenticated and selected_user.id != user.id %}
+            {% if myfav %}
+                <form action="{% url 'unfollow' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="whom" value="{{ selected_user.id }}" />
+                    <p>
+                        Kedvencnek jelölted.
+                        <input type="submit" value="Törlés a kedvencek közül" class="small_button" />
+                    </p>
+                </form>
+            {% else %}
+                <form action="{% url 'follow' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="whom" value="{{ selected_user.id }}" />
+                    <p>
+                        Érdekel {{ selected_user.username }}? Jelöld kedvencnek, hogy követni tudd a szavazatait és kommentjeit:
+                        <input type="submit" value="Hozzáadás a kedvencekhez" class="small_button" />
+                    </p>
+                </form>
+            {% endif %}
+        {% endif %}
+
         {% if selected_user.id == user.id and user.validated_email %}
             <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
             <div class="mobilemenu">
