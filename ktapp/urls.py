@@ -93,6 +93,7 @@ urlpatterns += patterns(
     url(r'^kozkerdesek/$', web_views.polls, name='polls'),
 
     url(r'^elemzesek/$', web_views.list_of_reviews, name='list_of_reviews'),
+    url(r'^portrek/$', web_views.list_of_bios, name='list_of_bios'),
 
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', web_views.user_films, name='user_films'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', web_views.user_comments, name='user_comments'),

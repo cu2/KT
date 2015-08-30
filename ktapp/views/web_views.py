@@ -2464,6 +2464,17 @@ def list_of_reviews(request):
     })
 
 
+def list_of_bios(request):
+    unapproved_bios = []
+    if request.user.is_authenticated():
+        if kt_utils.check_permission('approve_bio', request.user):
+            unapproved_bios = models.Biography.objects.select_related('artist', 'created_by').filter(approved=False).order_by('-created_at')
+    return render(request, 'ktapp/list_of_bios.html', {
+        'bios': models.Biography.objects.select_related('artist', 'created_by').filter(approved=True).order_by('-created_at'),
+        'unapproved_bios': unapproved_bios,
+    })
+
+
 def old_url(request):
     print request.path
     if request.path == '/film.php':

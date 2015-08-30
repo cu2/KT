@@ -1,0 +1,54 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Portrék - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Portrék</h1>
+{% endblock %}
+
+{% block main %}
+    <div class="centered_content">
+
+        {% if unapproved_bios %}
+            <h2>Elfogadásra várók</h2>
+            <table class="fullsize sortable">
+                <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Színész/rendező</th>
+                    <th data-sort="string">Ki írta</th>
+                    <th data-sort="string" data-sort-default="desc">Mikor</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for bio in unapproved_bios %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td><a href="{% url 'artist' bio.artist.id bio.artist.slug_cache %}">{{ bio.artist.name }}</a></td>
+                        <td>{% if bio.created_by %}<a href="{% url 'user_profile' bio.created_by.id bio.created_by.slug_cache %}">{{ bio.created_by }}</a>{% endif %}</td>
+                        <td class="nowrap">{{ bio.created_at|date:"Y-m-d" }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <table class="fullsize sortable">
+            <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Színész/rendező</th>
+                    <th data-sort="string">Ki írta</th>
+                    <th data-sort="string" data-sort-default="desc">Mikor</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for bio in bios %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td><a href="{% url 'artist' bio.artist.id bio.artist.slug_cache %}">{{ bio.artist.name }}</a></td>
+                    <td>{% if bio.created_by %}<a href="{% url 'user_profile' bio.created_by.id bio.created_by.slug_cache %}">{{ bio.created_by }}</a>{% endif %}</td>
+                    <td class="nowrap">{{ bio.created_at|date:"Y-m-d" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}
