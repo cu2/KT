@@ -2453,6 +2453,17 @@ def changes(request):
     })
 
 
+def list_of_reviews(request):
+    unapproved_reviews = []
+    if request.user.is_authenticated():
+        if kt_utils.check_permission('approve_review', request.user):
+            unapproved_reviews = models.Review.objects.select_related('film', 'created_by').filter(approved=False).order_by('-created_at')
+    return render(request, 'ktapp/list_of_reviews.html', {
+        'reviews': models.Review.objects.select_related('film', 'created_by').filter(approved=True).order_by('-created_at'),
+        'unapproved_reviews': unapproved_reviews,
+    })
+
+
 def old_url(request):
     print request.path
     if request.path == '/film.php':

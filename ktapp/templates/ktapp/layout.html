@@ -118,6 +118,11 @@
                         <li><a href="{% url 'polls' %}?tipus=leendo">Leendő</a></li>
                     </ul>
                 </li>
+                <li>Tartalmak<br />
+                    <ul class="submenu">
+                        <li><a href="{% url 'list_of_reviews' %}">Elemzések</a></li>
+                    </ul>
+                </li>
                 {% if user.is_authenticated and user.core_member %}
                     <li>Szerk<br />
                         <ul class="submenu">

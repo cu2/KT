@@ -1,0 +1,55 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Elemzések - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Elemzések</h1>
+{% endblock %}
+
+{% block main %}
+    <div class="centered_content">
+
+        {% if unapproved_reviews %}
+            <h2>Elfogadásra várók</h2>
+            <table class="fullsize sortable">
+                <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Film</th>
+                    <th data-sort="string">Ki írta</th>
+                    <th data-sort="string" data-sort-default="desc">Mikor</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for review in unapproved_reviews %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td>{{ review.film|film_url_html_w_year:"film_reviews" }}</td>
+                        <td>{% if review.created_by %}<a href="{% url 'user_profile' review.created_by.id review.created_by.slug_cache %}">{{ review.created_by }}</a>{% endif %}</td>
+                        <td class="nowrap">{{ review.created_at|date:"Y-m-d" }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <table class="fullsize sortable">
+            <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Film</th>
+                    <th data-sort="string">Ki írta</th>
+                    <th data-sort="string" data-sort-default="desc">Mikor</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for review in reviews %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td>{{ review|review_url_html_w_year }}</td>
+                    <td>{% if review.created_by %}<a href="{% url 'user_profile' review.created_by.id review.created_by.slug_cache %}">{{ review.created_by }}</a>{% endif %}</td>
+                    <td class="nowrap">{{ review.created_at|date:"Y-m-d" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}
