@@ -285,8 +285,8 @@ class Comment(models.Model):
             kwargs['domain'].number_of_comments = kwargs['domain'].comment_set.count()
             kwargs['domain'].last_comment = kwargs['domain'].comment_set.latest()
             kwargs['domain'].save()
-            self.user.latest_comments = ','.join([unicode(c.id) for c in self.user.comment_set.all().order_by('-created_at', '-id')[:100]])
-            self.user.save()
+            self.created_by.latest_comments = ','.join([unicode(c.id) for c in self.created_by.comment_set.all().order_by('-created_at', '-id')[:100]])
+            self.created_by.save()
 
 
 @receiver(post_delete, sender=Comment)
@@ -311,8 +311,8 @@ def delete_comment(sender, instance, **kwargs):
     else:
         domain.last_comment = None
     domain.save()
-    instance.user.latest_comments = ','.join([unicode(c.id) for c in instance.user.comment_set.all().order_by('-created_at', '-id')[:100]])
-    instance.user.save()
+    instance.created_by.latest_comments = ','.join([unicode(c.id) for c in instance.created_by.comment_set.all().order_by('-created_at', '-id')[:100]])
+    instance.created_by.save()
 
 
 class Topic(models.Model):
