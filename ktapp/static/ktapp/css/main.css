@@ -633,6 +633,13 @@ ul.poll li {
     margin: 0;
     padding: 5px;
 }
+.film_addon_source {
+    background: rgb(218,211,184);
+    margin: 0;
+    padding: 2px 5px;
+    font-size: 9pt;
+    overflow: auto;
+}
 .film_addon_author {
     background: rgb(218,211,184);
     margin: 0;

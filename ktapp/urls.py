@@ -95,6 +95,8 @@ urlpatterns += patterns(
     url(r'^elemzesek/$', web_views.list_of_reviews, name='list_of_reviews'),
     url(r'^portrek/$', web_views.list_of_bios, name='list_of_bios'),
     url(r'^kepek/$', web_views.latest_pictures, name='latest_pictures'),
+    url(r'^idezetek/$', web_views.latest_quotes, name='latest_quotes'),
+    url(r'^erdekessegek/$', web_views.latest_trivias, name='latest_trivias'),
 
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', web_views.user_films, name='user_films'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', web_views.user_comments, name='user_comments'),

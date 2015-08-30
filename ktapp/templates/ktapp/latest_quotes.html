@@ -1,0 +1,17 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Legfrissebb idézetek - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Legfrissebb idézetek</h1>
+{% endblock %}
+
+{% block main %}
+<div class="centered_content">
+
+    {% for q in quotes %}
+        {% include 'ktapp/blocks/film_addon_block.html' with addon=q show_addon_source=True addon_type='quote' %}
+    {% endfor %}
+
+</div>
+{% endblock %}

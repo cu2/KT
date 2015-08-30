@@ -2481,6 +2481,18 @@ def latest_pictures(request):
     })
 
 
+def latest_quotes(request):
+    return render(request, 'ktapp/latest_quotes.html', {
+        'quotes': models.Quote.objects.select_related('film').all().order_by('-created_at')[:100],
+    })
+
+
+def latest_trivias(request):
+    return render(request, 'ktapp/latest_trivias.html', {
+        'trivias': models.Trivia.objects.select_related('film').all().order_by('-created_at')[:100],
+    })
+
+
 def old_url(request):
     print request.path
     if request.path == '/film.php':

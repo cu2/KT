@@ -1,0 +1,17 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Legfrissebb érdekességek - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Legfrissebb érdekességek</h1>
+{% endblock %}
+
+{% block main %}
+<div class="centered_content">
+
+    {% for t in trivias %}
+        {% include 'ktapp/blocks/film_addon_block.html' with addon=t show_addon_source=True addon_type='trivia' %}
+    {% endfor %}
+
+</div>
+{% endblock %}
