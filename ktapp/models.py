@@ -64,6 +64,8 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     last_message_checking_at = models.DateTimeField(blank=True, null=True)
     old_tv_settings = models.CharField(max_length=250, blank=True, null=True)
     last_activity_at = models.DateTimeField(blank=True, null=True)
+    latest_votes = models.TextField(blank=True)
+    latest_comments = models.TextField(blank=True)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -218,6 +220,8 @@ class Vote(models.Model):
         super(Vote, self).save(*args, **kwargs)
         self.film.comment_set.filter(created_by=self.user).update(rating=self.rating)
         Wishlist.objects.filter(film=self.film, wished_by=self.user, wish_type=Wishlist.WISH_TYPE_YES).delete()
+        self.user.latest_votes = ','.join([unicode(v.id) for v in self.user.vote_set.all().order_by('-when', '-id')[:100]])
+        self.user.save()
 
 
 @receiver(post_delete, sender=Vote)
@@ -226,6 +230,8 @@ def delete_vote(sender, instance, **kwargs):
         instance.film.comment_set.filter(created_by=instance.user).update(rating=None)
     except Film.DoesNotExist:
         pass
+    instance.user.latest_votes = ','.join([unicode(v.id) for v in instance.user.vote_set.all().order_by('-when', '-id')[:100]])
+    instance.user.save()
 
 
 class Comment(models.Model):
@@ -279,6 +285,8 @@ class Comment(models.Model):
             kwargs['domain'].number_of_comments = kwargs['domain'].comment_set.count()
             kwargs['domain'].last_comment = kwargs['domain'].comment_set.latest()
             kwargs['domain'].save()
+            self.user.latest_comments = ','.join([unicode(c.id) for c in self.user.comment_set.all().order_by('-created_at', '-id')[:100]])
+            self.user.save()
 
 
 @receiver(post_delete, sender=Comment)
@@ -303,6 +311,8 @@ def delete_comment(sender, instance, **kwargs):
     else:
         domain.last_comment = None
     domain.save()
+    instance.user.latest_comments = ','.join([unicode(c.id) for c in instance.user.comment_set.all().order_by('-created_at', '-id')[:100]])
+    instance.user.save()
 
 
 class Topic(models.Model):
