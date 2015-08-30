@@ -66,6 +66,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     last_activity_at = models.DateTimeField(blank=True, null=True)
     latest_votes = models.TextField(blank=True)
     latest_comments = models.TextField(blank=True)
+    number_of_comments = models.PositiveIntegerField(default=0)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -255,6 +256,7 @@ class Comment(models.Model):
     reply_to = models.ForeignKey('self', blank=True, null=True, on_delete=models.SET_NULL)
     rating = models.PositiveSmallIntegerField(blank=True, null=True)  # cache for film comments
     serial_number = models.PositiveIntegerField(default=0)
+    serial_number_by_user = models.PositiveIntegerField(default=0)
 
     def __unicode__(self):
         return self.content[:100]
@@ -273,6 +275,7 @@ class Comment(models.Model):
             self.content = strip_tags(self.content)
             self.content_html = utils.bbcode_to_html(self.content)
             self.serial_number = kwargs['domain'].comment_set.count() + 1
+            self.serial_number_by_user = self.created_by.comment_set.count() + 1
             if self.domain == Comment.DOMAIN_FILM:
                 try:
                     vote = Vote.objects.get(film=self.film, user=self.created_by)
@@ -286,6 +289,7 @@ class Comment(models.Model):
             kwargs['domain'].last_comment = kwargs['domain'].comment_set.latest()
             kwargs['domain'].save()
             self.created_by.latest_comments = ','.join([unicode(c.id) for c in self.created_by.comment_set.all().order_by('-created_at', '-id')[:100]])
+            self.created_by.number_of_comments = self.created_by.comment_set.count()
             self.created_by.save()
 
 
@@ -311,7 +315,11 @@ def delete_comment(sender, instance, **kwargs):
     else:
         domain.last_comment = None
     domain.save()
+    for idx, remaining_comment in enumerate(Comment.objects.filter(created_by=instance.created_by).order_by('created_at', 'id')):
+        remaining_comment.serial_number_by_user = idx + 1
+        remaining_comment.save()
     instance.created_by.latest_comments = ','.join([unicode(c.id) for c in instance.created_by.comment_set.all().order_by('-created_at', '-id')[:100]])
+    instance.created_by.number_of_comments = instance.created_by.comment_set.count()
     instance.created_by.save()
 
 
