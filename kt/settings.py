@@ -185,8 +185,8 @@ LOGGING = {
 }
 
 AUTH_USER_MODEL = 'ktapp.KTUser'
-LOGIN_URL = '/bejelentkezes/'
-LOGIN_REDIRECT_URL = '/bejelentkezes/'
+LOGIN_URL = '/bejelentkezes'
+LOGIN_REDIRECT_URL = '/'
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
