@@ -267,6 +267,7 @@ class Comment(models.Model):
         index_together = [
             ['created_at'],
             ['domain', 'created_at'],
+            ['created_by', 'serial_number_by_user', 'created_at'],
         ]
 
     def save(self, *args, **kwargs):

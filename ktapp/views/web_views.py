@@ -1944,7 +1944,7 @@ def custom_login(request):
 
 def user_profile(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    if request.user.is_authenticated():
+    if request.user.is_authenticated() and request.user.id != selected_user.id:
         number_of_messages = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(Q(sent_by=selected_user) | Q(sent_to=selected_user)).count()
     else:
         number_of_messages = 0
@@ -1961,15 +1961,15 @@ def user_profile(request, id, name_slug):
         'number_of_vapiti_votes': number_of_vapiti_votes,
         'vapiti_weight': number_of_votes + 25 * number_of_vapiti_votes,
         'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
-        'latest_votes': selected_user.votes().select_related('film').order_by('-when', '-id')[:10],
-        'latest_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(created_by=selected_user)[:10],
+        'latest_votes': selected_user.vote_set.filter(id__in=selected_user.latest_votes.split(',')[:10]).select_related('film').order_by('-when', '-id'),
+        'latest_comments': models.Comment.objects.filter(id__in=selected_user.latest_comments.split(',')[:10]).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by'),
         'myfav': models.Follow.objects.filter(who=request.user, whom=selected_user).count() if request.user.is_authenticated() else 0,
     })
 
 
 def user_films(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    if request.user.is_authenticated():
+    if request.user.is_authenticated() and request.user.id != selected_user.id:
         number_of_messages = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(Q(sent_by=selected_user) | Q(sent_to=selected_user)).count()
     else:
         number_of_messages = 0
@@ -2109,30 +2109,38 @@ def user_films(request, id, name_slug):
 
 def user_comments(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    if request.user.is_authenticated():
+    if request.user.is_authenticated() and request.user.id != selected_user.id:
         number_of_messages = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(Q(sent_by=selected_user) | Q(sent_to=selected_user)).count()
     else:
         number_of_messages = 0
-    number_of_comments = selected_user.comment_set.count()
     p = int(request.GET.get('p', 0))
     if p == 1:
         return HttpResponseRedirect(reverse('user_comments', args=(selected_user.id, selected_user.slug_cache)))
-    max_pages = int(math.ceil(1.0 * number_of_comments / COMMENTS_PER_PAGE))
+    max_pages = int(math.ceil(1.0 * selected_user.number_of_comments / COMMENTS_PER_PAGE))
     if max_pages == 0:
         max_pages = 1
     if p == 0:
         p = 1
     if p > max_pages:
         return HttpResponseRedirect(reverse('user_comments', args=(selected_user.id, selected_user.slug_cache)) + '?p=' + str(max_pages))
+    comments_qs = selected_user.comment_set.select_related('film', 'topic', 'poll', 'reply_to', 'reply_to__created_by')
+    if max_pages > 1:
+        first_comment = selected_user.number_of_comments - COMMENTS_PER_PAGE * (p - 1) - (COMMENTS_PER_PAGE - 1)
+        last_comment = selected_user.number_of_comments - COMMENTS_PER_PAGE * (p - 1)
+        print first_comment
+        print last_comment
+        comments = comments_qs.filter(serial_number_by_user__lte=last_comment, serial_number_by_user__gte=first_comment)
+    else:
+        comments = comments_qs.all()
     return render(request, 'ktapp/user_profile_subpages/user_comments.html', {
         'active_tab': 'comments',
         'selected_user': selected_user,
         'number_of_votes': selected_user.vote_set.count(),
-        'number_of_comments': number_of_comments,
+        'number_of_comments': selected_user.number_of_comments,
         'number_of_wishes': selected_user.wishlist_set.filter(wish_type__in=['Y', 'G']).count(),
         'number_of_messages': number_of_messages,
         'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
-        'comments': selected_user.comment_set.select_related('film', 'topic', 'poll', 'reply_to', 'reply_to__created_by').all().order_by('-created_at')[(p-1) * COMMENTS_PER_PAGE:p * COMMENTS_PER_PAGE],
+        'comments': comments.order_by('-created_at'),
         'p': p,
         'max_pages': max_pages,
     })
@@ -2140,7 +2148,7 @@ def user_comments(request, id, name_slug):
 
 def user_wishlist(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    if request.user.is_authenticated():
+    if request.user.is_authenticated() and request.user.id != selected_user.id:
         number_of_messages = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(Q(sent_by=selected_user) | Q(sent_to=selected_user)).count()
     else:
         number_of_messages = 0
