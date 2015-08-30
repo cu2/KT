@@ -783,14 +783,17 @@ def film_keywords(request, id, film_slug):
             pass
     major_keywords = models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=models.Keyword.KEYWORD_TYPE_MAJOR)
     other_keywords = models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=models.Keyword.KEYWORD_TYPE_OTHER)
+    major_and_other_keywords = models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type__in=(models.Keyword.KEYWORD_TYPE_MAJOR, models.Keyword.KEYWORD_TYPE_OTHER))
     if rating == 0:  # hide spoiler keywords
         major_keywords = major_keywords.exclude(spoiler=True)
         other_keywords = other_keywords.exclude(spoiler=True)
+        major_and_other_keywords = major_and_other_keywords.exclude(spoiler=True)
     return render(request, 'ktapp/film_subpages/film_keywords.html', {
         'active_tab': 'keywords',
         'film': film,
         'major_keywords': [(x.keyword, x.spoiler) for x in major_keywords.order_by('keyword__name', 'keyword__id')],
         'other_keywords': [(x.keyword, x.spoiler) for x in other_keywords.order_by('keyword__name', 'keyword__id')],
+        'major_and_other_keywords': [(x.keyword, x.spoiler) for x in major_and_other_keywords.order_by('keyword__name', 'keyword__id')],
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     })
 
@@ -1018,43 +1021,21 @@ def new_film(request):
 
         for type_name, type_code in [('countries', 'C'), ('genres', 'G')]:
             new_keywords = set()
-            new_keyword_spoiler = {}
             for keyword_name in kt_utils.strip_whitespace(request.POST.get(type_name, '')).split(','):
                 keyword_name = keyword_name.strip()
                 if keyword_name.endswith('*'):
-                    spoiler = True
                     keyword_name = keyword_name[:-1]
-                else:
-                    spoiler = False
                 if not keyword_name:
                     continue
-                if type_code not in {'M', 'O'}:
-                    spoiler = False
-                if request.user.is_staff:
-                    keyword, created = models.Keyword.objects.get_or_create(
-                        name=keyword_name,
-                        keyword_type=type_code,
-                    )
-                    if created:
-                        keyword.created_by = request.user
-                        keyword.save()
-                else:
-                    try:
-                        keyword = models.Keyword.objects.get(
-                            name=keyword_name,
-                            keyword_type=type_code,
-                        )
-                    except models.Keyword.DoesNotExist:
-                        keyword = None
+                keyword = models.Keyword.get_keyword_by_name(keyword_name, type_code)
                 if keyword:
                     new_keywords.add(keyword.id)
-                    new_keyword_spoiler[keyword.id] = spoiler
             for keyword_id in new_keywords:
                 models.FilmKeywordRelationship.objects.create(
                     film=film,
                     keyword=models.Keyword.objects.get(id=keyword_id),
                     created_by=request.user,
-                    spoiler=new_keyword_spoiler[keyword_id],
+                    spoiler=False,
                 )
 
         film.plot_summary = request.POST.get('film_plot', '').strip()
@@ -1329,42 +1310,20 @@ def edit_premiers(request):
 def edit_keywords(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
-        for type_name, type_code in [('countries', 'C'), ('genres', 'G'), ('major_keywords', 'M'), ('other_keywords', 'O')]:
+        for type_name, type_code in [('countries', 'C'), ('genres', 'G')]:
             old_keywords = set()
             for keyword in models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type=type_code):
                 old_keywords.add(keyword.keyword.id)
             new_keywords = set()
-            new_keyword_spoiler = {}
             for keyword_name in kt_utils.strip_whitespace(request.POST.get(type_name, '')).split(','):
                 keyword_name = keyword_name.strip()
                 if keyword_name.endswith('*'):
-                    spoiler = True
                     keyword_name = keyword_name[:-1]
-                else:
-                    spoiler = False
                 if not keyword_name:
                     continue
-                if type_code not in {'M', 'O'}:
-                    spoiler = False
-                if type_code == 'M' or (type_code in {'C', 'G'} and not request.user.is_staff):  # don't create new
-                    try:
-                        keyword = models.Keyword.objects.get(
-                            name=keyword_name,
-                            keyword_type=type_code,
-                        )
-                    except models.Keyword.DoesNotExist:
-                        keyword = None
-                else:
-                    keyword, created = models.Keyword.objects.get_or_create(
-                        name=keyword_name,
-                        keyword_type=type_code,
-                    )
-                    if created:
-                        keyword.created_by = request.user
-                        keyword.save()
+                keyword = models.Keyword.get_keyword_by_name(keyword_name, type_code)
                 if keyword:
                     new_keywords.add(keyword.id)
-                    new_keyword_spoiler[keyword.id] = spoiler
             for keyword_id in old_keywords - new_keywords:
                 models.FilmKeywordRelationship.objects.filter(film=film, keyword__id=keyword_id).delete()
             for keyword_id in new_keywords - old_keywords:
@@ -1372,12 +1331,52 @@ def edit_keywords(request):
                     film=film,
                     keyword=models.Keyword.objects.get(id=keyword_id),
                     created_by=request.user,
-                    spoiler=new_keyword_spoiler[keyword_id],
+                    spoiler=False,
                 )
             for keyword_id in new_keywords & old_keywords:
                 keyword = models.FilmKeywordRelationship.objects.filter(film=film, keyword__id=keyword_id)[0]
-                keyword.spoiler = new_keyword_spoiler[keyword_id]
+                keyword.spoiler = False
                 keyword.save()
+        # major and other keywords
+        old_keywords = set()
+        for keyword in models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type__in=(models.Keyword.KEYWORD_TYPE_MAJOR, models.Keyword.KEYWORD_TYPE_OTHER)):
+            old_keywords.add(keyword.keyword.id)
+        new_keywords = set()
+        new_keyword_spoiler = {}
+        for keyword_name in kt_utils.strip_whitespace(request.POST.get('keywords', '')).split(','):
+            keyword_name = keyword_name.strip()
+            if keyword_name.endswith('*'):
+                spoiler = True
+                keyword_name = keyword_name[:-1]
+            else:
+                spoiler = False
+            if not keyword_name:
+                continue
+            keyword = models.Keyword.get_keyword_by_name(keyword_name, 'K')
+            if keyword is None:
+                keyword, created = models.Keyword.objects.get_or_create(
+                    name=keyword_name,
+                    keyword_type=models.Keyword.KEYWORD_TYPE_OTHER,
+                )
+                if created:
+                    keyword.created_by = request.user
+                    keyword.save()
+            if keyword:
+                new_keywords.add(keyword.id)
+                new_keyword_spoiler[keyword.id] = spoiler
+        for keyword_id in old_keywords - new_keywords:
+            models.FilmKeywordRelationship.objects.filter(film=film, keyword__id=keyword_id).delete()
+        for keyword_id in new_keywords - old_keywords:
+            models.FilmKeywordRelationship.objects.create(
+                film=film,
+                keyword=models.Keyword.objects.get(id=keyword_id),
+                created_by=request.user,
+                spoiler=new_keyword_spoiler[keyword_id],
+            )
+        for keyword_id in new_keywords & old_keywords:
+            keyword = models.FilmKeywordRelationship.objects.filter(film=film, keyword__id=keyword_id)[0]
+            keyword.spoiler = new_keyword_spoiler[keyword_id]
+            keyword.save()
     return HttpResponseRedirect(reverse('film_keywords', args=(film.id, film.slug_cache)))
 
 

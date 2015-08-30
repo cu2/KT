@@ -658,6 +658,19 @@ class Keyword(models.Model):
         self.slug_cache = slugify(self.name)
         super(Keyword, self).save(*args, **kwargs)
 
+    @classmethod
+    def get_keyword_by_name(cls, name, keyword_type):  # case and more importantly accent sensitive getter
+        qs = cls.objects.filter(name=name)
+        if keyword_type:
+            if keyword_type == 'K':
+                qs = qs.filter(keyword_type__in=(cls.KEYWORD_TYPE_MAJOR, cls.KEYWORD_TYPE_OTHER))
+            else:
+                qs = qs.filter(keyword_type=keyword_type)
+        keyword_list = [keyword for keyword in qs if keyword.name == name]
+        if keyword_list:
+            return keyword_list[0]
+        return None
+
 
 class FilmKeywordRelationship(models.Model):
     film = models.ForeignKey(Film)
