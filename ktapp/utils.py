@@ -8,6 +8,8 @@ from django.core.exceptions import PermissionDenied
 
 
 def bbcode_to_html(value):
+    value = re.sub('\[link\](.*?)\[/link\]', '<a href="\\1">\\1</a>', value, flags=re.S)
+    value = re.sub('\[link=\](.*?)\[/link\]', '<a href="\\1">\\1</a>', value, flags=re.S)
     value = re.sub('\[link=([^\]]*)\](.*?)\[/link\]', '<a href="\\1">\\2</a>', value, flags=re.S)
     value = re.sub('\[b\](.*?)\[/b\]', '<b>\\1</b>', value, flags=re.S)
     value = re.sub('\[i\](.*?)\[/i\]', '<i>\\1</i>', value, flags=re.S)
