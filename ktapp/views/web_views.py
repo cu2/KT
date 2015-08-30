@@ -2475,6 +2475,12 @@ def list_of_bios(request):
     })
 
 
+def latest_pictures(request):
+    return render(request, 'ktapp/latest_pictures.html', {
+        'pictures': models.Picture.objects.select_related('film').all().order_by('-created_at')[:100],
+    })
+
+
 def old_url(request):
     print request.path
     if request.path == '/film.php':

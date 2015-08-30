@@ -1,0 +1,15 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Legfrissebb képek - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Legfrissebb képek</h1>
+{% endblock %}
+
+{% block main %}
+
+    {% for p in pictures %}
+        <a href="{% url 'film_picture' p.film.id p.film.slug_cache p.id %}" title="{{ p.film.orig_title }} ({{ p.film.year }})"><img src="{{ p.get_display_urls.mid }}" class="picture" alt="{{ p.film.orig_title }} ({{ p.film.year }})" /></a>
+    {% endfor %}
+
+{% endblock %}

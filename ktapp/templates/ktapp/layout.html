@@ -122,6 +122,7 @@
                     <ul class="submenu">
                         <li><a href="{% url 'list_of_reviews' %}">Elemzések</a></li>
                         <li><a href="{% url 'list_of_bios' %}">Portrék</a></li>
+                        <li><a href="{% url 'latest_pictures' %}">Képek</a></li>
                     </ul>
                 </li>
                 {% if user.is_authenticated and user.core_member %}
