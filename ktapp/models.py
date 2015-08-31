@@ -67,6 +67,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     latest_votes = models.TextField(blank=True)
     latest_comments = models.TextField(blank=True)
     number_of_comments = models.PositiveIntegerField(default=0)
+    number_of_ratings = models.PositiveIntegerField(default=0)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -222,6 +223,7 @@ class Vote(models.Model):
         self.film.comment_set.filter(created_by=self.user).update(rating=self.rating)
         Wishlist.objects.filter(film=self.film, wished_by=self.user, wish_type=Wishlist.WISH_TYPE_YES).delete()
         self.user.latest_votes = ','.join([unicode(v.id) for v in self.user.vote_set.all().order_by('-when', '-id')[:100]])
+        self.user.number_of_ratings = self.user.vote_set.count()
         self.user.save()
 
 
@@ -232,6 +234,7 @@ def delete_vote(sender, instance, **kwargs):
     except Film.DoesNotExist:
         pass
     instance.user.latest_votes = ','.join([unicode(v.id) for v in instance.user.vote_set.all().order_by('-when', '-id')[:100]])
+    instance.user.number_of_ratings = instance.user.vote_set.count()
     instance.user.save()
 
 
