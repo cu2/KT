@@ -42,6 +42,8 @@ def user_profile(request, id, name_slug):
     number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
     this_year = datetime.date.today().year
     number_of_vapiti_votes = selected_user.vote_set.filter(film__main_premier_year=this_year).count()
+    latest_votes = [int(v) for v in selected_user.latest_votes.split(',') if v != ''][:10]
+    latest_comments = [int(c) for c in selected_user.latest_comments.split(',') if c != ''][:10]
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,
@@ -52,8 +54,8 @@ def user_profile(request, id, name_slug):
         'number_of_vapiti_votes': number_of_vapiti_votes,
         'vapiti_weight': number_of_votes + 25 * number_of_vapiti_votes,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
-        'latest_votes': selected_user.vote_set.filter(id__in=selected_user.latest_votes.split(',')[:10]).select_related('film').order_by('-when', '-id'),
-        'latest_comments': models.Comment.objects.filter(id__in=selected_user.latest_comments.split(',')[:10]).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by'),
+        'latest_votes': selected_user.vote_set.filter(id__in=latest_votes).select_related('film').order_by('-when', '-id'),
+        'latest_comments': models.Comment.objects.filter(id__in=latest_comments).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by'),
         'myfav': models.Follow.objects.filter(who=request.user, whom=selected_user).count() if request.user.is_authenticated() else 0,
     })
 
@@ -262,16 +264,20 @@ def user_activity(request, id, name_slug):
     min_month = selected_user.date_joined.month
     max_month = datetime.date.today().month
     months = []
-    for year in years:
-        if year == max_year:
-            for month in range(max_month, 0, -1):
-                months.append('%04d-%02d' % (year, month))
-        elif year == min_year:
-            for month in range(12, min_month - 1, -1):
-                months.append('%04d-%02d' % (year, month))
-        else:
-            for month in range(12, 0, -1):
-                months.append('%04d-%02d' % (year, month))
+    if len(years) == 1:
+        for month in range(max_month, min_month - 1, -1):
+            months.append('%04d-%02d' % (years[0], month))
+    else:
+        for year in years:
+            if year == max_year:
+                for month in range(max_month, 0, -1):
+                    months.append('%04d-%02d' % (year, month))
+            elif year == min_year:
+                for month in range(12, min_month - 1, -1):
+                    months.append('%04d-%02d' % (year, month))
+            else:
+                for month in range(12, 0, -1):
+                    months.append('%04d-%02d' % (year, month))
     years = ['%04d' % y for y in years]
     vote_data = {
         'm': {},
