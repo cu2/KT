@@ -6,6 +6,10 @@ from django.views.generic.base import RedirectView
 from rest_framework import routers
 
 from ktapp.views import web_views, api_views
+from ktapp.views.web import user_profile as user_profile_views
+from ktapp.views.web import post as post_views
+from ktapp.views.web import film as film_views
+from ktapp.views.web import user as user_views
 
 
 # API urls
@@ -40,35 +44,35 @@ urlpatterns += patterns(
     url(r'^bemutatok/$', web_views.premiers, name='premiers'),
     url(r'^top_filmek/$', web_views.top_films, name='top_films'),
 
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/velemenyek/$', web_views.film_comments, name='film_comments'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/idezetek/$', web_views.film_quotes, name='film_quotes'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/erdekessegek/$', web_views.film_trivias, name='film_trivias'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/kulcsszavak/$', web_views.film_keywords, name='film_keywords'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/elemzesek/$', web_views.film_reviews, name='film_reviews'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/elemzesek/(?P<review_id>\d+)$', web_views.film_review, name='film_review'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/dijak/$', web_views.film_awards, name='film_awards'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/linkek/$', web_views.film_links, name='film_links'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/kepek/$', web_views.film_pictures, name='film_pictures'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/kepek/(?P<picture_id>\d+)$', web_views.film_picture, name='film_picture'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)$', web_views.film_main, name='film_main'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/velemenyek/$', film_views.film_comments, name='film_comments'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/idezetek/$', film_views.film_quotes, name='film_quotes'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/erdekessegek/$', film_views.film_trivias, name='film_trivias'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/kulcsszavak/$', film_views.film_keywords, name='film_keywords'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/elemzesek/$', film_views.film_reviews, name='film_reviews'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/elemzesek/(?P<review_id>\d+)$', film_views.film_review, name='film_review'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/dijak/$', film_views.film_awards, name='film_awards'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/linkek/$', film_views.film_links, name='film_links'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/kepek/$', film_views.film_pictures, name='film_pictures'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/kepek/(?P<picture_id>\d+)$', film_views.film_picture, name='film_picture'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)$', film_views.film_main, name='film_main'),
 
-    url(r'^szavaz$', web_views.vote, name='vote'),
-    url(r'^kivan$', web_views.wish, name='wish'),
-    url(r'^kommentel$', web_views.new_comment, name='new_comment'),
-    url(r'^uj_idezet$', web_views.new_quote, name='new_quote'),
-    url(r'^uj_erdekesseg$', web_views.new_trivia, name='new_trivia'),
-    url(r'^uj_elemzes$', web_views.new_review, name='new_review'),
-    url(r'^uj_kep$', web_views.new_picture, name='new_picture'),
-    url(r'^szerk_kep$', web_views.edit_picture, name='edit_picture'),
-    url(r'^torol_kep$', web_views.delete_picture, name='delete_picture'),
-    url(r'^elemzes_elfogadasa$', web_views.approve_review, name='approve_review'),
-    url(r'^elemzes_elutasitasa$', web_views.disapprove_review, name='disapprove_review'),
+    url(r'^szavaz$', post_views.vote, name='vote'),
+    url(r'^kivan$', post_views.wish, name='wish'),
+    url(r'^kommentel$', post_views.new_comment, name='new_comment'),
+    url(r'^uj_idezet$', post_views.new_quote, name='new_quote'),
+    url(r'^uj_erdekesseg$', post_views.new_trivia, name='new_trivia'),
+    url(r'^uj_elemzes$', post_views.new_review, name='new_review'),
+    url(r'^uj_kep$', post_views.new_picture, name='new_picture'),
+    url(r'^szerk_kep$', post_views.edit_picture, name='edit_picture'),
+    url(r'^torol_kep$', post_views.delete_picture, name='delete_picture'),
+    url(r'^elemzes_elfogadasa$', post_views.approve_review, name='approve_review'),
+    url(r'^elemzes_elutasitasa$', post_views.disapprove_review, name='disapprove_review'),
 
     url(r'^uj_film$', web_views.new_film, name='new_film'),
-    url(r'^szerk_film$', web_views.edit_film, name='edit_film'),
-    url(r'^szerk_sztori$', web_views.edit_plot, name='edit_plot'),
-    url(r'^szerk_bemutatok$', web_views.edit_premiers, name='edit_premiers'),
-    url(r'^szerk_kulcsszavak$', web_views.edit_keywords, name='edit_keywords'),
+    url(r'^szerk_film$', post_views.edit_film, name='edit_film'),
+    url(r'^szerk_sztori$', post_views.edit_plot, name='edit_plot'),
+    url(r'^szerk_bemutatok$', post_views.edit_premiers, name='edit_premiers'),
+    url(r'^szerk_kulcsszavak$', post_views.edit_keywords, name='edit_keywords'),
 
     url(r'^valtozasok/$', web_views.changes, name='changes'),
 
@@ -76,13 +80,13 @@ urlpatterns += patterns(
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)/kepek/(?P<picture_id>\d+)$', web_views.artist_picture, name='artist_picture'),
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.artist_main, name='artist'),
     url(r'^szereplo/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.role, name='role'),
-    url(r'^uj_szereplo$', web_views.new_role, name='new_role'),
-    url(r'^torol_szereplo$', web_views.delete_role, name='delete_role'),
-    url(r'^osszevon_muvesz$', web_views.merge_artist, name='merge_artist'),
+    url(r'^uj_szereplo$', post_views.new_role, name='new_role'),
+    url(r'^torol_szereplo$', post_views.delete_role, name='delete_role'),
+    url(r'^osszevon_muvesz$', post_views.merge_artist, name='merge_artist'),
 
     url(r'^forum/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.forum, name='forum'),
     url(r'^forum/$', web_views.list_of_topics, name='list_of_topics'),
-    url(r'^uj_topik$', web_views.new_topic, name='new_topic'),
+    url(r'^uj_topik$', post_views.new_topic, name='new_topic'),
     url(r'^legfrissebb_kommentek/$', web_views.latest_comments, name='latest_comments'),
     url(r'^kedvencek/$', web_views.favourites, name='favourites'),
 
@@ -98,26 +102,26 @@ urlpatterns += patterns(
     url(r'^idezetek/$', web_views.latest_quotes, name='latest_quotes'),
     url(r'^erdekessegek/$', web_views.latest_trivias, name='latest_trivias'),
 
-    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', web_views.user_films, name='user_films'),
-    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', web_views.user_comments, name='user_comments'),
-    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', web_views.user_wishlist, name='user_wishlist'),
-    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/aktivitas/$', web_views.user_activity, name='user_activity'),
-    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', web_views.user_messages, name='user_messages'),
-    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.user_profile, name='user_profile'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', user_profile_views.user_films, name='user_films'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', user_profile_views.user_comments, name='user_comments'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', user_profile_views.user_wishlist, name='user_wishlist'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/aktivitas/$', user_profile_views.user_activity, name='user_activity'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', user_profile_views.user_messages, name='user_messages'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)$', user_profile_views.user_profile, name='user_profile'),
 
-    url(r'^jelszo_modositasa$', web_views.change_password, name='change_password'),
-    url(r'^bejelentkezes$', web_views.custom_login, name='login'),
+    url(r'^jelszo_modositasa$', user_views.change_password, name='change_password'),
+    url(r'^bejelentkezes$', user_views.custom_login, name='login'),
     url(r'^kijelentkezes$', logout, name='logout'),
-    url(r'^regisztracio$', web_views.registration, name='registration'),
-    url(r'^email_ellenorzes/(?P<token>.*)$', web_views.verify_email, name='verify_email'),
-    url(r'^jelszo_reset/(?P<token>.*)$', web_views.reset_password, name='reset_password'),
+    url(r'^regisztracio$', user_views.registration, name='registration'),
+    url(r'^email_ellenorzes/(?P<token>.*)$', user_views.verify_email, name='verify_email'),
+    url(r'^jelszo_reset/(?P<token>.*)$', user_views.reset_password, name='reset_password'),
 
-    url(r'^uzik/$', web_views.messages, name='messages'),
-    url(r'^uj_uzenet$', web_views.new_message, name='new_message'),
-    url(r'^torol_uzenet$', web_views.delete_message, name='delete_message'),
+    url(r'^uzik/$', user_views.messages, name='messages'),
+    url(r'^uj_uzenet$', user_views.new_message, name='new_message'),
+    url(r'^torol_uzenet$', post_views.delete_message, name='delete_message'),
 
-    url(r'^uj_kedvenc$', web_views.follow, name='follow'),
-    url(r'^torol_kedvenc$', web_views.unfollow, name='unfollow'),
+    url(r'^uj_kedvenc$', post_views.follow, name='follow'),
+    url(r'^torol_kedvenc$', post_views.unfollow, name='unfollow'),
 
     # legacy redirects:
     url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # old php urls
