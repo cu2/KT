@@ -101,6 +101,7 @@ urlpatterns += patterns(
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', web_views.user_films, name='user_films'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', web_views.user_comments, name='user_comments'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', web_views.user_wishlist, name='user_wishlist'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/aktivitas/$', web_views.user_activity, name='user_activity'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', web_views.user_messages, name='user_messages'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.user_profile, name='user_profile'),
 

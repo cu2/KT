@@ -6,6 +6,7 @@ import math
 import json
 from ipware.ip import get_ip
 
+from django.db import connection
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
@@ -14,7 +15,7 @@ from django.core.validators import validate_email
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django import forms
-from django.db.models import Sum, Q
+from django.db.models import Q, Max
 from django.utils.html import strip_tags
 from django.utils.crypto import get_random_string
 
@@ -26,6 +27,11 @@ from ktapp import texts
 
 COMMENTS_PER_PAGE = 100
 MESSAGES_PER_PAGE = 50
+
+USER_PROFILE_TAB_WIDTH = {
+    True: 16,
+    False: 20,
+}
 
 
 def index(request):
@@ -1941,25 +1947,34 @@ def custom_login(request):
     })
 
 
-def user_profile(request, id, name_slug):
-    selected_user = get_object_or_404(models.KTUser, pk=id)
-    if request.user.is_authenticated() and request.user.id != selected_user.id:
+def _get_user_profile_numbers(request, selected_user, with_messages=True):
+    if with_messages and request.user.is_authenticated() and request.user.id != selected_user.id:
         number_of_messages = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(Q(sent_by=selected_user) | Q(sent_to=selected_user)).count()
     else:
         number_of_messages = 0
+    return (
+        selected_user.number_of_ratings,
+        selected_user.number_of_comments,
+        selected_user.wishlist_set.filter(wish_type__in=['Y', 'G']).count(),
+        number_of_messages,
+    )
+
+
+def user_profile(request, id, name_slug):
+    selected_user = get_object_or_404(models.KTUser, pk=id)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
     this_year = datetime.date.today().year
-    number_of_votes = selected_user.vote_set.count()
     number_of_vapiti_votes = selected_user.vote_set.filter(film__main_premier_year=this_year).count()
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,
         'number_of_votes': number_of_votes,
-        'number_of_comments': selected_user.comment_set.count(),
-        'number_of_wishes': selected_user.wishlist_set.filter(wish_type__in=['Y', 'G']).count(),
+        'number_of_comments': number_of_comments,
+        'number_of_wishes': number_of_wishes,
         'number_of_messages': number_of_messages,
         'number_of_vapiti_votes': number_of_vapiti_votes,
         'vapiti_weight': number_of_votes + 25 * number_of_vapiti_votes,
-        'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
+        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'latest_votes': selected_user.vote_set.filter(id__in=selected_user.latest_votes.split(',')[:10]).select_related('film').order_by('-when', '-id'),
         'latest_comments': models.Comment.objects.filter(id__in=selected_user.latest_comments.split(',')[:10]).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by'),
         'myfav': models.Follow.objects.filter(who=request.user, whom=selected_user).count() if request.user.is_authenticated() else 0,
@@ -1968,10 +1983,7 @@ def user_profile(request, id, name_slug):
 
 def user_films(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    if request.user.is_authenticated() and request.user.id != selected_user.id:
-        number_of_messages = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(Q(sent_by=selected_user) | Q(sent_to=selected_user)).count()
-    else:
-        number_of_messages = 0
+    number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
 
     qs = models.Vote.objects.filter(user=selected_user).select_related('film')
 
@@ -2081,11 +2093,11 @@ def user_films(request, id, name_slug):
     return render(request, 'ktapp/user_profile_subpages/user_films.html', {
         'active_tab': 'films',
         'selected_user': selected_user,
-        'number_of_votes': selected_user.vote_set.count(),
-        'number_of_comments': selected_user.comment_set.count(),
-        'number_of_wishes': selected_user.wishlist_set.filter(wish_type__in=['Y', 'G']).count(),
+        'number_of_votes': number_of_votes,
+        'number_of_comments': number_of_comments,
+        'number_of_wishes': number_of_wishes,
         'number_of_messages': number_of_messages,
-        'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
+        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'result_count': result_count,
         'querystring': {
             'title': title,
@@ -2108,10 +2120,7 @@ def user_films(request, id, name_slug):
 
 def user_comments(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    if request.user.is_authenticated() and request.user.id != selected_user.id:
-        number_of_messages = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(Q(sent_by=selected_user) | Q(sent_to=selected_user)).count()
-    else:
-        number_of_messages = 0
+    number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
     p = int(request.GET.get('p', 0))
     if p == 1:
         return HttpResponseRedirect(reverse('user_comments', args=(selected_user.id, selected_user.slug_cache)))
@@ -2134,11 +2143,11 @@ def user_comments(request, id, name_slug):
     return render(request, 'ktapp/user_profile_subpages/user_comments.html', {
         'active_tab': 'comments',
         'selected_user': selected_user,
-        'number_of_votes': selected_user.vote_set.count(),
-        'number_of_comments': selected_user.number_of_comments,
-        'number_of_wishes': selected_user.wishlist_set.filter(wish_type__in=['Y', 'G']).count(),
+        'number_of_votes': number_of_votes,
+        'number_of_comments': number_of_comments,
+        'number_of_wishes': number_of_wishes,
         'number_of_messages': number_of_messages,
-        'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
+        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'comments': comments.order_by('-created_at'),
         'p': p,
         'max_pages': max_pages,
@@ -2147,27 +2156,118 @@ def user_comments(request, id, name_slug):
 
 def user_wishlist(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    if request.user.is_authenticated() and request.user.id != selected_user.id:
-        number_of_messages = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(Q(sent_by=selected_user) | Q(sent_to=selected_user)).count()
-    else:
-        number_of_messages = 0
+    number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
     qs = models.Wishlist.objects.select_related('film').filter(wished_by=selected_user).order_by('film__orig_title', 'film__id')
     return render(request, 'ktapp/user_profile_subpages/user_wishlist.html', {
         'active_tab': 'wishlist',
         'selected_user': selected_user,
-        'number_of_votes': selected_user.vote_set.count(),
-        'number_of_comments': selected_user.comment_set.count(),
-        'number_of_wishes': selected_user.wishlist_set.filter(wish_type__in=['Y', 'G']).count(),
+        'number_of_votes': number_of_votes,
+        'number_of_comments': number_of_comments,
+        'number_of_wishes': number_of_wishes,
         'number_of_messages': number_of_messages,
-        'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
+        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'wishlist_yes': qs.filter(wish_type=models.Wishlist.WISH_TYPE_YES),
         'wishlist_get': qs.filter(wish_type=models.Wishlist.WISH_TYPE_GET),
+    })
+
+
+def user_activity(request, id, name_slug):
+    selected_user = get_object_or_404(models.KTUser, pk=id)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    cursor = connection.cursor()
+    max_max_vote = models.KTUser.objects.all().aggregate(Max('number_of_ratings'))['number_of_ratings__max']
+    max_max_comment = models.KTUser.objects.all().aggregate(Max('number_of_comments'))['number_of_comments__max']
+    scale_vote = (1.0 * selected_user.number_of_ratings / max_max_vote)**0.3
+    scale_comment = (1.0 * selected_user.number_of_comments / max_max_comment)**0.3
+    min_year = selected_user.date_joined.year
+    max_year = datetime.date.today().year
+    years = range(max_year, min_year - 1, -1)
+    min_month = selected_user.date_joined.month
+    max_month = datetime.date.today().month
+    months = []
+    for year in years:
+        if year == max_year:
+            for month in range(max_month, 0, -1):
+                months.append('%04d-%02d' % (year, month))
+        elif year == min_year:
+            for month in range(12, min_month - 1, -1):
+                months.append('%04d-%02d' % (year, month))
+        else:
+            for month in range(12, 0, -1):
+                months.append('%04d-%02d' % (year, month))
+    years = ['%04d' % y for y in years]
+    vote_data = {
+        'm': {},
+        'y': {},
+    }
+    comment_data = {
+        'm': {},
+        'y': {},
+    }
+    max_vote = {
+        'm': 0,
+        'y': 0,
+    }
+    max_comment = {
+        'm': 0,
+        'y': 0,
+    }
+    cursor.execute('SELECT LEFT(`when`, 7) AS dt, COUNT(1) FROM ktapp_vote WHERE user_id = %s AND `when` IS NOT NULL GROUP BY dt', [selected_user.id])
+    for row in cursor.fetchall():
+        vote_data['m'][row[0]] = row[1]
+        if row[1] > max_vote['m']:
+            max_vote['m'] = row[1]
+    cursor.execute('SELECT LEFT(`when`, 4) AS dt, COUNT(1) FROM ktapp_vote WHERE user_id = %s AND `when` IS NOT NULL GROUP BY dt', [selected_user.id])
+    for row in cursor.fetchall():
+        vote_data['y'][row[0]] = row[1]
+        if row[1] > max_vote['y']:
+            max_vote['y'] = row[1]
+    cursor.execute('SELECT LEFT(created_at, 7) AS dt, COUNT(1) FROM ktapp_comment WHERE created_by_id = %s AND created_at IS NOT NULL GROUP BY dt', [selected_user.id])
+    for row in cursor.fetchall():
+        comment_data['m'][row[0]] = row[1]
+        if row[1] > max_comment['m']:
+            max_comment['m'] = row[1]
+    cursor.execute('SELECT LEFT(created_at, 4) AS dt, COUNT(1) FROM ktapp_comment WHERE created_by_id = %s AND created_at IS NOT NULL GROUP BY dt', [selected_user.id])
+    for row in cursor.fetchall():
+        comment_data['y'][row[0]] = row[1]
+        if row[1] > max_comment['y']:
+            max_comment['y'] = row[1]
+    data_month = []
+    for month in months:
+        data_month.append((
+            month,
+            vote_data['m'].get(month, 0),
+            comment_data['m'].get(month, 0),
+            int(100.0 * scale_vote * vote_data['m'].get(month, 0) / max_vote['m']) if max_vote['m'] > 0 else 0,
+            int(100.0 * scale_comment * comment_data['m'].get(month, 0) / max_comment['m']) if max_comment['m'] > 0 else 0,
+        ))
+    data_year = []
+    for year in years:
+        data_year.append((
+            year,
+            vote_data['y'].get(year, 0),
+            comment_data['y'].get(year, 0),
+            int(100.0 * scale_vote * vote_data['y'].get(year, 0) / max_vote['y']) if max_vote['y'] > 0 else 0,
+            int(100.0 * scale_comment * comment_data['y'].get(year, 0) / max_comment['y']) if max_comment['y'] > 0 else 0,
+        ))
+
+    return render(request, 'ktapp/user_profile_subpages/user_activity.html', {
+        'active_tab': 'activity',
+        'selected_user': selected_user,
+        'number_of_votes': number_of_votes,
+        'number_of_comments': number_of_comments,
+        'number_of_wishes': number_of_wishes,
+        'number_of_messages': number_of_messages,
+        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
+        'data_month': data_month,
+        'data_year': data_year,
     })
 
 
 @login_required()
 def user_messages(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
+    number_of_votes, number_of_comments, number_of_wishes, _ = _get_user_profile_numbers(request, selected_user, with_messages=False)
     messages_qs = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(
         Q(sent_by=selected_user)
         | Q(sent_to=selected_user)
@@ -2189,11 +2289,11 @@ def user_messages(request, id, name_slug):
     return render(request, 'ktapp/user_profile_subpages/user_messages.html', {
         'active_tab': 'messages',
         'selected_user': selected_user,
-        'number_of_votes': selected_user.vote_set.count(),
-        'number_of_comments': selected_user.comment_set.count(),
-        'number_of_wishes': selected_user.wishlist_set.filter(wish_type__in=['Y', 'G']).count(),
+        'number_of_votes': number_of_votes,
+        'number_of_comments': number_of_comments,
+        'number_of_wishes': number_of_wishes,
         'number_of_messages': number_of_messages,
-        'tab_width': 20 if request.user.is_authenticated() and request.user.id != selected_user.id else 25,
+        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'messages': messages_qs.order_by('-sent_at')[(p-1) * MESSAGES_PER_PAGE:p * MESSAGES_PER_PAGE],
         'p': p,
         'max_pages': max_pages,

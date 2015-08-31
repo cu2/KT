@@ -1,0 +1,66 @@
+{% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
+{% load kt_extras %}
+
+{% block user_profile_main %}
+
+    <div class="centered_content">
+
+        <h2>Szavazatok és kommentek száma éves bontásban</h2>
+        <table class="fullsize sortable">
+            <thead>
+            <tr class="header_tr">
+                <th></th>
+                <th data-sort="int">Szavazatok</th>
+                <th data-sort="string">Év</th>
+                <th data-sort="int">Kommentek</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in data_year %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td style="width: 30%">
+                        <div style="width: {{ row.3 }}%; height: 15px; background: rgb(100,149,237); float: right"></div>
+                    </td>
+                    <td class="center">{{ row.1 }}</td>
+                    <td class="center">{{ row.0 }}</td>
+                    <td class="center">{{ row.2 }}</td>
+                    <td style="width: 30%">
+                        <div style="width: {{ row.4 }}%; height: 15px; background: rgb(250,128,114)"></div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Szavazatok és kommentek száma havi bontásban</h2>
+        <table class="fullsize sortable">
+            <thead>
+            <tr class="header_tr">
+                <th></th>
+                <th data-sort="int">Szavazatok</th>
+                <th data-sort="string">Hónap</th>
+                <th data-sort="int">Kommentek</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in data_month %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td style="width: 30%">
+                        <div style="width: {{ row.3 }}%; height: 15px; background: rgb(100,149,237); float: right"></div>
+                    </td>
+                    <td class="center">{{ row.1 }}</td>
+                    <td class="center">{{ row.0 }}</td>
+                    <td class="center">{{ row.2 }}</td>
+                    <td style="width: 30%">
+                        <div style="width: {{ row.4 }}%; height: 15px; background: rgb(250,128,114)"></div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
