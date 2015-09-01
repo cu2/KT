@@ -307,11 +307,12 @@ def new_film(request):
 
         directors = set()
         for director_name in kt_utils.strip_whitespace(request.POST.get('film_directors', '')).split(','):
-            if director_name.strip() == '':
+            director_name = kt_utils.strip_whitespace_and_separator(director_name)
+            if director_name == '':
                 continue
-            director = models.Artist.get_artist_by_name(director_name.strip())
+            director = models.Artist.get_artist_by_name(director_name)
             if director is None:
-                director = models.Artist.objects.create(name=director_name.strip())
+                director = models.Artist.objects.create(name=director_name)
             directors.add(director)
         for director in directors:
             models.FilmArtistRelationship.objects.create(
@@ -324,7 +325,7 @@ def new_film(request):
         for type_name, type_code in [('countries', 'C'), ('genres', 'G')]:
             new_keywords = set()
             for keyword_name in kt_utils.strip_whitespace(request.POST.get(type_name, '')).split(','):
-                keyword_name = keyword_name.strip()
+                keyword_name = kt_utils.strip_whitespace_and_separator(keyword_name)
                 if keyword_name.endswith('*'):
                     keyword_name = keyword_name[:-1]
                 if not keyword_name:

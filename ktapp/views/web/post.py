@@ -226,11 +226,12 @@ def edit_film(request):
         film.year = film_year
         directors = set()
         for director_name in kt_utils.strip_whitespace(request.POST.get('film_directors', '')).split(','):
-            if director_name.strip() == '':
+            director_name = kt_utils.strip_whitespace_and_separator(director_name)
+            if director_name == '':
                 continue
-            director = models.Artist.get_artist_by_name(director_name.strip())
+            director = models.Artist.get_artist_by_name(director_name)
             if director is None:
-                director = models.Artist.objects.create(name=director_name.strip())
+                director = models.Artist.objects.create(name=director_name)
             directors.add(director)
         models.FilmArtistRelationship.objects.filter(film=film, role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR).delete()
         for director in directors:
@@ -430,7 +431,7 @@ def edit_keywords(request):
                 old_keywords.add(keyword.keyword.id)
             new_keywords = set()
             for keyword_name in kt_utils.strip_whitespace(request.POST.get(type_name, '')).split(','):
-                keyword_name = keyword_name.strip()
+                keyword_name = kt_utils.strip_whitespace_and_separator(keyword_name)
                 if keyword_name.endswith('*'):
                     keyword_name = keyword_name[:-1]
                 if not keyword_name:
@@ -458,7 +459,7 @@ def edit_keywords(request):
         new_keywords = set()
         new_keyword_spoiler = {}
         for keyword_name in kt_utils.strip_whitespace(request.POST.get('keywords', '')).split(','):
-            keyword_name = keyword_name.strip()
+            keyword_name = kt_utils.strip_whitespace_and_separator(keyword_name)
             if keyword_name.endswith('*'):
                 spoiler = True
                 keyword_name = keyword_name[:-1]
@@ -535,9 +536,9 @@ def merge_artist(request):
 @kt_utils.kt_permission_required('new_role')
 def new_role(request):
     if request.POST:
-        role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))
+        role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))  # NOTE: role name *can* contain , or ;
         role_type = kt_utils.strip_whitespace(request.POST.get('role_type', ''))
-        role_artist = kt_utils.strip_whitespace(request.POST.get('role_artist', ''))
+        role_artist = kt_utils.strip_whitespace_and_separator(request.POST.get('role_artist', ''))
         role_gender = kt_utils.strip_whitespace(request.POST.get('role_gender', ''))
         try:
             film = models.Film.objects.get(id=request.POST.get('film_id', 0))

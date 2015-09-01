@@ -60,6 +60,10 @@ def strip_whitespace(value):
     return value.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ').strip()
 
 
+def strip_whitespace_and_separator(value):
+    return value.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ').replace(',', ' ').replace(';', ' ').strip()
+
+
 def check_permission(perm, user, silent=True):
     if user.is_authenticated():
         grp = {

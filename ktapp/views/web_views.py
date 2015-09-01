@@ -546,11 +546,12 @@ def new_film(request):
 
         directors = set()
         for director_name in kt_utils.strip_whitespace(request.POST.get('film_directors', '')).split(','):
-            if director_name.strip() == '':
+            director_name = kt_utils.strip_whitespace_and_separator(director_name)
+            if director_name == '':
                 continue
-            director = models.Artist.get_artist_by_name(director_name.strip())
+            director = models.Artist.get_artist_by_name(director_name)
             if director is None:
-                director = models.Artist.objects.create(name=director_name.strip())
+                director = models.Artist.objects.create(name=director_name)
             directors.add(director)
         for director in directors:
             models.FilmArtistRelationship.objects.create(
@@ -563,7 +564,7 @@ def new_film(request):
         for type_name, type_code in [('countries', 'C'), ('genres', 'G')]:
             new_keywords = set()
             for keyword_name in kt_utils.strip_whitespace(request.POST.get(type_name, '')).split(','):
-                keyword_name = keyword_name.strip()
+                keyword_name = kt_utils.strip_whitespace_and_separator(keyword_name)
                 if keyword_name.endswith('*'):
                     keyword_name = keyword_name[:-1]
                 if not keyword_name:
@@ -635,7 +636,7 @@ def artist_main(request, id, name_slug):
         random_picture = None
     if request.POST:
         if kt_utils.check_permission('edit_artist', request.user):
-            artist_name = kt_utils.strip_whitespace(request.POST.get('artist_name', ''))
+            artist_name = kt_utils.strip_whitespace_and_separator(request.POST.get('artist_name', ''))
             artist_gender = kt_utils.strip_whitespace(request.POST.get('artist_gender', ''))
             if artist_gender in ['U', 'M', 'F']:
                 artist.name = artist_name
@@ -799,7 +800,7 @@ def role(request, id, name_slug):
     role = get_object_or_404(models.FilmArtistRelationship, pk=id)
     if request.POST:
         if kt_utils.check_permission('edit_role', request.user):
-            role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))
+            role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))  # NOTE: role name *can* contain , or ;
             role_type = kt_utils.strip_whitespace(request.POST.get('role_type', ''))
             if role_name != '' and role_type in ['F', 'V']:
                 role.role_name = role_name
