@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import datetime
 import json
 import re
@@ -162,3 +164,27 @@ def changelog(model, created_by, action, object, state_before, state_after):
             state_before=myjsondumps(state_before),
             state_after=myjsondumps(state_after),
         )
+
+
+def get_next_picture(pictures, picture):
+    found_this = False
+    next_picture = None
+    for pic in pictures:
+        if found_this:
+            next_picture = pic
+            break
+        if pic == picture:
+            found_this = True
+    if next_picture is None:
+        next_picture = pictures[0]
+    return next_picture
+
+
+def get_selected_picture_details(model, film, picture, next_picture):
+    return {
+        'picture': picture,
+        'next_picture': next_picture,
+        'pic_height': model.THUMBNAIL_SIZES['max'][1],
+        'artists': picture.artists.all(),
+        'film_title_article': 'az' if film.orig_title[:1].lower() in u'aáeéiíoóöőuúüű' else 'a',
+    }

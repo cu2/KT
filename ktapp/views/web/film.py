@@ -200,30 +200,6 @@ def film_links(request, id, film_slug):
     })
 
 
-def _get_next_picture(pictures, picture):
-    found_this = False
-    next_picture = None
-    for pic in pictures:
-        if found_this:
-            next_picture = pic
-            break
-        if pic == picture:
-            found_this = True
-    if next_picture is None:
-        next_picture = pictures[0]
-    return next_picture
-
-
-def _get_selected_picture_details(film, picture, next_picture):
-    return {
-        'picture': picture,
-        'next_picture': next_picture,
-        'pic_height': models.Picture.THUMBNAIL_SIZES['max'][1],
-        'artists': picture.artists.all(),
-        'film_title_article': 'az' if film.orig_title[:1].lower() in u'aáeéiíoóöőuúüű' else 'a',
-    }
-
-
 def film_pictures(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
     pictures = sorted(film.picture_set.all(), key=lambda pic: (pic.order_key, pic.id))
@@ -241,8 +217,8 @@ def film_pictures(request, id, film_slug):
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     }
     if len(pictures) == 1:
-        next_picture = _get_next_picture(pictures, pictures[0])
-        context.update(_get_selected_picture_details(film, pictures[0], next_picture))
+        next_picture = kt_utils.get_next_picture(pictures, pictures[0])
+        context.update(kt_utils.get_selected_picture_details(models.Picture, film, pictures[0], next_picture))
     return render(request, 'ktapp/film_subpages/film_pictures.html', context)
 
 
@@ -252,7 +228,7 @@ def film_picture(request, id, film_slug, picture_id):
     if picture.film != film:
         raise Http404
     pictures = sorted(film.picture_set.all(), key=lambda pic: (pic.order_key, pic.id))
-    next_picture = _get_next_picture(pictures, picture)
+    next_picture = kt_utils.get_next_picture(pictures, picture)
     upload_form = kt_forms.PictureUploadForm(initial={'film': film})
     upload_form.fields['film'].widget = forms.HiddenInput()
     context = {
@@ -266,7 +242,7 @@ def film_picture(request, id, film_slug, picture_id):
         'permission_delete_picture': kt_utils.check_permission('delete_picture', request.user),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     }
-    context.update(_get_selected_picture_details(film, picture, next_picture))
+    context.update(kt_utils.get_selected_picture_details(models.Picture, film, picture, next_picture))
     return render(request, 'ktapp/film_subpages/film_pictures.html', context)
 
 

@@ -769,8 +769,8 @@ def artist_pictures(request, id, name_slug):
     }
     if len(pictures) == 1:
         picture = pictures[0]
-        next_picture = _get_next_picture(pictures, picture)
-        context.update(_get_selected_picture_details(picture.film, picture, next_picture))
+        next_picture = kt_utils.get_next_picture(pictures, picture)
+        context.update(kt_utils.get_selected_picture_details(models.Picture, picture.film, picture, next_picture))
         context.update({'film': picture.film})
     return render(request, 'ktapp/artist_pictures.html', context)
 
@@ -779,13 +779,13 @@ def artist_picture(request, id, name_slug, picture_id):
     artist = get_object_or_404(models.Artist, pk=id)
     picture = get_object_or_404(models.Picture, pk=picture_id)
     pictures = sorted(artist.picture_set.all(), key=lambda pic: (-pic.film.year, pic.film.orig_title, pic.id))
-    next_picture = _get_next_picture(pictures, picture)
+    next_picture = kt_utils.get_next_picture(pictures, picture)
     context = {
         'artist': artist,
         'film': picture.film,
         'pictures': pictures,
     }
-    context.update(_get_selected_picture_details(picture.film, picture, next_picture))
+    context.update(kt_utils.get_selected_picture_details(models.Picture, picture.film, picture, next_picture))
     return render(request, 'ktapp/artist_pictures.html', context)
 
 
