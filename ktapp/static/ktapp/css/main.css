@@ -51,7 +51,7 @@
     z-index: 5;
     box-sizing: border-box;
     font-size: 9pt;
-    overflow: hidden;
+    overflow: auto;
     border-right: solid rgba(109,106,92,0.5) 1px;
     padding: 10px 0 0 10px;
 }

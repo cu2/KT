@@ -668,6 +668,7 @@ def artist_main(request, id, name_slug):
         ''', {
             'artist_id': artist.id,
         })
+    number_of_directions = 0  # RawQuerySet has no __bool__() or __len__(), so we do it manually
     director_vote_count = 0
     director_vote_avg = 0
     if directions:
@@ -679,6 +680,7 @@ def artist_main(request, id, name_slug):
             'nr5': 0,
         }
         for x in directions:
+            number_of_directions += 1
             director_votes['nr1'] += x.number_of_ratings_1
             director_votes['nr2'] += x.number_of_ratings_2
             director_votes['nr3'] += x.number_of_ratings_3
@@ -715,6 +717,7 @@ def artist_main(request, id, name_slug):
         ''', {
             'artist_id': artist.id,
         })
+    number_of_roles = 0
     actor_vote_count = 0
     actor_vote_avg = 0
     if roles:
@@ -726,6 +729,7 @@ def artist_main(request, id, name_slug):
             'nr5': 0,
             }
         for x in roles:
+            number_of_roles += 1
             actor_votes['nr1'] += x.number_of_ratings_1
             actor_votes['nr2'] += x.number_of_ratings_2
             actor_votes['nr3'] += x.number_of_ratings_3
@@ -746,6 +750,8 @@ def artist_main(request, id, name_slug):
         'random_picture': random_picture,
         'directions': directions,
         'roles': roles,
+        'number_of_directions': number_of_directions,
+        'number_of_roles': number_of_roles,
         'director_vote_count': director_vote_count,
         'actor_vote_count': actor_vote_count,
         'director_vote_avg': director_vote_avg,

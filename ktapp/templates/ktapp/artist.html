@@ -4,6 +4,8 @@
 
 {% block title %}{{ artist.name }} - Kritikus Tömeg{% endblock %}
 
+{% block meta_description %}{{ artist.name }} színész/rendező: szerepek, rendezések, díjak, portré, életrajz{% endblock %}
+
 {% block header %}
     <h1 style="margin-bottom: 0">{{ artist.name }}</h1>
     <p>
@@ -20,16 +22,16 @@
         <p style="text-align: center"><a href="{% url 'artist_pictures' artist.id artist.slug_cache %}"><img src="{{ random_picture.get_display_urls.mid }}" style="width: {{ random_picture.get_widths.mid }}px; height: {{ random_picture.get_heights.mid }}px" class="picture" /></a></p>
     {% endif %}
 
-{% if directions and director_vote_count >= actor_vote_count %}
-    <h2>Rendezőként{% if director_vote_count >= 50 %}<span class="artist_avg"> ({{ director_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
+{% if number_of_directions and director_vote_count >= actor_vote_count %}
+    <h2>Rendezések{% if director_vote_count >= 50 %}<span class="artist_avg"> ({{ director_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
     {% include 'ktapp/tables/directions.html' with directions=directions %}
 {% endif %}
-{% if roles %}
-    <h2>Színészként{% if actor_vote_count >= 50 %}<span class="artist_avg"> ({{ actor_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
+{% if number_of_roles %}
+    <h2>Szerepek{% if actor_vote_count >= 50 %}<span class="artist_avg"> ({{ actor_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
     {% include 'ktapp/tables/roles.html' with roles=roles %}
 {% endif %}
-{% if directions and actor_vote_count > director_vote_count %}
-    <h2>Rendezőként{% if director_vote_count >= 50 %}<span class="artist_avg"> ({{ director_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
+{% if number_of_directions and actor_vote_count > director_vote_count %}
+    <h2>Rendezések{% if director_vote_count >= 50 %}<span class="artist_avg"> ({{ director_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
     {% include 'ktapp/tables/directions.html' with directions=directions %}
 {% endif %}
 
