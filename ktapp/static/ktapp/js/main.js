@@ -1,4 +1,7 @@
 $(function() {
+    $('form').submit(function() {
+        $(this).find('input:submit').prop('disabled', true);
+    });
     $('.toggle_delete').click(function() {
         $(this).closest('.delete_area').find('.delete_confirm').toggle();
     });
