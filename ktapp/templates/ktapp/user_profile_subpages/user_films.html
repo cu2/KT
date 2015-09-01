@@ -20,6 +20,7 @@
         <tr class="header_tr">
             <th>Film</th>
             <th>Év</th>
+            <th>Rendező</th>
             <th>Átlag</th>
             <th>Szerinte{% if selected_user.id == user.id %}d{% endif %}</th>
             <th>Osztályozva</th>
@@ -28,6 +29,7 @@
             <tr class="{% cycle '' 'odd' %}">
                 <td>{{ r.film|film_url_html }}</td>
                 <td class="center">{% if r.film.year %}{{ r.film.year }}{% endif %}</td>
+                <td>{{ r.film|film_directors }}</td>
                 <td class="center">{{ r.film|film_rating_html }}</td>
                 <td class="center">{{ r.rating }}</td>
                 <td class="center">{{ r.when|date:"Y-m-d" }}</td>

@@ -50,6 +50,7 @@
                 <th>#</th>
                 <th>Film</th>
                 <th>Év</th>
+                <th>Rendező</th>
                 <th>Átlag</th>
                 <th>Szavazatszám</th>
                 {% if type == 'legerdekesebb' %}
@@ -66,6 +67,7 @@
                     <td class="center">{{ forloop.counter }}</td>
                     <td>{{ film|film_url_html }}</td>
                     <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
+                    <td>{{ film|film_directors }}</td>
                     <td class="center">{{ film|film_avg_rating_html }}</td>
                     <td class="center">{{ film|film_num_rating_html }}</td>
                     {% if type == 'legerdekesebb' %}

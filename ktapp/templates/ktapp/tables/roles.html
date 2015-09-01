@@ -5,6 +5,7 @@
         <th data-sort="string">Szerep</th>
         <th data-sort="string">Film</th>
         <th data-sort="int">Év</th>
+        <th data-sort="string">Rendező</th>
         <th data-sort="float" data-sort-default="desc">Átlag</th>
         {% if request.user.is_authenticated %}
             <th data-sort="int" data-sort-default="desc">Szerinted?</th>
@@ -19,6 +20,7 @@
             <td><a href="{% url 'role' role.role_id role.role_slug_cache %}">{{ role.role_role_name }}</a>{% if role.role_actor_subtype == 'V' %} (hangja){% endif %}{% if role.role_actor_subtype == 'D' %} (magyar hangja){% endif %}</td>
             <td>{{ role|film_url_html }}</td>
             <td class="center">{% if role.year %}{{ role.year }}{% endif %}</td>
+            <td>{{ role|film_directors }}</td>
             <td class="center" data-sort-value="{{ role|film_rating_sort_value }}">{{ role|film_avg_rating_html }}</td>
             {% if request.user.is_authenticated %}
                 <td class="center" data-sort-value="{% if role.my_rating %}{{ role.my_rating }}{% else %}0{% endif %}">{% if role.my_rating %}{{ role.my_rating }}{% endif %}</td>

@@ -18,6 +18,7 @@
                 {% endif %}
                 {% if toplist.toplist_type == 'F' %}
                     <th>Film</th>
+                    <th>Rendező</th>
                     <th>Átlag</th>
                 {% else %}
                     <th>{% if toplist.toplist_type == 'A' %}Színész{% else %}Rendező{% endif %}</th>
@@ -33,6 +34,7 @@
                     {% endif %}
                     {% if toplist.toplist_type == 'F' %}
                         <td class="nowrap">{{ item.film|film_url_html_w_year }}</td>
+                        <td>{{ item.film|film_directors }}</td>
                         <td class="center">{{ item.film|film_rating_html }}</td>
                     {% elif toplist.toplist_type == 'A' %}
                         <td class="nowrap"><a href="{% url 'artist' item.actor.id item.actor.slug_cache %}">{{ item.actor.name }}</a></td>

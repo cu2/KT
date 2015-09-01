@@ -10,6 +10,27 @@ register = template.Library()
 
 
 @register.filter
+def film_directors(film):
+    if not film.directors_cache:
+        return '?'
+    ids, slugs, names = film.directors_cache.split(';')
+    ids = ids.split(',')
+    slugs = slugs.split(',')
+    names = names.split(',')
+    if len(ids) > 3:
+        more = ' - ...'
+    else:
+        more = ''
+    dir_links = []
+    for id, slug_cache, name in zip(ids[:3], slugs, names):
+        dir_links.append(u'<a href="{url}">{name}</a>'.format(
+            url=reverse('artist', args=(id, slug_cache)),
+            name=name,
+        ))
+    return mark_safe(' - '.join(dir_links) + more)
+
+
+@register.filter
 def film_url_html(film, subpage='film_main'):
     if film.second_title:
         second_row = film.second_title
