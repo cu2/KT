@@ -149,6 +149,7 @@ class Film(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     open_for_vote_from = models.DateField(blank=True, null=True)
     main_poster = models.ForeignKey('Picture', blank=True, null=True, related_name='main_poster', on_delete=models.SET_NULL)
+    directors_cache = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'
@@ -608,6 +609,21 @@ class FilmArtistRelationship(models.Model):
     def save(self, *args, **kwargs):
         self.slug_cache = slugify(self.role_name)
         super(FilmArtistRelationship, self).save(*args, **kwargs)
+        ids = []
+        slugs = []
+        names = []
+        for idx, d in enumerate(self.film.directors()[:4]):
+            if idx == 3:
+                ids.append('')  # indicate that there are more than 3 directors
+            else:
+                ids.append(unicode(d.id))
+                slugs.append(d.slug_cache)
+                names.append(d.name)
+        if len(ids):
+            self.film.directors_cache = ('%s;%s;%s' % (','.join(ids), ','.join(slugs), ','.join(names)))[:250]
+        else:
+            self.film.directors_cache = ''
+        self.film.save()
 
 
 class Biography(models.Model):
