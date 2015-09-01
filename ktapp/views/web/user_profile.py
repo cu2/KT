@@ -19,8 +19,8 @@ MESSAGES_PER_PAGE = 50
 
 
 USER_PROFILE_TAB_WIDTH = {
-    True: 16,
-    False: 20,
+    True: 14,
+    False: 16,
 }
 
 
@@ -33,13 +33,14 @@ def _get_user_profile_numbers(request, selected_user, with_messages=True):
         selected_user.number_of_ratings,
         selected_user.number_of_comments,
         selected_user.wishlist_set.filter(wish_type__in=['Y', 'G']).count(),
+        models.UserToplist.objects.filter(created_by=selected_user).count(),
         number_of_messages,
     )
 
 
 def user_profile(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
     this_year = datetime.date.today().year
     number_of_vapiti_votes = selected_user.vote_set.filter(film__main_premier_year=this_year).count()
     latest_votes = [int(v) for v in selected_user.latest_votes.split(',') if v != ''][:10]
@@ -50,6 +51,7 @@ def user_profile(request, id, name_slug):
         'number_of_votes': number_of_votes,
         'number_of_comments': number_of_comments,
         'number_of_wishes': number_of_wishes,
+        'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
         'number_of_vapiti_votes': number_of_vapiti_votes,
         'vapiti_weight': number_of_votes + 25 * number_of_vapiti_votes,
@@ -62,7 +64,7 @@ def user_profile(request, id, name_slug):
 
 def user_films(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
 
     qs = models.Vote.objects.filter(user=selected_user).select_related('film')
 
@@ -175,6 +177,7 @@ def user_films(request, id, name_slug):
         'number_of_votes': number_of_votes,
         'number_of_comments': number_of_comments,
         'number_of_wishes': number_of_wishes,
+        'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'result_count': result_count,
@@ -199,7 +202,7 @@ def user_films(request, id, name_slug):
 
 def user_comments(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
     p = int(request.GET.get('p', 0))
     if p == 1:
         return HttpResponseRedirect(reverse('user_comments', args=(selected_user.id, selected_user.slug_cache)))
@@ -225,6 +228,7 @@ def user_comments(request, id, name_slug):
         'number_of_votes': number_of_votes,
         'number_of_comments': number_of_comments,
         'number_of_wishes': number_of_wishes,
+        'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'comments': comments.order_by('-created_at'),
@@ -235,7 +239,7 @@ def user_comments(request, id, name_slug):
 
 def user_wishlist(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
     qs = models.Wishlist.objects.select_related('film').filter(wished_by=selected_user).order_by('film__orig_title', 'film__id')
     return render(request, 'ktapp/user_profile_subpages/user_wishlist.html', {
         'active_tab': 'wishlist',
@@ -243,6 +247,7 @@ def user_wishlist(request, id, name_slug):
         'number_of_votes': number_of_votes,
         'number_of_comments': number_of_comments,
         'number_of_wishes': number_of_wishes,
+        'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'wishlist_yes': qs.filter(wish_type=models.Wishlist.WISH_TYPE_YES),
@@ -250,9 +255,39 @@ def user_wishlist(request, id, name_slug):
     })
 
 
+def user_toplists(request, id, name_slug):
+    selected_user = get_object_or_404(models.KTUser, pk=id)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    toplists = models.UserToplist.objects.filter(created_by=selected_user).order_by('-created_at')
+    toplist_details = []
+    for toplist in toplists:
+        toplist_list = []
+        with_comments = False
+        for item in models.UserToplistItem.objects.filter(usertoplist=toplist).select_related('film', 'director', 'actor').order_by('serial_number'):
+            toplist_list.append(item)
+            if item.comment:
+                with_comments = True
+        toplist_details.append((
+            toplist,
+            toplist_list,
+            with_comments,
+        ))
+    return render(request, 'ktapp/user_profile_subpages/user_toplists.html', {
+        'active_tab': 'toplists',
+        'selected_user': selected_user,
+        'number_of_votes': number_of_votes,
+        'number_of_comments': number_of_comments,
+        'number_of_wishes': number_of_wishes,
+        'number_of_toplists': number_of_toplists,
+        'number_of_messages': number_of_messages,
+        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
+        'toplist_details': toplist_details,
+    })
+
+
 def user_activity(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
     cursor = connection.cursor()
     max_max_vote = models.KTUser.objects.all().aggregate(Max('number_of_ratings'))['number_of_ratings__max']
     max_max_comment = models.KTUser.objects.all().aggregate(Max('number_of_comments'))['number_of_comments__max']
@@ -340,6 +375,7 @@ def user_activity(request, id, name_slug):
         'number_of_votes': number_of_votes,
         'number_of_comments': number_of_comments,
         'number_of_wishes': number_of_wishes,
+        'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'data_month': data_month,
@@ -350,12 +386,11 @@ def user_activity(request, id, name_slug):
 @login_required()
 def user_messages(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, _ = _get_user_profile_numbers(request, selected_user, with_messages=False)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
     messages_qs = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(
         Q(sent_by=selected_user)
         | Q(sent_to=selected_user)
     ).select_related('sent_by')
-    number_of_messages = messages_qs.count()
     try:
         p = int(request.GET.get('p', 0))
     except ValueError:
@@ -375,6 +410,7 @@ def user_messages(request, id, name_slug):
         'number_of_votes': number_of_votes,
         'number_of_comments': number_of_comments,
         'number_of_wishes': number_of_wishes,
+        'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'messages': messages_qs.order_by('-sent_at')[(p-1) * MESSAGES_PER_PAGE:p * MESSAGES_PER_PAGE],
