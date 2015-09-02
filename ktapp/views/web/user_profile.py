@@ -24,16 +24,16 @@ USER_PROFILE_TAB_WIDTH = {
 }
 
 
-def _get_user_profile_numbers(request, selected_user, with_messages=True):
-    if with_messages and request.user.is_authenticated() and request.user.id != selected_user.id:
+def _get_user_profile_numbers(request, selected_user):
+    if request.user.is_authenticated() and request.user.id != selected_user.id:
         number_of_messages = models.MessageCountCache.get_count(owned_by=request.user, partner=selected_user)
     else:
         number_of_messages = 0
     return (
         selected_user.number_of_ratings,
         selected_user.number_of_comments,
-        selected_user.wishlist_set.filter(wish_type__in=['Y', 'G']).count(),
-        models.UserToplist.objects.filter(created_by=selected_user).count(),
+        selected_user.number_of_wishes_yes + selected_user.number_of_wishes_get,
+        selected_user.number_of_toplists,
         number_of_messages,
     )
 
