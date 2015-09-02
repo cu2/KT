@@ -16,11 +16,30 @@
     <div class="centered_content">
 
         <ul class="poll">
-            {% for pollchoice, pollchoice_percent, pollchoice_px in pollchoices %}
+            {% for pollchoice, pollchoice_percent, pollchoice_px, your_vote in pollchoices %}
                 {% if poll.state == 'O' %}
                     <li>
+                        {% if user.is_authenticated and your_vote %}<b>{% endif %}
                         [{{ pollchoice.number_of_votes }}] {{ pollchoice.choice }}
+                        {% if user.is_authenticated and your_vote %}</b>{% endif %}
                         {% if user.is_authenticated %}
+                            {% if your_vote %}
+                                <form action="{% url 'poll_vote' %}" method="post" class="inline" style="vertical-align: 1px">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="poll" value="{{ poll.id }}" />
+                                    <input type="hidden" name="pollchoice" value="{{ pollchoice.id }}" />
+                                    <input type="hidden" name="vote" value="0" />
+                                    <input type="submit" value="-" class="small_button" />
+                                </form>
+                            {% else %}
+                                <form action="{% url 'poll_vote' %}" method="post" class="inline" style="vertical-align: 1px">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="poll" value="{{ poll.id }}" />
+                                    <input type="hidden" name="pollchoice" value="{{ pollchoice.id }}" />
+                                    <input type="hidden" name="vote" value="1" />
+                                    <input type="submit" value="+" class="small_button" />
+                                </form>
+                            {% endif %}
                         {% endif %}
                     </li>
                 {% else %}

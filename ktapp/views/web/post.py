@@ -3,7 +3,7 @@
 import json
 
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
@@ -631,3 +631,17 @@ def delete_message(request):
             models.MessageCountCache.update_cache(owned_by=owned_by, partner=other)
             models.MessageCountCache.update_cache(owned_by=other, partner=owned_by)
     return HttpResponseRedirect(next_url)
+
+
+@require_POST
+@login_required
+def poll_vote(request):
+    poll = get_object_or_404(models.Poll, id=request.POST.get('poll', 0))
+    if poll.state != models.Poll.STATE_OPEN:
+        return HttpResponseForbidden()
+    pollchoice = get_object_or_404(models.PollChoice, id=request.POST.get('pollchoice', 0))
+    if request.POST.get('vote', 0) == '1':
+        models.PollVote.objects.get_or_create(user=request.user, pollchoice=pollchoice)
+    else:
+        models.PollVote.objects.filter(user=request.user, pollchoice=pollchoice).delete()
+    return HttpResponseRedirect(reverse('poll', args=(poll.id, poll.slug_cache)))

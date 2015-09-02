@@ -963,6 +963,7 @@ def poll(request, id, title_slug):
             pollchoice,
             100.0 * pollchoice.number_of_votes / sum_number_of_votes if sum_number_of_votes > 0 else None,
             int(300.0 * pollchoice.number_of_votes / max_number_of_votes) if max_number_of_votes > 0 else 0,
+            models.PollVote.objects.filter(user=request.user, pollchoice=pollchoice).count() if request.user.is_authenticated() else 0,
         ))
     return render(request, 'ktapp/poll.html', {
         'poll': selected_poll,

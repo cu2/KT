@@ -414,6 +414,26 @@ class PollVote(models.Model):
         super(PollVote, self).save(*args, **kwargs)
         self.pollchoice.number_of_votes = self.pollchoice.pollvote_set.count()
         self.pollchoice.save()
+        self.pollchoice.poll.number_of_votes = sum([pc.number_of_votes for pc in self.pollchoice.poll.pollchoice_set.all()])
+        users = set()
+        for pc in self.pollchoice.poll.pollchoice_set.all():
+            for pv in PollVote.objects.filter(pollchoice=pc):
+                users.add(pv.user)
+        self.pollchoice.poll.number_of_people = len(users)
+        self.pollchoice.poll.save()
+
+
+@receiver(post_delete, sender=PollVote)
+def delete_pollvote(sender, instance, **kwargs):
+    instance.pollchoice.number_of_votes = instance.pollchoice.pollvote_set.count()
+    instance.pollchoice.save()
+    instance.pollchoice.poll.number_of_votes = sum([pc.number_of_votes for pc in instance.pollchoice.poll.pollchoice_set.all()])
+    users = set()
+    for pc in instance.pollchoice.poll.pollchoice_set.all():
+        for pv in PollVote.objects.filter(pollchoice=pc):
+            users.add(pv.user)
+    instance.pollchoice.poll.number_of_people = len(users)
+    instance.pollchoice.poll.save()
 
 
 class FilmUserContent(models.Model):
