@@ -12,6 +12,35 @@
             <br />
             Súly{% if selected_user.id == user.id %}od{% endif %}: {{ vapiti_weight }}
         </p>
+
+        {% if user.is_authenticated %}
+            {% if selected_user.id == user.id %}
+                {% if selected_user.core_member %}
+                    <p>Törzstag vagy.</p>
+                {% endif %}
+            {% else %}
+                {% if myfav %}
+                    <form action="{% url 'unfollow' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="whom" value="{{ selected_user.id }}" />
+                        <p>
+                            Kedvencnek jelölted.
+                            <input type="submit" value="Törlés a kedvencek közül" class="small_button" />
+                        </p>
+                    </form>
+                {% else %}
+                    <form action="{% url 'follow' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="whom" value="{{ selected_user.id }}" />
+                        <p>
+                            Érdekel {{ selected_user.username }}? Jelöld kedvencnek, hogy követni tudd a szavazatait és kommentjeit:
+                            <input type="submit" value="Hozzáadás a kedvencekhez" class="small_button" />
+                        </p>
+                    </form>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
         {% if selected_user.id == user.id %}
             <p>
                 Nemed:
@@ -68,37 +97,17 @@
             </p>
         {% endif %}
 
-        {% if user.is_authenticated and selected_user.id != user.id %}
-            {% if myfav %}
-                <form action="{% url 'unfollow' %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="whom" value="{{ selected_user.id }}" />
-                    <p>
-                        Kedvencnek jelölted.
-                        <input type="submit" value="Törlés a kedvencek közül" class="small_button" />
-                    </p>
-                </form>
-            {% else %}
-                <form action="{% url 'follow' %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="whom" value="{{ selected_user.id }}" />
-                    <p>
-                        Érdekel {{ selected_user.username }}? Jelöld kedvencnek, hogy követni tudd a szavazatait és kommentjeit:
-                        <input type="submit" value="Hozzáadás a kedvencekhez" class="small_button" />
-                    </p>
-                </form>
+        {% if user.is_authenticated %}
+            {% if selected_user.id == user.id and user.validated_email %}
+                <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
+                <div class="mobilemenu">
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+                        <p><input type="submit" value="Kijelentkezés" class="small_button" /></p>
+                    </form>
+                </div>
             {% endif %}
-        {% endif %}
-
-        {% if selected_user.id == user.id and user.validated_email %}
-            <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
-            <div class="mobilemenu">
-                <form action="{% url 'logout' %}" method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
-                    <p><input type="submit" value="Kijelentkezés" class="small_button" /></p>
-                </form>
-            </div>
         {% endif %}
 
     </div>
