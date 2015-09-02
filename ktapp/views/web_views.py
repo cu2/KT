@@ -965,11 +965,31 @@ def poll(request, id, title_slug):
             int(300.0 * pollchoice.number_of_votes / max_number_of_votes) if max_number_of_votes > 0 else 0,
             models.PollVote.objects.filter(user=request.user, pollchoice=pollchoice).count() if request.user.is_authenticated() else 0,
         ))
+    try:
+        reply_to_comment = models.Comment.objects.get(id=request.GET.get('valasz', 0))
+        reply_to_id = reply_to_comment.id
+    except models.Comment.DoesNotExist:
+        reply_to_comment = None
+        reply_to_id = None
+    comment_form = kt_forms.CommentForm(initial={
+        'domain': models.Comment.DOMAIN_POLL,
+        'film': None,
+        'topic': None,
+        'poll': selected_poll,
+        'reply_to': reply_to_id,
+    })
+    comment_form.fields['domain'].widget = forms.HiddenInput()
+    comment_form.fields['film'].widget = forms.HiddenInput()
+    comment_form.fields['topic'].widget = forms.HiddenInput()
+    comment_form.fields['poll'].widget = forms.HiddenInput()
+    comment_form.fields['reply_to'].widget = forms.HiddenInput()
     return render(request, 'ktapp/poll.html', {
         'poll': selected_poll,
         'pollchoices': pollchoices,
         'sum_number_of_votes': sum_number_of_votes,
-        'comments': models.Comment.objects.filter(domain=models.Comment.DOMAIN_POLL, poll=selected_poll).select_related('created_by', 'reply_to', 'reply_to__created_by'),
+        'comments': selected_poll.comment_set.select_related('created_by', 'reply_to', 'reply_to__created_by').all(),
+        'comment_form': comment_form,
+        'reply_to_comment': reply_to_comment,
     })
 
 

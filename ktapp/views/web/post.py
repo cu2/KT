@@ -46,14 +46,14 @@ def wish(request):
 
 @require_POST
 @login_required
-def new_comment(request):  # TODO: extend with poll comments
-    domain_type = request.POST["domain"]
+def new_comment(request):
+    domain_type = request.POST['domain']
     if domain_type == models.Comment.DOMAIN_FILM:
-        domain = get_object_or_404(models.Film, pk=request.POST["film"])
+        domain = get_object_or_404(models.Film, pk=request.POST['film'])
     elif domain_type == models.Comment.DOMAIN_TOPIC:
-        domain = get_object_or_404(models.Topic, pk=request.POST["topic"])
+        domain = get_object_or_404(models.Topic, pk=request.POST['topic'])
     elif domain_type == models.Comment.DOMAIN_POLL:
-        domain = get_object_or_404(models.Poll, pk=request.POST["poll"])
+        domain = get_object_or_404(models.Poll, pk=request.POST['poll'])
     else:
         raise Http404
     if request.POST:
@@ -63,11 +63,11 @@ def new_comment(request):  # TODO: extend with poll comments
             comment.created_by = request.user
             comment.save(domain=domain)  # Comment model updates domain object
     if domain_type == models.Comment.DOMAIN_FILM:
-        return HttpResponseRedirect(reverse("film_comments", args=(domain.pk, domain.slug_cache)))
+        return HttpResponseRedirect(reverse('film_comments', args=(domain.pk, domain.slug_cache)))
     elif domain_type == models.Comment.DOMAIN_TOPIC:
-        return HttpResponseRedirect(reverse("forum", args=(domain.pk, domain.slug_cache)))
+        return HttpResponseRedirect(reverse('forum', args=(domain.pk, domain.slug_cache)))
     elif domain_type == models.Comment.DOMAIN_POLL:
-        return HttpResponseRedirect(reverse("index"))
+        return HttpResponseRedirect(reverse('poll', args=(domain.pk, domain.slug_cache)))
     else:
         raise Http404
 

@@ -48,6 +48,8 @@
             {% endfor %}
         </ul>
 
+        {% include 'ktapp/blocks/new_comment_block.html' %}
+
         {% for c in comments %}
             {% include 'ktapp/blocks/comment_block.html' with comment=c %}
         {% endfor %}

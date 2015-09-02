@@ -28,7 +28,7 @@
                     {{ hidden }}
                 {% endfor %}
                 {% if reply_to_comment %}
-                    <p>Válasz a #{{ reply_to_comment.serial_number }} kommentre (<a href="{% if film %}{% url 'film_comments' film.id film.slug_cache %}{% elif topic %}{% url 'forum' topic.id topic.slug_cache %}{% endif %}">mégse</a>):</p>
+                    <p>Válasz a #{{ reply_to_comment.serial_number }} kommentre (<a href="{% if film %}{% url 'film_comments' film.id film.slug_cache %}{% elif topic %}{% url 'forum' topic.id topic.slug_cache %}{% elif poll %}{% url 'poll' poll.id poll.slug_cache %}{% endif %}">mégse</a>):</p>
                 {% endif %}
                 {{ comment_form.content.errors }}
                 {{ comment_form.content }}
