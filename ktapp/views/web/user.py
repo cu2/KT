@@ -74,18 +74,15 @@ def registration(request):
                 )
             )
             login(request, kt_utils.custom_authenticate(models.KTUser, username, password))
-            welcome_message = models.Message.objects.create(
+            models.Message.send_message(
                 sent_by=None,
                 content=texts.WELCOME_PM_BODY.format(
                     username=user.username,
                     email=user.email,
                     reset_password_url=reverse('reset_password', args=('',)),  # important: don't send the token via pm
                 ),
-                owned_by=user,
-                private=True,
+                recipients=[user],
             )
-            welcome_message.sent_to.add(user)
-            welcome_message.save()
             return HttpResponseRedirect(next_url)
     return render(request, 'ktapp/registration.html', {
         'next': next_url,
@@ -342,17 +339,11 @@ def new_message(request):
             recipients.discard(request.user)
         if len(recipients) == 0:
             return HttpResponseRedirect(next_url)
-        owners = recipients | {request.user}
-        for owner in owners:
-            message = models.Message.objects.create(
-                sent_by=request.user,
-                content=content,
-                owned_by=owner,
-                private=len(recipients)==1,
-            )
-            for recipient in recipients:
-                message.sent_to.add(recipient)
-            message.save()
+        models.Message.send_message(
+            sent_by=request.user,
+            content=content,
+            recipients=recipients,
+        )
         # TODO: check KTUser.email_notification
         # for recipient in recipients:
         #     recipient.email_user(

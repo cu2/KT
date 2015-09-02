@@ -26,7 +26,7 @@ USER_PROFILE_TAB_WIDTH = {
 
 def _get_user_profile_numbers(request, selected_user, with_messages=True):
     if with_messages and request.user.is_authenticated() and request.user.id != selected_user.id:
-        number_of_messages = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(Q(sent_by=selected_user) | Q(sent_to=selected_user)).count()
+        number_of_messages = models.MessageCountCache.get_count(owned_by=request.user, partner=selected_user)
     else:
         number_of_messages = 0
     return (

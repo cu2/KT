@@ -7,6 +7,7 @@ from PIL import Image
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.core.mail import send_mail
+from django.db.models import Q
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.template.defaultfilters import slugify
@@ -68,6 +69,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     latest_comments = models.TextField(blank=True)
     number_of_comments = models.PositiveIntegerField(default=0)
     number_of_ratings = models.PositiveIntegerField(default=0)
+    number_of_messages = models.PositiveIntegerField(default=0)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -923,10 +925,74 @@ class Message(models.Model):
         self.content = strip_tags(self.content)
         self.content_html = utils.bbcode_to_html(self.content)
         super(Message, self).save(*args, **kwargs)
-        for recipient in self.recipients():
-            if recipient.last_message_at is None or recipient.last_message_at < self.sent_at:
-                recipient.last_message_at = self.sent_at
+
+    @classmethod
+    def send_message(cls, sent_by, content, recipients):
+        if sent_by is None:
+            owners = recipients
+        else:
+            owners = recipients | {sent_by}
+        for owner in owners:
+            message = Message.objects.create(
+                sent_by=sent_by,
+                content=content,
+                owned_by=owner,
+                private=len(recipients)==1,
+            )
+            for recipient in recipients:
+                message.sent_to.add(recipient)
+            message.save()
+            owner.number_of_messages = Message.objects.filter(owned_by=owner).count()
+            owner.save()
+            for recipient in recipients:
+                recipient.number_of_messages = Message.objects.filter(owned_by=recipient).count()
+                if recipient.last_message_at is None or recipient.last_message_at < message.sent_at:
+                    recipient.last_message_at = message.sent_at
                 recipient.save()
+        if sent_by and len(recipients)==1:
+            other = list(recipients)[0]
+            MessageCountCache.update_cache(owned_by=sent_by, partner=other)
+            MessageCountCache.update_cache(owned_by=other, partner=sent_by)
+
+
+@receiver(post_delete, sender=Message)
+def delete_message(sender, instance, **kwargs):
+    instance.owned_by.number_of_messages = Message.objects.filter(owned_by=instance.owned_by).count()
+    if Message.objects.filter(owned_by=instance.owned_by).exclude(sent_by=instance.owned_by).count() > 0:
+        instance.owned_by.last_message_at = Message.objects.filter(owned_by=instance.owned_by).exclude(sent_by=instance.owned_by).latest('sent_at').sent_at
+    else:
+        instance.owned_by.last_message_at = None
+    instance.owned_by.save()
+    # recipients are not available here, so MessageCountCache.update_cache lives in view function
+
+
+class MessageCountCache(models.Model):
+    owned_by = models.ForeignKey(KTUser, related_name='owned_message_count', on_delete=models.CASCADE)
+    partner = models.ForeignKey(KTUser, related_name='partner_message_count', on_delete=models.CASCADE)
+    number_of_messages = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ['owned_by', 'partner']
+
+    @classmethod
+    def get_count(cls, owned_by, partner):
+        if owned_by == partner:
+            return 0
+        try:
+            return cls.objects.get(owned_by=owned_by, partner=partner).number_of_messages
+        except cls.DoesNotExist:
+            pass
+        return cls.update_cache(owned_by, partner)
+
+    @classmethod
+    def update_cache(cls, owned_by, partner):
+        if owned_by == partner:
+            return 0
+        number_of_messages = Message.objects.filter(private=True).filter(owned_by=owned_by).filter(Q(sent_by=partner) | Q(sent_to=partner)).count()
+        item, created = cls.objects.get_or_create(owned_by=owned_by, partner=partner)
+        item.number_of_messages = number_of_messages
+        item.save()
+        return number_of_messages
 
 
 class Wishlist(models.Model):
