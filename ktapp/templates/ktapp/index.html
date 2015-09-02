@@ -22,7 +22,7 @@
                 {% for genre in film.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
             </p>
             <p class="film_block_content">
-                {{ film.plot_summary }}
+                {{ film.plot_summary|linebreaksbr }}
             </p>
             <br class="clear" />
         </div>

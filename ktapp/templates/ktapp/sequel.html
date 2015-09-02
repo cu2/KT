@@ -1,0 +1,47 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}{{ sequel.name }}{% if sequel.sequel_type == 'A' %} adaptációk{% elif sequel.sequel_type == 'R' %} remake-ek{% endif %} - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>{{ sequel.name }}{% if sequel.sequel_type == 'A' %} adaptációk{% elif sequel.sequel_type == 'R' %} remake-ek{% endif %}</h1>
+{% endblock %}
+
+{% block main %}
+<div class="centered_contentx">
+
+    <table class="fullsize">
+        <tr class="header_tr">
+            <th>Film</th>
+            <th>Év</th>
+            <th>Rendező</th>
+            <th>Átlag</th>
+            <th>Szavazatszám</th>
+            <th>Kommentek száma</th>
+        </tr>
+        {% for film in sequel.all_films %}
+            <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                <td>
+                    {% if film.main_poster %}
+                        <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} ({{ film.year }})"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
+                    {% endif %}
+                    <p class="film_block_content">
+                        <b><a href="{% url 'film_main' film.id film.slug_cache %}">{{ film.orig_title }}</a></b><br />
+                        {% if film.second_title %}{{ film.second_title }}<br />{% endif %}
+                    </p>
+                    <p class="film_block_content">
+                        {{ film.plot_summary|linebreaksbr }}
+                    </p>
+                    <br class="clear" />
+                </td>
+                <td class="center">{{ film.year }}</td>
+                <td>{{ film|film_directors }}</td>
+                <td class="center">{{ film|film_avg_rating_html }}</td>
+                <td class="center">{{ film|film_num_rating_html }}</td>
+                <td class="center">{{ film.number_of_comments }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+</div>
+{% endblock %}

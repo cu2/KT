@@ -1,0 +1,30 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Adaptációk, folytatások, remake-ek - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Adaptációk, folytatások, remake-ek</h1>
+{% endblock %}
+
+{% block main %}
+<div class="centered_content">
+
+    <table class="fullsize sortable">
+        <thead>
+            <tr class="header_tr">
+                <th data-sort="string">Típus</th>
+                <th data-sort="string">Cím</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for sequel in sequels %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td>{% if sequel.sequel_type == 'A' %}adaptáció{% elif sequel.sequel_type == 'R' %}remake{% else %}folytatás{% endif %}</td>
+                <td><a href="{% url 'sequel' sequel.id sequel.slug_cache %}">{{ sequel.name }}</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+{% endblock %}

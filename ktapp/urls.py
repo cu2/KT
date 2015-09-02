@@ -44,6 +44,9 @@ urlpatterns += patterns(
     url(r'^bemutatok/$', web_views.premiers, name='premiers'),
     url(r'^top_filmek/$', web_views.top_films, name='top_films'),
 
+    url(r'^folytatasok/$', web_views.sequels, name='sequels'),
+    url(r'^folytatas/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.sequel, name='sequel'),
+
     url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/velemenyek/$', film_views.film_comments, name='film_comments'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/idezetek/$', film_views.film_quotes, name='film_quotes'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/erdekessegek/$', film_views.film_trivias, name='film_trivias'),

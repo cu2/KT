@@ -1051,6 +1051,20 @@ def latest_trivias(request):
     })
 
 
+def sequels(request):
+    return render(request, 'ktapp/sequels.html', {
+        'sequels': models.Sequel.objects.all().order_by('name'),
+    })
+
+
+def sequel(request, id, title_slug):
+    selected_sequel = get_object_or_404(models.Sequel, pk=id)
+    return render(request, 'ktapp/sequel.html', {
+        'sequel': selected_sequel,
+    })
+
+
+
 def old_url(request):
     print request.path
     if request.path == '/film.php':
