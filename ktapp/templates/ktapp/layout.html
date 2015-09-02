@@ -130,13 +130,13 @@
                         <li><a href="{% url 'list_of_bios' %}">Portrék</a></li>
                     </ul>
                 </li>
-                {% if user.is_authenticated and user.core_member %}
+                {% if user.is_authenticated and user.is_staff or user.is_reliable %}
                     <li>Szerk<br />
                         <ul class="submenu">
-                            {% if user.core_member %}
+                            {% if user.is_staff or user.is_reliable %}
                                 <li><a href="{% url 'new_film' %}">Filmfeltöltés</a></li>
                             {% endif %}
-                            {% if user.is_staff %}
+                            {% if user.is_staff or user.is_reliable %}
                                 <li><a href="{% url 'changes' %}">Változások</a></li>
                             {% endif %}
                             {% if user.is_superuser %}

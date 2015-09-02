@@ -73,9 +73,9 @@ def check_permission(perm, user, silent=True):
             'approve_review': 'admin',
             'new_picture': 'core',
             'edit_picture': 'core',
-            'delete_picture': 'admin',
-            'new_film': 'admin',
-            'edit_film': 'admin',
+            'delete_picture': 'reliable',
+            'new_film': 'reliable',
+            'edit_film': 'reliable',
             'edit_premiers': 'admin',
             'edit_artist': 'core',
             'merge_artist': 'admin',
@@ -84,11 +84,13 @@ def check_permission(perm, user, silent=True):
             'new_role': 'core',
             'delete_role': 'core',
             'new_topic': 'core',
-            'check_changes': 'admin',
+            'check_changes': 'reliable',
         }.get(perm, perm)
         if grp == 'admin' and user.is_staff:
             return True
-        if grp == 'core' and user.core_member:
+        if grp == 'reliable' and user.is_reliable or user.is_staff:
+            return True
+        if grp == 'core' and user.core_member or user.is_reliable or user.is_staff:
             return True
     if silent:
         return False

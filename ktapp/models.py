@@ -74,6 +74,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_wishes_no = models.PositiveIntegerField(default=0)
     number_of_wishes_get = models.PositiveIntegerField(default=0)
     number_of_toplists = models.PositiveIntegerField(default=0)
+    is_reliable = models.BooleanField(default=False)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
