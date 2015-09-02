@@ -70,6 +70,10 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_comments = models.PositiveIntegerField(default=0)
     number_of_ratings = models.PositiveIntegerField(default=0)
     number_of_messages = models.PositiveIntegerField(default=0)
+    number_of_wishes_yes = models.PositiveIntegerField(default=0)
+    number_of_wishes_no = models.PositiveIntegerField(default=0)
+    number_of_wishes_get = models.PositiveIntegerField(default=0)
+    number_of_toplists = models.PositiveIntegerField(default=0)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -1013,6 +1017,28 @@ class Wishlist(models.Model):
         unique_together = ['film', 'wished_by', 'wish_type']
 
 
+    def save(self, *args, **kwargs):
+        super(Wishlist, self).save(*args, **kwargs)
+        if self.wish_type == Wishlist.WISH_TYPE_YES:
+            self.wished_by.number_of_wishes_yes = Wishlist.objects.filter(wished_by=self.wished_by, wish_type=Wishlist.WISH_TYPE_YES).count()
+        elif self.wish_type == Wishlist.WISH_TYPE_NO:
+            self.wished_by.number_of_wishes_no = Wishlist.objects.filter(wished_by=self.wished_by, wish_type=Wishlist.WISH_TYPE_NO).count()
+        else:
+            self.wished_by.number_of_wishes_get = Wishlist.objects.filter(wished_by=self.wished_by, wish_type=Wishlist.WISH_TYPE_GET).count()
+        self.wished_by.save()
+
+
+@receiver(post_delete, sender=Wishlist)
+def delete_wish(sender, instance, **kwargs):
+    if instance.wish_type == Wishlist.WISH_TYPE_YES:
+        instance.wished_by.number_of_wishes_yes = Wishlist.objects.filter(wished_by=instance.wished_by, wish_type=Wishlist.WISH_TYPE_YES).count()
+    elif instance.wish_type == Wishlist.WISH_TYPE_NO:
+        instance.wished_by.number_of_wishes_no = Wishlist.objects.filter(wished_by=instance.wished_by, wish_type=Wishlist.WISH_TYPE_NO).count()
+    else:
+        instance.wished_by.number_of_wishes_get = Wishlist.objects.filter(wished_by=instance.wished_by, wish_type=Wishlist.WISH_TYPE_GET).count()
+    instance.wished_by.save()
+
+
 class TVChannel(models.Model):
     name = models.CharField(max_length=250)
     active = models.BooleanField(default=True)
@@ -1053,6 +1079,14 @@ class UserToplist(models.Model):
     def save(self, *args, **kwargs):
         self.slug_cache = slugify(self.title)
         super(UserToplist, self).save(*args, **kwargs)
+        self.created_by.number_of_toplists = UserToplist.objects.filter(created_by=self.created_by).count()
+        self.created_by.save()
+
+
+@receiver(post_delete, sender=UserToplist)
+def delete_usertoplist(sender, instance, **kwargs):
+    instance.created_by.number_of_toplists = UserToplist.objects.filter(created_by=instance.created_by).count()
+    instance.created_by.save()
 
 
 class UserToplistItem(models.Model):
