@@ -62,6 +62,7 @@ urlpatterns += patterns(
     url(r'^szavaz$', post_views.vote, name='vote'),
     url(r'^kivan$', post_views.wish, name='wish'),
     url(r'^kommentel$', post_views.new_comment, name='new_comment'),
+    url(r'^szerk_komment$', post_views.edit_comment, name='edit_comment'),
     url(r'^uj_idezet$', post_views.new_quote, name='new_quote'),
     url(r'^uj_erdekesseg$', post_views.new_trivia, name='new_trivia'),
     url(r'^uj_elemzes$', post_views.new_review, name='new_review'),

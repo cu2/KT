@@ -1,4 +1,13 @@
 $(function() {
+    $('.show_comment_edit_form').click(function() {
+        $(this).closest('.comment_block').find('.comment_content').hide();
+        $(this).closest('.comment_block').find('.comment_edit_form').show();
+        $(this).closest('.comment_block').find('.comment_edit_form').find('textarea').focus();
+    });
+    $('.hide_comment_edit_form').click(function() {
+        $(this).closest('.comment_block').find('.comment_edit_form').hide();
+        $(this).closest('.comment_block').find('.comment_content').show().focus();
+    });
     $('form').submit(function() {
         $(this).find('input:submit').prop('disabled', true);
     });

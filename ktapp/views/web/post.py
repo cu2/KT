@@ -75,6 +75,20 @@ def new_comment(request):
 
 @require_POST
 @login_required
+def edit_comment(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    comment = get_object_or_404(models.Comment, id=request.POST.get('comment_id', 0))
+    if request.user.is_staff or (comment.created_by.id == request.user.id and comment.editable()):
+        content = request.POST.get('content', '').strip()
+        if content != '':
+            comment.content = content
+            comment.save()
+        return HttpResponseRedirect(next_url)
+    return HttpResponseForbidden()
+
+
+@require_POST
+@login_required
 @kt_utils.kt_permission_required('new_quote')
 def new_quote(request):
     film = get_object_or_404(models.Film, pk=request.POST["film"])

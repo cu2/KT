@@ -320,6 +320,7 @@ input, select, textarea {
 }
 textarea {
     width: 100%;
+    font-family: verdana, sans-serif;
 }
 .button {
     color: rgb(146,23,23);
@@ -630,6 +631,9 @@ ul.poll li {
 .comment_button_reply {
     position: absolute; z-index: 10;
     right: 5px; top: 5px;
+}
+.comment_edit_form textarea {
+    width: 99%;
 }
 
 

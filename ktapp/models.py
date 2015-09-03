@@ -281,11 +281,22 @@ class Comment(models.Model):
             ['created_by', 'serial_number_by_user', 'created_at'],
         ]
 
+    def editable(self):
+        if self.domain == Comment.DOMAIN_FILM:
+            domain = self.film
+        elif self.domain == Comment.DOMAIN_TOPIC:
+            domain = self.topic
+        elif self.domain == Comment.DOMAIN_POLL:
+            domain = self.poll
+        else:
+            return False
+        return domain.last_comment_id == self.id
+
     def save(self, *args, **kwargs):
         """Save comment and update domain object as well"""
+        self.content = strip_tags(self.content)
+        self.content_html = utils.bbcode_to_html(self.content)
         if 'domain' in kwargs:
-            self.content = strip_tags(self.content)
-            self.content_html = utils.bbcode_to_html(self.content)
             self.serial_number = kwargs['domain'].comment_set.count() + 1
             self.serial_number_by_user = self.created_by.comment_set.count() + 1
             if self.domain == Comment.DOMAIN_FILM:
