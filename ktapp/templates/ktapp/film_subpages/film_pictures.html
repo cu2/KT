@@ -57,9 +57,11 @@
                 </div>
             {% endif %}
         {% endif %}
-        {% for picture in pictures %}
-            <a href="{% url 'film_picture' film.id film.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="thumbnail" /></a>
-        {% endfor %}
+        {% if pictures|length > 1 %}
+            {% for picture in pictures %}
+                <a href="{% url 'film_picture' film.id film.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="thumbnail" /></a>
+            {% endfor %}
+        {% endif %}
         {% if permission_new_picture %}
             <h3>Új kép feltöltése</h3>
             <form action="{% url 'new_picture' %}" method="post" enctype="multipart/form-data">

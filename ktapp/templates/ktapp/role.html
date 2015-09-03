@@ -11,7 +11,27 @@
     <p>Film: <a href="{% url 'film_main' role.film.id role.film.slug_cache %}">{{ role.film.orig_title }} ({{ role.film.year }})</a> {{ role.film.second_title }}</p>
     <p>Színész: <a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}</p>
 
+    <div class="centered_content">
+        {% if picture %}
+            <p class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
+                <a href="{% url 'role' role.id role.slug_cache %}?p={{ next_picture.id }}#pix"><img src="{{ picture.get_display_urls.max }}" style="width: {{ picture.get_widths.max }}px; height: {{ picture.get_heights.max }}px" class="picture" /></a>
+                <a name="pix" class="jumptarget"></a>
+                <br />
+                {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} <a href="{% url 'film_pictures' film.id film.slug_cache %}">{{ film.orig_title }}</a>{% if film.year %} ({{ film.year }}){% endif %} című filmben
+                {% if picture.source_url %}
+                    <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
+                {% endif %}
+            </p>
+        {% endif %}
+        {% if pictures|length > 1 %}
+            {% for picture in pictures %}
+                <a href="{% url 'role' role.id role.slug_cache %}?p={{ picture.id }}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="thumbnail" /></a>
+            {% endfor %}
+        {% endif %}
+    </div>
+
     {% if permission_edit_role %}
+        <p><br /></p>
         <p><span class="button small_button" id="show_role_edit_form_button">Szereplő módosítása</span></p>
         <div id="role_edit_form" style="display: none">
         <form action="" method="post">

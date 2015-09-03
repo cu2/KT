@@ -813,11 +813,31 @@ def role(request, id, name_slug):
                 role.actor_subtype = role_type
                 role.save()
             return HttpResponseRedirect(reverse('role', args=(role.id, role.slug_cache)))
-    return render(request, 'ktapp/role.html', {
+    context = {
         'role': role,
         'permission_edit_role': kt_utils.check_permission('edit_role', request.user),
         'permission_delete_role': kt_utils.check_permission('delete_role', request.user),
-    })
+    }
+    pictures = sorted(role.artist.picture_set.filter(film=role.film), key=lambda pic: (-pic.film.year, pic.film.orig_title, pic.id))
+    if pictures:
+        context.update({
+            'pictures': pictures,
+        })
+        selected_picture_id = request.GET.get('p', 0)
+        if selected_picture_id:
+            try:
+                picture = models.Picture.objects.get(id=selected_picture_id, film=role.film, artists__id=role.artist.id)
+            except models.Picture.DoesNotExist:
+                return HttpResponseRedirect(reverse('role', args=(role.id, role.slug_cache)))
+        else:
+            picture = None
+        if len(pictures) == 1:
+            picture = pictures[0]
+        if picture:
+            next_picture = kt_utils.get_next_picture(pictures, picture)
+            context.update(kt_utils.get_selected_picture_details(models.Picture, picture.film, picture, next_picture))
+            context.update({'film': picture.film})
+    return render(request, 'ktapp/role.html', context)
 
 
 def list_of_topics(request):
