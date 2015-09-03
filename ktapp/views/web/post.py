@@ -688,3 +688,33 @@ def poll_support(request):
             poll.state = models.Poll.STATE_APPROVED
         poll.save()
     return HttpResponseRedirect(reverse('polls') + '?tipus=leendo')
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('new_poll')
+def new_poll(request):
+    title = kt_utils.strip_whitespace(request.POST.get('title', ''))
+    if title == '':
+        return HttpResponseRedirect(reverse('polls') + '?tipus=leendo')
+    choices = []
+    for choice in request.POST.get('choices', '').strip().split('\n'):
+        choice = kt_utils.strip_whitespace(choice)
+        if choice == '':
+            continue
+        choices.append(choice)
+    if len(choices) == 0:
+        return HttpResponseRedirect(reverse('polls') + '?tipus=leendo')
+    poll = models.Poll.objects.create(
+        title=title,
+        created_by=request.user,
+        nominated_by=',%s,' % request.user.id,
+        state=models.Poll.STATE_WAITING_FOR_APPROVAL,
+    )
+    for idx, choice in enumerate(choices):
+        models.PollChoice.objects.create(
+            poll=poll,
+            choice=choice,
+            serial_number=idx + 1,
+        )
+    return HttpResponseRedirect(reverse('polls') + '?tipus=leendo')

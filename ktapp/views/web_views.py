@@ -938,6 +938,7 @@ def polls(request):
             'polls_w': polls_w.order_by('-created_at'),
             'polls_a': polls_a.order_by('-created_at'),
             'permission_poll_admin': kt_utils.check_permission('poll_admin', request.user),
+            'permission_new_poll': kt_utils.check_permission('new_poll', request.user),
             'myself': ',%s,' % request.user.id if request.user.is_authenticated() else '',
         })
 

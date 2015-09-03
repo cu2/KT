@@ -881,6 +881,10 @@ ul.poll li {
 }
 
 
+.wide_input {
+    width: 300px;
+}
+
 .search_input {
     width: 80px;
 }
@@ -942,6 +946,7 @@ ul.poll li {
 .recipients_input {
     width: 300px;
 }
+
 
 .ui-autocomplete-loading {
     background-image: url(images/ajax-loader.gif);

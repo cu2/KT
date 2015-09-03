@@ -9,6 +9,18 @@
 {% block main %}
     <div class="centered_content">
 
+        {% if permission_new_poll %}
+            <h2>Új közkérdés</h2>
+            <form action="{% url 'new_poll' %}" method="post">
+                {% csrf_token %}
+                <p><label for="id_title">Kérdés:</label> <input type="text" name="title" id="id_title" class="wide_input" /></p>
+                <p><label for="id_choices">Lehetséges válaszok (soronként egy) (<b>ne</b> számozd meg őket!):</label><br />
+                    <textarea name="choices" id="id_choices" rows="10"></textarea>
+                </p>
+                <p class="center"><input type="submit" value="Közkérdés beküldése" /></p>
+            </form>
+        {% endif %}
+
         <h2>Támogatásra vár</h2>
 
         {% for poll in polls_w %}
