@@ -53,11 +53,17 @@ def index(request):
             if comment.created_at > buzz_comment_domains[key][1]:
                 buzz_comment_domains[key] = (comment.id, comment.created_at)
     buzz_comment_ids = [id for id, _ in sorted(buzz_comment_domains.values(), key=lambda x: x[1], reverse=True)[:10]]
+    # random poll
+    try:
+        random_poll = models.Poll.objects.filter(state=models.Poll.STATE_OPEN).order_by('?')[0]
+    except IndexError:
+        random_poll = None
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
         'toplist': toplist_of_the_day,
         'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
         'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids),
+        'random_poll': random_poll,
     })
 
 
@@ -931,6 +937,8 @@ def polls(request):
         return render(request, 'ktapp/polls_admin.html', {
             'polls_w': polls_w.order_by('-created_at'),
             'polls_a': polls_a.order_by('-created_at'),
+            'permission_poll_admin': kt_utils.check_permission('poll_admin', request.user),
+            'myself': ',%s,' % request.user.id if request.user.is_authenticated() else '',
         })
 
     if poll_type == 'aktualis':
@@ -990,6 +998,7 @@ def poll(request, id, title_slug):
         'comments': selected_poll.comment_set.select_related('created_by', 'reply_to', 'reply_to__created_by').all(),
         'comment_form': comment_form,
         'reply_to_comment': reply_to_comment,
+        'permission_poll_admin': kt_utils.check_permission('poll_admin', request.user),
     })
 
 

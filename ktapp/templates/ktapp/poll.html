@@ -54,5 +54,13 @@
             {% include 'ktapp/blocks/comment_block.html' with comment=c %}
         {% endfor %}
 
+        {% if permission_poll_admin and poll.state == 'O' %}
+            <form action="{% url 'poll_archive' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="poll" value="{{ poll.id }}" />
+                <p><input type="submit" value="Közkérdés archiválása" /></p>
+            </form>
+        {% endif %}
+
     </div>
 {% endblock %}

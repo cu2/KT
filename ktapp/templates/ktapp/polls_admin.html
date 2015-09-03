@@ -9,49 +9,49 @@
 {% block main %}
     <div class="centered_content">
 
-        <h2>Jelölésre vár</h2>
-        <table class="fullsize sortable">
-            <thead>
-            <tr class="header_tr">
-                <th data-sort="string">Mikor</th>
-                <th data-sort="string">Ki</th>
-                <th data-sort="string">Kérdés</th>
-                <th data-sort="string">Jelölték</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for poll in polls_w %}
-                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
-                    <td class="nowrap">{{ poll.created_at|date:"Y-m-d" }}</td>
-                    <td>{% if poll.created_by %}<a href="{% url 'user_profile' poll.created_by.id poll.created_by.slug_cache %}">{{ poll.created_by.username }}</a>{% endif %}</td>
-                    <td>{{ poll.title }}</td>
-                    <td>{{ poll.nominated_by }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <h2>Támogatásra vár</h2>
+
+        {% for poll in polls_w %}
+            {% if permission_poll_admin %}
+                {% if myself in poll.nominated_by %}
+                    <h3><span class="small_button_selected">Támogatod</span> {{ poll.title }}</h3></h3>
+                {% else %}
+                    <form action="{% url 'poll_support' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="poll" value="{{ poll.id }}" />
+                        <h3><input type="submit" value="Támogatás" class="small_button" /> {{ poll.title }}</h3>
+                    </form>
+                {% endif %}
+            {% else %}
+                <h3>{{ poll.title }}</h3>
+            {% endif %}
+            <p>{{ poll.created_at|date:"Y-m-d" }}{% if poll.created_by %} <a href="{% url 'user_profile' poll.created_by.id poll.created_by.slug_cache %}">{{ poll.created_by.username }}</a>{% endif %}</p>
+            <ul>
+                {% for pollchoice in poll.pollchoices %}
+                    <li>{{ pollchoice }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
 
         <h2>Aktiválásra vár</h2>
-        <table class="fullsize sortable">
-            <thead>
-                <tr class="header_tr">
-                    <th data-sort="string">Mikor</th>
-                    <th data-sort="string">Ki</th>
-                    <th data-sort="string">Kérdés</th>
-                    <th data-sort="string">Jelölték</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for poll in polls_a %}
-                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
-                    <td class="nowrap">{{ poll.created_at|date:"Y-m-d" }}</td>
-                    <td>{% if poll.created_by %}<a href="{% url 'user_profile' poll.created_by.id poll.created_by.slug_cache %}">{{ poll.created_by.username }}</a>{% endif %}</td>
-                    <td>{{ poll.title }}</td>
-                    <td>{{ poll.nominated_by }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+
+        {% for poll in polls_a %}
+            {% if permission_poll_admin %}
+                <form action="{% url 'poll_activate' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="poll" value="{{ poll.id }}" />
+                    <h3><input type="submit" value="Aktiválás" class="small_button" /> {{ poll.title }}</h3>
+                </form>
+            {% else %}
+                <h3>{{ poll.title }}</h3>
+            {% endif %}
+            <p>{{ poll.created_at|date:"Y-m-d" }}{% if poll.created_by %} <a href="{% url 'user_profile' poll.created_by.id poll.created_by.slug_cache %}">{{ poll.created_by.username }}</a>{% endif %}</p>
+            <ul>
+                {% for pollchoice in poll.pollchoices %}
+                    <li>{{ pollchoice }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
 
     </div>
 {% endblock %}

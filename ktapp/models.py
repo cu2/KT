@@ -386,6 +386,9 @@ class Poll(models.Model):
         self.slug_cache = slugify(self.title)
         super(Poll, self).save(*args, **kwargs)
 
+    def pollchoices(self):
+        return self.pollchoice_set.all()
+
 
 class PollChoice(models.Model):
     poll = models.ForeignKey(Poll)

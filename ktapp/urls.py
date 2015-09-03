@@ -99,6 +99,10 @@ urlpatterns += patterns(
     url(r'^kozkerdes/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.poll, name='poll'),
     url(r'^kozkerdesek/$', web_views.polls, name='polls'),
     url(r'^kozkerdesre_szavaz$', post_views.poll_vote, name='poll_vote'),
+    url(r'^kozkerdest_archival', post_views.poll_archive, name='poll_archive'),
+    url(r'^kozkerdest_aktival', post_views.poll_activate, name='poll_activate'),
+    url(r'^kozkerdest_tamogat', post_views.poll_support, name='poll_support'),
+    # url(r'^uj_kozkerdes', post_views.new_poll, name='new_poll'),
 
     url(r'^elemzesek/$', web_views.list_of_reviews, name='list_of_reviews'),
     url(r'^portrek/$', web_views.list_of_bios, name='list_of_bios'),

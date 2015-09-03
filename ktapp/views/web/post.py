@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import json
 
 from django.shortcuts import get_object_or_404
@@ -645,3 +646,45 @@ def poll_vote(request):
     else:
         models.PollVote.objects.filter(user=request.user, pollchoice=pollchoice).delete()
     return HttpResponseRedirect(reverse('poll', args=(poll.id, poll.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('poll_admin')
+def poll_archive(request):
+    poll = get_object_or_404(models.Poll, id=request.POST.get('poll', 0))
+    if poll.state != models.Poll.STATE_OPEN:
+        return HttpResponseForbidden()
+    poll.state = models.Poll.STATE_CLOSED
+    poll.open_until = datetime.datetime.now()
+    poll.save()
+    return HttpResponseRedirect(reverse('poll', args=(poll.id, poll.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('poll_admin')
+def poll_activate(request):
+    poll = get_object_or_404(models.Poll, id=request.POST.get('poll', 0))
+    if poll.state != models.Poll.STATE_APPROVED:
+        return HttpResponseForbidden()
+    poll.state = models.Poll.STATE_OPEN
+    poll.open_from = datetime.datetime.now()
+    poll.save()
+    return HttpResponseRedirect(reverse('poll', args=(poll.id, poll.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('poll_admin')
+def poll_support(request):
+    poll = get_object_or_404(models.Poll, id=request.POST.get('poll', 0))
+    if poll.state != models.Poll.STATE_WAITING_FOR_APPROVAL:
+        return HttpResponseForbidden()
+    nominated_by = set([int(id) for id in poll.nominated_by.split(',') if id != ''])
+    if request.user.id not in nominated_by:
+        poll.nominated_by = poll.nominated_by + unicode(request.user.id) + ','
+        if len(nominated_by) + 1 >= 3:
+            poll.state = models.Poll.STATE_APPROVED
+        poll.save()
+    return HttpResponseRedirect(reverse('polls') + '?tipus=leendo')

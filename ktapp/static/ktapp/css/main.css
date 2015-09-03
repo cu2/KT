@@ -344,16 +344,27 @@ input.inactive_action {
     border-radius: 10px;
     padding: 1px 10px !important;
 }
-@media (min-width: 800px) {
-    .small_button {
-        font-size: 9pt;
-    }
-}
 .very_small_button {
     font-size: 7pt;
     font-weight: normal;
     border-radius: 10px;
     padding: 1px 5px !important;
+}
+.small_button_selected {
+    font-size: 7pt;
+    font-weight: normal;
+    border-radius: 10px;
+    padding: 1px 10px !important;
+    background: rgb(249,244,218);
+    border: solid 1px rgb(128,128,128);
+}
+@media (min-width: 800px) {
+    .small_button {
+        font-size: 9pt;
+    }
+    .small_button_selected {
+        font-size: 9pt;
+    }
 }
 #toptopmenu .small_button {
     font-size: 9pt;
