@@ -30,6 +30,7 @@ urlpatterns = patterns(
     url(r'^api/autocomplete/artists/$', api_views.get_artists, name='get_artists'),
     url(r'^api/autocomplete/keywords/$', api_views.get_keywords, name='get_keywords'),
     url(r'^api/autocomplete/films/$', api_views.get_films, name='get_films'),
+    url(r'^api/autocomplete/sequels/$', api_views.get_sequels, name='get_sequels'),
 )
 
 
@@ -77,6 +78,7 @@ urlpatterns += patterns(
     url(r'^szerk_sztori$', post_views.edit_plot, name='edit_plot'),
     url(r'^szerk_bemutatok$', post_views.edit_premiers, name='edit_premiers'),
     url(r'^szerk_kulcsszavak$', post_views.edit_keywords, name='edit_keywords'),
+    url(r'^szerk_folytatasok$', post_views.edit_sequels, name='edit_sequels'),
 
     url(r'^valtozasok/$', web_views.changes, name='changes'),
 

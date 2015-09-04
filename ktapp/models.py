@@ -790,7 +790,7 @@ class Sequel(models.Model):
 class FilmSequelRelationship(models.Model):
     film = models.ForeignKey(Film)
     sequel = models.ForeignKey(Sequel)
-    serial_number = models.PositiveSmallIntegerField(default=0)
+    serial_number = models.PositiveSmallIntegerField(default=0)  # NOTE: not yet used
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
 

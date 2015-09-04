@@ -111,6 +111,13 @@ $(function() {
     $('#hide_keyword_form').click(function () {
         $('#keyword_form').toggle();
     });
+    $('#show_sequel_form').click(function () {
+        $('#sequel_form').toggle();
+        if ($('#sequel_form').is(':visible')) $('#id_countries').focus();
+    });
+    $('#hide_sequel_form').click(function () {
+        $('#sequel_form').toggle();
+    });
 
     function split(val) {
         return val.split(/,\s*/);
@@ -287,6 +294,21 @@ $(function() {
             }
         }, 'json');
     });
+
+    $('.input_for_sequel')
+        .autocomplete({
+            source: function(request, response) {
+                $.getJSON('api/autocomplete/sequels/', {
+                    q: request.term
+                }, response);
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                if (ui.item) {
+                    this.value = ui.item.value;
+                }
+            }
+        });
 
     $('.focus_this').focus();
 

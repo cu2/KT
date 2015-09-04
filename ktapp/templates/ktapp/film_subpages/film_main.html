@@ -91,6 +91,27 @@
                     </table>
                 {% endfor %}
             {% endif %}
+            {% if permission_edit_film %}
+                <span class="button small_button" id="show_sequel_form">folytatások szerkesztése</span>
+                <div id="sequel_form" style="display: none">
+                    <h3>Folytatások szerkesztése</h3>
+                    <p>A = adaptáció, S = sequel (folytatás), R = remake</p>
+                    <form action="{% url 'edit_sequels' %}" method="post" class="inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                        {% for seq in film.all_sequels %}
+                            <p><input type="text" name="sequel" value="({{ seq.sequel_type }}) {{ seq.name }}" class="input_for_sequel wide_input" /></p>
+                        {% endfor %}
+                        <p><input type="text" name="sequel" class="input_for_sequel wide_input" /></p>
+                        <p><input type="text" name="sequel" class="input_for_sequel wide_input" /></p>
+                        <p><input type="text" name="sequel" class="input_for_sequel wide_input" /></p>
+                        <p>
+                            <input type="submit" value="Folytatások mentése" />
+                            <span class="button small_button" style="float: right" id="hide_sequel_form">Mégsem</span>
+                        </p>
+                    </form>
+                </div>
+            {% endif %}
             <div class="hover_show_button_context">
                 <h3>Bemutató{% if film.main_premier or film.main_premier_year %}{% if other_premiers %}k{% endif %}{% endif %}{% if permission_edit_premiers %} <span class="hover_show_button button small_button" id="show_premier_form">bemutatók szerkesztése</span>{% endif %}</h3>
                 <ul class="mini_list">

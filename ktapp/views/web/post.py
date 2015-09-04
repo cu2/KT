@@ -512,6 +512,56 @@ def edit_keywords(request):
 
 @require_POST
 @login_required
+@kt_utils.kt_permission_required('edit_film')
+def edit_sequels(request):
+    # (S) Bosszúállók
+    film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
+    sequel_names_before = set(['(%s) %s' % (s.sequel_type, s.name) for s in film.all_sequels()])
+    sequel_names_after = set()
+    sequels_before = set([s.id for s in film.all_sequels()])
+    sequels_after = set()
+    for raw_sequel in request.POST.getlist('sequel', []):
+        raw_sequel = kt_utils.strip_whitespace(raw_sequel)
+        if raw_sequel == '':
+            continue
+        if raw_sequel[:3] in {'(A)', '(S)', '(R)'}:
+            sequel_type = raw_sequel[1]
+            sequel_name = raw_sequel[3:].strip()
+        else:
+            sequel_type = 'S'
+            sequel_name = raw_sequel
+        sequel, created = models.Sequel.objects.get_or_create(
+            sequel_type=sequel_type,
+            name=sequel_name,
+        )
+        if created:
+            sequel.created_by = request.user
+            sequel.save()
+        sequels_after.add(sequel.id)
+        sequel_names_after.add('(%s) %s' % (sequel.sequel_type, sequel.name))
+    for sequel_id in sequels_before - sequels_after:
+        models.FilmSequelRelationship.objects.filter(film=film, sequel_id=sequel_id).delete()
+        if models.FilmSequelRelationship.objects.filter(sequel_id=sequel_id).count() == 0:
+            models.Sequel.objects.get(id=sequel_id).delete()
+    for sequel_id in sequels_after - sequels_before:
+        models.FilmSequelRelationship.objects.create(
+            film=film,
+            sequel=models.Sequel.objects.get(id=sequel_id),
+            created_by=request.user,
+        )
+    kt_utils.changelog(
+        models.Change,
+        request.user,
+        'edit_sequels',
+        'film:%s' % film.id,
+        {'sequels': sorted(list(sequel_names_before))},
+        {'sequels': sorted(list(sequel_names_after))},
+    )
+    return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+
+
+@require_POST
+@login_required
 @kt_utils.kt_permission_required('merge_artist')
 def merge_artist(request):
     artist_1 = get_object_or_404(models.Artist, id=request.POST.get('artist_1', 0))

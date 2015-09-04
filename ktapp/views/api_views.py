@@ -114,3 +114,24 @@ def get_films(request):
             )[:10]
         ]
     ), content_type='application/json')
+
+
+def get_sequels(request):
+    q = request.GET.get('q', '')
+    if len(q) < 2:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+    if q[:3] in {'(A)', '(S)', '(R)'}:
+        sequel_type = q[1]
+        sequel_name = q[3:].strip()
+    else:
+        sequel_type = None
+        sequel_name = q
+    if len(sequel_name) < 2:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+    if sequel_type:
+        seq_qs = models.Sequel.objects.filter(sequel_type=sequel_type, name__icontains=sequel_name)
+    else:
+        seq_qs = models.Sequel.objects.filter(name__icontains=sequel_name)
+    return HttpResponse(json.dumps(
+        ['(%s) %s' % (seq.sequel_type, seq.name) for seq in seq_qs.order_by('name', 'id')[:10]]
+    ), content_type='application/json')
