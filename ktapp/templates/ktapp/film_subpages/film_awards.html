@@ -8,4 +8,18 @@
         {% endif %}
     </div>
 
+    {% if permission_edit_film %}
+        <h3>Új díj felvétele</h3>
+        <form action="{% url 'new_award' %}" method="post" class="inline">
+            {% csrf_token %}
+            <input type="hidden" name="film_id" value="{{ film.pk }}" />
+            <p><label for="id_name">Díj:</label> <input type="text" name="name" id="id_name" class="input_for_award wide_input focus_this" /></p>
+            <p><label for="id_year">Év:</label> <input type="text" name="year" id="id_year" class="input_for_award wide_input" /></p>
+            <p><label for="id_category">Kategória:</label> <input type="text" name="category" id="id_category" class="input_for_award wide_input" /></p>
+            <p><label for="id_artist">Színész/Rendező:</label> <input type="text" name="artist" id="id_artist" class="input_for_artist_in_film wide_input" /></p>
+            <p><label for="id_note">Egyéb ember vagy megjegyzés:</label> <input type="text" name="note" id="id_note" class="wide_input" /></p>
+            <p><input type="submit" value="Díj mentése" /></p>
+        </form>
+    {% endif %}
+
 {% endblock %}

@@ -514,7 +514,6 @@ def edit_keywords(request):
 @login_required
 @kt_utils.kt_permission_required('edit_film')
 def edit_sequels(request):
-    # (S) Bosszúállók
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     sequel_names_before = set(['(%s) %s' % (s.sequel_type, s.name) for s in film.all_sequels()])
     sequel_names_after = set()
@@ -558,6 +557,33 @@ def edit_sequels(request):
         {'sequels': sorted(list(sequel_names_after))},
     )
     return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('edit_film')
+def new_award(request):
+    film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
+    name = kt_utils.strip_whitespace(request.POST.get('name', ''))
+    year = kt_utils.strip_whitespace(request.POST.get('year', ''))
+    category = kt_utils.strip_whitespace(request.POST.get('category', ''))
+    if name == '' or year == '' or category == '':
+        return HttpResponseRedirect(reverse('film_awards', args=(film.id, film.slug_cache)))
+    artist_name = kt_utils.strip_whitespace(request.POST.get('artist', ''))
+    note = kt_utils.strip_whitespace(request.POST.get('note', ''))
+    artist = models.Artist.get_artist_by_name(artist_name)
+    if artist_name != '' and artist is None and note == '':
+        note = artist_name
+    models.Award.objects.create(
+        film=film,
+        name=name,
+        year=year,
+        category=category,
+        artist=artist,
+        note=note,
+        created_by_id=request.user.id,
+    )
+    return HttpResponseRedirect(reverse('film_awards', args=(film.id, film.slug_cache)))
 
 
 @require_POST

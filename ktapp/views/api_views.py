@@ -59,8 +59,14 @@ def get_users(request):
 
 def get_artists(request):
     q = request.GET.get('q', '')
+    f = request.GET.get('f', '')
     if len(q) < 2:
         return HttpResponse(json.dumps([]), content_type='application/json')
+    if f:
+        roles = models.FilmArtistRelationship.objects.filter(film_id=f)
+        return HttpResponse(json.dumps(
+            [{'label': role.artist.name, 'value': role.artist.name, 'id': role.artist.id, 'gender': role.artist.gender} for role in roles.filter(artist__name__icontains=q).order_by('artist__name', 'artist_id')[:10]]
+        ), content_type='application/json')
     return HttpResponse(json.dumps(
         [{'label': artist.name, 'value': artist.name, 'id': artist.id, 'gender': artist.gender} for artist in models.Artist.objects.filter(name__icontains=q).order_by('name', 'id')[:10]]
     ), content_type='application/json')
@@ -135,3 +141,24 @@ def get_sequels(request):
     return HttpResponse(json.dumps(
         ['(%s) %s' % (seq.sequel_type, seq.name) for seq in seq_qs.order_by('name', 'id')[:10]]
     ), content_type='application/json')
+
+
+def get_awards(request):
+    t = request.GET.get('t', '')
+    q = request.GET.get('q', '')
+    if len(q) < 2:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+    if t not in {'N', 'Y', 'C'}:
+        t = 'N'
+    if t == 'N':
+        return HttpResponse(json.dumps(
+            [a['name'] for a in models.Award.objects.filter(name__icontains=q).values('name').distinct()[:10]]
+        ), content_type='application/json')
+    elif t == 'Y':
+        return HttpResponse(json.dumps(
+            [a['year'] for a in models.Award.objects.filter(year__icontains=q).values('year').distinct()[:10]]
+        ), content_type='application/json')
+    else:
+        return HttpResponse(json.dumps(
+            [a['category'] for a in models.Award.objects.filter(category__icontains=q).values('category').distinct()[:10]]
+        ), content_type='application/json')

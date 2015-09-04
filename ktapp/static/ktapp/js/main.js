@@ -310,6 +310,48 @@ $(function() {
             }
         });
 
+    var award_type = 'N';
+    $('.input_for_award')
+        .focus(function() {
+            if ($(this).attr('id') == 'id_name') award_type = 'N';
+            else if ($(this).attr('id') == 'id_year') award_type = 'Y';
+            else award_type = 'C';
+        })
+        .autocomplete({
+            source: function(request, response) {
+                $.getJSON('api/autocomplete/awards/', {
+                    q: request.term,
+                    t: award_type
+                }, response);
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                if (ui.item) {
+                    this.value = ui.item.value;
+                }
+            }
+        });
+
+    var film_id = '';
+    $('.input_for_artist_in_film')
+        .focus(function() {
+            film_id = $(this).closest('form').find('[name="film_id"]').val();
+        })
+        .autocomplete({
+            source: function(request, response) {
+                $.getJSON('api/autocomplete/artists/', {
+                    q: request.term,
+                    f: film_id
+                }, response);
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                if (ui.item) {
+                    this.value = ui.item.value;
+                }
+            }
+        });
+
     $('.focus_this').focus();
 
 });
