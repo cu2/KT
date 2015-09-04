@@ -276,7 +276,7 @@ def search(request):
             'rank': 850,
             'type': 'sequel/%s' % result.sequel_type,
             'title': result.name,
-            'url': '',  # TODO
+            'url': reverse('sequel', args=(result.id, result.slug_cache)),
             'object': result,
         })
     for result in models.Keyword.objects.filter(name__icontains=q):
@@ -300,7 +300,7 @@ def search(request):
             'rank': 700,
             'type': 'poll',
             'title': result.title,
-            'url': '',  # TODO
+            'url': reverse('poll', args=(result.id, result.slug_cache)),
             'object': result,
         })
     for result in models.KTUser.objects.filter(username__icontains=q):
