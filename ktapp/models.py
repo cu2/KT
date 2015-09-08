@@ -157,6 +157,7 @@ class Film(models.Model):
     open_for_vote_from = models.DateField(blank=True, null=True)
     main_poster = models.ForeignKey('Picture', blank=True, null=True, related_name='main_poster', on_delete=models.SET_NULL)
     directors_cache = models.CharField(max_length=250, blank=True)
+    genres_cache = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'
@@ -748,12 +749,36 @@ class FilmKeywordRelationship(models.Model):
     def save(self, *args, **kwargs):
         super(FilmKeywordRelationship, self).save(*args, **kwargs)
         self.film.number_of_keywords = self.film.keyword_set.count()
+        if self.keyword.keyword_type == Keyword.KEYWORD_TYPE_GENRE:
+            ids = []
+            slugs = []
+            names = []
+            for g in self.film.genres():
+                ids.append(unicode(g.id))
+                slugs.append(g.slug_cache)
+                names.append(g.name)
+            if len(ids):
+                self.film.genres_cache = ('%s;%s;%s' % (','.join(ids), ','.join(slugs), ','.join(names)))[:250]
+            else:
+                self.film.genres_cache = ''
         self.film.save()
 
 
 @receiver(post_delete, sender=FilmKeywordRelationship)
 def delete_filmkeyword(sender, instance, **kwargs):
     instance.film.number_of_keywords = instance.film.keyword_set.count()
+    if instance.keyword.keyword_type == Keyword.KEYWORD_TYPE_GENRE:
+        ids = []
+        slugs = []
+        names = []
+        for g in instance.film.genres():
+            ids.append(unicode(g.id))
+            slugs.append(g.slug_cache)
+            names.append(g.name)
+        if len(ids):
+            instance.film.genres_cache = ('%s;%s;%s' % (','.join(ids), ','.join(slugs), ','.join(names)))[:250]
+        else:
+            instance.film.genres_cache = ''
     instance.film.save()
 
 
