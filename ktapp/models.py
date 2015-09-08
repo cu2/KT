@@ -4,7 +4,7 @@ import random
 import string
 from PIL import Image
 
-from django.db import models
+from django.db import models, connection
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.core.mail import send_mail
 from django.db.models import Q
@@ -104,7 +104,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
         return self.follow.all()
 
     def get_followed_by(self):
-        return [u.who for u in self.followed_by.all()]
+        return [u.who for u in self.followed_by.all().select_related('who')]
 
     def save(self, *args, **kwargs):
         self.slug_cache = slugify(self.username)
@@ -234,6 +234,7 @@ class Vote(models.Model):
         self.user.latest_votes = ','.join([unicode(v.id) for v in self.user.vote_set.all().order_by('-when', '-id')[:100]])
         self.user.number_of_ratings = self.user.vote_set.count()
         self.user.save()
+        Recommendation.recalculate_fav_for_users_and_film(self.user.get_followed_by(), self.film)
 
 
 @receiver(post_delete, sender=Vote)
@@ -245,6 +246,62 @@ def delete_vote(sender, instance, **kwargs):
     instance.user.latest_votes = ','.join([unicode(v.id) for v in instance.user.vote_set.all().order_by('-when', '-id')[:100]])
     instance.user.number_of_ratings = instance.user.vote_set.count()
     instance.user.save()
+    Recommendation.recalculate_fav_for_users_and_film(instance.user.get_followed_by(), instance.film)
+
+
+class Recommendation(models.Model):
+    film = models.ForeignKey(Film)
+    user = models.ForeignKey(KTUser)
+    fav_number_of_ratings = models.PositiveIntegerField(default=0)
+    fav_average_rating = models.DecimalField(default=None, max_digits=2, decimal_places=1, blank=True, null=True)
+
+    class Meta:
+        unique_together = ['film', 'user']
+
+    @classmethod
+    def recalculate_fav_for_user_and_user(cls, who, whom):
+        cursor = connection.cursor()
+        cursor.execute('''
+            DELETE FROM ktapp_recommendation WHERE user_id = %s AND film_id IN (
+                SELECT film_id FROM ktapp_vote WHERE user_id = %s
+            )
+        ''', [who.id, whom.id])
+        cursor.execute('''
+            INSERT INTO ktapp_recommendation (user_id, film_id, fav_number_of_ratings, fav_average_rating)
+            SELECT
+              f.who_id AS user_id,
+              v.film_id AS film_id,
+              COUNT(v.rating) AS fav_number_of_ratings,
+              CAST(AVG(v.rating) AS DECIMAL(2, 1)) AS fav_average_rating
+            FROM ktapp_follow f
+            INNER JOIN ktapp_vote v ON v.user_id = f.whom_id
+            WHERE f.who_id = %s AND v.film_id IN (
+                SELECT film_id FROM ktapp_vote WHERE user_id = %s
+            )
+            GROUP BY
+              f.who_id,
+              v.film_id
+        ''', [who.id, whom.id])
+
+    @classmethod
+    def recalculate_fav_for_users_and_film(cls, users, film):
+        user_ids = ','.join([unicode(u.id) for u in users])
+        cursor = connection.cursor()
+        cursor.execute('DELETE FROM ktapp_recommendation WHERE user_id IN (%s) AND film_id = %s' % (user_ids, film.id))
+        cursor.execute('''
+            INSERT INTO ktapp_recommendation (user_id, film_id, fav_number_of_ratings, fav_average_rating)
+            SELECT
+              f.who_id AS user_id,
+              v.film_id AS film_id,
+              COUNT(v.rating) AS fav_number_of_ratings,
+              CAST(AVG(v.rating) AS DECIMAL(2, 1)) AS fav_average_rating
+            FROM ktapp_follow f
+            INNER JOIN ktapp_vote v ON v.user_id = f.whom_id
+            WHERE f.who_id IN (%s) AND v.film_id = %s
+            GROUP BY
+              f.who_id,
+              v.film_id
+        ''' % (user_ids, film.id))
 
 
 class Comment(models.Model):
@@ -1170,6 +1227,15 @@ class Follow(models.Model):
     who = models.ForeignKey(KTUser, related_name='follows')
     whom = models.ForeignKey(KTUser, related_name='followed_by')
     started_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        super(Follow, self).save(*args, **kwargs)
+        Recommendation.recalculate_fav_for_user_and_user(self.who, self.whom)
+
+
+@receiver(post_delete, sender=Follow)
+def delete_follow(sender, instance, **kwargs):
+    Recommendation.recalculate_fav_for_user_and_user(instance.who, instance.whom)
 
 
 class PasswordToken(models.Model):
