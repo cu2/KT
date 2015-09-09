@@ -14,7 +14,7 @@ from django.template.defaultfilters import slugify
 from django.utils.html import strip_tags
 
 from kt import settings
-from ktapp import utils
+from ktapp import utils as kt_utils
 
 
 class KTUser(AbstractBaseUser, PermissionsMixin):
@@ -158,6 +158,8 @@ class Film(models.Model):
     main_poster = models.ForeignKey('Picture', blank=True, null=True, related_name='main_poster', on_delete=models.SET_NULL)
     directors_cache = models.CharField(max_length=250, blank=True)
     genres_cache = models.CharField(max_length=250, blank=True)
+    director_names_cache = models.CharField(max_length=250, blank=True)
+    genre_names_cache = models.CharField(max_length=250, blank=True)
 
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'
@@ -354,7 +356,7 @@ class Comment(models.Model):
     def save(self, *args, **kwargs):
         """Save comment and update domain object as well"""
         self.content = strip_tags(self.content)
-        self.content_html = utils.bbcode_to_html(self.content)
+        self.content_html = kt_utils.bbcode_to_html(self.content)
         if 'domain' in kwargs:
             self.serial_number = kwargs['domain'].comment_set.count() + 1
             self.serial_number_by_user = self.created_by.comment_set.count() + 1
@@ -527,7 +529,7 @@ class Quote(FilmUserContent):
 
     def save(self, *args, **kwargs):
         self.content = strip_tags(self.content)
-        self.content_html = utils.bbcode_to_html(self.content)
+        self.content_html = kt_utils.bbcode_to_html(self.content)
         super(Quote, self).save(*args, **kwargs)
         self.film.number_of_quotes = self.film.quote_set.count()
         self.film.save()
@@ -544,7 +546,7 @@ class Trivia(FilmUserContent):
 
     def save(self, *args, **kwargs):
         self.content = strip_tags(self.content)
-        self.content_html = utils.bbcode_to_html(self.content)
+        self.content_html = kt_utils.bbcode_to_html(self.content)
         super(Trivia, self).save(*args, **kwargs)
         self.film.number_of_trivias = self.film.trivia_set.count()
         self.film.save()
@@ -561,7 +563,7 @@ class Review(FilmUserContent):
 
     def save(self, *args, **kwargs):
         self.content = strip_tags(self.content)
-        self.content_html = utils.bbcode_to_html(self.content)
+        self.content_html = kt_utils.bbcode_to_html(self.content)
         super(Review, self).save(*args, **kwargs)
         self.film.number_of_reviews = self.film.review_set.filter(approved=True).count()
         self.film.save()
@@ -721,8 +723,10 @@ class FilmArtistRelationship(models.Model):
                 names.append(d.name)
         if len(ids):
             self.film.directors_cache = ('%s;%s;%s' % (','.join(ids), ','.join(slugs), ','.join(names)))[:250]
+            self.film.director_names_cache = ','.join(names)[:250]
         else:
             self.film.directors_cache = ''
+            self.film.director_names_cache = ''
         self.film.save()
 
 
@@ -737,7 +741,7 @@ class Biography(models.Model):
 
     def save(self, *args, **kwargs):
         self.content = strip_tags(self.content)
-        self.content_html = utils.bbcode_to_html(self.content)
+        self.content_html = kt_utils.bbcode_to_html(self.content)
         super(Biography, self).save(*args, **kwargs)
 
     def __unicode__(self):
@@ -817,8 +821,10 @@ class FilmKeywordRelationship(models.Model):
                 names.append(g.name)
             if len(ids):
                 self.film.genres_cache = ('%s;%s;%s' % (','.join(ids), ','.join(slugs), ','.join(names)))[:250]
+                self.film.genre_names_cache = ','.join(names)[:250]
             else:
                 self.film.genres_cache = ''
+                self.film.genre_names_cache = ''
         self.film.save()
 
 
@@ -835,8 +841,10 @@ def delete_filmkeyword(sender, instance, **kwargs):
             names.append(g.name)
         if len(ids):
             instance.film.genres_cache = ('%s;%s;%s' % (','.join(ids), ','.join(slugs), ','.join(names)))[:250]
+            instance.film.genre_names_cache = ','.join(names)[:250]
         else:
             instance.film.genres_cache = ''
+            instance.film.genre_names_cache = ''
     instance.film.save()
 
 
@@ -1045,7 +1053,7 @@ class Message(models.Model):
 
     def save(self, *args, **kwargs):
         self.content = strip_tags(self.content)
-        self.content_html = utils.bbcode_to_html(self.content)
+        self.content_html = kt_utils.bbcode_to_html(self.content)
         super(Message, self).save(*args, **kwargs)
 
     @classmethod
