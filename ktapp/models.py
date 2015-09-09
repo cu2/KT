@@ -286,22 +286,23 @@ class Recommendation(models.Model):
     @classmethod
     def recalculate_fav_for_users_and_film(cls, users, film):
         user_ids = ','.join([unicode(u.id) for u in users])
-        cursor = connection.cursor()
-        cursor.execute('DELETE FROM ktapp_recommendation WHERE user_id IN (%s) AND film_id = %s' % (user_ids, film.id))
-        cursor.execute('''
-            INSERT INTO ktapp_recommendation (user_id, film_id, fav_number_of_ratings, fav_average_rating)
-            SELECT
-              f.who_id AS user_id,
-              v.film_id AS film_id,
-              COUNT(v.rating) AS fav_number_of_ratings,
-              CAST(AVG(v.rating) AS DECIMAL(2, 1)) AS fav_average_rating
-            FROM ktapp_follow f
-            INNER JOIN ktapp_vote v ON v.user_id = f.whom_id
-            WHERE f.who_id IN (%s) AND v.film_id = %s
-            GROUP BY
-              f.who_id,
-              v.film_id
-        ''' % (user_ids, film.id))
+        if user_ids:
+            cursor = connection.cursor()
+            cursor.execute('DELETE FROM ktapp_recommendation WHERE user_id IN (%s) AND film_id = %s' % (user_ids, film.id))
+            cursor.execute('''
+                INSERT INTO ktapp_recommendation (user_id, film_id, fav_number_of_ratings, fav_average_rating)
+                SELECT
+                  f.who_id AS user_id,
+                  v.film_id AS film_id,
+                  COUNT(v.rating) AS fav_number_of_ratings,
+                  CAST(AVG(v.rating) AS DECIMAL(2, 1)) AS fav_average_rating
+                FROM ktapp_follow f
+                INNER JOIN ktapp_vote v ON v.user_id = f.whom_id
+                WHERE f.who_id IN (%s) AND v.film_id = %s
+                GROUP BY
+                  f.who_id,
+                  v.film_id
+            ''' % (user_ids, film.id))
 
 
 class Comment(models.Model):
