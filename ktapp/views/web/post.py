@@ -689,7 +689,8 @@ def follow(request):
         other_user = models.KTUser.objects.get(id=request.POST.get('whom', 0))
     except models.KTUser.DoesNotExist:
         return HttpResponseRedirect(next_url)
-    models.Follow.objects.get_or_create(who=request.user, whom=other_user)
+    if request.user.id != other_user.id:
+        models.Follow.objects.get_or_create(who=request.user, whom=other_user)
     return HttpResponseRedirect(next_url)
 
 
