@@ -31,6 +31,26 @@ def film_directors(film):
 
 
 @register.filter
+def film_genres(film, all=None):
+    if not film.genres_cache:
+        return '?'
+    ids, slugs, names = film.genres_cache.split(';')
+    ids = ids.split(',')
+    slugs = slugs.split(',')
+    names = names.split(',')
+    if len(ids) > 3 and all is None:
+        more = ', ...'
+    else:
+        more = ''
+    if all is None:
+        ids = ids[:3]
+    genre_links = []
+    for id, slug_cache, name in zip(ids, slugs, names):
+        genre_links.append(name)
+    return mark_safe(', '.join(genre_links) + more)
+
+
+@register.filter
 def film_url_html(film, subpage='film_main'):
     if film.second_title:
         second_row = film.second_title
@@ -115,6 +135,33 @@ def film_rating_sort_value(film):
     if film.average_rating is None:
         return '0.0'
     return unicode(film.average_rating)
+
+
+@register.filter
+def film_fav_rating_html(film, with_count=True):
+    if film.fav_number_of_ratings == 0:
+        return ''
+    if film.fav_average_rating is None:
+        avg_rating = '?'
+    else:
+        avg_rating = round(film.fav_average_rating, 1)
+    if with_count:
+        return mark_safe(u'{avg_rating}<br />\n<span class="td_sub">({num_rating})</span>'.format(
+            avg_rating=avg_rating,
+            num_rating=film.fav_number_of_ratings,
+        ))
+    return mark_safe(u'{avg_rating}'.format(
+        avg_rating=avg_rating,
+    ))
+
+
+@register.filter
+def film_fav_rating_sort_value(film):
+    if film.fav_number_of_ratings == 0:
+        return '-0.1'
+    if film.fav_average_rating is None:
+        return '0.0'
+    return unicode(film.fav_average_rating)
 
 
 @register.filter

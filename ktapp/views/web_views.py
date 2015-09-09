@@ -15,6 +15,7 @@ from django.db.models import Q
 from ktapp import models
 from ktapp import forms as kt_forms
 from ktapp import utils as kt_utils
+from ktapp.helpers import filmlist
 
 
 COMMENTS_PER_PAGE = 100
@@ -650,31 +651,12 @@ def artist_main(request, id, name_slug):
                 artist.save()
             return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))
 
-    if request.user.is_authenticated():
-        directions = models.Film.objects.raw('''
-        SELECT f.*,
-        v.rating AS my_rating, CASE WHEN w.film_id IS NOT NULL THEN 1 ELSE 0 END AS my_wish
-        FROM ktapp_film f
-        INNER JOIN ktapp_filmartistrelationship fa ON fa.film_id = f.id AND fa.role_type = 'D'
-        LEFT JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = %(user_id)s
-        LEFT JOIN ktapp_wishlist w ON w.film_id = f.id AND w.wished_by_id = %(user_id)s AND w.wish_type = 'Y'
-        WHERE fa.artist_id = %(artist_id)s
-        ORDER BY f.year DESC, f.orig_title, f.id
-        ''', {
-            'artist_id': artist.id,
-            'user_id': request.user.id,
-        })
-    else:
-        directions = models.Film.objects.raw('''
-        SELECT f.*,
-        NULL AS my_rating, NULL AS my_wish
-        FROM ktapp_film f
-        INNER JOIN ktapp_filmartistrelationship fa ON fa.film_id = f.id AND fa.role_type = 'D'
-        WHERE fa.artist_id = %(artist_id)s
-        ORDER BY f.year DESC, f.orig_title, f.id
-        ''', {
-            'artist_id': artist.id,
-        })
+    directions, _ = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[('director_id', artist.id)],
+        ordering=('year', 'DESC'),
+        films_per_page=None,
+    )
     number_of_directions = 0  # RawQuerySet has no __bool__() or __len__(), so we do it manually
     director_vote_count = 0
     director_vote_avg = 0
@@ -697,33 +679,12 @@ def artist_main(request, id, name_slug):
         if director_vote_count:
             director_vote_avg = 1.0 * (director_votes.get('nr1', 0) + 2*director_votes.get('nr2', 0) + 3*director_votes.get('nr3', 0) + 4*director_votes.get('nr4', 0) + 5*director_votes.get('nr5', 0)) / director_vote_count
 
-    if request.user.is_authenticated():
-        roles = models.Film.objects.raw('''
-        SELECT f.*,
-        fa.id AS role_id, fa.slug_cache AS role_slug_cache, fa.role_name AS role_role_name, fa.actor_subtype AS role_actor_subtype,
-        v.rating AS my_rating, CASE WHEN w.film_id IS NOT NULL THEN 1 ELSE 0 END AS my_wish
-        FROM ktapp_film f
-        INNER JOIN ktapp_filmartistrelationship fa ON fa.film_id = f.id AND fa.role_type = 'A'
-        LEFT JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = %(user_id)s
-        LEFT JOIN ktapp_wishlist w ON w.film_id = f.id AND w.wished_by_id = %(user_id)s AND w.wish_type = 'Y'
-        WHERE fa.artist_id = %(artist_id)s
-        ORDER BY f.year DESC, f.orig_title, f.id
-        ''', {
-            'artist_id': artist.id,
-            'user_id': request.user.id,
-        })
-    else:
-        roles = models.Film.objects.raw('''
-        SELECT f.*,
-        fa.id AS role_id, fa.slug_cache AS role_slug_cache, fa.role_name AS role_role_name, fa.actor_subtype AS role_actor_subtype,
-        NULL AS my_rating, NULL AS my_wish
-        FROM ktapp_film f
-        INNER JOIN ktapp_filmartistrelationship fa ON fa.film_id = f.id AND fa.role_type = 'A'
-        WHERE fa.artist_id = %(artist_id)s
-        ORDER BY f.year DESC, f.orig_title, f.id
-        ''', {
-            'artist_id': artist.id,
-        })
+    roles, _ = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[('actor_id', artist.id)],
+        ordering=('year', 'DESC'),
+        films_per_page=None,
+    )
     number_of_roles = 0
     actor_vote_count = 0
     actor_vote_avg = 0
@@ -734,7 +695,7 @@ def artist_main(request, id, name_slug):
             'nr3': 0,
             'nr4': 0,
             'nr5': 0,
-            }
+        }
         for x in roles:
             number_of_roles += 1
             actor_votes['nr1'] += x.number_of_ratings_1

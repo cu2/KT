@@ -965,3 +965,11 @@ ul.poll li {
     background: rgb(218,211,184);
     padding: 10px;
 }
+
+
+.wish {
+    color: rgb(201,156,138);
+}
+.wish_active {
+    color: rgb(146,23,23);
+}
