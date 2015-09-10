@@ -158,10 +158,10 @@ def film_fav_rating_html(film, with_count=True):
 @register.filter
 def film_fav_rating_sort_value(film):
     if film.fav_number_of_ratings == 0:
-        return '-0.1'
+        return '0000000'
     if film.fav_average_rating is None:
-        return '0.0'
-    return unicode(film.fav_average_rating)
+        return '00%05d' % film.fav_number_of_ratings
+    return '%02d%05d' % (int(10 * film.fav_average_rating), film.fav_number_of_ratings)
 
 
 @register.filter

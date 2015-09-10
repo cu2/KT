@@ -186,12 +186,38 @@ def user_wishlist(request, id, name_slug):
         wishlist_type = 'G'
     else:
         wishlist_type = 'Y'
-    wishlist, _ = filmlist.filmlist(
+
+    filters = [('wished_by_id', '%s:%s' % (wishlist_type, selected_user.id))] + filmlist.get_filters_from_request(request)
+    films, nice_filters = filmlist.filmlist(
         user_id=request.user.id,
-        filters=[('wished_by_id', '%s:%s' % (wishlist_type, selected_user.id))],
+        filters=filters,
         ordering=('average_rating', 'DESC'),
         films_per_page=None,
     )
+    querystring = {}
+    for filter_type, filter_value in nice_filters:
+        if filter_type in {'title', 'year', 'director', 'actor', 'country', 'genre', 'keyword', 'my_rating', 'other_rating', 'my_wish'}:
+            querystring[filter_type] = filter_value
+        elif filter_type == 'number_of_ratings':
+            min_value, max_value = filter_value.split('-')
+            querystring['num_rating_min'] = kt_utils.coalesce(min_value, '')
+            querystring['num_rating_max'] = kt_utils.coalesce(max_value, '')
+        elif filter_type == 'average_rating':
+            min_value, max_value = filter_value.split('-')
+            querystring['avg_rating_min'] = kt_utils.coalesce(min_value, '')
+            querystring['avg_rating_max'] = kt_utils.coalesce(max_value, '')
+        elif filter_type == 'fav_average_rating':
+            min_value, max_value = filter_value.split('-')
+            querystring['fav_avg_rating_min'] = kt_utils.coalesce(min_value, '')
+            querystring['fav_avg_rating_max'] = kt_utils.coalesce(max_value, '')
+
+    qs_combined = '&'.join('%s=%s' % (key, val) for key, val in querystring.iteritems())
+    if qs_combined != '':
+        qs_combined = '&' + qs_combined
+
+    films = list(films)
+    result_count = len(films)
+
     return render(request, 'ktapp/user_profile_subpages/user_wishlist.html', {
         'active_tab': 'wishlist',
         'selected_user': selected_user,
@@ -201,7 +227,10 @@ def user_wishlist(request, id, name_slug):
         'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
-        'wishlist': list(wishlist),
+        'result_count': result_count,
+        'querystring': querystring,
+        'qs_combined': qs_combined,
+        'films': films,
         'wishlist_type': wishlist_type,
         'number_of_wishes_yes': selected_user.number_of_wishes_yes,
         'number_of_wishes_no': selected_user.number_of_wishes_no,

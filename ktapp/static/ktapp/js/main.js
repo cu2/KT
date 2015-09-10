@@ -14,9 +14,16 @@ $(function() {
     $('.toggle_delete').click(function() {
         $(this).closest('.delete_area').find('.delete_confirm').toggle();
     });
+    $('table.sortable thead tr th input').click(function(event) {
+        event.stopPropagation();
+    });
     var sortable_table = $('table.sortable').stupidtable();
     sortable_table.on("aftertablesort", function (event, data) {
         var th = $(this).find("th");
+        var th_arr = th.find('.arrow_holder');
+        if (th_arr.length > 0) {
+            th = th_arr;
+        }
         th.find(".arrow").remove();
         var dir = $.fn.stupidtable.dir;
         var arrow = data.direction === dir.ASC ? "&uarr;" : "&darr;";

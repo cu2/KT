@@ -276,25 +276,29 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
                     additional_param.append(fav_avg_rating_interval[1])
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'my_rating' and user_id:
-                try:
-                    min_value, max_value = filter_value.split('-')
-                except ValueError:
-                    min_value = max_value = filter_value
-                try:
-                    my_rating_min = int(kt_utils.strip_whitespace(min_value))
-                except ValueError:
-                    my_rating_min = None
-                try:
-                    my_rating_max = int(kt_utils.strip_whitespace(max_value))
-                except ValueError:
-                    my_rating_max = None
-                my_rating_interval = kt_utils.minmax2interval(my_rating_min, my_rating_max, 0, 5)
-                if my_rating_interval:
-                    my_rating_join_type = 'INNER'
-                    additional_where.append('''v.rating BETWEEN %s AND %s''')
-                    additional_param.append(my_rating_interval[0])
-                    additional_param.append(my_rating_interval[1])
+                if filter_value == '0':
+                    additional_where.append('''v.rating IS NULL''')
                     nice_filters.append((filter_type, filter_value))
+                else:
+                    try:
+                        min_value, max_value = filter_value.split('-')
+                    except ValueError:
+                        min_value = max_value = filter_value
+                    try:
+                        my_rating_min = int(kt_utils.strip_whitespace(min_value))
+                    except ValueError:
+                        my_rating_min = None
+                    try:
+                        my_rating_max = int(kt_utils.strip_whitespace(max_value))
+                    except ValueError:
+                        my_rating_max = None
+                    my_rating_interval = kt_utils.minmax2interval(my_rating_min, my_rating_max, 0, 5)
+                    if my_rating_interval:
+                        my_rating_join_type = 'INNER'
+                        additional_where.append('''v.rating BETWEEN %s AND %s''')
+                        additional_param.append(my_rating_interval[0])
+                        additional_param.append(my_rating_interval[1])
+                        nice_filters.append((filter_type, filter_value))
             if filter_type == 'other_rating':
                 try:
                     min_value, max_value = filter_value.split('-')
