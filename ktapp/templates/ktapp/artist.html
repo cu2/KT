@@ -23,15 +23,15 @@
     {% endif %}
 
 {% if number_of_directions and director_vote_count >= actor_vote_count %}
-    <h2>Rendezések{% if director_vote_count >= 50 %}<span class="artist_avg"> ({{ director_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
+    <h2>Rendezések{% if director_vote_count >= 50 %}<span class="small_heading_2"> ({{ director_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
     {% include 'ktapp/tables/directions.html' with directions=directions %}
 {% endif %}
 {% if number_of_roles %}
-    <h2>Szerepek{% if actor_vote_count >= 50 %}<span class="artist_avg"> ({{ actor_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
+    <h2>Szerepek{% if actor_vote_count >= 50 %}<span class="small_heading_2"> ({{ actor_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
     {% include 'ktapp/tables/roles.html' with roles=roles %}
 {% endif %}
 {% if number_of_directions and actor_vote_count > director_vote_count %}
-    <h2>Rendezések{% if director_vote_count >= 50 %}<span class="artist_avg"> ({{ director_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
+    <h2>Rendezések{% if director_vote_count >= 50 %}<span class="small_heading_2"> ({{ director_vote_avg|floatformat:"1" }})</span>{% endif %}</h2>
     {% include 'ktapp/tables/directions.html' with directions=directions %}
 {% endif %}
 

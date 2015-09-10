@@ -204,6 +204,25 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
                     additional_param.append(num_comment_interval[0])
                     additional_param.append(num_comment_interval[1])
                     nice_filters.append((filter_type, filter_value))
+            if filter_type == 'wished_by_id':
+                wish_type, wished_by_id = filter_value.split(':')
+                try:
+                    wished_by = models.KTUser.objects.get(id=wished_by_id)
+                except models.KTUser.DoesNotExist:
+                    wished_by = None
+                if wished_by:
+                    table_alias_idx += 1
+                    additional_inner_joins.append('''
+                        INNER JOIN ktapp_wishlist {table_name}
+                        ON {table_name}.film_id = f.id
+                        AND {table_name}.wished_by_id = {wished_by_id}
+                        AND {table_name}.wish_type = '{wish_type}'
+                    '''.format(
+                        table_name='wish_%s' % table_alias_idx,
+                        wished_by_id=wished_by.id,
+                        wish_type=wish_type,
+                    ))
+                    nice_filters.append((filter_type, filter_value))
             if filter_type == 'seen_it' and user_id:
                 if filter_value == '1':
                     my_rating_join_type = 'INNER'

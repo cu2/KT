@@ -5,57 +5,83 @@
 
     <div class="centered_content">
 
-    {% if wishlist_yes %}
-        <h2>Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} nézni</h2>
-        <table class="fullsize sortable">
-            <thead>
-                <tr class="header_tr">
-                    <th data-sort="string">Film</th>
-                    <th data-sort="int">Év</th>
-                    <th data-sort="string">Rendező</th>
-                    <th data-sort="float" data-sort-default="desc">Átlag</th>
-                    <th data-sort="int" data-sort-default="desc">Szavazatszám</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for w in wishlist_yes %}
-                <tr class="{% cycle '' 'odd' %}">
-                    <td>{{ w.film|film_url_html }}</td>
-                    <td class="center">{% if w.film.year %}{{ w.film.year }}{% endif %}</td>
-                    <td>{{ w.film|film_directors }}</td>
-                    <td class="center" data-sort-value="{{ w.film|film_rating_sort_value }}">{{ w.film|film_avg_rating_html }}</td>
-                    <td class="center" data-sort-value="{{ w.film.number_of_ratings }}">{{ w.film|film_num_rating_html }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+        {% if number_of_wishes == 0 %}
+            <p>Nincsenek kívánságai{% if selected_user.id == user.id %}d{% endif %}.</p>
+        {% else %}
+            {% if wishlist_type == 'Y' %}
+                <h2>Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} nézni<span class="small_heading_2"> ({{ number_of_wishes_yes }} film)</span></h2>
+            {% elif wishlist_type == 'G' %}
+                <h2>Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} szerezni<span class="small_heading_2"> ({{ number_of_wishes_get }} film)</span></h2>
+            {% else %}
+                <h2>Amiket nem akar{% if selected_user.id == user.id %}sz{% endif %} megnézni<span class="small_heading_2"> ({{ number_of_wishes_no }} film)</span></h2>
+            {% endif %}
+        {% endif %}
 
-    {% if wishlist_get %}
-        <h2>Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} szerezni</h2>
-        <table class="fullsize sortable">
-            <thead>
-                <tr class="header_tr">
-                    <th data-sort="string">Film</th>
-                    <th data-sort="int">Év</th>
-                    <th data-sort="string">Rendező</th>
-                    <th data-sort="float" data-sort-default="desc">Átlag</th>
-                    <th data-sort="int" data-sort-default="desc">Szavazatszám</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for w in wishlist_get %}
-                <tr class="{% cycle '' 'odd' %}">
-                    <td>{{ w.film|film_url_html }}</td>
-                    <td class="center">{% if w.film.year %}{{ w.film.year }}{% endif %}</td>
-                    <td>{{ w.film|film_directors }}</td>
-                    <td class="center" data-sort-value="{{ w.film|film_rating_sort_value }}">{{ w.film|film_avg_rating_html }}</td>
-                    <td class="center" data-sort-value="{{ w.film.number_of_ratings }}">{{ w.film|film_num_rating_html }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-    {% endif %}
+        {% if wishlist %}
+            <table class="fullsize sortable">
+                <thead>
+                    <tr class="header_tr">
+                        <th data-sort="string">Film</th>
+                        <th data-sort="int">Év</th>
+                        <th data-sort="string">Rendező</th>
+                        <th data-sort="string">Műfaj</th>
+                        <th data-sort="int" data-sort-default="desc">Nézettség</th>
+                        <th data-sort="float" data-sort-default="desc">Átlag</th>
+                        {% if request.user.is_authenticated %}
+                            <th data-sort="float" data-sort-default="desc">Kedvenceid</th>
+                            <th data-sort="int" data-sort-default="desc">Szerinted</th>
+                            {% if selected_user.id != user.id %}
+                                <th data-sort="string">&#9733;</th>
+                            {% endif %}
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                {% for film in wishlist %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td>{{ film|film_url_html }}</td>
+                        <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
+                        <td>{{ film|film_directors }}</td>
+                        <td>{{ film|film_genres }}</td>
+                        <td class="center" data-sort-value="{{ film.number_of_ratings }}">{{ film|film_num_rating_html }}</td>
+                        <td class="center" data-sort-value="{{ film|film_rating_sort_value }}">{{ film|film_avg_rating_html }}</td>
+                        {% if request.user.is_authenticated %}
+                            <td class="center" data-sort-value="{{ film|film_fav_rating_sort_value }}">{{ film|film_fav_rating_html }}</td>
+                            <td class="center" data-sort-value="{% if film.my_rating %}{{ film.my_rating }}{% else %}0{% endif %}">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
+                            {% if selected_user.id != user.id %}
+                                <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</td>
+                            {% endif %}
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p><br /></p>
+        {% endif %}
+
+        {% if wishlist_type == 'Y' %}
+            {% if number_of_wishes_get %}
+                <h3><a href="{% url 'user_wishlist' selected_user.id selected_user.slug_cache %}?t=szerez">Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} szerezni</a><span class="small_heading_3"> ({{ number_of_wishes_get }} film)</span></h3>
+            {% endif %}
+            {% if number_of_wishes_no %}
+                <h3><a href="{% url 'user_wishlist' selected_user.id selected_user.slug_cache %}?t=nem">Amiket nem akar{% if selected_user.id == user.id %}sz{% endif %} megnézni</a><span class="small_heading_3"> ({{ number_of_wishes_no }} film)</span></h3>
+            {% endif %}
+        {% elif wishlist_type == 'G' %}
+            {% if number_of_wishes_yes %}
+                <h3><a href="{% url 'user_wishlist' selected_user.id selected_user.slug_cache %}">Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} nézni</a><span class="small_heading_3"> ({{ number_of_wishes_yes }} film)</span></h3>
+            {% endif %}
+            {% if number_of_wishes_no %}
+                <h3><a href="{% url 'user_wishlist' selected_user.id selected_user.slug_cache %}?t=nem">Amiket nem akar{% if selected_user.id == user.id %}sz{% endif %} megnézni</a><span class="small_heading_3"> ({{ number_of_wishes_no }} film)</span></h3>
+            {% endif %}
+        {% else %}
+            {% if number_of_wishes_yes %}
+                <h3><a href="{% url 'user_wishlist' selected_user.id selected_user.slug_cache %}">Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} nézni</a><span class="small_heading_3"> ({{ number_of_wishes_yes }} film)</span></h3>
+            {% endif %}
+            {% if number_of_wishes_get %}
+                <h3><a href="{% url 'user_wishlist' selected_user.id selected_user.slug_cache %}?t=szerez">Amiket meg akar{% if selected_user.id == user.id %}sz{% endif %} szerezni</a><span class="small_heading_3"> ({{ number_of_wishes_get }} film)</span></h3>
+            {% endif %}
+        {% endif %}
+
 
     </div>
 

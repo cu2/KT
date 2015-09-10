@@ -12,6 +12,7 @@ from django.db.models import Q, Max
 
 from ktapp import models
 from ktapp import utils as kt_utils
+from ktapp.helpers import filmlist
 
 
 COMMENTS_PER_PAGE = 100
@@ -32,7 +33,7 @@ def _get_user_profile_numbers(request, selected_user):
     return (
         selected_user.number_of_ratings,
         selected_user.number_of_comments,
-        selected_user.number_of_wishes_yes + selected_user.number_of_wishes_get,
+        selected_user.number_of_wishes_yes + selected_user.number_of_wishes_no + selected_user.number_of_wishes_get,
         selected_user.number_of_toplists,
         number_of_messages,
     )
@@ -240,7 +241,19 @@ def user_comments(request, id, name_slug):
 def user_wishlist(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
     number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
-    qs = models.Wishlist.objects.select_related('film').filter(wished_by=selected_user).order_by('film__orig_title', 'film__id')
+    wishlist_type = request.GET.get('t', 'igen')
+    if wishlist_type == 'nem':
+        wishlist_type = 'N'
+    elif wishlist_type == 'szerez':
+        wishlist_type = 'G'
+    else:
+        wishlist_type = 'Y'
+    wishlist, _ = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[('wished_by_id', '%s:%s' % (wishlist_type, selected_user.id))],
+        ordering=('average_rating', 'DESC'),
+        films_per_page=None,
+    )
     return render(request, 'ktapp/user_profile_subpages/user_wishlist.html', {
         'active_tab': 'wishlist',
         'selected_user': selected_user,
@@ -250,8 +263,11 @@ def user_wishlist(request, id, name_slug):
         'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
-        'wishlist_yes': qs.filter(wish_type=models.Wishlist.WISH_TYPE_YES),
-        'wishlist_get': qs.filter(wish_type=models.Wishlist.WISH_TYPE_GET),
+        'wishlist': list(wishlist),
+        'wishlist_type': wishlist_type,
+        'number_of_wishes_yes': selected_user.number_of_wishes_yes,
+        'number_of_wishes_no': selected_user.number_of_wishes_no,
+        'number_of_wishes_get': selected_user.number_of_wishes_get,
     })
 
 
