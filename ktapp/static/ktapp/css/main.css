@@ -473,6 +473,7 @@ tr.selected_film_tr {
 }
 table.sortable tr.header_tr {
     cursor: pointer;
+    color: rgb(146,23,23);
 }
 
 
