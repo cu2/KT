@@ -3,14 +3,14 @@
     <thead>
         <tr class="header_tr">
             <th data-sort="string">Film</th>
-            <th data-sort="int">Év</th>
+            <th data-sort="int" data-sort-default="desc">Év</th>
             <th data-sort="string">Műfaj</th>
             <th data-sort="int" data-sort-default="desc">Nézettség</th>
             <th data-sort="float" data-sort-default="desc">Átlag</th>
             {% if request.user.is_authenticated %}
                 <th data-sort="float" data-sort-default="desc">Kedvenceid</th>
                 <th data-sort="int" data-sort-default="desc">Szerinted</th>
-                <th data-sort="string">&#9733;</th>
+                <th data-sort="int" data-sort-default="desc">&#9733;</th>
             {% endif %}
         </tr>
     </thead>
@@ -25,7 +25,7 @@
             {% if request.user.is_authenticated %}
                 <td class="center" data-sort-value="{{ direction|film_fav_rating_sort_value }}">{{ direction|film_fav_rating_html }}</td>
                 <td class="center" data-sort-value="{% if direction.my_rating %}{{ direction.my_rating }}{% else %}0{% endif %}">{% if direction.my_rating %}{{ direction.my_rating }}{% endif %}</td>
-                <td class="center wish{% if direction.my_wish == 1 %}_active{% endif %}">{% if direction.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</td>
+                <td class="center wish{% if direction.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if direction.my_wish %}{{ direction.my_wish }}{% else %}0{% endif %}">{% if direction.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</td>
             {% endif %}
         </tr>
     {% endfor %}

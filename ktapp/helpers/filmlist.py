@@ -223,6 +223,28 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
                         wish_type=wish_type,
                     ))
                     nice_filters.append((filter_type, filter_value))
+            if filter_type == 'seen_by_id':
+                try:
+                    seen_by = models.KTUser.objects.get(id=filter_value)
+                except models.KTUser.DoesNotExist:
+                    seen_by = None
+                if seen_by:
+                    additional_select.append('''
+                        {table_name}.rating AS other_rating,
+                        {table_name}.`when` AS other_rating_when,
+                        {table_name}.id AS other_rating_id,
+                    '''.format(
+                        table_name='seen_by_other',
+                    ))
+                    additional_inner_joins.append('''
+                        INNER JOIN ktapp_vote {table_name}
+                        ON {table_name}.film_id = f.id
+                        AND {table_name}.user_id = {seen_by_id}
+                    '''.format(
+                        table_name='seen_by_other',
+                        seen_by_id=seen_by.id,
+                    ))
+                    nice_filters.append((filter_type, filter_value))
             if filter_type == 'seen_it' and user_id:
                 if filter_value == '1':
                     my_rating_join_type = 'INNER'
@@ -230,7 +252,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
                 if filter_value == '0':
                     additional_where.append('''v.rating IS NULL''')
                     nice_filters.append((filter_type, filter_value))
-            if filter_type == 'wish_it' and user_id:
+            if filter_type == 'my_wish' and user_id:
                 if filter_value == '1':
                     additional_where.append('''w.film_id IS NOT NULL''')
                     nice_filters.append((filter_type, filter_value))
@@ -273,6 +295,25 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
                     additional_param.append(my_rating_interval[0])
                     additional_param.append(my_rating_interval[1])
                     nice_filters.append((filter_type, filter_value))
+            if filter_type == 'other_rating':
+                try:
+                    min_value, max_value = filter_value.split('-')
+                except ValueError:
+                    min_value = max_value = filter_value
+                try:
+                    other_rating_min = int(kt_utils.strip_whitespace(min_value))
+                except ValueError:
+                    other_rating_min = None
+                try:
+                    other_rating_max = int(kt_utils.strip_whitespace(max_value))
+                except ValueError:
+                    other_rating_max = None
+                other_rating_interval = kt_utils.minmax2interval(other_rating_min, other_rating_max, 0, 5)
+                if other_rating_interval:
+                    additional_where.append('''seen_by_other.rating BETWEEN %s AND %s''')
+                    additional_param.append(other_rating_interval[0])
+                    additional_param.append(other_rating_interval[1])
+                    nice_filters.append((filter_type, filter_value))
     order_by = None
     if ordering:
         try:
@@ -294,18 +335,22 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
         if order_field == 'number_of_ratings':
             order_fields = ['f.number_of_ratings', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'average_rating':
-            order_fields = ['f.average_rating', 'f.orig_title', 'f.year', 'f.id']
+            order_fields = ['f.average_rating', 'f.number_of_ratings DESC', 'f.orig_title', 'f.year', 'f.id']
         if user_id:
             if order_field == 'fav_average_rating':
-                order_fields = ['r.fav_average_rating', 'f.orig_title', 'f.year', 'f.id']
+                order_fields = ['r.fav_average_rating', 'r.fav_number_of_ratings DESC', 'f.orig_title', 'f.year', 'f.id']
             if order_field == 'my_rating':
                 order_fields = ['v.rating', 'f.orig_title', 'f.year', 'f.id']
             if order_field == 'my_rating_when':
                 order_fields = ['v.`when`', 'v.id', 'f.orig_title', 'f.year', 'f.id']
-            if order_field == 'wish_it':
+            if order_field == 'my_wish':
                 order_fields = ['CASE WHEN w.film_id IS NOT NULL THEN 1 ELSE 0 END', 'f.orig_title', 'f.year', 'f.id']
             if order_field == 'seen_it':
                 order_fields = ['CASE WHEN v.rating IS NOT NULL THEN 1 ELSE 0 END', 'f.orig_title', 'f.year', 'f.id']
+        if order_field == 'other_rating':
+            order_fields = ['other_rating', 'f.orig_title', 'f.year', 'f.id']
+        if order_field == 'other_rating_when':
+            order_fields = ['other_rating_when', 'other_rating_id', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'number_of_comments':
             order_fields = ['f.number_of_comments', 'f.orig_title', 'f.year', 'f.id']
         if order_fields:
@@ -318,6 +363,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
     if user_id:
         sql_user_select = '''
             v.rating AS my_rating,
+            v.`when` AS my_rating_when,
             CASE WHEN w.film_id IS NOT NULL THEN 1 ELSE 0 END AS my_wish,
             COALESCE(r.fav_number_of_ratings, 0) AS fav_number_of_ratings,
             r.fav_average_rating
@@ -333,6 +379,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
     else:
         sql_user_select = '''
             NULL AS my_rating,
+            NULL AS my_rating_when,
             0 AS my_wish,
             0 AS fav_number_of_ratings,
             NULL AS fav_average_rating
@@ -368,3 +415,24 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
     qs = models.Film.objects.raw(sql, additional_param)
     # print qs.query.sql
     return qs, nice_filters
+
+
+def get_filters_from_request(request):
+    filters = []
+    # seen_it
+    # number_of_comments
+    possible_fields = ['title', 'year', 'director', 'actor', 'country', 'genre', 'keyword', 'my_rating', 'other_rating', 'my_wish']
+    for field in possible_fields:
+        val = kt_utils.strip_whitespace(request.GET.get(field, ''))
+        if val:
+            filters.append((field, val))
+    val = '%s-%s' % (kt_utils.strip_whitespace(request.GET.get('num_rating_min', '')), kt_utils.strip_whitespace(request.GET.get('num_rating_max', '')))
+    if val != '':
+        filters.append(('number_of_ratings', val))
+    val = '%s-%s' % (kt_utils.strip_whitespace(request.GET.get('avg_rating_min', '')), kt_utils.strip_whitespace(request.GET.get('avg_rating_max', '')))
+    if val != '':
+        filters.append(('average_rating', val))
+    val = '%s-%s' % (kt_utils.strip_whitespace(request.GET.get('fav_avg_rating_min', '')), kt_utils.strip_whitespace(request.GET.get('fav_avg_rating_max', '')))
+    if val != '':
+        filters.append(('fav_average_rating', val))
+    return filters

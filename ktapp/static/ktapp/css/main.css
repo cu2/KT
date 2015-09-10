@@ -419,6 +419,9 @@ input.inactive_action {
 .full_input {
     width: 90%;
 }
+.small_input {
+    width: 25px;
+}
 
 .new_message_warning {
     background: rgb(30,36,180);
