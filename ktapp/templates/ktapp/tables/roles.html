@@ -29,7 +29,7 @@
             {% if request.user.is_authenticated %}
                 <td class="center" data-sort-value="{{ role|film_fav_rating_sort_value }}">{{ role|film_fav_rating_html }}</td>
                 <td class="center" data-sort-value="{% if role.my_rating %}{{ role.my_rating }}{% else %}0{% endif %}">{% if role.my_rating %}{{ role.my_rating }}{% endif %}</td>
-                <td class="center wish{% if role.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if role.my_wish %}{{ role.my_wish }}{% else %}0{% endif %}">{% if role.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</td>
+                <td class="center wish{% if role.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if role.my_wish %}{{ role.my_wish }}{% else %}0{% endif %}"><span data-id="{{ role.id }}">{% if role.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
             {% endif %}
         </tr>
     {% endfor %}

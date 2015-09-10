@@ -979,3 +979,9 @@ ul.poll li {
 .wish_active {
     color: rgb(146,23,23);
 }
+.wish span {
+    cursor: pointer;
+}
+.wish_active span {
+    cursor: pointer;
+}

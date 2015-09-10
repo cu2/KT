@@ -94,7 +94,7 @@
                         <td class="center">{{ film|film_fav_rating_html }}</td>
                         <td class="center">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
                         {% if selected_user.id != user.id %}
-                            <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</td>
+                            <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
                         {% endif %}
                     {% endif %}
                     {% if selected_user.id != user.id %}

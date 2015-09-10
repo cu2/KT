@@ -1,4 +1,41 @@
 $(function() {
+    $('tr').on('click', 'span', function() {
+        var parent_td = $(this).closest('td');
+        if (parent_td.hasClass('wish')) {
+            $(this).closest('td').removeClass('wish').addClass('wish_active');
+        } else {
+            $(this).closest('td').removeClass('wish_active').addClass('wish');
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'kivan',
+            data: {
+                csrfmiddlewaretoken: $.cookie('csrftoken'),
+                film_id: $(this).data('id'),
+                wish_type: 'Y',
+                action: parent_td.hasClass('wish_active')?'+':'-',
+                ajax: '1'
+            },
+            context: $(this),
+            success: function(data) {
+                var parent_td = $(this).closest('td');
+                if (data.success) {
+                    if (parent_td.hasClass('wish_active')) {
+                        $(this).html('&#9733;');
+                    } else {
+                        $(this).html('&#9734;');
+                    }
+                } else {
+                    if (parent_td.hasClass('wish_active')) {
+                        $(this).closest('td').removeClass('wish_active').addClass('wish');
+                    } else {
+                        $(this).closest('td').removeClass('wish').addClass('wish_active');
+                    }
+                }
+            },
+            dataType: 'json'
+        });
+    });
     $('.show_comment_edit_form').click(function() {
         $(this).closest('.comment_block').find('.comment_content').hide();
         $(this).closest('.comment_block').find('.comment_edit_form').show();

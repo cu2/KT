@@ -34,14 +34,21 @@ def vote(request):
 @require_POST
 @login_required
 def wish(request):
-    film = get_object_or_404(models.Film, pk=request.POST['film_id'])
+    try:
+        film = get_object_or_404(models.Film, pk=request.POST['film_id'])
+    except Http404:
+        if request.POST.get('ajax', '') == '1':
+            return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+        raise
     wish_type = request.POST.get('wish_type', '')
     action = request.POST.get('action', '')
-    if wish_type in [type_code for type_code, type_name in models.Wishlist.WISH_TYPES] and action in ['+', '-']:
+    if wish_type in [type_code for type_code, type_name in models.Wishlist.WISH_TYPES] and action in {'+', '-'}:
         if action == '+':
             models.Wishlist.objects.get_or_create(film=film, wished_by=request.user, wish_type=wish_type)
         else:
             models.Wishlist.objects.filter(film=film, wished_by=request.user, wish_type=wish_type).delete()
+    if request.POST.get('ajax', '') == '1':
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
     return HttpResponseRedirect(reverse('film_main', args=(film.pk, film.slug_cache)))
 
 

@@ -25,7 +25,7 @@
             {% if request.user.is_authenticated %}
                 <td class="center" data-sort-value="{{ direction|film_fav_rating_sort_value }}">{{ direction|film_fav_rating_html }}</td>
                 <td class="center" data-sort-value="{% if direction.my_rating %}{{ direction.my_rating }}{% else %}0{% endif %}">{% if direction.my_rating %}{{ direction.my_rating }}{% endif %}</td>
-                <td class="center wish{% if direction.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if direction.my_wish %}{{ direction.my_wish }}{% else %}0{% endif %}">{% if direction.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</td>
+                <td class="center wish{% if direction.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if direction.my_wish %}{{ direction.my_wish }}{% else %}0{% endif %}"><span data-id="{{ direction.id }}">{% if direction.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
             {% endif %}
         </tr>
     {% endfor %}
