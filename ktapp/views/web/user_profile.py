@@ -210,6 +210,10 @@ def user_wishlist(request, id, name_slug):
             min_value, max_value = filter_value.split('-')
             querystring['fav_avg_rating_min'] = kt_utils.coalesce(min_value, '')
             querystring['fav_avg_rating_max'] = kt_utils.coalesce(max_value, '')
+    if wishlist_type == 'N':
+        querystring['t'] = 'nem'
+    if wishlist_type == 'G':
+        querystring['t'] = 'szerez'
 
     qs_combined = '&'.join('%s=%s' % (key, val) for key, val in querystring.iteritems())
     if qs_combined != '':

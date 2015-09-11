@@ -17,6 +17,7 @@
 
         <form action="{% url 'user_wishlist' selected_user.id selected_user.slug_cache %}" method="get">
             <input type="hidden" name="o" value="{{ ordering_str }}" />
+            {% if querystring.t %}<input type="hidden" name="t" value="{{ querystring.t }}" />{% endif %}
             <table>
                 <tr class="header_tr">
                     <th>
