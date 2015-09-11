@@ -906,7 +906,7 @@ class Picture(models.Model):
     width = models.PositiveIntegerField(default=0, editable=False)
     height = models.PositiveIntegerField(default=0, editable=False)
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     source_url = models.CharField(max_length=250, blank=True)
     PICTURE_TYPE_POSTER = 'P'
     PICTURE_TYPE_DVD = 'D'
