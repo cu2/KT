@@ -384,7 +384,7 @@ def _get_type_and_filter(request):
     return toplist_type, '', ''
 
 
-def _get_film_list(toplist_type, filter_type, filter_value):
+def _get_film_list(user_id, toplist_type, filter_type, filter_value):
     thresholds = {
         'legjobb': 100,
         'ismeretlen': 30,
@@ -392,87 +392,90 @@ def _get_film_list(toplist_type, filter_type, filter_value):
         'legerdekesebb': 50,
         'legnezettebb': 100,
     }
-    qs = models.Film.objects
+    filters = []
     if filter_type == 'ev':
-        qs = qs.filter(year__range=(filter_value, filter_value+9))
+        filters.append(('year', '%s-%s' % (filter_value, filter_value+9)))
     elif filter_type == 'bemutato':
-        qs = qs.filter(main_premier_year=filter_value)
-    elif filter_type in {'orszag', 'mufaj'}:
-        qs = models.FilmKeywordRelationship.objects.filter(keyword__id=filter_value.id)
+        filters.append(('main_premier_year', filter_value))
+    elif filter_type == 'orszag':
+        filters.append(('country', filter_value.name))
+    elif filter_type == 'mufaj':
+        filters.append(('genre', filter_value.name))
 
-    if filter_type in {'orszag', 'mufaj'}:
+    if toplist_type in {'legjobb', 'legrosszabb', 'legnezettebb'}:
         if toplist_type == 'legjobb':
-            if qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]).filter(film__average_rating__gte=3.5).count() >= 50:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]).filter(film__average_rating__gte=3.5)
-            elif qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2).filter(film__average_rating__gte=3.5).count() >= 20:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2).filter(film__average_rating__gte=3.5)
-            else:
-                qs = qs.filter(film__number_of_ratings__gte=10).filter(film__average_rating__gte=3.5)
-            qs = qs.order_by('-film__average_rating')
-        elif toplist_type == 'ismeretlen':
-            qs = qs.filter(film__number_of_ratings__lt=thresholds[toplist_type]).filter(film__number_of_ratings__gte=10)
-            qs = qs.order_by('-film__average_rating')
+            filters.append(('average_rating', '3.5-'))
+            ordering = ('average_rating', 'DESC')
         elif toplist_type == 'legrosszabb':
-            if qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]).filter(film__average_rating__lte=2.5).count() >= 50:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]).filter(film__average_rating__lte=2.5)
-            elif qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2).filter(film__average_rating__lte=2.5).count() >= 20:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2).filter(film__average_rating__lte=2.5)
-            else:
-                qs = qs.filter(film__number_of_ratings__gte=10).filter(film__average_rating__lte=2.5)
-            qs = qs.order_by('film__average_rating')
-        elif toplist_type == 'legerdekesebb':
-            if qs.filter(film__number_of_comments__gte=thresholds[toplist_type]).count() >= 50:
-                qs = qs.filter(film__number_of_comments__gte=thresholds[toplist_type])
-            elif qs.filter(film__number_of_comments__gte=thresholds[toplist_type]/2).count() >= 20:
-                qs = qs.filter(film__number_of_comments__gte=thresholds[toplist_type]/2)
-            else:
-                qs = qs.filter(film__number_of_comments__gte=10)
-            qs = qs.order_by('-film__number_of_comments')
-        elif toplist_type == 'legnezettebb':
-            if qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]).count() >= 50:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type])
-            elif qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2).count() >= 20:
-                qs = qs.filter(film__number_of_ratings__gte=thresholds[toplist_type]/2)
-            else:
-                qs = qs.filter(film__number_of_ratings__gte=10)
-            qs = qs.order_by('-film__number_of_ratings')
-    else:
-        if toplist_type == 'legjobb':
-            if qs.filter(number_of_ratings__gte=thresholds[toplist_type]).filter(average_rating__gte=3.5).count() >= 50:
-                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type]).filter(average_rating__gte=3.5)
-            elif qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2).filter(average_rating__gte=3.5).count() >= 20:
-                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2).filter(average_rating__gte=3.5)
-            else:
-                qs = qs.filter(number_of_ratings__gte=10).filter(average_rating__gte=3.5)
-            qs = qs.order_by('-average_rating')
-        elif toplist_type == 'ismeretlen':
-            qs = qs.filter(number_of_ratings__lt=thresholds[toplist_type]).filter(number_of_ratings__gte=10)
-            qs = qs.order_by('-average_rating')
-        elif toplist_type == 'legrosszabb':
-            if qs.filter(number_of_ratings__gte=thresholds[toplist_type]).filter(average_rating__lte=2.5).count() >= 50:
-                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type]).filter(average_rating__lte=2.5)
-            elif qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2).filter(average_rating__lte=2.5).count() >= 20:
-                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2).filter(average_rating__lte=2.5)
-            else:
-                qs = qs.filter(number_of_ratings__gte=10).filter(average_rating__lte=2.5)
-            qs = qs.order_by('average_rating')
-        elif toplist_type == 'legerdekesebb':
-            if qs.filter(number_of_comments__gte=thresholds[toplist_type]).count() >= 50:
-                qs = qs.filter(number_of_comments__gte=thresholds[toplist_type])
-            elif qs.filter(number_of_comments__gte=thresholds[toplist_type]/2).count() >= 20:
-                qs = qs.filter(number_of_comments__gte=thresholds[toplist_type]/2)
-            else:
-                qs = qs.filter(number_of_comments__gte=10)
-            qs = qs.order_by('-number_of_comments')
-        elif toplist_type == 'legnezettebb':
-            if qs.filter(number_of_ratings__gte=thresholds[toplist_type]).count() >= 50:
-                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type])
-            elif qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2).count() >= 20:
-                qs = qs.filter(number_of_ratings__gte=thresholds[toplist_type]/2)
-            else:
-                qs = qs.filter(number_of_ratings__gte=10)
-            qs = qs.order_by('-number_of_ratings')
-    return qs
+            filters.append(('average_rating', '-2.5'))
+            ordering = ('average_rating', 'ASC')
+        else:
+            ordering = ('number_of_ratings', 'DESC')
+        films, _ = filmlist.filmlist(
+            user_id=user_id,
+            filters=filters + [('number_of_ratings', '%s-' % thresholds[toplist_type])],
+            ordering=ordering,
+            films_per_page=250,
+        )
+        films = list(films)
+        if len(films) >= 50:
+            return films
+        films, _ = filmlist.filmlist(
+            user_id=user_id,
+            filters=filters + [('number_of_ratings', '%s-' % (thresholds[toplist_type]/2))],
+            ordering=ordering,
+            films_per_page=250,
+        )
+        films = list(films)
+        if len(films) >= 20:
+            return films
+        films, _ = filmlist.filmlist(
+            user_id=user_id,
+            filters=filters + [('number_of_ratings', '10-')],
+            ordering=ordering,
+            films_per_page=250,
+        )
+        return list(films)
+
+    if toplist_type == 'ismeretlen':
+        ordering = ('average_rating', 'DESC')
+        films, _ = filmlist.filmlist(
+            user_id=user_id,
+            filters=filters + [('number_of_ratings', '10-%s' % (thresholds[toplist_type]-1))],
+            ordering=ordering,
+            films_per_page=250,
+        )
+        return list(films)
+
+    if toplist_type == 'legerdekesebb':
+        ordering = ('number_of_comments', 'DESC')
+        films, _ = filmlist.filmlist(
+            user_id=user_id,
+            filters=filters + [('number_of_comments', '%s-' % thresholds[toplist_type])],
+            ordering=ordering,
+            films_per_page=250,
+        )
+        films = list(films)
+        if len(films) >= 50:
+            return films
+        films, _ = filmlist.filmlist(
+            user_id=user_id,
+            filters=filters + [('number_of_comments', '%s-' % (thresholds[toplist_type]/2))],
+            ordering=ordering,
+            films_per_page=250,
+        )
+        films = list(films)
+        if len(films) >= 20:
+            return films
+        films, _ = filmlist.filmlist(
+            user_id=user_id,
+            filters=filters + [('number_of_comments', '10-')],
+            ordering=ordering,
+            films_per_page=250,
+        )
+        return list(films)
+
+    return []
 
 
 def top_films(request):
@@ -481,11 +484,7 @@ def top_films(request):
     minimum_year = 1900
     minimum_premier = 1970
     toplist_type, filter_type, filter_value = _get_type_and_filter(request)
-    qs = _get_film_list(toplist_type, filter_type, filter_value)
-    if filter_type in {'orszag', 'mufaj'}:
-        films = [x.film for x in qs[:250]]
-    else:
-        films = qs[:250]
+    films = _get_film_list(request.user.id, toplist_type, filter_type, filter_value)
     links = []
     if filter_type == 'ev':
         links.append((1890, '-1899'))

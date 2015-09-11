@@ -1,8 +1,10 @@
+from django.db import connection
+
 from ktapp import models
 from ktapp import utils as kt_utils
 
 
-def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20):
+def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20, count=False):
     table_alias_idx = 0
     role_idx = 0
     additional_inner_joins = []
@@ -28,14 +30,19 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
                         additional_param.append('%{term}%'.format(term=title_piece))
                         additional_param.append('%{term}%'.format(term=title_piece))
                 if title_pieces:
-                    nice_filters.append(('title', ' '.join(title_pieces)))
+                    nice_filters.append((filter_type, ' '.join(title_pieces)))
             if filter_type == 'year':
                 year_interval = kt_utils.str2interval(filter_value, int)
                 if year_interval:
                     additional_where.append('''f.year BETWEEN %s AND %s''')
                     additional_param.append(year_interval[0])
                     additional_param.append(year_interval[1])
-                    nice_filters.append(('year', filter_value))
+                    nice_filters.append((filter_type, filter_value))
+            if filter_type == 'main_premier_year':
+                if filter_value:
+                    additional_where.append('''f.main_premier_year = %s''')
+                    additional_param.append(filter_value)
+                    nice_filters.append((filter_type, filter_value))
             if filter_type == 'director':
                 director_names = []
                 for director_name in filter_value.split(','):
@@ -55,7 +62,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
                                 director_ids=','.join([str(d.id) for d in directors]),
                             ))
                 if director_names:
-                    nice_filters.append(('director', ', '.join(director_names)))
+                    nice_filters.append((filter_type, ', '.join(director_names)))
             if filter_type == 'actor':
                 actor_names = []
                 for actor_name in filter_value.split(','):
@@ -85,7 +92,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
                                 actor_ids=','.join([str(a.id) for a in actors]),
                             ))
                 if actor_names:
-                    nice_filters.append(('actor', ', '.join(actor_names)))
+                    nice_filters.append((filter_type, ', '.join(actor_names)))
             if filter_type == 'director_id':
                 try:
                     director = models.Artist.objects.get(id=filter_value)
@@ -102,7 +109,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
                         table_name='director_%s' % table_alias_idx,
                         director_id=director.id,
                     ))
-                    nice_filters.append(('director_id', director.id))
+                    nice_filters.append((filter_type, director.id))
             if filter_type == 'actor_id':
                 try:
                     actor = models.Artist.objects.get(id=filter_value)
@@ -129,7 +136,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
                         table_name='actor_%s' % table_alias_idx,
                         actor_id=actor.id,
                     ))
-                    nice_filters.append(('actor_id', actor.id))
+                    nice_filters.append((filter_type, actor.id))
             if filter_type in {'country', 'genre', 'keyword'}:
                 keyword_names = []
                 for keyword_name in filter_value.split(','):
@@ -396,8 +403,26 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20)
         )
     else:
         sql_limit = ''
+    if count:
+        cursor = connection.cursor()
+        sql = '''
+            SELECT COUNT(DISTINCT f.id)
+            FROM ktapp_film f
+            {additional_inner_joins}
+            {sql_user}
+            {additional_where}
+        '''.format(
+            additional_select='\n'.join(additional_select) if additional_select else '',
+            additional_inner_joins='\n'.join(additional_inner_joins),
+            sql_user_select=sql_user_select,
+            sql_user=sql_user,
+            additional_where='WHERE %s' % '\nAND\n'.join(additional_where) if additional_where else '',
+        )
+        print sql
+        cursor.execute(sql)
+        return cursor.fetchone()[0]
     sql = '''
-        SELECT
+        SELECT DISTINCT
           f.*,
           {additional_select}
           {sql_user_select}
