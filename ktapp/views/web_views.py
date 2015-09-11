@@ -1027,16 +1027,19 @@ def list_of_bios(request):
 def latest_pictures(request):
     pictures = list(models.Picture.objects.raw('''
         SELECT
-          ktapp_picture.*,
-          ktapp_film.*
+          p.*,
+          f.id AS film_id,
+          f.slug_cache AS film_slug_cache,
+          f.orig_title AS film_orig_title,
+          f.year AS film_year
         FROM
-          ktapp_picture USE INDEX (ktapp_picture_created_at_3047bfe36ccde785_uniq)
+          ktapp_picture p USE INDEX (ktapp_picture_created_at_3047bfe36ccde785_uniq)
         INNER JOIN
-          ktapp_film
+          ktapp_film f
         ON
-          ktapp_film.id = ktapp_picture.film_id
+          f.id = p.film_id
         ORDER BY
-          ktapp_picture.created_at DESC
+          p.created_at DESC
         LIMIT
           100
     '''))  # NOTE: apparently MySQL is an idiot
