@@ -1025,8 +1025,23 @@ def list_of_bios(request):
 
 
 def latest_pictures(request):
+    pictures = list(models.Picture.objects.raw('''
+        SELECT
+          ktapp_picture.*,
+          ktapp_film.*
+        FROM
+          ktapp_picture USE INDEX (ktapp_picture_created_at_3047bfe36ccde785_uniq)
+        INNER JOIN
+          ktapp_film
+        ON
+          ktapp_film.id = ktapp_picture.film_id
+        ORDER BY
+          ktapp_picture.created_at DESC
+        LIMIT
+          100
+    '''))  # NOTE: apparently MySQL is an idiot
     return render(request, 'ktapp/latest_pictures.html', {
-        'pictures': models.Picture.objects.select_related('film').all().order_by('-created_at')[:100],
+        'pictures': pictures,
     })
 
 
