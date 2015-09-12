@@ -65,10 +65,10 @@ def get_artists(request):
     if f:
         roles = models.FilmArtistRelationship.objects.filter(film_id=f)
         return HttpResponse(json.dumps(
-            [{'label': role.artist.name, 'value': role.artist.name, 'id': role.artist.id, 'gender': role.artist.gender} for role in roles.filter(artist__name__icontains=q).order_by('artist__name', 'artist_id')[:10]]
+            [{'label': role.artist.name, 'value': role.artist.name, 'id': role.artist.id, 'gender': role.artist.gender} for role in roles.filter(artist__name__icontains=q).order_by('-artist__number_of_ratings', 'artist__name', 'artist_id')[:10]]
         ), content_type='application/json')
     return HttpResponse(json.dumps(
-        [{'label': artist.name, 'value': artist.name, 'id': artist.id, 'gender': artist.gender} for artist in models.Artist.objects.filter(name__icontains=q).order_by('name', 'id')[:10]]
+        [{'label': artist.name, 'value': artist.name, 'id': artist.id, 'gender': artist.gender} for artist in models.Artist.objects.filter(name__icontains=q).order_by('-number_of_ratings', 'name', 'id')[:10]]
     ), content_type='application/json')
 
 

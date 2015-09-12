@@ -661,6 +661,15 @@ class Artist(models.Model):
     slug_cache = models.CharField(max_length=250, blank=True)
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
+    number_of_films = models.PositiveIntegerField(default=0)
+    number_of_ratings = models.PositiveIntegerField(default=0)
+    average_rating = models.DecimalField(default=0, max_digits=2, decimal_places=1, blank=True, null=True)
+    number_of_films_as_actor = models.PositiveIntegerField(default=0)
+    number_of_ratings_as_actor = models.PositiveIntegerField(default=0)
+    average_rating_as_actor = models.DecimalField(default=0, max_digits=2, decimal_places=1, blank=True, null=True)
+    number_of_films_as_director = models.PositiveIntegerField(default=0)
+    number_of_ratings_as_director = models.PositiveIntegerField(default=0)
+    average_rating_as_director = models.DecimalField(default=0, max_digits=2, decimal_places=1, blank=True, null=True)
 
     def __unicode__(self):
         return self.name

@@ -578,63 +578,18 @@ def artist_main(request, id, name_slug):
                 artist.gender = artist_gender
                 artist.save()
             return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))
-
     directions, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('director_id', artist.id)],
         ordering=('year', 'DESC'),
         films_per_page=None,
     )
-    number_of_directions = 0  # RawQuerySet has no __bool__() or __len__(), so we do it manually
-    director_vote_count = 0
-    director_vote_avg = 0
-    if directions:
-        director_votes = {
-            'nr1': 0,
-            'nr2': 0,
-            'nr3': 0,
-            'nr4': 0,
-            'nr5': 0,
-        }
-        for x in directions:
-            number_of_directions += 1
-            director_votes['nr1'] += x.number_of_ratings_1
-            director_votes['nr2'] += x.number_of_ratings_2
-            director_votes['nr3'] += x.number_of_ratings_3
-            director_votes['nr4'] += x.number_of_ratings_4
-            director_votes['nr5'] += x.number_of_ratings_5
-            director_vote_count += x.number_of_ratings
-        if director_vote_count:
-            director_vote_avg = 1.0 * (director_votes.get('nr1', 0) + 2*director_votes.get('nr2', 0) + 3*director_votes.get('nr3', 0) + 4*director_votes.get('nr4', 0) + 5*director_votes.get('nr5', 0)) / director_vote_count
-
     roles, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('actor_id', artist.id)],
         ordering=('year', 'DESC'),
         films_per_page=None,
     )
-    number_of_roles = 0
-    actor_vote_count = 0
-    actor_vote_avg = 0
-    if roles:
-        actor_votes = {
-            'nr1': 0,
-            'nr2': 0,
-            'nr3': 0,
-            'nr4': 0,
-            'nr5': 0,
-        }
-        for x in roles:
-            number_of_roles += 1
-            actor_votes['nr1'] += x.number_of_ratings_1
-            actor_votes['nr2'] += x.number_of_ratings_2
-            actor_votes['nr3'] += x.number_of_ratings_3
-            actor_votes['nr4'] += x.number_of_ratings_4
-            actor_votes['nr5'] += x.number_of_ratings_5
-            actor_vote_count += x.number_of_ratings
-        if actor_vote_count:
-            actor_vote_avg = 1.0 * (actor_votes.get('nr1', 0) + 2*actor_votes.get('nr2', 0) + 3*actor_votes.get('nr3', 0) + 4*actor_votes.get('nr4', 0) + 5*actor_votes.get('nr5', 0)) / actor_vote_count
-
     normal_name = artist.name
     similar_artists = [a for a in models.Artist.objects.filter(name=normal_name) if a != artist]
     if ' ' in normal_name:
@@ -646,12 +601,12 @@ def artist_main(request, id, name_slug):
         'random_picture': random_picture,
         'directions': directions,
         'roles': roles,
-        'number_of_directions': number_of_directions,
-        'number_of_roles': number_of_roles,
-        'director_vote_count': director_vote_count,
-        'actor_vote_count': actor_vote_count,
-        'director_vote_avg': director_vote_avg,
-        'actor_vote_avg': actor_vote_avg,
+        'number_of_directions': artist.number_of_films_as_director,
+        'number_of_roles': artist.number_of_films_as_actor,
+        'director_vote_count': artist.number_of_ratings_as_director,
+        'actor_vote_count': artist.number_of_ratings_as_actor,
+        'director_vote_avg': artist.average_rating_as_director,
+        'actor_vote_avg': artist.average_rating_as_actor,
         'awards': models.Award.objects.filter(artist=artist).order_by('name', 'year', 'category'),
         'biographies': models.Biography.objects.filter(artist=artist, approved=True),
         'unapproved_biographies': models.Biography.objects.filter(artist=artist, approved=False),
