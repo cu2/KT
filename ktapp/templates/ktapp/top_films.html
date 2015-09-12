@@ -55,9 +55,11 @@
             {% endif %}
             <th>Nézettség{% if type == 'legnezettebb' %}&darr;{% endif %}</th>
             <th>Átlag{% if type in 'legjobb,ismeretlen' %}&darr;{% endif %}{% if type == 'legrosszabb' %}&uarr;{% endif %}</th>
-            <th>Kedvenceid</th>
-            <th>Szerinted</th>
-            <th>&#9733;</th>
+            {% if request.user.is_authenticated %}
+                <th>Kedvenceid</th>
+                <th>Szerinted</th>
+                <th>&#9733;</th>
+            {% endif %}
             {% if filter_type == 'bemutato' %}
                 <th>Bemutató</th>
             {% endif %}
@@ -76,9 +78,11 @@
                 {% endif %}
                 <td class="center">{{ film|film_num_rating_html }}</td>
                 <td class="center">{{ film|film_avg_rating_html }}</td>
-                <td class="center">{{ film|film_fav_rating_html }}</td>
-                <td class="center">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
-                <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if film.my_wish %}{{ film.my_wish }}{% else %}0{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+                {% if request.user.is_authenticated %}
+                    <td class="center">{{ film|film_fav_rating_html }}</td>
+                    <td class="center">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
+                    <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+                {% endif %}
                 {% if filter_type == 'bemutato' %}
                     <td>{{ film.main_premier|date:"F j." }}</td>
                 {% endif %}
