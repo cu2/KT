@@ -17,13 +17,14 @@ def jsonlog(logger, level, payload):
 class LoggingMiddleware(object):
 
     def process_request(self, request):
-        now = datetime.datetime.now()
+        utcnow = datetime.datetime.utcnow()
         if request.user.is_authenticated():
-            request.user.last_activity_at = now
+            request.user.last_activity_at = datetime.datetime.now()
             request.user.save()
         ip = get_ip(request)
         jsonlog(kt_pageview_logger, logging.INFO, {
-            'datetime': datetime.datetime.strftime(now, '%Y-%m-%d %H:%M:%S'),
+            'utc_timestamp': utcnow.strftime('%s.%f'),
+            'utc_datetime': utcnow.strftime('%Y-%m-%d %H:%M:%S.%f'),
             'ip': ip if ip else '',
             'user_agent': request.META.get('HTTP_USER_AGENT', ''),
             'url': request.get_full_path(),
@@ -33,16 +34,19 @@ class LoggingMiddleware(object):
             'server_name': request.META.get('SERVER_NAME', ''),
             'user_id': request.user.id if request.user.id else 0,
             'user_name': request.user.username,
+            'session': request.session.session_key,
         })
         request.session['received_time'] = time.time()
 
     def process_response(self, request, response):
         try:
             if 'received_time' in request.session:
+                utcnow = datetime.datetime.utcnow()
                 response_time = time.time() - request.session['received_time']
                 ip = get_ip(request)
                 jsonlog(kt_loadtime_logger, logging.INFO, {
-                    'datetime': datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+                    'utc_timestamp': utcnow.strftime('%s.%f'),
+                    'utc_datetime': utcnow.strftime('%Y-%m-%d %H:%M:%S.%f'),
                     'ip': ip if ip else '',
                     'user_agent': request.META.get('HTTP_USER_AGENT', ''),
                     'url': request.get_full_path(),
@@ -52,6 +56,7 @@ class LoggingMiddleware(object):
                     'server_name': request.META.get('SERVER_NAME', ''),
                     'user_id': request.user.id if request.user.id else 0,
                     'user_name': request.user.username,
+                    'session': request.session.session_key,
                     'response_time_ms': 1000.0 * response_time,
                     'response_status_code': response.status_code,
                 })
@@ -61,7 +66,7 @@ class LoggingMiddleware(object):
 
     def process_exception(self, request, exc):
         kt_exception_logger.exception(u'-----\nDATETIME={dt}\nURL={url}\nUSER_ID={user_id}\nUSER_NAME={user_name}'.format(
-            dt=datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'),
+            dt=datetime.datetime.strftime(datetime.datetime.utcnow(), '%Y-%m-%d %H:%M:%S.%f'),
             url=request.get_full_path(),
             user_id=request.user.id if request.user.id else 0,
             user_name=request.user.username,
