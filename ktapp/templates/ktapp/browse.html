@@ -10,42 +10,128 @@
 {% block main %}
 
     <form action="{% url 'browse' %}" method="get">
-        <p>Cím: <input type="text" tabindex="12" name="title" value="{{ title }}" class="search_input" /></p>
-        <p>Év: <input type="text" tabindex="13" name="year" value="{{ year }}" class="search_input" /> (formátum: <span class="input_format">ÉÉÉÉ</span>, <span class="input_format">ÉÉÉÉ-</span>, <span class="input_format">-ÉÉÉÉ</span>, <span class="input_format">ÉÉÉÉ-ÉÉÉÉ</span>)</p>
-        <p>Rendező(k): <input type="text" tabindex="14" name="directors" value="{{ directors }}" class="search_input input_for_artists" /></p>
-        <p>Színész(ek): <input type="text" tabindex="15" name="actors" value="{{ actors }}" class="search_input input_for_artists" /></p>
-        <p>Ország(ok): <input type="text" tabindex="16" name="countries" id="id_countries" value="{{ countries }}" class="search_input input_for_keywords" /></p>
-        <p>Műfaj(ok): <input type="text" tabindex="17" name="genres" id="id_genres" value="{{ genres }}" class="search_input input_for_keywords" /></p>
-        <p>Kulcsszó/szavak: <input type="text" tabindex="18" name="keywords" id="id_keywords" value="{{ keywords }}" class="search_input input_for_keywords" /></p>
-        <p>Átlag: <input type="text" tabindex="19" name="avg_rating_min" value="{{ avg_rating_min }}" /> - <input type="text" tabindex="20" name="avg_rating_max" value="{{ avg_rating_max }}" /></p>
-        <p>Szavazatok száma: <input type="text" tabindex="21" name="num_rating_min" value="{{ num_rating_min }}" /> - <input type="text" tabindex="22" name="num_rating_max" value="{{ num_rating_max }}" /></p>
-        <p><input type="submit" value="Mehet" tabindex="23" /></p>
+        <input type="hidden" name="o" value="{{ ordering_str }}" />
+        <table>
+            <tr class="header_tr">
+                <th>
+                    Színész<br />
+                    <input type="text" class="full_input input_for_artists" name="actor" value="{{ querystring.actor }}" />
+                </th>
+                <th>
+                    Ország<br />
+                    <input type="text" class="full_input input_for_keywords" name="country" id="id_countries" value="{{ querystring.country }}" />
+                </th>
+                <th>
+                    Kulcsszó<br />
+                    <input type="text" class="full_input input_for_keywords" name="keyword" id="id_keywords" value="{{ querystring.keyword }}" />
+                </th>
+                <td>
+                    <input type="submit" value="Filmek szűrése" />
+                    {{ result_count }} film
+                </td>
+            </tr>
+        </table>
+        <table class="fullsize">
+            <tr class="header_tr">
+                <th>
+                    <a href="{% url 'browse' %}?o={% if ordering_str == 'title' %}-{% endif %}title{{ qs_combined }}">Film{% if ordering_str == 'title' %}&uarr;{% elif ordering_str == '-title' %}&darr;{% endif %}</a><br />
+                    <input type="text" class="full_input" name="title" value="{{ querystring.title }}" />
+                </th>
+                <th>
+                    <a href="{% url 'browse' %}?o={% if ordering_str != '-year' %}-{% endif %}year{{ qs_combined }}">Év{% if ordering_str == 'year' %}&uarr;{% elif ordering_str == '-year' %}&darr;{% endif %}</a><br />
+                    <input type="text" class="full_input" name="year" value="{{ querystring.year }}" />
+                </th>
+                <th>
+                    <a href="{% url 'browse' %}?o={% if ordering_str == 'director' %}-{% endif %}director{{ qs_combined }}">Rendező{% if ordering_str == 'director' %}&uarr;{% elif ordering_str == '-director' %}&darr;{% endif %}</a><br />
+                    <input type="text" class="full_input input_for_artists" name="director" value="{{ querystring.director }}" />
+                </th>
+                <th>
+                    <a href="{% url 'browse' %}?o={% if ordering_str == 'genre' %}-{% endif %}genre{{ qs_combined }}">Műfaj{% if ordering_str == 'genre' %}&uarr;{% elif ordering_str == '-genre' %}&darr;{% endif %}</a><br />
+                    <input type="text" class="full_input input_for_keywords" name="genre" id="id_genres" value="{{ querystring.genre }}" />
+                </th>
+                <th class="nowrap">
+                    <a href="{% url 'browse' %}?o={% if ordering_str != '-number_of_ratings' %}-{% endif %}number_of_ratings{{ qs_combined }}">Nézettség{% if ordering_str == 'number_of_ratings' %}&uarr;{% elif ordering_str == '-number_of_ratings' %}&darr;{% endif %}</a><br />
+                    <input type="text" class="small_input" name="num_rating_min" value="{{ querystring.num_rating_min }}" />-<input type="text" class="small_input" name="num_rating_max" value="{{ querystring.num_rating_max }}" />
+                </th>
+                <th class="nowrap">
+                    <a href="{% url 'browse' %}?o={% if ordering_str != '-average_rating' %}-{% endif %}average_rating{{ qs_combined }}">Átlag{% if ordering_str == 'average_rating' %}&uarr;{% elif ordering_str == '-average_rating' %}&darr;{% endif %}</a><br />
+                    <input type="text" class="small_input" name="avg_rating_min" value="{{ querystring.avg_rating_min }}" />-<input type="text" class="small_input" name="avg_rating_max" value="{{ querystring.avg_rating_max }}" />
+                </th>
+                {% if request.user.is_authenticated %}
+                    <th class="nowrap">
+                        <a href="{% url 'browse' %}?o={% if ordering_str != '-fav_average_rating' %}-{% endif %}fav_average_rating{{ qs_combined }}">Kedvenceid{% if ordering_str == 'fav_average_rating' %}&uarr;{% elif ordering_str == '-fav_average_rating' %}&darr;{% endif %}</a><br />
+                        <input type="text" class="small_input" name="fav_avg_rating_min" value="{{ querystring.fav_avg_rating_min }}" />-<input type="text" class="small_input" name="fav_avg_rating_max" value="{{ querystring.fav_avg_rating_max }}" />
+                    </th>
+                    <th>
+                        <a href="{% url 'browse' %}?o={% if ordering_str != '-my_rating' %}-{% endif %}my_rating{{ qs_combined }}">Szerinted{% if ordering_str == 'my_rating' %}&uarr;{% elif ordering_str == '-my_rating' %}&darr;{% endif %}</a><br />
+                        <input type="text" class="full_input" name="my_rating" value="{{ querystring.my_rating }}" />
+                    </th>
+                    {% if selected_user.id != user.id %}
+                        <th>
+                            <a href="{% url 'browse' %}?o={% if ordering_str != '-my_wish' %}-{% endif %}my_wish{{ qs_combined }}">&#9733;{% if ordering_str == 'my_wish' %}&uarr;{% elif ordering_str == '-my_wish' %}&darr;{% endif %}</a><br />
+                            <select name="my_wish">
+                                <option value="">-</option>
+                                <option value="1"{% if querystring.my_wish == '1' %} selected="selected"{% endif %}>&#9733;</option>
+                                <option value="0"{% if querystring.my_wish == '0' %} selected="selected"{% endif %}>&#9734;</option>
+                            </select>
+                        </th>
+                    {% endif %}
+                {% endif %}
+                {% if selected_user.id != user.id %}
+                    <th>
+                        <a href="{% url 'browse' %}?o={% if ordering_str != '-other_rating' %}-{% endif %}other_rating{{ qs_combined }}">Szerinte{% if ordering_str == 'other_rating' %}&uarr;{% elif ordering_str == '-other_rating' %}&darr;{% endif %}</a><br />
+                        <input type="text" class="full_input" name="other_rating" value="{{ querystring.other_rating }}" />
+                    </th>
+                {% endif %}
+                <th>
+                    <a href="{% url 'browse' %}?o={% if ordering_str != '-other_rating_when' %}-{% endif %}other_rating_when{{ qs_combined }}">Osztályozta{% if selected_user.id == user.id %}d{% endif %}{% if ordering_str == 'other_rating_when' %}&uarr;{% elif ordering_str == '-other_rating_when' %}&darr;{% endif %}</a><br />
+                    &nbsp;
+                </th>
+            </tr>
+            {% for film in films %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td>{{ film|film_url_html }}</td>
+                    <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
+                    <td>{{ film|film_directors }}</td>
+                    <td>{{ film|film_genres }}</td>
+                    <td class="center">{{ film|film_num_rating_html }}</td>
+                    <td class="center">{{ film|film_avg_rating_html }}</td>
+                    {% if request.user.is_authenticated %}
+                        <td class="center">{{ film|film_fav_rating_html }}</td>
+                        <td class="center">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
+                        {% if selected_user.id != user.id %}
+                            <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+                        {% endif %}
+                    {% endif %}
+                    {% if selected_user.id != user.id %}
+                        <td class="center">{{ film.other_rating }}</td>
+                    {% endif %}
+                    <td class="center">{{ film.other_rating_when|date:"Y-m-d" }}</td>
+                </tr>
+            {% endfor %}
+        </table>
     </form>
 
-    {% if error_type == 'too_many' %}
-        <p class="error">Túl sok találat ({{ result_count }}), szűkíts a feltételeken...</p>
-    {% elif error_type == 'ok' %}
-        {% if result_count %}
-            <p>{{ result_count }} találat:</p>
-            <table class="fullsize">
-                <tr class="header_tr">
-                    <th>Film</th>
-                    <th>Év</th>
-                    <th>Rendező</th>
-                    <th>Átlag</th>
-                </tr>
-                {% for r in results %}
-                    <tr class="{% cycle '' 'odd' %}">
-                        <td>{{ r|film_url_html }}</td>
-                        <td class="center">{% if r.year %}{{ r.year }}{% endif %}</td>
-                        <td>{% for director in r.directors|slice:":3" %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %}{% if r.directors|length > 3 %} - ...{% endif %}</td>
-                        <td class="center">{{ r|film_rating_html }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p>Nincs találat.</p>
-        {% endif %}
+    {% if max_pages >= 2 %}
+        <ul class="paging">
+            <li>{% if p == 1 %}<b>1</b>{% else %}<a href="{% url 'browse' %}?o={{ ordering_str }}{{ qs_combined }}">1</a>{% endif %}</li>
+            {% if p >= 4 %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            {% if p >= 3 %}
+                <li><a href="{% url 'browse' %}?o={{ ordering_str }}{{ qs_combined }}&p={{ p|add:"-1" }}">{{ p|add:"-1" }}</a></li>
+            {% endif %}
+            {% if 2 <= p and p <= max_pages|add:"-1" %}
+                <li><b>{{ p }}</b></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-2" %}
+                <li><a href="{% url 'browse' %}?o={{ ordering_str }}{{ qs_combined }}&p={{ p|add:"1" }}">{{ p|add:"1" }}</a></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-3" %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'browse' %}?o={{ ordering_str }}{{ qs_combined }}&p={{ max_pages }}">{{ max_pages }}</a>{% endif %}</li>
+        </ul>
     {% endif %}
 
 {% endblock %}

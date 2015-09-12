@@ -20,6 +20,7 @@ from ktapp.helpers import filmlist
 
 COMMENTS_PER_PAGE = 100
 MESSAGES_PER_PAGE = 50
+FILMS_PER_PAGE = 100
 
 
 def index(request):
@@ -89,153 +90,81 @@ def premiers(request):
     })
 
 
-def _list_of_films(request):
-    qs = models.Film.objects
-    no_filter = True
-
-    title = kt_utils.strip_whitespace(request.GET.get('title', ''))
-    if title:
-        qs = qs.filter(
-            Q(orig_title__icontains=title)
-            | Q(second_title__icontains=title)
-            | Q(third_title__icontains=title)
-        )
-        no_filter = False
-
-    year = kt_utils.strip_whitespace(request.GET.get('year', ''))
-    year_interval = kt_utils.str2interval(year, int)
-    if year_interval:
-        qs = qs.filter(year__range=year_interval)
-        no_filter = False
-
-    directors = kt_utils.strip_whitespace(request.GET.get('directors', '')).strip(',')
-    for director_name in directors.split(','):
-        if director_name.strip():
-            try:
-                director = models.Artist.objects.filter(name=director_name.strip())[0]
-            except IndexError:
-                director = None
-            if director:
-                qs = qs.filter(artists__id=director.id, filmartistrelationship__role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR)
-                no_filter = False
-
-    actors = kt_utils.strip_whitespace(request.GET.get('actors', '')).strip(',')
-    for actor_name in actors.split(','):
-        if actor_name.strip():
-            try:
-                actor = models.Artist.objects.filter(name=actor_name.strip())[0]
-            except IndexError:
-                actor = None
-            if actor:
-                qs = qs.filter(artists__id=actor.id, filmartistrelationship__role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR)
-                no_filter = False
-
-    countries = kt_utils.strip_whitespace(request.GET.get('countries', '')).strip(',')
-    for country_name in countries.split(','):
-        if country_name.strip():
-            try:
-                country = models.Keyword.objects.filter(name=country_name.strip(), keyword_type=models.Keyword.KEYWORD_TYPE_COUNTRY)[0]
-            except IndexError:
-                country = None
-            if country:
-                qs = qs.filter(keywords__id=country.id)
-                no_filter = False
-
-    genres = kt_utils.strip_whitespace(request.GET.get('genres', '')).strip(',')
-    for genre_name in genres.split(','):
-        if genre_name.strip():
-            try:
-                genre = models.Keyword.objects.filter(name=genre_name.strip(), keyword_type=models.Keyword.KEYWORD_TYPE_GENRE)[0]
-            except IndexError:
-                genre = None
-            if genre:
-                qs = qs.filter(keywords__id=genre.id)
-                no_filter = False
-
-    keywords = kt_utils.strip_whitespace(request.GET.get('keywords', '')).strip(',')
-    for keyword_name in keywords.split(','):
-        if keyword_name.strip():
-            try:
-                keyword = models.Keyword.objects.filter(name=keyword_name.strip(), keyword_type__in=[models.Keyword.KEYWORD_TYPE_MAJOR, models.Keyword.KEYWORD_TYPE_OTHER])[0]
-            except IndexError:
-                keyword = None
-            if keyword:
-                qs = qs.filter(keywords__id=keyword.id)
-                no_filter = False
-
-    try:
-        avg_rating_min = float(kt_utils.strip_whitespace(request.GET.get('avg_rating_min', '')).replace(',', '.'))
-    except ValueError:
-        avg_rating_min = None
-    try:
-        avg_rating_max = float(kt_utils.strip_whitespace(request.GET.get('avg_rating_max', '')).replace(',', '.'))
-    except ValueError:
-        avg_rating_max = None
-    avg_rating_interval = kt_utils.minmax2interval(avg_rating_min, avg_rating_max, 0.0, 5.0)
-    if avg_rating_interval:
-        qs = qs.filter(average_rating__range=avg_rating_interval)
-        no_filter = False
-
-    try:
-        num_rating_min = int(kt_utils.strip_whitespace(request.GET.get('num_rating_min', '')))
-    except ValueError:
-        num_rating_min = None
-    try:
-        num_rating_max = int(kt_utils.strip_whitespace(request.GET.get('num_rating_max', '')))
-    except ValueError:
-        num_rating_max = None
-    num_rating_interval = kt_utils.minmax2interval(num_rating_min, num_rating_max, 0, 99999)
-    if num_rating_interval:
-        qs = qs.filter(number_of_ratings__range=num_rating_interval)
-        no_filter = False
-
-    return (
-        no_filter, qs,
-        title, year,
-        directors, actors,
-        countries, genres, keywords,
-        avg_rating_min, avg_rating_max,
-        num_rating_min, num_rating_max
-    )
-
-
 def browse(request):
-    (
-        no_filter, qs,
-        title, year,
-        directors, actors,
-        countries, genres, keywords,
-        avg_rating_min, avg_rating_max,
-        num_rating_min, num_rating_max
-    ) = _list_of_films(request)
-    if no_filter:
-        error_type = ''
-        results = []
-        result_count = 0
+    ordering_str = kt_utils.strip_whitespace(request.GET.get('o', ''))
+    if ordering_str == '':
+        ordering_str = '-average_rating'
+    if ordering_str[0] == '-':
+        ordering = (ordering_str[1:], 'DESC')
     else:
-        qs = qs.distinct()
-        result_count = qs.count()
-        if result_count > 1000:
-            error_type = 'too_many'
-            results = []
-        else:
-            error_type = 'ok'
-            results = qs.order_by('orig_title', 'year', 'id')
+        ordering = (ordering_str, 'ASC')
+    filters = filmlist.get_filters_from_request(request)
+    # result_count, nice_filters = filmlist.filmlist(
+    #     user_id=request.user.id,
+    #     filters=filters,
+    #     count=True
+    # )
+    # if result_count <= 1000:
+    #     films, nice_filters = filmlist.filmlist(
+    #         user_id=request.user.id,
+    #         filters=filters,
+    #         ordering=ordering,
+    #         films_per_page=1000,
+    #     )
+    # else:
+    #     films = []
+    films, nice_filters = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=filters,
+        ordering=ordering,
+        films_per_page=1000,
+    )
+    querystring = {}
+    for filter_type, filter_value in nice_filters:
+        if filter_type in {'title', 'year', 'director', 'actor', 'country', 'genre', 'keyword', 'my_rating', 'other_rating', 'my_wish'}:
+            querystring[filter_type] = filter_value
+        elif filter_type == 'number_of_ratings':
+            min_value, max_value = filter_value.split('-')
+            querystring['num_rating_min'] = kt_utils.coalesce(min_value, '')
+            querystring['num_rating_max'] = kt_utils.coalesce(max_value, '')
+        elif filter_type == 'average_rating':
+            min_value, max_value = filter_value.split('-')
+            querystring['avg_rating_min'] = kt_utils.coalesce(min_value, '')
+            querystring['avg_rating_max'] = kt_utils.coalesce(max_value, '')
+        elif filter_type == 'fav_average_rating':
+            min_value, max_value = filter_value.split('-')
+            querystring['fav_avg_rating_min'] = kt_utils.coalesce(min_value, '')
+            querystring['fav_avg_rating_max'] = kt_utils.coalesce(max_value, '')
+
+    qs_combined = '&'.join('%s=%s' % (key, val) for key, val in querystring.iteritems())
+    if qs_combined != '':
+        qs_combined = '&' + qs_combined
+
+    films = list(films)
+    result_count = len(films)
+
+    try:
+        p = int(request.GET.get('p', 0))
+    except ValueError:
+        p = 0
+    max_pages = int(math.ceil(1.0 * result_count / FILMS_PER_PAGE))
+    if max_pages == 0:
+        max_pages = 1
+    if p == 0:
+        p = 1
+    if p > max_pages:
+        p = max_pages
+
+    films = films[(p-1) * FILMS_PER_PAGE:p * FILMS_PER_PAGE]
+
     return render(request, 'ktapp/browse.html', {
-        'title': title,
-        'year': year,
-        'directors': directors,
-        'actors': actors,
-        'countries': countries,
-        'genres': genres,
-        'keywords': keywords,
-        'avg_rating_min': kt_utils.coalesce(avg_rating_min, ''),
-        'avg_rating_max': kt_utils.coalesce(avg_rating_max, ''),
-        'num_rating_min': kt_utils.coalesce(num_rating_min, ''),
-        'num_rating_max': kt_utils.coalesce(num_rating_max, ''),
-        'error_type': error_type,
         'result_count': result_count,
-        'results': results,
+        'querystring': querystring,
+        'qs_combined': qs_combined,
+        'ordering_str': ordering_str,
+        'p': p,
+        'max_pages': max_pages,
+        'films': films,
     })
 
 
@@ -912,12 +841,6 @@ def usertoplist(request, id, title_slug):
             toplist_list.append(item)
             if item.comment:
                 with_comments = True
-    # toplist_list = []
-    # with_comments = False
-    # for item in models.UserToplistItem.objects.filter(usertoplist=toplist).select_related('film', 'director', 'actor').order_by('serial_number'):
-    #     toplist_list.append(item)
-    #     if item.comment:
-    #         with_comments = True
     return render(request, 'ktapp/usertoplist.html', {
         'toplist': toplist,
         'toplist_list': toplist_list,

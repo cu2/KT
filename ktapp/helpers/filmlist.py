@@ -441,9 +441,8 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
             sql_user=sql_user,
             additional_where='WHERE %s' % '\nAND\n'.join(additional_where) if additional_where else '',
         )
-        print sql
-        cursor.execute(sql)
-        return cursor.fetchone()[0]
+        cursor.execute(sql, additional_param)
+        return cursor.fetchone()[0], nice_filters
     sql = '''
         SELECT DISTINCT
           f.*,
@@ -465,7 +464,6 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
         sql_limit=sql_limit,
     )
     qs = models.Film.objects.raw(sql, additional_param)
-    # print qs.query.sql
     return qs, nice_filters
 
 
