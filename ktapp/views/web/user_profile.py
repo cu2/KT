@@ -248,12 +248,26 @@ def user_toplists(request, id, name_slug):
     toplists = models.UserToplist.objects.filter(created_by=selected_user).order_by('-created_at')
     toplist_details = []
     for toplist in toplists:
-        toplist_list = []
-        with_comments = False
-        for item in models.UserToplistItem.objects.filter(usertoplist=toplist).select_related('film', 'director', 'actor').order_by('serial_number'):
-            toplist_list.append(item)
-            if item.comment:
-                with_comments = True
+        if toplist.toplist_type == models.UserToplist.TOPLIST_TYPE_FILM:
+            items, _ = filmlist.filmlist(
+                user_id=request.user.id,
+                filters=[('usertoplist_id', toplist.id)],
+                ordering='serial_number',
+                films_per_page=None,
+            )
+            toplist_list = []
+            with_comments = False
+            for item in items:
+                toplist_list.append(item)
+                if item.comment:
+                    with_comments = True
+        else:
+            toplist_list = []
+            with_comments = False
+            for item in models.UserToplistItem.objects.filter(usertoplist=toplist).select_related('director', 'actor').order_by('serial_number'):
+                toplist_list.append(item)
+                if item.comment:
+                    with_comments = True
         toplist_details.append((
             toplist,
             toplist_list,

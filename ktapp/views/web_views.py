@@ -892,12 +892,32 @@ def usertoplists(request):
 
 def usertoplist(request, id, title_slug):
     toplist = get_object_or_404(models.UserToplist, pk=id)
-    toplist_list = []
-    with_comments = False
-    for item in models.UserToplistItem.objects.filter(usertoplist=toplist).select_related('film', 'director', 'actor').order_by('serial_number'):
-        toplist_list.append(item)
-        if item.comment:
-            with_comments = True
+    if toplist.toplist_type == models.UserToplist.TOPLIST_TYPE_FILM:
+        items, _ = filmlist.filmlist(
+            user_id=request.user.id,
+            filters=[('usertoplist_id', toplist.id)],
+            ordering='serial_number',
+            films_per_page=None,
+        )
+        toplist_list = []
+        with_comments = False
+        for item in items:
+            toplist_list.append(item)
+            if item.comment:
+                with_comments = True
+    else:
+        toplist_list = []
+        with_comments = False
+        for item in models.UserToplistItem.objects.filter(usertoplist=toplist).select_related('director', 'actor').order_by('serial_number'):
+            toplist_list.append(item)
+            if item.comment:
+                with_comments = True
+    # toplist_list = []
+    # with_comments = False
+    # for item in models.UserToplistItem.objects.filter(usertoplist=toplist).select_related('film', 'director', 'actor').order_by('serial_number'):
+    #     toplist_list.append(item)
+    #     if item.comment:
+    #         with_comments = True
     return render(request, 'ktapp/usertoplist.html', {
         'toplist': toplist,
         'toplist_list': toplist_list,

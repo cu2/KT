@@ -1,0 +1,52 @@
+{% load kt_extras %}
+
+<table class="fullsize">
+    <tr class="header_tr">
+        {% if toplist.ordered %}
+            <th>#</th>
+        {% endif %}
+        {% if toplist.toplist_type == 'F' %}
+            <th>Film</th>
+            <th>Rendező</th>
+            <th>Műfaj</th>
+            <th>Nézettség</th>
+            <th>Átlag</th>
+            {% if request.user.is_authenticated %}
+                <th>Kedvenceid</th>
+                <th>Szerinted</th>
+                <th>&#9733;</th>
+            {% endif %}
+        {% else %}
+            <th>{% if toplist.toplist_type == 'A' %}Színész{% else %}Rendező{% endif %}</th>
+        {% endif %}
+        {% if with_comments %}
+            <th>Megjegyzés</th>
+        {% endif %}
+    </tr>
+    {% for item in toplist_list %}
+        <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+            {% if toplist.ordered %}
+                <td class="center">{{ forloop.counter }}</td>
+            {% endif %}
+            {% if toplist.toplist_type == 'F' %}
+                <td class="nowrap">{{ item|film_url_html_w_year }}</td>
+                <td>{{ item|film_directors }}</td>
+                <td>{{ item|film_genres }}</td>
+                <td class="center">{{ item|film_num_rating_html }}</td>
+                <td class="center">{{ item|film_avg_rating_html }}</td>
+                {% if request.user.is_authenticated %}
+                    <td class="center">{{ item|film_fav_rating_html }}</td>
+                    <td class="center">{% if item.my_rating %}{{ item.my_rating }}{% endif %}</td>
+                    <td class="center wish{% if item.my_wish == 1 %}_active{% endif %}"><span data-id="{{ item.id }}">{% if item.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+                {% endif %}
+            {% elif toplist.toplist_type == 'A' %}
+                <td class="nowrap"><a href="{% url 'artist' item.actor.id item.actor.slug_cache %}">{{ item.actor.name }}</a></td>
+            {% else %}
+                <td class="nowrap"><a href="{% url 'artist' item.director.id item.director.slug_cache %}">{{ item.director.name }}</a></td>
+            {% endif %}
+            {% if with_comments %}
+                <td>{{ item.comment }}</td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+</table>

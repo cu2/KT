@@ -211,6 +211,27 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     additional_param.append(num_comment_interval[0])
                     additional_param.append(num_comment_interval[1])
                     nice_filters.append((filter_type, filter_value))
+            if filter_type == 'usertoplist_id':
+                try:
+                    usertoplist = models.UserToplist.objects.get(id=filter_value)
+                except models.UserToplist.DoesNotExist:
+                    usertoplist = None
+                if usertoplist:
+                    additional_select.append('''
+                        {table_name}.serial_number AS serial_number,
+                        {table_name}.comment AS comment,
+                    '''.format(
+                        table_name='utli',
+                    ))
+                    additional_inner_joins.append('''
+                        INNER JOIN ktapp_usertoplistitem {table_name}
+                        ON {table_name}.film_id = f.id
+                        AND {table_name}.usertoplist_id = {usertoplist_id}
+                    '''.format(
+                        table_name='utli',
+                        usertoplist_id=usertoplist.id,
+                    ))
+                    nice_filters.append((filter_type, filter_value))
             if filter_type == 'wished_by_id':
                 wish_type, wished_by_id = filter_value.split(':')
                 try:
@@ -364,6 +385,8 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
             order_fields = ['other_rating_when', 'other_rating_id', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'number_of_comments':
             order_fields = ['f.number_of_comments', 'f.orig_title', 'f.year', 'f.id']
+        if order_field == 'serial_number':
+            order_fields = ['utli.serial_number', 'f.orig_title', 'f.year', 'f.id']
         if order_fields:
             order_by = ', '.join(['%s %s' % (order_fields[0], order_order)] + [of for of in order_fields[1:]])
     if page:

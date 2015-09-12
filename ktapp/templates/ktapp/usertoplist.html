@@ -9,44 +9,7 @@
 {% endblock %}
 
 {% block main %}
-    <div class="centered_content">
 
-        <table class="fullsize">
-            <tr class="header_tr">
-                {% if toplist.ordered %}
-                    <th>#</th>
-                {% endif %}
-                {% if toplist.toplist_type == 'F' %}
-                    <th>Film</th>
-                    <th>Rendező</th>
-                    <th>Átlag</th>
-                {% else %}
-                    <th>{% if toplist.toplist_type == 'A' %}Színész{% else %}Rendező{% endif %}</th>
-                {% endif %}
-                {% if with_comments %}
-                    <th>Megjegyzés</th>
-                {% endif %}
-            </tr>
-            {% for item in toplist_list %}
-                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
-                    {% if toplist.ordered %}
-                        <td class="center">{{ forloop.counter }}</td>
-                    {% endif %}
-                    {% if toplist.toplist_type == 'F' %}
-                        <td class="nowrap">{{ item.film|film_url_html_w_year }}</td>
-                        <td>{{ item.film|film_directors }}</td>
-                        <td class="center">{{ item.film|film_rating_html }}</td>
-                    {% elif toplist.toplist_type == 'A' %}
-                        <td class="nowrap"><a href="{% url 'artist' item.actor.id item.actor.slug_cache %}">{{ item.actor.name }}</a></td>
-                    {% else %}
-                        <td class="nowrap"><a href="{% url 'artist' item.director.id item.director.slug_cache %}">{{ item.director.name }}</a></td>
-                    {% endif %}
-                    {% if with_comments %}
-                        <td>{{ item.comment }}</td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-        </table>
+        {% include 'ktapp/tables/usertoplist.html' %}
 
-    </div>
 {% endblock %}

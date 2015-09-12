@@ -15,14 +15,24 @@
                     <th data-sort="string">Toplista</th>
                     <th data-sort="string">Felhasználó</th>
                     <th data-sort="string" data-sort-default="desc">Mikor</th>
+                    <th data-sort="string">Típus</th>
                 </tr>
             </thead>
             <tbody>
             {% for utl in usertoplists %}
                 <tr class="{% cycle '' 'odd' %}">
-                    <td><a href="{% url 'usertoplist' utl.id utl.slug_cache %}">{{ utl.title }}</a></td>
+                    <td><a href="{% url 'usertoplist' utl.id utl.slug_cache %}">{% if utl.quality %}<b>{% endif %}{{ utl.title }}{% if utl.quality %}</b>{% endif %}</a></td>
                     <td><a href="{% url 'user_profile' utl.created_by.id utl.created_by.slug_cache %}">{{ utl.created_by }}</a></td>
                     <td class="nowrap">{{ utl.created_at|date:"Y-m-d" }}</td>
+                    <td>
+                        {% if utl.toplist_type == 'F' %}
+                            filmek
+                        {% elif utl.toplist_type == 'A' %}
+                            színészek
+                        {% else %}
+                            rendezők
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>
