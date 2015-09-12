@@ -90,9 +90,9 @@ def check_permission(perm, user, silent=True):
         }.get(perm, perm)
         if grp == 'admin' and user.is_staff:
             return True
-        if grp == 'reliable' and user.is_reliable or user.is_staff:
+        if grp == 'reliable' and (user.is_reliable or user.is_staff):
             return True
-        if grp == 'core' and user.core_member or user.is_reliable or user.is_staff:
+        if grp == 'core' and (user.core_member or user.is_reliable or user.is_staff):
             return True
     if silent:
         return False
