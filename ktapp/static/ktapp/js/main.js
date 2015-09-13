@@ -1,5 +1,5 @@
 $(function() {
-    $('tr').on('click', 'span', function() {
+    $('tr').on('click', 'td.wish span, td.wish_active span', function() {
         var parent_td = $(this).closest('td');
         if (parent_td.hasClass('wish')) {
             $(this).closest('td').removeClass('wish').addClass('wish_active');
