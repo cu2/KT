@@ -128,6 +128,7 @@
                         <li><a href="{% url 'latest_pictures' %}">Képek</a></li>
                         <li><a href="{% url 'list_of_reviews' %}">Elemzések</a></li>
                         <li><a href="{% url 'list_of_bios' %}">Portrék</a></li>
+                        <li><a href="{% url 'awards' %}">Díjak</a></li>
                     </ul>
                 </li>
                 {% if user.is_authenticated and user.is_staff or user.is_reliable %}

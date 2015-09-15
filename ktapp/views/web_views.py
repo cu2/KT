@@ -970,6 +970,17 @@ def sequel(request, id, title_slug):
     })
 
 
+def awards(request):
+    award_name = request.GET.get('dij', '')
+    if award_name:
+        award_list = models.Award.objects.filter(name=award_name).select_related('film', 'artist').order_by('-year', 'category')
+    else:
+        award_list = models.Award.objects.values('name').distinct().order_by('name')
+    return render(request, 'ktapp/awards.html', {
+        'award_name': award_name,
+        'award_list': award_list,
+    })
+
 
 def old_url(request):
     print request.path

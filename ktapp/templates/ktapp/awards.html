@@ -1,0 +1,59 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Díjak - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    {% if award_name %}
+        <h1>{{ award_name }}<span class="small_heading_2"> (<a href="{% url 'awards' %}">összes díj</a>)</span></h1>
+    {% else %}
+        <h1>Díjak</h1>
+    {% endif %}
+{% endblock %}
+
+{% block main %}
+    <div class="centered_content">
+
+        {% if award_name %}
+            <table class="fullsize sortable">
+                <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Év</th>
+                    <th data-sort="string">Kategória</th>
+                    <th data-sort="string">Film</th>
+                    <th data-sort="string">Művész/Megjegyzés</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for award in award_list %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td class="center">{{ award.year }}</td>
+                        <td>{{ award.category }}</td>
+                        <td>{{ award.film|film_url_html_w_year }}</td>
+                        <td>
+                            {% if award.artist %}<a href="{% url 'artist' award.artist.id award.artist.slug_cache %}">{{ award.artist.name }}</a>{% endif %}
+                            {{ award.note }}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <table class="fullsize sortable">
+                <thead>
+                <tr class="header_tr">
+                    <th data-sort="string">Díj</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for award in award_list %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td><a href="{% url 'awards' %}?dij={{ award.name|urlquote_plus }}">{{ award.name }}</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+    </div>
+{% endblock %}

@@ -114,6 +114,7 @@ urlpatterns += patterns(
     url(r'^kepek/$', web_views.latest_pictures, name='latest_pictures'),
     url(r'^idezetek/$', web_views.latest_quotes, name='latest_quotes'),
     url(r'^erdekessegek/$', web_views.latest_trivias, name='latest_trivias'),
+    url(r'^dijak/$', web_views.awards, name='awards'),
 
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', user_profile_views.user_films, name='user_films'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', user_profile_views.user_comments, name='user_comments'),
