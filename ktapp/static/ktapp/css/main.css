@@ -75,7 +75,7 @@
         z-index: 20;
         top: 45px; bottom: 0;
         width: 160px;
-        font-size: 12pt;
+        font-size: 10pt;
     }
 }
 
@@ -97,7 +97,7 @@
     padding-top: 4px;
     padding-left: 35px;
     font-weight: bold;
-    font-size: 15pt;
+    font-size: 14pt;
 }
 #mobilelogo a {
     display: inline-block;
@@ -107,7 +107,7 @@
     padding-top: 4px;
     padding-left: 35px;
     font-weight: bold;
-    font-size: 15pt;
+    font-size: 14pt;
 }
 
 
@@ -167,9 +167,16 @@ footer ul li {
     margin: 0 auto;
     width: 100%;
 }
+.centered_content_wide {
+    margin: 0 auto;
+    width: 100%;
+}
 @media (min-width: 800px) {
     .centered_content {
         width: 70%;
+    }
+    .centered_content_wide {
+        width: 80%;
     }
 }
 
@@ -240,7 +247,7 @@ body {
 }
 @media (min-width: 800px) {
     body {
-        font-size: 12pt;
+        font-size: 10pt;
     }
 }
 
@@ -268,11 +275,11 @@ footer ul {
 
 
 h1 {
-    font-size: 15pt;
+    font-size: 14pt;
     font-weight: bold;
 }
 h2 {
-    font-size: 13pt;
+    font-size: 12pt;
     font-weight: bold;
 }
 h3 {
@@ -282,13 +289,13 @@ h3 {
 }
 @media (min-width: 800px) {
     h1 {
-        font-size: 20pt;
+        font-size: 14pt;
     }
     h2 {
-        font-size: 16pt;
+        font-size: 12pt;
     }
     h3 {
-        font-size: 12pt;
+        font-size: 10pt;
     }
 }
 
@@ -361,10 +368,10 @@ input.inactive_action {
 }
 @media (min-width: 800px) {
     .small_button {
-        font-size: 9pt;
+        font-size: 8pt;
     }
     .small_button_selected {
-        font-size: 9pt;
+        font-size: 8pt;
     }
 }
 #toptopmenu .small_button {
@@ -466,7 +473,7 @@ table.fullsize {
     width: 100%;
 }
 .td_sub {
-    font-size: 7pt;
+    font-size: 9pt;
 }
 tr.selected_film_tr {
     font-weight: bold;
@@ -577,7 +584,7 @@ ul.poll li {
 }
 @media (min-width: 800px) {
     #tabs ul li {
-        font-size: 11pt;
+        font-size: 10pt;
     }
     .tab_count {
         font-size: 8pt;
@@ -622,7 +629,7 @@ ul.poll li {
     background: rgb(218,211,184);
     margin: 0;
     padding: 2px 5px;
-    font-size: 9pt;
+    font-size: 8pt;
     overflow: auto;
 }
 .comment_block_author_right {
@@ -630,7 +637,7 @@ ul.poll li {
 }
 .comment_block_reply_to {
     text-align: right;
-    font-size: 9pt;
+    font-size: 8pt;
 }
 .comment_block_reply_to p span {
     border-top: solid rgb(0,0,0) 1px;
@@ -659,14 +666,14 @@ ul.poll li {
     background: rgb(218,211,184);
     margin: 0;
     padding: 2px 5px;
-    font-size: 9pt;
+    font-size: 8pt;
     overflow: auto;
 }
 .film_addon_author {
     background: rgb(218,211,184);
     margin: 0;
     padding: 2px 5px;
-    font-size: 9pt;
+    font-size: 8pt;
     text-align: right;
     overflow: auto;
 }
@@ -674,14 +681,14 @@ ul.poll li {
     background: rgb(218,211,184);
     margin: 0;
     padding: 2px 5px;
-    font-size: 9pt;
+    font-size: 8pt;
     overflow: auto;
 }
 .portrait_author {
     background: rgb(218,211,184);
     margin: 0;
     padding: 2px 5px;
-    font-size: 9pt;
+    font-size: 8pt;
     overflow: auto;
 }
 
@@ -733,7 +740,7 @@ ul.poll li {
 
 @media (min-width: 800px) {
     #film_header h1 {
-        font-size: 16pt;
+        font-size: 14pt;
     }
     #film_header h2 {
         font-size: 12pt;
@@ -771,7 +778,7 @@ ul.poll li {
         font-size: 8pt;
     }
     #film_rating_avg {
-        font-size: 16pt;
+        font-size: 14pt;
     }
 }
 
