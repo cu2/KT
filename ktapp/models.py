@@ -132,7 +132,7 @@ class Film(models.Model):
     number_of_ratings_3 = models.PositiveIntegerField(default=0)
     number_of_ratings_4 = models.PositiveIntegerField(default=0)
     number_of_ratings_5 = models.PositiveIntegerField(default=0)
-    number_of_ratings = models.PositiveIntegerField(default=0)
+    number_of_ratings = models.PositiveIntegerField(default=0, db_index=True)
     average_rating = models.DecimalField(default=0, max_digits=2, decimal_places=1, blank=True, null=True)
     number_of_quotes = models.PositiveIntegerField(default=0)
     number_of_trivias = models.PositiveIntegerField(default=0)

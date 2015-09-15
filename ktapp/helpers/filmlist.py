@@ -365,7 +365,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
         if order_field == 'genre':
             order_fields = ['f.genre_names_cache', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'number_of_ratings':
-            order_fields = ['f.number_of_ratings', 'f.orig_title', 'f.year', 'f.id']
+            order_fields = ['f.number_of_ratings']  # so that index can be used
         if order_field == 'average_rating':
             order_fields = ['f.average_rating', 'f.number_of_ratings DESC', 'f.orig_title', 'f.year', 'f.id']
         if user_id:

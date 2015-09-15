@@ -93,7 +93,7 @@ def premiers(request):
 def browse(request):
     ordering_str = kt_utils.strip_whitespace(request.GET.get('o', ''))
     if ordering_str == '':
-        ordering_str = '-average_rating'
+        ordering_str = '-number_of_ratings'
     if ordering_str[0] == '-':
         ordering = (ordering_str[1:], 'DESC')
     else:
