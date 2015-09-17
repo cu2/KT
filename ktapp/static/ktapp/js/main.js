@@ -1,4 +1,18 @@
 $(function() {
+    $('.move_to_off').click(function() {
+        var list_of_ids = '';
+        $('.comment_to_move_to_off:checked').each(function() {
+            list_of_ids += $(this).data('id') + ',';
+        });
+        $.post('offba', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            list_of_ids: list_of_ids
+        }, function(data) {
+            if (data.success) {
+                document.location.reload();
+            }
+        });
+    });
     $('tr').on('click', 'td.wish span, td.wish_active span', function() {
         var parent_td = $(this).closest('td');
         if (parent_td.hasClass('wish')) {

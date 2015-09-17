@@ -816,3 +816,51 @@ def new_poll(request):
             serial_number=idx + 1,
         )
     return HttpResponseRedirect(reverse('polls') + '?tipus=leendo')
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('admin')
+def move_to_off(request):
+    off_topic = models.Topic.objects.get(id=87)
+    domain_object = None
+    domain = ''
+    for id_str in kt_utils.strip_whitespace(request.POST.get('list_of_ids', '')).split(','):
+        id_str = kt_utils.strip_whitespace(id_str)
+        if id_str == '':
+            continue
+        try:
+            comment = models.Comment.objects.get(id=id_str)
+        except models.Comment.DoesNotExist:
+            comment = None
+        if comment:
+            if domain_object is None:
+                domain = comment.domain
+                if comment.domain == models.Comment.DOMAIN_FILM:
+                    domain_object = comment.film
+                    url = request.build_absolute_uri(reverse('film_comments', args=(domain_object.id, domain_object.slug_cache)))
+                    link_text = domain_object.orig_title
+                elif comment.domain == models.Comment.DOMAIN_TOPIC:
+                    domain_object = comment.topic
+                    url = request.build_absolute_uri(reverse('topic', args=(domain_object.id, domain_object.slug_cache)))
+                    link_text = domain_object.title
+                elif comment.domain == models.Comment.DOMAIN_POLL:
+                    domain_object = comment.poll
+                    url = request.build_absolute_uri(reverse('poll', args=(domain_object.id, domain_object.slug_cache)))
+                    link_text = domain_object.title
+            if domain_object is None:
+                continue
+            comment.domain = 'T'
+            comment.topic = off_topic
+            comment.film_id = None
+            comment.poll_id = None
+            comment.rating = None
+            comment.content += u'\n\n--\nÁthelyezve a(z) [link={url}]{link_text}[/link] topikból.'.format(
+                url=url,
+                link_text=link_text,
+            )
+            comment.save()
+    if domain_object:
+        models.Comment.fix_comments(domain, domain_object)
+        models.Comment.fix_comments('T', off_topic)
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')

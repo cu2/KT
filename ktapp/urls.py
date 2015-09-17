@@ -81,6 +81,7 @@ urlpatterns += patterns(
     url(r'^szerk_kulcsszavak$', post_views.edit_keywords, name='edit_keywords'),
     url(r'^szerk_folytatasok$', post_views.edit_sequels, name='edit_sequels'),
     url(r'^uj_dij$', post_views.new_award, name='new_award'),
+    url(r'^offba$', post_views.move_to_off, name='move_to_off'),
 
     url(r'^valtozasok/$', web_views.changes, name='changes'),
 

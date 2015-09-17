@@ -11,9 +11,9 @@
             {% endif %}</span>
             <span class="comment_block_author_right">
                 {% if request.user.is_authenticated %}
-                    <a href="{% if comment.domain == 'F' %}{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'T' %}{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'P' %}{% url 'poll' comment.poll.id comment.poll.slug_cache %}?valasz={{ comment.id }}{% endif %}">&larr;</a>&nbsp;
+                    <a href="{% if comment.domain == 'F' %}{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'T' %}{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'P' %}{% url 'poll' comment.poll.id comment.poll.slug_cache %}?valasz={{ comment.id }}{% endif %}" title="válasz erre a kommentre">&larr;</a>&nbsp;
                     {% if request.user.is_staff or comment.editable and comment.created_by.id == request.user.id %}
-                        (<span class="action_text show_comment_edit_form">szerk</span>)&nbsp;
+                        (<span class="action_text show_comment_edit_form" title="komment szerkesztése">szerk</span>)&nbsp;
                     {% endif %}
                 {% endif %}
                 {% if comment.created_by %}<a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% endif %}
@@ -26,12 +26,15 @@
             {% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}
             <span class="comment_block_author_right">
                 {% if request.user.is_authenticated %}
-                    <a href="{% if comment.domain == 'F' %}{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'T' %}{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'P' %}{% url 'poll' comment.poll.id comment.poll.slug_cache %}?valasz={{ comment.id }}{% endif %}">&larr;</a>&nbsp;
+                    <a href="{% if comment.domain == 'F' %}{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'T' %}{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'P' %}{% url 'poll' comment.poll.id comment.poll.slug_cache %}?valasz={{ comment.id }}{% endif %}" title="válasz erre a kommentre">&larr;</a>&nbsp;
                     {% if request.user.is_staff or comment.editable and comment.created_by.id == request.user.id %}
-                        (<span class="action_text show_comment_edit_form">szerk</span>)&nbsp;
+                        (<span class="action_text show_comment_edit_form" title="komment szerkesztése">szerk</span>)&nbsp;
                     {% endif %}
                 {% endif %}
                 #{{ comment.serial_number }}
+                {% if request.user.is_authenticated and request.user.is_staff and comment.domain == 'F' %}
+                    <input type="checkbox" class="comment_to_move_to_off" data-id="{{ comment.id }}" title="ikszeld be, ha OFF-ba szeretnéd mozgatni" />
+                {% endif %}
             </span>
         {% endif %}
     </div>

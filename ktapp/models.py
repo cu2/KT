@@ -376,6 +376,42 @@ class Comment(models.Model):
             self.created_by.number_of_comments = self.created_by.comment_set.count()
             self.created_by.save()
 
+    @classmethod
+    def fix_comments(cls, domain, domain_object):
+        if domain == cls.DOMAIN_FILM:
+            domain_id_field = 'film_id'
+        elif domain == cls.DOMAIN_TOPIC:
+            domain_id_field = 'topic_id'
+        elif domain == cls.DOMAIN_POLL:
+            domain_id_field = 'poll_id'
+        else:
+            return
+        cursor = connection.cursor()
+        cursor.execute('''
+            UPDATE
+              ktapp_comment c, (
+                SELECT
+                  c.id, @a:=@a+1 AS serial_number
+                FROM
+                  ktapp_comment c,
+                  (SELECT @a:= 0) AS a
+                WHERE
+                  domain = '{domain}'
+                  AND {domain_id_field} = {domain_id}
+                ORDER BY
+                  c.created_at, c.id
+              ) t
+            SET c.serial_number = t.serial_number
+            WHERE c.id = t.id
+        '''.format(
+            domain=domain,
+            domain_id_field=domain_id_field,
+            domain_id=domain_object.id,
+        ))
+        domain_object.number_of_comments = domain_object.comment_set.count()
+        domain_object.last_comment = domain_object.comment_set.latest()
+        domain_object.save()
+
 
 @receiver(post_delete, sender=Comment)
 def delete_comment(sender, instance, **kwargs):
