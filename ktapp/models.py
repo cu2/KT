@@ -409,7 +409,10 @@ class Comment(models.Model):
             domain_id=domain_object.id,
         ))
         domain_object.number_of_comments = domain_object.comment_set.count()
-        domain_object.last_comment = domain_object.comment_set.latest()
+        if domain_object.number_of_comments:
+            domain_object.last_comment = domain_object.comment_set.latest()
+        else:
+            domain_object.last_comment = None
         domain_object.save()
 
 
