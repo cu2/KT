@@ -5,9 +5,7 @@
             handleFunction(mockObject);
         } else {
             loaderTimerId = setTimeout(loaderTimer, 100);
-            var host = 'localhost:8000';
-            var host = 'kritikustomeg.org';
-            $.get('http://' + host + url, function(data) {
+            $.get(url, function(data) {
                 clearTimeout(loaderTimerId);
                 handleFunction(data);
                 $('#loader').hide();
@@ -91,7 +89,7 @@
     function loadBuzz() {
         mockObject = BUZZ;
         mockObject = null;
-        loadData('/api/buzz', function(data) {
+        loadData('/api/buzz/', function(data) {
             var x = '';
             for(var i=0; i < data.length; i++) {
                 var comment = data[i];
