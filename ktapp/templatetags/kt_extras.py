@@ -102,11 +102,11 @@ def film_rating_html(film, with_count=True):
         avg_rating = round(film.average_rating, 1)
     if with_count:
         return mark_safe(u'{avg_rating}<br />\n<span class="td_sub">({num_rating})</span>'.format(
-            avg_rating=avg_rating,
+            avg_rating=unicode(avg_rating).replace('.', ','),
             num_rating=film.number_of_ratings,
         ))
     return mark_safe(u'{avg_rating}'.format(
-        avg_rating=avg_rating,
+        avg_rating=unicode(avg_rating).replace('.', ','),
     ))
 
 
@@ -147,11 +147,11 @@ def film_fav_rating_html(film, with_count=True):
         avg_rating = round(film.fav_average_rating, 1)
     if with_count:
         return mark_safe(u'{avg_rating}<br />\n<span class="td_sub">({num_rating})</span>'.format(
-            avg_rating=avg_rating,
+            avg_rating=unicode(avg_rating).replace('.', ','),
             num_rating=film.fav_number_of_ratings,
         ))
     return mark_safe(u'{avg_rating}'.format(
-        avg_rating=avg_rating,
+        avg_rating=unicode(avg_rating).replace('.', ','),
     ))
 
 
