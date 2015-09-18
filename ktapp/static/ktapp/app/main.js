@@ -5,7 +5,9 @@
             handleFunction(mockObject);
         } else {
             loaderTimerId = setTimeout(loaderTimer, 100);
-            $.get(url, function(data) {
+            var host = 'localhost:8000';
+            var host = 'kritikustomeg.org';
+            $.get('http://' + host + url, function(data) {
                 clearTimeout(loaderTimerId);
                 handleFunction(data);
                 $('#loader').hide();
