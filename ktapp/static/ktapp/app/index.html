@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>KT</title>
+        <link rel="stylesheet" type="text/css" href="normalize.css" />
+        <link rel="stylesheet" type="text/css" href="main.css" />
+        <script src="jquery-1.11.2.min.js"></script>
+        <script src="main.js"></script>
+    </head>
+    <body>
+        <div id="container">
+            <div id="status-bar">
+                <div id="logo">KT</div>
+                <div id="title">Kritikus Tömeg</div>
+                <div id="search">SR</div>
+            </div>
+            <div class="page active-page" id="page-index">
+                <ul class="main-navigation">
+                    <li class="tab active-tab" id="tab-index-buzz">Buzz
+                    </li><li class="tab" id="tab-index-comments">Közösség
+                    </li><li class="tab" id="tab-index-top">Top
+                    </li><li class="tab" id="tab-index-compass">Iránytű</li>
+                </ul>
+                <section class="main-content active-main-content" id="main-content-index-buzz">
+                    <p>Comment 1</p>
+                    <p>Comment 2</p>
+                    <p>Comment 3</p>
+                    <p>Comment 4</p>
+                    <p>Comment 5</p>
+                </section>
+                <section class="main-content" id="main-content-index-comments">
+                    <p>Vote 1</p>
+                    <p>Vote 2</p>
+                    <p>Vote 3</p>
+                    <p>Vote 4</p>
+                    <p>Vote 5</p>
+                </section>
+                <section class="main-content" id="main-content-index-top">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cím</th>
+                                <th>Átlag</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Valami</td>
+                                <td>4.9</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+                <section class="main-content" id="main-content-index-compass">
+                    <p>I'm feeling lucky</p>
+                </section>
+            </div>
+            <div class="page" id="page-film">
+                <ul class="main-navigation">
+                    <li class="tab active-tab" id="tab-film-main">Adatok</li>
+                    <li class="tab" id="tab-film-comments">Kommentek</li>
+                    <li class="tab" id="tab-film-pictures">Képek</li>
+                    <li class="tab" id="tab-film-misc">Egyéb</li>
+                </ul>
+                <section class="main-content active-main-content" id="main-content-film-main">
+                    <h1><span id="orig_title"></span> (<span id="year"></span>)</h1>
+                    <h2 id="other_titles"></h2>
+                    <p>(<span id="director"></span>)</p>
+                    <p>
+                        <span id="countries"></span>
+                        <span id="genres"></span>
+                    </p>
+                    <p>Átlag: <span id="avg_rating"></span> (<span id="num_rating"></span> szavazat)</p>
+                    <ul class="barchart">
+                        <li><span class="bar" id="rating_bar_5"></span><span class="bar_label"><span id="number_of_ratings_5"></span> zseniális</span></li>
+                        <li><span class="bar" id="rating_bar_4"></span><span class="bar_label"><span id="number_of_ratings_4"></span> jó</span></li>
+                        <li><span class="bar" id="rating_bar_3"></span><span class="bar_label"><span id="number_of_ratings_3"></span> oké/elmegy</span></li>
+                        <li><span class="bar" id="rating_bar_2"></span><span class="bar_label"><span id="number_of_ratings_2"></span> rossz</span></li>
+                        <li><span class="bar" id="rating_bar_1"></span><span class="bar_label"><span id="number_of_ratings_1"></span> nézhetetlen</span></li>
+                    </ul>
+                    <p id="plot_summary"></p>
+                </section>
+                <section class="main-content" id="main-content-film-comments">
+                    <p>Comment 1</p>
+                    <p>Comment 2</p>
+                    <p>Comment 3</p>
+                    <p>Comment 4</p>
+                    <p>Comment 5</p>
+                </section>
+                <section class="main-content" id="main-content-film-pictures">
+                    <p>Pic 1</p>
+                    <p>Pic 2</p>
+                    <p>Pic 3</p>
+                </section>
+                <section class="main-content" id="main-content-film-misc">
+                    <p>Misc</p>
+                </section>
+            </div>
+        </div>
+        <div id="loader">LOADING...</div>
+    </body>
+</html>

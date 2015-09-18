@@ -342,16 +342,18 @@ class Comment(models.Model):
             ['created_by', 'serial_number_by_user', 'created_at'],
         ]
 
-    def editable(self):
+    @property
+    def domain_object(self):
         if self.domain == Comment.DOMAIN_FILM:
-            domain = self.film
+            return self.film
         elif self.domain == Comment.DOMAIN_TOPIC:
-            domain = self.topic
+            return self.topic
         elif self.domain == Comment.DOMAIN_POLL:
-            domain = self.poll
-        else:
-            return False
-        return domain.last_comment_id == self.id
+            return self.poll
+        raise Exception
+
+    def editable(self):
+        return self.domain_object.last_comment_id == self.id
 
     def save(self, *args, **kwargs):
         """Save comment and update domain object as well"""

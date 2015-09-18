@@ -32,6 +32,7 @@ urlpatterns = patterns(
     url(r'^api/autocomplete/films/$', api_views.get_films, name='get_films'),
     url(r'^api/autocomplete/sequels/$', api_views.get_sequels, name='get_sequels'),
     url(r'^api/autocomplete/awards/$', api_views.get_awards, name='get_awards'),
+    url(r'^api/buzz/$', api_views.buzz, name='buzz'),
 )
 
 

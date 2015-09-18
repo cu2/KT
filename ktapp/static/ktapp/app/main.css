@@ -1,0 +1,247 @@
+/* Samsung Galaxy Ace: 320x480 */
+
+html {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    background: rgb(228, 222, 195);
+    /*background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76LAAAAF0lEQVQYV2OMq7zlw4AHMOKTBMkNDwUADaQCBt1l9w4AAAAASUVORK5CYII=) repeat;*/
+    color: rgb(30, 30, 30);
+}
+
+#container {
+    font-size: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.page {
+    display: none;
+}
+.active-page {
+    display: block;
+}
+
+
+#status-bar {
+    width: 100%;
+    height: 47px; line-height: 48px;
+    border-bottom: solid rgb(176, 171, 150) 1px;
+    margin: 0;
+    padding: 0;
+    font-size: 24px;
+    background: rgb(201, 196, 172);
+    font-weight: bold;
+}
+
+#status-bar div {
+    position: absolute;
+    top: 0;
+    height: 47px;
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#logo {
+    left: 0;
+    width: 48px;
+    background: rgb(176, 171, 150);
+    cursor: pointer;
+    color: rgb(147, 24, 24);
+    text-align: center;
+}
+#title {
+    left: 48px; right: 48px;
+    padding: 0px 8px !important;
+}
+#search {
+    right: 0;
+    width: 48px;
+    background: rgb(176, 171, 150);
+    cursor: pointer;
+    color: rgb(147, 24, 24);
+    text-align: center;
+}
+
+
+.main-navigation {
+    width: 100%;
+    height: 47px; line-height: 48px;
+    border-bottom: solid rgb(176, 171, 150) 1px;
+    margin: 0;
+    padding: 0;
+    background: rgb(201, 196, 172);
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.main-navigation li {
+    display: inline-block;
+    width: 25%; height: 48px; line-height: 48px;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    cursor: pointer;
+    color: rgb(147, 24, 24);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.main-navigation li.active-tab {
+    color: rgb(0, 0, 0);
+    cursor: default;
+    border-bottom: solid rgb(176, 171, 150) 5px;
+    height: 43px;
+}
+
+
+
+.main-content {
+    display: none;
+    margin: 0;
+    padding: 8px;
+}
+
+.active-main-content {
+    display: block;
+}
+
+
+ul.barchart {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+ul.barchart li {
+    height: 24px;
+    line-height: 24px;
+    margin: 4px 0;
+}
+.bar {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    background: rgb(0, 0, 0);
+    color: rgb(228, 222, 195);
+    font-size: 8pt;
+    height: 24px;
+}
+.bar_label {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-left: 4px;
+}
+
+
+
+
+
+.comment_block {
+    margin: 20px 0 40px 0;
+    overflow: hidden;
+}
+.comment_block_content {
+    position: relative;
+    background: rgb(249,244,218);
+}
+.comment_block_content p {
+    margin: 0;
+    padding: 5px;
+}
+.comment_source {
+    font-weight: bold;
+}
+.comment_block_author {
+    background: rgb(218,211,184);
+    margin: 0;
+    padding: 2px 5px;
+    font-size: 10pt;
+    overflow: auto;
+}
+.comment_block_author_right {
+    float: right;
+}
+
+
+
+
+
+h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 22px;
+    line-height: 24px;
+}
+h2 {
+    margin: 0;
+    padding: 0;
+    font-size: 18px;
+    line-height: 24px;
+}
+p {
+    margin: 0;
+    padding: 0;
+}
+
+
+
+a {
+    color: rgb(147, 24, 24);
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+.link {
+    color: rgb(147, 24, 24);
+    cursor: pointer;
+}
+.link:hover {
+    text-decoration: underline;
+}
+
+button {
+    background: rgb(249, 244, 218);
+    border: solid rgb(128, 128, 128) 1px;
+    color: rgb(147, 24, 24);
+    padding: 5px;
+}
+button:hover {
+    background: rgb(201, 196, 172);
+}
+
+#loader {
+    display: none;
+    position: absolute;
+    left: 50%; top: 50%; z-index: 100;
+    background: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    padding: 5px;
+    border: solid rgb(0, 0, 0) 1px;
+}
+
+
+table {
+    border-collapse: collapse;
+}
+th {
+    margin: 1px !important;
+    background: rgb(176, 171, 150);
+}
+td {
+    margin: 1px;
+    background: rgb(201, 196, 172);
+}
+tr {
+    background: #E4DEC3;
+}

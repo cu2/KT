@@ -159,3 +159,32 @@ def get_awards(request):
         return HttpResponse(json.dumps(
             [a['category'] for a in models.Award.objects.filter(category__icontains=q).values('category').distinct()[:10]]
         ), content_type='application/json')
+
+
+def buzz(request):
+    buzz_comment_domains = {}
+    # for comment in models.Comment.objects.all()[:100]:
+    for comment in models.Comment.objects.filter(domain='F')[:100]:
+        key = (comment.domain, comment.film_id, comment.topic_id, comment.poll_id)
+        if key not in buzz_comment_domains:
+            buzz_comment_domains[key] = (comment.id, comment.created_at)
+        else:
+            if comment.created_at > buzz_comment_domains[key][1]:
+                buzz_comment_domains[key] = (comment.id, comment.created_at)
+    buzz_comment_ids = [id for id, _ in sorted(buzz_comment_domains.values(), key=lambda x: x[1], reverse=True)[:10]]
+    buzz_comments = []
+    for comment in models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids):
+        buzz_comments.append({
+            'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'content': comment.content_html,
+            'domain': comment.domain,
+            'domain_object': {
+                'id': comment.domain_object.id,
+                'title': getattr(comment.domain_object, 'orig_title', getattr(comment.domain_object, 'title', '???')),
+            },
+            'created_by': {
+                'id': comment.created_by.id,
+                'username': comment.created_by.username,
+            },
+        })
+    return HttpResponse(json.dumps(buzz_comments), content_type='application/json')
