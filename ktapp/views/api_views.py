@@ -28,14 +28,11 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 class FilmViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Film.objects.all()
     serializer_class = serializers.FilmSerializer
-    paginate_by = 10
-    paginate_by_param = 'page_size'
-    max_paginate_by = 100
 
 
 class KeywordViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Keyword.objects.all()
-    serializer_class = serializers.KeywordSerializer
+    serializer_class = serializers.ShortKeywordSerializer
 
 
 class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
