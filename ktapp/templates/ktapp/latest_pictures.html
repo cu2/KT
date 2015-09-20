@@ -9,7 +9,7 @@
 {% block main %}
 
     {% for p in pictures %}
-        <a href="{% url 'film_picture' p.film_id p.film_slug_cache p.id %}" title="{{ p.film_orig_title }} ({{ p.film_year }})"><img src="{{ p.get_display_urls.mid }}" class="picture" alt="{{ p.film_orig_title }} ({{ p.film_year }})" /></a>
+        <a href="{% url 'film_picture' p.film_id p.film_slug_cache p.id %}" title="{{ p.film_orig_title }} ({{ p.film_year }}){% if p.film_second_title %} / {{ p.film_second_title }}{% endif %}"><img src="{{ p.get_display_urls.mid }}" class="picture" alt="{{ p.film_orig_title }} ({{ p.film_year }}){% if p.film_second_title %} / {{ p.film_second_title }}{% endif %}" /></a>
     {% endfor %}
 
 {% endblock %}

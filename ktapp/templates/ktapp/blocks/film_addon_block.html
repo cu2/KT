@@ -2,11 +2,11 @@
     {% if show_addon_source %}
         <div class="film_addon_source">
             {% if addon_type == 'quote' %}
-                <a href="{% url 'film_quotes' addon.film.id addon.film.slug_cache %}">{{ addon.film.orig_title }}</a>
+                <a href="{% url 'film_quotes' addon.film.id addon.film.slug_cache %}">{{ addon.film.orig_title }} ({{ addon.film.year }}){% if addon.film.second_title %} / {{ addon.film.second_title }}{% endif %}</a>
             {% elif addon_type == 'trivia' %}
-                <a href="{% url 'film_trivias' addon.film.id addon.film.slug_cache %}">{{ addon.film.orig_title }}</a>
+                <a href="{% url 'film_trivias' addon.film.id addon.film.slug_cache %}">{{ addon.film.orig_title }} ({{ addon.film.year }}){% if addon.film.second_title %} / {{ addon.film.second_title }}{% endif %}</a>
             {% else %}
-                <a href="{% url 'film_main' addon.film.id addon.film.slug_cache %}">{{ addon.film.orig_title }}</a>
+                <a href="{% url 'film_main' addon.film.id addon.film.slug_cache %}">{{ addon.film.orig_title }} ({{ addon.film.year }}){% if addon.film.second_title %} / {{ addon.film.second_title }}{% endif %}</a>
             {% endif %}
         </div>
     {% endif %}

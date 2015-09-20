@@ -928,6 +928,7 @@ def latest_pictures(request):
           f.id AS film_id,
           f.slug_cache AS film_slug_cache,
           f.orig_title AS film_orig_title,
+          f.second_title AS film_second_title,
           f.year AS film_year
         FROM
           ktapp_picture p USE INDEX (ktapp_picture_created_at_3047bfe36ccde785_uniq)
