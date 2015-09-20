@@ -1,4 +1,8 @@
 $(function() {
+    $('.show_spoilers').click(function() {
+        $('.spoiler').removeClass('spoiler').addClass('visible_spoiler');
+        $('.show_spoilers_section').css('visibility', 'hidden');
+    });
     $('.move_to_off').click(function() {
         var list_of_ids = '';
         $('.comment_to_move_to_off:checked').each(function() {
@@ -411,5 +415,9 @@ $(function() {
         });
 
     $('.focus_this').focus();
+
+    $('.comment_block_content .spoiler').each(function() {
+        $('.show_spoilers_section').css('visibility', 'visible');
+    });
 
 });

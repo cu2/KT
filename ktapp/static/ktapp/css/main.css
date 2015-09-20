@@ -420,6 +420,12 @@ input.inactive_action {
 .spoiler * {
     color: rgb(249,244,218);
 }
+.visible_spoiler {
+    display: inline-block;
+    background: rgb(249,244,218);
+    border: solid 1px rgb(0, 0, 0);
+    padding: 2px;
+}
 .comment_img {
     max-width: 99%;
 }
