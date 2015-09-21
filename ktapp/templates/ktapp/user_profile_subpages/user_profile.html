@@ -13,6 +13,14 @@
             Súly{% if selected_user.id == user.id %}od{% endif %}: {{ vapiti_weight }}
         </p>
 
+        {% if profile.major_genres or profile.minor_genres %}
+            <p>
+                Műfaj{% if selected_user.id == user.id %}aid{% else %}ok{% endif %}:
+                {% if profile.major_genres %}{% for genre in profile.major_genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
+                {% if profile.minor_genres %}({% for genre in profile.minor_genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
+            </p>
+        {% endif %}
+
         {% if user.is_authenticated %}
             {% if selected_user.id == user.id %}
                 {% if selected_user.core_member %}

@@ -47,6 +47,23 @@ def user_profile(request, id, name_slug):
     number_of_vapiti_votes = selected_user.vote_set.filter(film__main_premier_year=this_year).count()
     latest_votes = [int(v) for v in selected_user.latest_votes.split(',') if v != ''][:10]
     latest_comments = [int(c) for c in selected_user.latest_comments.split(',') if c != ''][:10]
+    # profile
+    profile = {
+        'major_genres': [],
+        'minor_genres': [],
+    }
+    for keyword in models.Keyword.objects.raw('''
+        SELECT k.*, ups.score AS ups_score
+        FROM ktapp_userprofilesegment ups
+        INNER JOIN ktapp_profilesegment ps ON ps.id = ups.segment_id AND ps.dimension = 'genre'
+        LEFT JOIN ktapp_keyword k ON k.id = ps.segment
+        WHERE ups.user_id = {user_id} AND ups.score >= 50
+        ORDER BY ups.score DESC;
+    '''.format(user_id=selected_user.id)):
+        if keyword.ups_score >= 100:
+            profile['major_genres'].append(keyword)
+        else:
+            profile['minor_genres'].append(keyword)
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,
@@ -61,6 +78,7 @@ def user_profile(request, id, name_slug):
         'latest_votes': selected_user.vote_set.filter(id__in=latest_votes).select_related('film').order_by('-when', '-id'),
         'latest_comments': models.Comment.objects.filter(id__in=latest_comments).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by'),
         'myfav': models.Follow.objects.filter(who=request.user, whom=selected_user).count() if request.user.is_authenticated() else 0,
+        'profile': profile,
     })
 
 
