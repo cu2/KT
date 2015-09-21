@@ -160,6 +160,7 @@ class Film(models.Model):
     genres_cache = models.CharField(max_length=250, blank=True)
     director_names_cache = models.CharField(max_length=250, blank=True)
     genre_names_cache = models.CharField(max_length=250, blank=True)
+    number_of_genres = models.PositiveSmallIntegerField(default=0)
 
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'
@@ -861,6 +862,7 @@ class FilmKeywordRelationship(models.Model):
     def save(self, *args, **kwargs):
         super(FilmKeywordRelationship, self).save(*args, **kwargs)
         self.film.number_of_keywords = self.film.keyword_set.count()
+        self.film.number_of_genres = self.film.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE).count()
         if self.keyword.keyword_type == Keyword.KEYWORD_TYPE_GENRE:
             ids = []
             slugs = []
@@ -881,6 +883,7 @@ class FilmKeywordRelationship(models.Model):
 @receiver(post_delete, sender=FilmKeywordRelationship)
 def delete_filmkeyword(sender, instance, **kwargs):
     instance.film.number_of_keywords = instance.film.keyword_set.count()
+    instance.film.number_of_genres = instance.film.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE).count()
     if instance.keyword.keyword_type == Keyword.KEYWORD_TYPE_GENRE:
         ids = []
         slugs = []
@@ -1317,3 +1320,28 @@ class Change(models.Model):
     object = models.CharField(max_length=250)
     state_before = models.TextField(blank=True)
     state_after = models.TextField(blank=True)
+
+
+class ProfileSegment(models.Model):
+    dimension = models.CharField(max_length=250, blank=True, null=True)
+    segment = models.PositiveIntegerField()
+    effective_number_of_films = models.PositiveIntegerField(default=0)
+    ratio_of_films = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ['dimension', 'segment']
+
+    def __unicode__(self):
+        return u'%s:%s' % (self.dimension, self.segment)
+
+
+class UserProfileSegment(models.Model):
+    user = models.ForeignKey(KTUser)
+    segment = models.ForeignKey(ProfileSegment)
+    number_of_votes = models.PositiveIntegerField(default=0)
+    relative_number_of_votes = models.PositiveIntegerField(default=0)
+    ratio_of_films = models.PositiveIntegerField(default=0)
+    score = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ['user', 'segment']
