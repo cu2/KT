@@ -11,15 +11,15 @@
             Kompetenci{% if selected_user.id == user.id %}ád{% else %}a{% endif %}: {{ number_of_vapiti_votes }} film
             <br />
             Súly{% if selected_user.id == user.id %}od{% endif %}: {{ vapiti_weight }}
+            <br />
+            Műfajok:
+            {% if profile.major_genres %}{% for genre in profile.major_genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
+            {% if profile.minor_genres %}({% for genre in profile.minor_genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
+            <br />
+            Országok:
+            {% if profile.major_countries %}{% for country in profile.major_countries %}{{ country.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
+            {% if profile.minor_countries %}({% for country in profile.minor_countries %}{{ country.name }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
         </p>
-
-        {% if profile.major_genres or profile.minor_genres %}
-            <p>
-                Műfaj{% if selected_user.id == user.id %}aid{% else %}ok{% endif %}:
-                {% if profile.major_genres %}{% for genre in profile.major_genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
-                {% if profile.minor_genres %}({% for genre in profile.minor_genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
-            </p>
-        {% endif %}
 
         {% if user.is_authenticated %}
             {% if selected_user.id == user.id %}

@@ -161,6 +161,7 @@ class Film(models.Model):
     director_names_cache = models.CharField(max_length=250, blank=True)
     genre_names_cache = models.CharField(max_length=250, blank=True)
     number_of_genres = models.PositiveSmallIntegerField(default=0)
+    number_of_countries = models.PositiveSmallIntegerField(default=0)
 
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'
@@ -863,6 +864,7 @@ class FilmKeywordRelationship(models.Model):
         super(FilmKeywordRelationship, self).save(*args, **kwargs)
         self.film.number_of_keywords = self.film.keyword_set.count()
         self.film.number_of_genres = self.film.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE).count()
+        self.film.number_of_countries = self.film.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_COUNTRY).count()
         if self.keyword.keyword_type == Keyword.KEYWORD_TYPE_GENRE:
             ids = []
             slugs = []
@@ -884,6 +886,7 @@ class FilmKeywordRelationship(models.Model):
 def delete_filmkeyword(sender, instance, **kwargs):
     instance.film.number_of_keywords = instance.film.keyword_set.count()
     instance.film.number_of_genres = instance.film.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE).count()
+    instance.film.number_of_countries = instance.film.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_COUNTRY).count()
     if instance.keyword.keyword_type == Keyword.KEYWORD_TYPE_GENRE:
         ids = []
         slugs = []

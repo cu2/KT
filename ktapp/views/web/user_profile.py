@@ -51,6 +51,8 @@ def user_profile(request, id, name_slug):
     profile = {
         'major_genres': [],
         'minor_genres': [],
+        'major_countries': [],
+        'minor_countries': [],
     }
     for keyword in models.Keyword.objects.raw('''
         SELECT k.*, ups.score AS ups_score
@@ -64,6 +66,18 @@ def user_profile(request, id, name_slug):
             profile['major_genres'].append(keyword)
         else:
             profile['minor_genres'].append(keyword)
+    for keyword in models.Keyword.objects.raw('''
+        SELECT k.*, ups.score AS ups_score
+        FROM ktapp_userprofilesegment ups
+        INNER JOIN ktapp_profilesegment ps ON ps.id = ups.segment_id AND ps.dimension = 'country'
+        LEFT JOIN ktapp_keyword k ON k.id = ps.segment
+        WHERE ups.user_id = {user_id} AND ups.score >= 100
+        ORDER BY ups.score DESC;
+    '''.format(user_id=selected_user.id)):
+        if keyword.ups_score >= 200:
+            profile['major_countries'].append(keyword)
+        else:
+            profile['minor_countries'].append(keyword)
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,
