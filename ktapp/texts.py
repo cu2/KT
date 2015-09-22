@@ -48,3 +48,18 @@ PM_EMAIL_BODY = u'''Kedves {username}!
 a KT szerkesztősége
 http://kritikustomeg.org/
 '''
+
+
+LONG_YEARS = {
+    1910: u"1920 előtt",
+    1920: u"'20-as évek",
+    1930: u"'30-as évek",
+    1940: u"'40-es évek",
+    1950: u"'50-es évek",
+    1960: u"'60-as évek",
+    1970: u"'70-es évek",
+    1980: u"'80-as évek",
+    1990: u"'90-es évek",
+    2000: u"2000-es évek",
+    2010: u"2010-es évek",
+}

@@ -13,12 +13,14 @@ from django.db.models import Q, Max
 from ktapp import models
 from ktapp import utils as kt_utils
 from ktapp.helpers import filmlist
+from ktapp.texts import LONG_YEARS
 
 
 COMMENTS_PER_PAGE = 100
 MESSAGES_PER_PAGE = 50
 FILMS_PER_PAGE = 100
 
+MINIMUM_YEAR = 1920
 
 USER_PROFILE_TAB_WIDTH = {
     True: 14,
@@ -53,6 +55,8 @@ def user_profile(request, id, name_slug):
         'minor_genres': [],
         'major_countries': [],
         'minor_countries': [],
+        'major_years': [],
+        'minor_years': [],
     }
     for keyword in models.Keyword.objects.raw('''
         SELECT k.*, ups.score AS ups_score
@@ -78,6 +82,19 @@ def user_profile(request, id, name_slug):
             profile['major_countries'].append(keyword)
         else:
             profile['minor_countries'].append(keyword)
+    for year in models.UserProfileSegment.objects.raw('''
+        SELECT ups.*, ps.segment as ps_segment
+        FROM ktapp_userprofilesegment ups
+        INNER JOIN ktapp_profilesegment ps ON ps.id = ups.segment_id AND ps.dimension = 'year'
+        LEFT JOIN ktapp_keyword k ON k.id = ps.segment
+        WHERE ups.user_id = {user_id} AND ups.score >= 50
+        ORDER BY ups.score DESC;
+    '''.format(user_id=selected_user.id)):
+        year_str = LONG_YEARS[int(year.ps_segment)]
+        if year.score >= 100:
+            profile['major_years'].append(year_str)
+        else:
+            profile['minor_years'].append(year_str)
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,

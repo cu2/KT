@@ -19,6 +19,10 @@
             Országok:
             {% if profile.major_countries %}{% for country in profile.major_countries %}{{ country.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
             {% if profile.minor_countries %}({% for country in profile.minor_countries %}{{ country.name }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
+            <br />
+            Korszakok:
+            {% if profile.major_years %}{% for year in profile.major_years %}{{ year }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
+            {% if profile.minor_years %}({% for year in profile.minor_years %}{{ year }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
         </p>
 
         {% if user.is_authenticated %}
