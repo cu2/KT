@@ -22,6 +22,8 @@ COMMENTS_PER_PAGE = 100
 MESSAGES_PER_PAGE = 50
 FILMS_PER_PAGE = 100
 
+MINIMUM_YEAR = 1920
+
 
 def index(request):
     hash_of_the_day = int(hashlib.md5(datetime.datetime.now().strftime('%Y-%m-%d')).hexdigest(), 16)
@@ -273,7 +275,6 @@ def search(request):
 def _get_type_and_filter(request):
     today = datetime.date.today()
     this_year = today.year
-    minimum_year = 1900
     minimum_premier = 1970
     toplist_type = request.GET.get('tipus', '')
     if toplist_type not in {'legjobb', 'ismeretlen', 'legrosszabb', 'legerdekesebb', 'legnezettebb'}:
@@ -285,8 +286,8 @@ def _get_type_and_filter(request):
     if year:
         if year > this_year / 10 * 10:
             year = this_year / 10 * 10
-        if year < minimum_year:
-            year = minimum_year - 10
+        if year < MINIMUM_YEAR:
+            year = MINIMUM_YEAR - 10
         return toplist_type, 'ev', year
     try:
         premier = int(request.GET.get('bemutato', ''))
@@ -323,7 +324,10 @@ def _get_film_list(user_id, toplist_type, filter_type, filter_value):
     }
     filters = []
     if filter_type == 'ev':
-        filters.append(('year', '%s-%s' % (filter_value, filter_value+9)))
+        if filter_value < MINIMUM_YEAR:
+            filters.append(('year', '-%s' % (filter_value+9)))
+        else:
+            filters.append(('year', '%s-%s' % (filter_value, filter_value+9)))
     elif filter_type == 'bemutato':
         filters.append(('main_premier_year', filter_value))
     elif filter_type == 'orszag':
@@ -410,16 +414,13 @@ def _get_film_list(user_id, toplist_type, filter_type, filter_value):
 def top_films(request):
     today = datetime.date.today()
     this_year = today.year
-    minimum_year = 1900
     minimum_premier = 1970
     toplist_type, filter_type, filter_value = _get_type_and_filter(request)
     films = _get_film_list(request.user.id, toplist_type, filter_type, filter_value)
     links = []
     if filter_type == 'ev':
-        links.append((1890, '-1899'))
-        # links.append((1900, '-1909'))
-        # links.append((1910, '-1919'))
-        for y in range(minimum_year, this_year, 10):
+        links.append((MINIMUM_YEAR - 10, '-%s' % (MINIMUM_YEAR - 1)))
+        for y in range(MINIMUM_YEAR, this_year, 10):
             links.append((y, '%s-%s' % (y, unicode(y + 9)[2:])))
     elif filter_type == 'bemutato':
         for y in range(minimum_premier, this_year + 1):
