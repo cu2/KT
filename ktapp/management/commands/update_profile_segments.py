@@ -25,9 +25,9 @@ class Command(BaseCommand):
         # for keyword in models.Keyword.objects.filter(keyword_type=models.Keyword.KEYWORD_TYPE_COUNTRY):
         #     self.update_keyword_segment(cursor, 'country', keyword.id)
         # self.update_segment_all(cursor, 'country')
-        for year in range(MINIMUM_YEAR - 10, this_year, 10):
-            self.update_year_segment(cursor, year)
-        self.update_segment_all(cursor, 'year')
+        # for year in range(MINIMUM_YEAR - 10, this_year, 10):
+        #     self.update_year_segment(cursor, year)
+        # self.update_segment_all(cursor, 'year')
         # self.stdout.write('Updated segments.')
 
         self.stdout.write('Updating usersegments...')
@@ -40,20 +40,20 @@ class Command(BaseCommand):
         # self.update_usersegment_all(cursor, 'genre')
         # for keyword in models.Keyword.objects.filter(keyword_type=models.Keyword.KEYWORD_TYPE_COUNTRY):
         #     self.update_keyword_usersegment(cursor, 'country', keyword.id)
-        self.update_usersegment_all(cursor, 'country')
-        for year in range(MINIMUM_YEAR - 10, this_year, 10):
-            self.update_year_usersegment(cursor, year)
-        self.update_usersegment_all(cursor, 'year')
+        # self.update_usersegment_all(cursor, 'country')
+        # for year in range(MINIMUM_YEAR - 10, this_year, 10):
+        #     self.update_year_usersegment(cursor, year)
+        # self.update_usersegment_all(cursor, 'year')
         self.stdout.write('Updated usersegments.')
 
         self.stdout.write('Updating scores...')
-        cursor.execute('''
-            UPDATE ktapp_userprofilesegment ups
-            INNER JOIN ktapp_profilesegment ps
-            SET ups.score = ROUND(100.0 * ups.ratio_of_films / ps.ratio_of_films - 100.0)
-            WHERE
-              ps.id = ups.segment_id
-        ''')
+        # cursor.execute('''
+        #     UPDATE ktapp_userprofilesegment ups
+        #     INNER JOIN ktapp_profilesegment ps
+        #     SET ups.score = ROUND(100.0 * ups.ratio_of_films / ps.ratio_of_films - 100.0)
+        #     WHERE
+        #       ps.id = ups.segment_id
+        # ''')
         self.stdout.write('Updated scores.')
 
     def update_global_segment(self, cursor):
