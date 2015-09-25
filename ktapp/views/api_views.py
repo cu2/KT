@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 from django.http import HttpResponse
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
@@ -163,8 +164,7 @@ def get_awards(request):
 
 def buzz(request):
     buzz_comment_domains = {}
-    # for comment in models.Comment.objects.all()[:100]:
-    for comment in models.Comment.objects.filter(domain='F')[:100]:
+    for comment in models.Comment.objects.all()[:100]:
         key = (comment.domain, comment.film_id, comment.topic_id, comment.poll_id)
         if key not in buzz_comment_domains:
             buzz_comment_domains[key] = (comment.id, comment.created_at)
@@ -188,3 +188,49 @@ def buzz(request):
             },
         })
     return HttpResponse(json.dumps(buzz_comments), content_type='application/json')
+
+
+def comment_page(request, domain, id):
+    COMMENTS_PER_PAGE = 10
+    if domain == 'film':
+        domain = 'F'
+    elif domain == 'topic':
+        domain = 'T'
+    else:
+        domain = 'P'
+    if domain == 'F':
+        domain_object = get_object_or_404(models.Film, id=id)
+        qs = models.Comment.objects.filter(
+            domain=domain,
+            film_id=id,
+        )
+    elif domain == 'T':
+        domain_object = get_object_or_404(models.Topic, id=id)
+        qs = models.Comment.objects.filter(
+            domain=domain,
+            topic_id=id,
+        )
+    else:
+        domain_object = get_object_or_404(models.Poll, id=id)
+        qs = models.Comment.objects.filter(
+            domain=domain,
+            poll_id=id,
+        )
+    qs = qs.select_related('created_by', 'reply_to', 'reply_to__created_by')
+    p = int(request.GET.get('p', 0))
+    if p < 1:
+        p = 1
+    first_comment = domain_object.number_of_comments - COMMENTS_PER_PAGE * (p - 1) - (COMMENTS_PER_PAGE - 1)
+    last_comment = domain_object.number_of_comments - COMMENTS_PER_PAGE * (p - 1)
+    qs = qs.filter(serial_number__lte=last_comment, serial_number__gte=first_comment)
+    comments = []
+    for comment in qs.order_by('-serial_number')[:COMMENTS_PER_PAGE]:
+        comments.append({
+            'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'content': comment.content_html,
+            'created_by': {
+                'id': comment.created_by.id,
+                'username': comment.created_by.username,
+            },
+        })
+    return HttpResponse(json.dumps(comments), content_type='application/json')
