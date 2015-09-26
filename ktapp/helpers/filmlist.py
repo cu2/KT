@@ -28,8 +28,8 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                         title_piece_num = idx + 1
                         title_pieces.append(title_piece)
                         additional_where.append('''(f.orig_title LIKE %(title_piece_like_{title_piece_num})s OR f.second_title LIKE %(title_piece_like_{title_piece_num})s OR f.third_title LIKE %(title_piece_like_{title_piece_num})s)'''.format(title_piece_num=title_piece_num))
-                        additional_param['title_piece_%s' % title_piece_num] = '{term}'.format(term=title_piece)
-                        additional_param['title_piece_like_%s' % title_piece_num] = '%{term}%'.format(term=title_piece)
+                        additional_param['title_piece_%s' % title_piece_num] = u'{term}'.format(term=title_piece)
+                        additional_param['title_piece_like_%s' % title_piece_num] = u'%{term}%'.format(term=title_piece)
                         additional_select.append('''
                             LEAST(
                                 CASE WHEN LOCATE(%(title_piece_{title_piece_num})s, orig_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(orig_title) - {lenq}) + LOCATE(%(title_piece_{title_piece_num})s, orig_title) END,
