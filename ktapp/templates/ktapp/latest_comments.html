@@ -3,7 +3,11 @@
 {% block title %}Legfrissebb kommentek - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>Legfrissebb kommentek</h1>
+    {% if t == 'filmes' %}
+        <h1>Legfrissebb filmes kommentek<span class="small_heading_1"> (<a href="{% url 'latest_comments' %}">összes</a>)</span></h1>
+    {% else %}
+        <h1>Legfrissebb kommentek<span class="small_heading_1"> (<a href="{% url 'latest_comments' %}?t=filmes">csak filmes</a>)</span></h1>
+    {% endif %}
 {% endblock %}
 
 {% block main %}

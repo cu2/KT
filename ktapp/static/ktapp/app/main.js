@@ -232,7 +232,7 @@ var ktapp = {
                 ktapp.hasScrolled();
                 ktapp.didScroll = false;
             }
-        }, 250);
+        }, 100);
 
         ktapp.loadBuzz();
     }

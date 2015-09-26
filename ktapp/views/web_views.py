@@ -744,8 +744,16 @@ def forum(request, id, title_slug):
 
 
 def latest_comments(request):
+    t = request.GET.get('t', '')
+    if t not in {'', 'filmes'}:
+        t = ''
+    if t == 'filmes':
+        comments = models.Comment.objects.filter(domain='F').select_related('film', 'created_by', 'reply_to', 'reply_to__created_by').all()[:100]
+    else:
+        comments = models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').all()[:100]
     return render(request, 'ktapp/latest_comments.html', {
-        'comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').all()[:100],
+        'comments': comments,
+        't': t,
     })
 
 
