@@ -197,6 +197,8 @@ LOGIN_REDIRECT_URL = '/'
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 
+MAX_SEARCH_RESULTS = 10
+
 
 # if True, KTUser.email_user() will print the email instead of sending it
 try:

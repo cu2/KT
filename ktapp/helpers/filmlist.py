@@ -10,8 +10,9 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
     additional_inner_joins = []
     my_rating_join_type = 'LEFT'
     additional_where = []
-    additional_param = []
+    additional_param = {}
     additional_select = []
+    title_matches = []
     nice_filters = []
     if filters:
         for filter_type, filter_value in filters:
@@ -21,27 +22,38 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                 filter_value = int(filter_value)
             if filter_type == 'title':
                 title_pieces = []
-                for title_piece in filter_value.split(' '):
+                for idx, title_piece in enumerate(filter_value.split(' ')):
                     title_piece = title_piece.strip()
                     if title_piece:
+                        title_piece_num = idx + 1
                         title_pieces.append(title_piece)
-                        additional_where.append('''(f.orig_title LIKE %s OR f.second_title LIKE %s OR f.third_title LIKE %s)''')
-                        additional_param.append('%{term}%'.format(term=title_piece))
-                        additional_param.append('%{term}%'.format(term=title_piece))
-                        additional_param.append('%{term}%'.format(term=title_piece))
+                        additional_where.append('''(f.orig_title LIKE %(title_piece_like_{title_piece_num})s OR f.second_title LIKE %(title_piece_like_{title_piece_num})s OR f.third_title LIKE %(title_piece_like_{title_piece_num})s)'''.format(title_piece_num=title_piece_num))
+                        additional_param['title_piece_%s' % title_piece_num] = '{term}'.format(term=title_piece)
+                        additional_param['title_piece_like_%s' % title_piece_num] = '%{term}%'.format(term=title_piece)
+                        additional_select.append('''
+                            LEAST(
+                                CASE WHEN LOCATE(%(title_piece_{title_piece_num})s, orig_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(orig_title) - {lenq}) + LOCATE(%(title_piece_{title_piece_num})s, orig_title) END,
+                                CASE WHEN LOCATE(%(title_piece_{title_piece_num})s, second_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(second_title) - {lenq}) + LOCATE(%(title_piece_{title_piece_num})s, second_title) END,
+                                CASE WHEN LOCATE(%(title_piece_{title_piece_num})s, third_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(third_title) - {lenq}) + LOCATE(%(title_piece_{title_piece_num})s, third_title) END
+                            ) AS title_match_{title_piece_num},
+                        '''.format(
+                            title_piece_num=title_piece_num,
+                            lenq=len(title_piece)
+                        ))
+                        title_matches.append('title_match_%s' % title_piece_num)
                 if title_pieces:
                     nice_filters.append((filter_type, ' '.join(title_pieces)))
             if filter_type == 'year':
                 year_interval = kt_utils.str2interval(filter_value, int)
                 if year_interval:
-                    additional_where.append('''f.year BETWEEN %s AND %s''')
-                    additional_param.append(year_interval[0])
-                    additional_param.append(year_interval[1])
+                    additional_where.append('''f.year BETWEEN %(year_min)s AND %(year_max)s''')
+                    additional_param['year_min'] = year_interval[0]
+                    additional_param['year_max'] = year_interval[1]
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'main_premier_year':
                 if filter_value:
-                    additional_where.append('''f.main_premier_year = %s''')
-                    additional_param.append(filter_value)
+                    additional_where.append('''f.main_premier_year = %(main_premier_year)s''')
+                    additional_param['main_premier_year'] = filter_value
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'director':
                 director_names = []
@@ -175,9 +187,9 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     avg_rating_max = None
                 avg_rating_interval = kt_utils.minmax2interval(avg_rating_min, avg_rating_max, 0.0, 5.0)
                 if avg_rating_interval:
-                    additional_where.append('''f.average_rating BETWEEN %s AND %s''')
-                    additional_param.append(avg_rating_interval[0])
-                    additional_param.append(avg_rating_interval[1])
+                    additional_where.append('''f.average_rating BETWEEN %(average_rating_min)s AND %(average_rating_max)s''')
+                    additional_param['average_rating_min'] = avg_rating_interval[0]
+                    additional_param['average_rating_max'] = avg_rating_interval[1]
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'number_of_ratings':
                 min_value, max_value = filter_value.split('-')
@@ -191,9 +203,9 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     num_rating_max = None
                 num_rating_interval = kt_utils.minmax2interval(num_rating_min, num_rating_max, 0, 99999)
                 if num_rating_interval:
-                    additional_where.append('''f.number_of_ratings BETWEEN %s AND %s''')
-                    additional_param.append(num_rating_interval[0])
-                    additional_param.append(num_rating_interval[1])
+                    additional_where.append('''f.number_of_ratings BETWEEN %(number_of_ratings_min)s AND %(number_of_ratings_max)s''')
+                    additional_param['number_of_ratings_min'] = num_rating_interval[0]
+                    additional_param['number_of_ratings_max'] = num_rating_interval[1]
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'number_of_comments':
                 min_value, max_value = filter_value.split('-')
@@ -207,9 +219,9 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     num_comment_max = None
                 num_comment_interval = kt_utils.minmax2interval(num_comment_min, num_comment_max, 0, 99999)
                 if num_comment_interval:
-                    additional_where.append('''f.number_of_comments BETWEEN %s AND %s''')
-                    additional_param.append(num_comment_interval[0])
-                    additional_param.append(num_comment_interval[1])
+                    additional_where.append('''f.number_of_comments BETWEEN %(number_of_comments_min)s AND %(number_of_comments_max)s''')
+                    additional_param['number_of_comments_min'] = num_comment_interval[0]
+                    additional_param['number_of_comments_max'] = num_comment_interval[1]
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'usertoplist_id':
                 try:
@@ -299,9 +311,9 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     fav_avg_rating_max = None
                 fav_avg_rating_interval = kt_utils.minmax2interval(fav_avg_rating_min, fav_avg_rating_max, 0.0, 5.0)
                 if fav_avg_rating_interval:
-                    additional_where.append('''r.fav_average_rating BETWEEN %s AND %s''')
-                    additional_param.append(fav_avg_rating_interval[0])
-                    additional_param.append(fav_avg_rating_interval[1])
+                    additional_where.append('''r.fav_average_rating BETWEEN %(fav_average_rating_min)s AND %(fav_average_rating_max)s''')
+                    additional_param['fav_average_rating_min'] = fav_avg_rating_interval[0]
+                    additional_param['fav_average_rating_max'] = fav_avg_rating_interval[1]
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'my_rating' and user_id:
                 if filter_value == '0':
@@ -323,9 +335,9 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     my_rating_interval = kt_utils.minmax2interval(my_rating_min, my_rating_max, 0, 5)
                     if my_rating_interval:
                         my_rating_join_type = 'INNER'
-                        additional_where.append('''v.rating BETWEEN %s AND %s''')
-                        additional_param.append(my_rating_interval[0])
-                        additional_param.append(my_rating_interval[1])
+                        additional_where.append('''v.rating BETWEEN %(rating_min)s AND %(rating_max)s''')
+                        additional_param['rating_min'] = my_rating_interval[0]
+                        additional_param['rating_max'] = my_rating_interval[1]
                         nice_filters.append((filter_type, filter_value))
             if filter_type == 'other_rating':
                 try:
@@ -342,9 +354,9 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     other_rating_max = None
                 other_rating_interval = kt_utils.minmax2interval(other_rating_min, other_rating_max, 0, 5)
                 if other_rating_interval:
-                    additional_where.append('''seen_by_other.rating BETWEEN %s AND %s''')
-                    additional_param.append(other_rating_interval[0])
-                    additional_param.append(other_rating_interval[1])
+                    additional_where.append('''seen_by_other.rating BETWEEN %(seen_by_other_rating_min)s AND %(seen_by_other_rating_max)s''')
+                    additional_param['seen_by_other_rating_min'] = other_rating_interval[0]
+                    additional_param['seen_by_other_rating_max'] = other_rating_interval[1]
                     nice_filters.append((filter_type, filter_value))
     order_by = None
     if ordering:
@@ -358,6 +370,10 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
         order_fields = []
         if order_field == 'title':
             order_fields = ['f.orig_title', 'f.year', 'f.id']
+        if order_field == 'title_match':
+            order_fields = ['''
+                1000 * ({title_matches}) - 1 * CAST(number_of_ratings AS SIGNED)
+            '''.format(title_matches='+'.join(title_matches))]
         if order_field == 'year':
             order_fields = ['f.year', 'f.orig_title', 'f.id']
         if order_field == 'director':
@@ -463,6 +479,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
         order_by='ORDER BY %s' % order_by if order_by else '',
         sql_limit=sql_limit,
     )
+    print sql
     qs = models.Film.objects.raw(sql, additional_param)
     return qs, nice_filters
 

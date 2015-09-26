@@ -1,4 +1,5 @@
 {% extends "ktapp/layout.html" %}
+{% load kt_extras %}
 
 {% block title %}Kritikus Tömeg{% endblock %}
 
@@ -13,81 +14,147 @@
             <input type="text" placeholder="Keresés..." tabindex="2" name="q" value="{{ q }}" class="search_input" />
         </p>
     </form>
-    <p>{{ result_count }} találat:</p>
-    <ul id="search_results">
-        {% for result in results %}
-            <li>
-                <span class="search_result_type">
-                    {% if result.type == 'film' %}
-                        film
-                    {% elif result.type == 'user' %}
-                        felhasználó
-                    {% elif result.type == 'artist' %}
-                        színész/rendező
-                    {% elif result.type == 'role' %}
-                        szereplő
-                    {% elif result.type == 'keyword/C' %}
-                        ország
-                    {% elif result.type == 'keyword/G' %}
-                        műfaj
-                    {% elif result.type == 'keyword/M' or result.type == 'keyword/O' %}
-                        kulcsszó
-                    {% elif result.type == 'sequel/S' %}
-                        folytatás
-                    {% elif result.type == 'sequel/R' %}
-                        remake
-                    {% elif result.type == 'sequel/A' %}
-                        adaptáció
-                    {% elif result.type == 'topic' %}
-                        topik
-                    {% elif result.type == 'poll' %}
-                        közkérdés
-                    {% elif result.type == 'comment' %}
-                        komment
-                    {% else %}
-                        ???
-                    {% endif %}
-                </span>
-                <span class="search_result_title">
-                    <a href="{{ result.url }}">{{ result.title }}</a>
-                </span>
-                <span class="search_result_details">
-                {% if result.type == 'film' %}
-                    {% if result.object.second_title %}
-                        <br />
-                        {{ result.object.second_title }}
-                    {% endif %}
-                    {% if result.object.third_title %}
-                        <br />
-                        {{ result.object.third_title }}
-                    {% endif %}
-                    {% if result.object.directors %}
-                        <br />
-                        ({% for director in result.object.directors %}{{ director.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
-                    {% endif %}
-                    <br />
-                    {% for country in result.object.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
-                    {% for genre in result.object.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
-                {% elif result.type == 'role' %}
-                    <br />film: {{ result.object.film.orig_title }}
-                    <br />színész: {{ result.object.artist.name }}
-                {% elif result.type|slice:"6" == 'sequel' %}
-                    {% for film in result.object.all_films %}
-                        <br />
-                        {{ film.orig_title }} ({{ film.year }})
-                    {% endfor %}
-                {% elif result.type == 'poll' %}
-                    {% if result.object.open_from %}
-                        <br />
-                        {{ result.object.open_from|date:"Y. F j." }}{% if result.object.open_until %} - {% if result.object.open_from|date:"Y" == result.object.open_until|date:"Y" %}{{ result.object.open_until|date:"F j." }}{% else %}{{ result.object.open_until|date:"Y. F j." }}{% endif %}{% endif %}
-                    {% endif %}
-                {% elif result.type == 'comment' %}
-                    <br />
-                    {{ result.object.content }}
-                {% endif %}
-                </span>
-            </li>
-        {% endfor %}
-    </ul>
+
+    <div class="left_content">
+
+        {% if films %}
+        <h2>Filmek</h2>
+        <table class="fullsize">
+            <thead>
+                <tr class="header_tr">
+                    <th>Film</th>
+                    <th>Rendező</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in films %}
+                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                    <td>{{ item|film_url_html_w_year }}</td>
+                    <td>{{ item|film_directors }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if sequels %}
+        <h2>Adaptációk, folytatások, remake-ek</h2>
+        <table class="fullsize">
+            <thead>
+                <tr class="header_tr">
+                    <th>Típus</th>
+                    <th>Cím</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for item in sequels %}
+                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                    <td>{% if item.sequel_type == 'A' %}adaptáció{% elif item.sequel_type == 'R' %}remake{% else %}folytatás{% endif %}</td>
+                    <td><a href="{% url 'sequel' item.id item.slug_cache %}">{{ item.name }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if topics %}
+        <h2>Topikok</h2>
+        <table class="fullsize">
+            <thead>
+            <tr class="header_tr">
+                <th>Topik</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in topics %}
+                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                    <td><a href="{% url 'forum' item.id item.slug_cache %}">{{ item.title }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if polls %}
+        <h2>Közkérdések</h2>
+        <table class="fullsize">
+            <thead>
+            <tr class="header_tr">
+                <th>Közkérdés</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in polls %}
+                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                    <td><a href="{% url 'poll' item.id item.slug_cache %}">{{ item.title }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+    </div>
+    <div class="right_content">
+
+        {% if artists %}
+        <h2>Színészek/Rendezők</h2>
+        <table class="fullsize">
+            <thead>
+            <tr class="header_tr">
+                <th>Név</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in artists %}
+                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                    <td><a href="{% url 'artist' item.id item.slug_cache %}">{{ item.name }}</a> ({% if item.number_of_ratings_as_director >= item.number_of_ratings_as_actor %}rendező{% else %}színész{% endif %})</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if roles %}
+        <h2>Szereplők</h2>
+        <table class="fullsize">
+            <thead>
+            <tr class="header_tr">
+                <th>Szereplő</th>
+                <th>Színész</th>
+                <th>Film</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in roles %}
+                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                    <td><a href="{% url 'role' item.id item.slug_cache %}">{{ item.role_name }}</a></td>
+                    <td><a href="{% url 'artist' item.artist.id item.artist.slug_cache %}">{{ item.artist.name }}</a></td>
+                    <td><a href="{% url 'film_main' item.film.id item.film.slug_cache %}">{{ item.film|film_url_html_w_year }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        {% if users %}
+        <h2>Felhasználók</h2>
+        <table class="fullsize">
+            <thead>
+            <tr class="header_tr">
+                <th>Név</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in users %}
+                <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                    <td><a href="{% url 'user_profile' item.id item.slug_cache %}">{{ item.username }}</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+    </div>
+    <br class="clear" />
 
 {% endblock %}

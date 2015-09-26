@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django import forms
 from django.db.models import Q
 
+from kt import settings
 from ktapp import models
 from ktapp import forms as kt_forms
 from ktapp import utils as kt_utils
@@ -171,104 +172,31 @@ def browse(request):
 
 
 def search(request):
-    q = request.GET.get('q')
-    if not q:
+    q = request.GET.get('q', '')
+    if len(q) < 2:
         return HttpResponseRedirect(reverse('index'))
-    results = []
-    for result in models.Film.objects.filter(
-            Q(orig_title__icontains=q)
-            | Q(second_title__icontains=q)
-            | Q(third_title__icontains=q)
-    ):
-        results.append({
-            'rank': 1000 + result.number_of_ratings,
-            'type': 'film',
-            'title': '%s (%s)' % (result.orig_title, result.year),
-            'url': reverse('film_main', args=(result.id, result.slug_cache)),
-            'object': result,
-        })
-    for result in models.Artist.objects.filter(name__icontains=q):
-        results.append({
-            'rank': 1000  + result.num_rating(),
-            'type': 'artist',
-            'title': result.name,
-            'url': reverse('artist', args=(result.id, result.slug_cache)),
-            'object': result,
-        })
-    for result in models.FilmArtistRelationship.objects.filter(role_name__icontains=q, role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR):
-        results.append({
-            'rank': 900,
-            'type': 'role',
-            'title': result.role_name,
-            'url': reverse('role', args=(result.id, result.slug_cache)),
-            'object': result,
-        })
-    for result in models.Sequel.objects.filter(name__icontains=q):
-        results.append({
-            'rank': 850,
-            'type': 'sequel/%s' % result.sequel_type,
-            'title': result.name,
-            'url': reverse('sequel', args=(result.id, result.slug_cache)),
-            'object': result,
-        })
-    for result in models.Keyword.objects.filter(name__icontains=q):
-        results.append({
-            'rank': 800,
-            'type': 'keyword/%s' % result.keyword_type,
-            'title': result.name,
-            'url': '',  # TODO
-            'object': result,
-        })
-    for result in models.Topic.objects.filter(title__icontains=q):
-        results.append({
-            'rank': 750,
-            'type': 'topic',
-            'title': result.title,
-            'url': reverse('forum', args=(result.id, result.slug_cache)),
-            'object': result,
-        })
-    for result in models.Poll.objects.filter(title__icontains=q):
-        results.append({
-            'rank': 700,
-            'type': 'poll',
-            'title': result.title,
-            'url': reverse('poll', args=(result.id, result.slug_cache)),
-            'object': result,
-        })
-    for result in models.KTUser.objects.filter(username__icontains=q):
-        results.append({
-            'rank': 500,
-            'type': 'user',
-            'title': result.username,
-            'url': reverse('user_profile', args=(result.id, result.slug_cache)),
-            'object': result,
-        })
-    # content searches (should be separate?):
-    # | Q(plot_summary__icontains=q)
-    # for result in models.Comment.objects.filter(content__icontains=q):
-    #     if result.domain == models.Comment.DOMAIN_FILM:
-    #         title = '%s (%s)' % (result.film.orig_title, result.film.year)
-    #         url = reverse('film_comments', args=(result.film.id, result.film.slug_cache))
-    #     elif result.domain == models.Comment.DOMAIN_TOPIC:
-    #         title = result.topic.title
-    #         url = reverse('forum', args=(result.topic.id, result.topic.slug_cache))
-    #     else:
-    #         title = result.poll.title
-    #         url = ''  # TODO
-    #     results.append({
-    #         'rank': 750,
-    #         'type': 'comment',
-    #         'title': title,
-    #         'url': url,
-    #         'object': result,
-    #     })
-    # Quote
-    # Trivia
-    # Review
+    films, _ = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[('title', q)],
+        ordering='title_match',
+        films_per_page=settings.MAX_SEARCH_RESULTS + 1,
+    )
+    films = list(films)
+    artists = models.Artist.objects.filter(name__icontains=q).order_by('-number_of_ratings')[:settings.MAX_SEARCH_RESULTS + 1]
+    roles = models.FilmArtistRelationship.objects.select_related('artist', 'film').filter(role_name__icontains=q, role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).order_by('-artist__number_of_ratings')[:settings.MAX_SEARCH_RESULTS + 1]
+    sequels = models.Sequel.objects.filter(name__icontains=q).order_by('name')[:settings.MAX_SEARCH_RESULTS + 1]
+    topics = models.Topic.objects.filter(title__icontains=q).order_by('-number_of_comments')[:settings.MAX_SEARCH_RESULTS + 1]
+    polls = models.Poll.objects.filter(title__icontains=q).order_by('-number_of_comments')[:settings.MAX_SEARCH_RESULTS + 1]
+    users = models.KTUser.objects.filter(username__icontains=q).order_by('username')[:settings.MAX_SEARCH_RESULTS + 1]
     return render(request, 'ktapp/search.html', {
         'q': q,
-        'result_count': len(results),
-        'results': sorted(results, key=lambda r: (-r['rank'], r['title']))[:100],
+        'films': films[:settings.MAX_SEARCH_RESULTS],
+        'sequels': sequels[:settings.MAX_SEARCH_RESULTS],
+        'topics': topics[:settings.MAX_SEARCH_RESULTS],
+        'polls': polls[:settings.MAX_SEARCH_RESULTS],
+        'artists': artists[:settings.MAX_SEARCH_RESULTS],
+        'roles': roles[:settings.MAX_SEARCH_RESULTS],
+        'users': users[:settings.MAX_SEARCH_RESULTS],
     })
 
 
