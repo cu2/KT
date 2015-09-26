@@ -479,7 +479,6 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
         order_by='ORDER BY %s' % order_by if order_by else '',
         sql_limit=sql_limit,
     )
-    print sql
     qs = models.Film.objects.raw(sql, additional_param)
     return qs, nice_filters
 
