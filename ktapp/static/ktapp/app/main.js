@@ -14,8 +14,43 @@ var ktapp = {
         page: 'index',
         tab: 'index-buzz',
         filmId: null,
+        topicId: null,
+        pollId: null,
         commentPage: 0,
         loadedCommentPage: 0
+    },
+
+    /*****************************************************************************************/
+
+    templates: {
+        comment_block: function(context) {
+            var x = '';
+            var comment = context.comment;
+            x += '<div class="comment_block">';
+            x += '<div class="comment_block_author">';
+            x += '<div>' + comment.created_at + ' ';
+            if (context.hasOwnProperty('source') && context.source === true) {
+                x += ' ';
+                if (comment.domain === 'F') {
+                    x += '<span class="link link_film_comments" data-id="' + comment.domain_object.id + '">' + comment.domain_object.title + '</span>';
+                } else if (comment.domain === 'T') {
+                    x += '[<span class="link link_topic" data-id="' + comment.domain_object.id + '">' + comment.domain_object.title + '</span>]';
+                } else {
+                    x += '[<span class="link link_poll" data-id="' + comment.domain_object.id + '">' + comment.domain_object.title + '</span>]';
+                }
+            }
+            x += '</div>';
+            x += '<div class="comment_block_author_right">' + comment.created_by.username;
+            if (comment.domain === 'F') x += ' (' + comment.rating + ')';
+            x += ' #' + comment.serial_number;
+            x += '</div>';
+            x += '</div>';
+            x += '<div class="comment_block_content">';
+            x += '<p>' + comment.content + '</p>';
+            x += '</div>';
+            x += '</div>';
+            return x;
+        }
     },
 
     /*****************************************************************************************/
@@ -76,22 +111,34 @@ var ktapp = {
             ktapp.appState.commentPage += 1;
             ktapp.loadData('/api/comment_page/film/' + ktapp.appState.filmId + '/?p=' + ktapp.appState.commentPage, function(data) {
                 var x = $('#main-content-film-comments').html();
-                for(var i=0; i < data.length; i++) {
-                    var comment = data[i];
-                    x += '<div class="comment_block">';
-                    x += '<div class="comment_block_author">';
-                    x += '<div>' + comment.created_at + ' ';
-                    x += '</div>';
-                    x += '<div class="comment_block_author_right">' + comment.created_by.username + '</div>';
-                    x += '</div>';
-                    x += '<div class="comment_block_content">';
-                    x += '<p>' + comment.content + '</p>';
-                    x += '</div>';
-                    x += '</div>';
+                for(var i=0; i < data.comments.length; i++) {
+                    x += ktapp.templates.comment_block({comment: data.comments[i]});
                 }
                 $('#main-content-film-comments').html(x);
                 ktapp.appState.loadedCommentPage += 1;
-            }, mockObject);
+            }, null);
+        }
+        if (ktapp.appState.page === 'topic' && ktapp.appState.commentPage === ktapp.appState.loadedCommentPage) {
+            ktapp.appState.commentPage += 1;
+            ktapp.loadData('/api/comment_page/topic/' + ktapp.appState.topicId + '/?p=' + ktapp.appState.commentPage, function(data) {
+                var x = $('#main-content-topic-comments').html();
+                for(var i=0; i < data.comments.length; i++) {
+                    x += ktapp.templates.comment_block({comment: data.comments[i]});
+                }
+                $('#main-content-topic-comments').html(x);
+                ktapp.appState.loadedCommentPage += 1;
+            }, null);
+        }
+        if (ktapp.appState.page === 'poll' && ktapp.appState.commentPage === ktapp.appState.loadedCommentPage) {
+            ktapp.appState.commentPage += 1;
+            ktapp.loadData('/api/comment_page/poll/' + ktapp.appState.pollId + '/?p=' + ktapp.appState.commentPage, function(data) {
+                var x = $('#main-content-poll-comments').html();
+                for(var i=0; i < data.comments.length; i++) {
+                    x += ktapp.templates.comment_block({comment: data.comments[i]});
+                }
+                $('#main-content-poll-comments').html(x);
+                ktapp.appState.loadedCommentPage += 1;
+            }, null);
         }
     },
 
@@ -117,8 +164,48 @@ var ktapp = {
 
     /*****************************************************************************************/
 
+    loadTopic: function(id) {
+        ktapp.appState.filmId = null;
+        ktapp.appState.topicId = id;
+        ktapp.appState.pollId = null;
+        ktapp.showPageAndTab('topic', 'topic-comments');
+        ktapp.appState.loadedCommentPage = 0;
+        ktapp.appState.commentPage = 1;
+        $('#main-content-topic-comments').html('');
+        ktapp.loadData('/api/comment_page/topic/' + id + '/', function(data) {
+            $('#title').html('[fórum] ' + data.domain_object.title);
+            var x = '';
+            for(var i=0; i < data.comments.length; i++) {
+                x += ktapp.templates.comment_block({comment: data.comments[i]});
+            }
+            $('#main-content-topic-comments').html(x);
+            ktapp.appState.loadedCommentPage = 1;
+        }, null);
+    },
+
+    loadPoll: function(id) {
+        ktapp.appState.filmId = null;
+        ktapp.appState.topicId = null;
+        ktapp.appState.pollId = id;
+        ktapp.showPageAndTab('poll', 'poll-comments');
+        ktapp.appState.loadedCommentPage = 0;
+        ktapp.appState.commentPage = 1;
+        $('#main-content-poll-comments').html('');
+        ktapp.loadData('/api/comment_page/poll/' + id + '/', function(data) {
+            $('#title').html('[közkérdés] ' + data.domain_object.title);
+            var x = '';
+            for(var i=0; i < data.comments.length; i++) {
+                x += ktapp.templates.comment_block({comment: data.comments[i]});
+            }
+            $('#main-content-poll-comments').html(x);
+            ktapp.appState.loadedCommentPage = 1;
+        }, null);
+    },
+
     loadFilm: function(id, tab) {
         ktapp.appState.filmId = id;
+        ktapp.appState.topicId = null;
+        ktapp.appState.pollId = null;
         ktapp.showPageAndTab('film', tab);
         mockObject = ktapp.FILM;
         mockObject = null;
@@ -151,25 +238,17 @@ var ktapp = {
             $('#num_rating').html(data.number_of_ratings);
             $('#avg_rating').html(data.average_rating);
         }, mockObject);
+        ktapp.appState.loadedCommentPage = 0;
         ktapp.appState.commentPage = 1;
+        $('#main-content-film-comments').html('');
         ktapp.loadData('/api/comment_page/film/' + id + '/', function(data) {
             var x = '';
-            for(var i=0; i < data.length; i++) {
-                var comment = data[i];
-                x += '<div class="comment_block">';
-                x += '<div class="comment_block_author">';
-                x += '<div>' + comment.created_at + ' ';
-                x += '</div>';
-                x += '<div class="comment_block_author_right">' + comment.created_by.username + '</div>';
-                x += '</div>';
-                x += '<div class="comment_block_content">';
-                x += '<p>' + comment.content + '</p>';
-                x += '</div>';
-                x += '</div>';
+            for(var i=0; i < data.comments.length; i++) {
+                x += ktapp.templates.comment_block({comment: data.comments[i]});
             }
             $('#main-content-film-comments').html(x);
             ktapp.appState.loadedCommentPage = 1;
-        }, mockObject);
+        }, null);
     },
 
     loadBuzz: function() {
@@ -178,24 +257,10 @@ var ktapp = {
         ktapp.loadData('/api/buzz/', function(data) {
             var x = '';
             for(var i=0; i < data.length; i++) {
-                var comment = data[i];
-                x += '<div class="comment_block">';
-                x += '<div class="comment_block_author">';
-                x += '<div>' + comment.created_at + ' ';
-                if (comment.domain === 'F') {
-                    x += '<span class="link link_film_comments" data-id="' + comment.domain_object.id + '">' + comment.domain_object.title + '</span>';
-                } else if (comment.domain === 'T') {
-                    x += '[<span class="link link_topic" data-id="' + comment.domain_object.id + '">' + comment.domain_object.title + '</span>]';
-                } else {
-                    x += '[<span class="link link_poll" data-id="' + comment.domain_object.id + '">' + comment.domain_object.title + '</span>]';
-                }
-                x += '</div>';
-                x += '<div class="comment_block_author_right">' + comment.created_by.username + '</div>';
-                x += '</div>';
-                x += '<div class="comment_block_content">';
-                x += '<p>' + comment.content + '</p>';
-                x += '</div>';
-                x += '</div>';
+                x += ktapp.templates.comment_block({
+                    comment: data[i],
+                    source: true
+                });
             }
             $('#main-content-index-buzz').html(x);
         }, mockObject);
@@ -219,10 +284,18 @@ var ktapp = {
             ktapp.loadFilm($(this).data('id'), 'film-comments');
             return false;
         });
+        $(document).on('click', '.link_topic', function() {
+            ktapp.loadTopic($(this).data('id'));
+            return false;
+        });
+        $(document).on('click', '.link_poll', function() {
+            ktapp.loadPoll($(this).data('id'));
+            return false;
+        });
 
         $(window).scroll(function() {
             ktapp.didScroll = true;
-            if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
+            if ($(window).scrollTop() + $(window).height() > $(document).height() - 300) {
                 ktapp.nearBottomHandler();
             }
         });

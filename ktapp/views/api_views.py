@@ -176,6 +176,7 @@ def buzz(request):
     for comment in models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids):
         buzz_comments.append({
             'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'serial_number': comment.serial_number,
             'content': comment.content_html,
             'domain': comment.domain,
             'domain_object': {
@@ -186,6 +187,7 @@ def buzz(request):
                 'id': comment.created_by.id,
                 'username': comment.created_by.username,
             },
+            'rating': comment.rating,
         })
     return HttpResponse(json.dumps(buzz_comments), content_type='application/json')
 
@@ -226,11 +228,21 @@ def comment_page(request, domain, id):
     comments = []
     for comment in qs.order_by('-serial_number')[:COMMENTS_PER_PAGE]:
         comments.append({
+            'domain': domain,
             'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'serial_number': comment.serial_number,
             'content': comment.content_html,
             'created_by': {
                 'id': comment.created_by.id,
                 'username': comment.created_by.username,
             },
+            'rating': comment.rating,
         })
-    return HttpResponse(json.dumps(comments), content_type='application/json')
+    return HttpResponse(json.dumps({
+        'comments': comments,
+        'domain': domain,
+        'domain_object': {
+            'id': domain_object.id,
+            'title': getattr(domain_object, 'orig_title', getattr(domain_object, 'title', '???')),
+        },
+    }), content_type='application/json')
