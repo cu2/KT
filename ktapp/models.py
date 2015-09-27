@@ -199,7 +199,7 @@ class Film(models.Model):
         super(Film, self).save(*args, **kwargs)
 
     def fix_keywords(self):
-        self.number_of_keywords = self.keyword_set.count()
+        self.number_of_keywords = self.keywords.filter(filmkeywordrelationship__keyword__keyword_type__in=[Keyword.KEYWORD_TYPE_MAJOR, Keyword.KEYWORD_TYPE_OTHER]).count()
         self.number_of_genres = self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE).count()
         self.number_of_countries = self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_COUNTRY).count()
         ids = []
