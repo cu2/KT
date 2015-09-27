@@ -443,6 +443,7 @@ def new_film(request):
                     created_by=request.user,
                     spoiler=False,
                 )
+        film.fix_keywords()
 
         film.plot_summary = request.POST.get('film_plot', '').strip()
 

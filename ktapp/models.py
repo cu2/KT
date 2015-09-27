@@ -198,6 +198,25 @@ class Film(models.Model):
             self.slug_cache = slugify(self.orig_title) + '-' + slugify(self.year)
         super(Film, self).save(*args, **kwargs)
 
+    def fix_keywords(self):
+        self.number_of_keywords = self.keyword_set.count()
+        self.number_of_genres = self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE).count()
+        self.number_of_countries = self.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_COUNTRY).count()
+        ids = []
+        slugs = []
+        names = []
+        for g in self.genres():
+            ids.append(unicode(g.id))
+            slugs.append(g.slug_cache)
+            names.append(g.name)
+        if len(ids):
+            self.genres_cache = ('%s;%s;%s' % (','.join(ids), ','.join(slugs), ','.join(names)))[:250]
+            self.genre_names_cache = ','.join(names)[:250]
+        else:
+            self.genres_cache = ''
+            self.genre_names_cache = ''
+        self.save()
+
 
 class PremierType(models.Model):
     name = models.CharField(max_length=250)
@@ -859,49 +878,6 @@ class FilmKeywordRelationship(models.Model):
 
     class Meta:
         unique_together = ['film', 'keyword']
-
-    def save(self, *args, **kwargs):
-        super(FilmKeywordRelationship, self).save(*args, **kwargs)
-        self.film.number_of_keywords = self.film.keyword_set.count()
-        self.film.number_of_genres = self.film.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE).count()
-        self.film.number_of_countries = self.film.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_COUNTRY).count()
-        if self.keyword.keyword_type == Keyword.KEYWORD_TYPE_GENRE:
-            ids = []
-            slugs = []
-            names = []
-            for g in self.film.genres():
-                ids.append(unicode(g.id))
-                slugs.append(g.slug_cache)
-                names.append(g.name)
-            if len(ids):
-                self.film.genres_cache = ('%s;%s;%s' % (','.join(ids), ','.join(slugs), ','.join(names)))[:250]
-                self.film.genre_names_cache = ','.join(names)[:250]
-            else:
-                self.film.genres_cache = ''
-                self.film.genre_names_cache = ''
-        self.film.save()
-
-
-@receiver(post_delete, sender=FilmKeywordRelationship)
-def delete_filmkeyword(sender, instance, **kwargs):
-    instance.film.number_of_keywords = instance.film.keyword_set.count()
-    instance.film.number_of_genres = instance.film.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_GENRE).count()
-    instance.film.number_of_countries = instance.film.keywords.filter(filmkeywordrelationship__keyword__keyword_type=Keyword.KEYWORD_TYPE_COUNTRY).count()
-    if instance.keyword.keyword_type == Keyword.KEYWORD_TYPE_GENRE:
-        ids = []
-        slugs = []
-        names = []
-        for g in instance.film.genres():
-            ids.append(unicode(g.id))
-            slugs.append(g.slug_cache)
-            names.append(g.name)
-        if len(ids):
-            instance.film.genres_cache = ('%s;%s;%s' % (','.join(ids), ','.join(slugs), ','.join(names)))[:250]
-            instance.film.genre_names_cache = ','.join(names)[:250]
-        else:
-            instance.film.genres_cache = ''
-            instance.film.genre_names_cache = ''
-    instance.film.save()
 
 
 class Sequel(models.Model):

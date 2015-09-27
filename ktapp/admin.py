@@ -7,22 +7,6 @@ from ktapp import models
 from ktapp import forms as kt_forms
 
 
-class FilmArtistInline(admin.TabularInline):
-    model = models.FilmArtistRelationship
-
-
-class FilmKeywordInline(admin.TabularInline):
-    model = models.FilmKeywordRelationship
-
-
-class FilmSequelInline(admin.TabularInline):
-    model = models.FilmSequelRelationship
-
-
-class FilmPremierInline(admin.TabularInline):
-    model = models.Premier
-
-
 class FilmAdmin(admin.ModelAdmin):
     def view_link(self):
         return '<a href="%s">%s</a>' % (reverse("film_main", args=(self.pk, self.orig_title)), self.orig_title)
@@ -32,11 +16,11 @@ class FilmAdmin(admin.ModelAdmin):
     fields = ['orig_title', 'second_title', 'third_title', 'year', 'plot_summary',
               'main_premier', 'main_premier_year',
               'imdb_link', 'porthu_link', 'wikipedia_link_en', 'wikipedia_link_hu']
-    inlines = [FilmArtistInline, FilmKeywordInline, FilmSequelInline, FilmPremierInline]
 
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ['content', 'created_by', 'created_at', 'domain', 'film', 'topic', 'poll']
+    fields = ['content', 'domain']
 
 
 class FilmUserTextContentAdmin(admin.ModelAdmin):
@@ -49,6 +33,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 class AwardAdmin(admin.ModelAdmin):
     list_display = ['name', 'year', 'category', 'film', 'artist']
+    fields = ['name', 'year', 'category']
 
 
 class LinkAdmin(admin.ModelAdmin):

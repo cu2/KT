@@ -470,10 +470,6 @@ def edit_keywords(request):
                     created_by=request.user,
                     spoiler=False,
                 )
-            for keyword_id in new_keywords & old_keywords:
-                keyword = models.FilmKeywordRelationship.objects.filter(film=film, keyword__id=keyword_id)[0]
-                keyword.spoiler = False
-                keyword.save()
         # major and other keywords
         old_keywords = set()
         for keyword in models.FilmKeywordRelationship.objects.filter(film=film, keyword__keyword_type__in=(models.Keyword.KEYWORD_TYPE_MAJOR, models.Keyword.KEYWORD_TYPE_OTHER)):
@@ -514,6 +510,7 @@ def edit_keywords(request):
             keyword = models.FilmKeywordRelationship.objects.filter(film=film, keyword__id=keyword_id)[0]
             keyword.spoiler = new_keyword_spoiler[keyword_id]
             keyword.save()
+        film.fix_keywords()
     return HttpResponseRedirect(reverse('film_keywords', args=(film.id, film.slug_cache)))
 
 
