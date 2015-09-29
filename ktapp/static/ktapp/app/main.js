@@ -41,7 +41,10 @@ var ktapp = {
             }
             x += '</div>';
             x += '<div class="comment_block_author_right">' + comment.created_by.username;
-            if (comment.domain === 'F') x += ' (' + comment.rating + ')';
+            if (comment.domain === 'F') {
+                if (comment.rating) x += ' (' + comment.rating + ')';
+                else x += ' (?)';
+            }
             x += ' #' + comment.serial_number;
             x += '</div>';
             x += '</div>';
@@ -82,7 +85,7 @@ var ktapp = {
     },
 
     showPageAndTab: function(pageName, tabName) {
-        window.scrollTo(0, 0);
+        $('#pages').scrollTop(0);
         ktapp.showTab(tabName);
         ktapp.showPage(pageName);
     },
@@ -106,7 +109,7 @@ var ktapp = {
         }
     },
 
-    nearBottomHandler: function() {
+    infiniteContentHandler: function() {
         if (ktapp.appState.page === 'film' && ktapp.appState.tab === 'film-comments' && ktapp.appState.commentPage === ktapp.appState.loadedCommentPage) {
             ktapp.appState.commentPage += 1;
             ktapp.loadData('/api/comment_page/film/' + ktapp.appState.filmId + '/?p=' + ktapp.appState.commentPage, function(data) {
@@ -266,8 +269,47 @@ var ktapp = {
         }, mockObject);
     },
 
+    showSideBar: function() {
+        $('#sidebar-container').show().animate({
+            backgroundColor: 'rgba(0, 0, 0, 0.7)'
+        });
+        $('#sidebar').animate({
+            left: 0,
+            right: 48
+        });
+    },
+    hideSideBar: function() {
+        $('#sidebar').animate({
+            left: -480,
+            right: 480
+        });
+        $('#sidebar-container').animate({
+            backgroundColor: 'rgba(0, 0, 0, 0)'
+        }, function() {
+            $('#sidebar-container').hide();
+        })
+    },
+    toggleSideBar: function() {
+        if ($('#sidebar-container').css('display') === 'block') {
+            ktapp.hideSideBar();
+        } else {
+            ktapp.showSideBar();
+        }
+    },
+
     main: function() {
         $('#logo').click(function() {
+            ktapp.toggleSideBar();
+        });
+
+        $('#sidebar-container').click(function() {
+            ktapp.hideSideBar();
+        });
+        $('#sidebar').click(function() {
+            return false;
+        });
+        $('.menu-home').click(function() {
+            ktapp.hideSideBar();
             $('#title').html('Kritikus Tömeg');
             ktapp.showPageAndTab('index', 'index-buzz');
         });
@@ -293,19 +335,18 @@ var ktapp = {
             return false;
         });
 
-        $(window).scroll(function() {
-            ktapp.didScroll = true;
-            if ($(window).scrollTop() + $(window).height() > $(document).height() - 300) {
-                ktapp.nearBottomHandler();
+        $('#pages').scroll(function() {
+            if ($('#pages').scrollTop() + $('#container').height() > $('.active-main-content').height() - 300) {
+                ktapp.infiniteContentHandler();
             }
         });
 
-        setInterval(function() {
-            if (ktapp.didScroll) {
-                ktapp.hasScrolled();
-                ktapp.didScroll = false;
-            }
-        }, 100);
+//        setInterval(function() {
+//            if (ktapp.didScroll) {
+//                ktapp.hasScrolled();
+//                ktapp.didScroll = false;
+//            }
+//        }, 100);
 
         ktapp.loadBuzz();
     }
