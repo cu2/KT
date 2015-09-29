@@ -74,6 +74,7 @@ def check_permission(perm, user, silent=True):
             'new_picture': 'core',
             'edit_picture': 'core',
             'delete_picture': 'reliable',
+            'suggest_film': 'core',
             'new_film': 'reliable',
             'edit_film': 'reliable',
             'edit_premiers': 'admin',

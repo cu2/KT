@@ -1,0 +1,58 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Beküldött filmek</h1>
+{% endblock %}
+
+{% block main %}
+
+    <table class="fullsize">
+        <tr class="header_tr">
+            <th>Ki</th>
+            <th>Mikor</th>
+            <th>Film</th>
+            <th>Rendező</th>
+            <th>Ország</th>
+            <th>Műfaj</th>
+            <th>Leírás</th>
+            {% if user.is_authenticated and user.is_staff %}
+                <th colspan="2"></th>
+            {% endif %}
+        </tr>
+        {% for film in films %}
+            <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                <td>{% if film.created_by %}<a href="{% url 'user_profile' film.created_by.id film.created_by.slug_cache %}">{{ film.created_by.username }}</a>{% endif %}</td>
+                <td>{{ film.created_at|date:"Y-m-d" }}</td>
+                <td>
+                    {{ film.content.orig_title }} ({{ film.content.year }})<br />
+                    {{ film.content.second_title }}<br />
+                    {{ film.content.third_title }}
+                </td>
+                <td>{{ film.content.directors }}</td>
+                <td>{{ film.content.countries }}</td>
+                <td>{{ film.content.genres }}</td>
+                <td>{{ film.content.plot_summary }}</td>
+                {% if user.is_authenticated and user.is_staff %}
+                    <td>
+                        <form action="{% url 'accept_film' %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ film.id }}" />
+                            <input type="submit" value="&check;" class="small_button" />
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{% url 'reject_film' %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ film.id }}" />
+                            <input type="submit" value="&cross;" class="small_button" />
+                        </form>
+                    </td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

@@ -4,14 +4,14 @@
 {% block title %}Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>Új film felvétele</h1>
+    <h1>Új film beküldése</h1>
 {% endblock %}
 
 {% block main %}
 
     {% if user.is_authenticated %}
         <div id="film_edit_form">
-            <form action="{% url 'new_film' %}" method="post">
+            <form action="{% url 'suggest_film' %}" method="post">
                 {% csrf_token %}
                 <p>
                     <label for="id_film_orig_title">Eredeti cím:</label><br />
@@ -27,12 +27,10 @@
                     <label for="id_film_year">Gyártás éve (ÉÉÉÉ):</label><br />
                     <input type="text" name="film_year" id="id_film_year" tabindex="13" />
                 </p>
-                {% if permission_edit_premiers %}
                 <p>
                     <label for="id_main_premier">Bemutató dátuma (ÉÉÉÉ-HH-NN):</label><br />
                     <input type="text" name="main_premier" id="id_main_premier" tabindex="14" />
                 </p>
-                {% endif %}
                 <p>
                     <label for="id_film_directors">Rendező(k) (vesszővel elválasztva):</label><br />
                     <input type="text" name="film_directors" id="id_film_directors" class="input_for_artists" tabindex="15" />
@@ -66,7 +64,7 @@
                     <input type="text" name="film_wikipedia_link_hu" id="id_film_wikipedia_link_hu" tabindex="22" />
                 </p>
                 <p>
-                    <input type="submit" value="Film mentése" tabindex="23" />
+                    <input type="submit" value="Film beküldése" tabindex="23" />
                 </p>
             </form>
         </div>

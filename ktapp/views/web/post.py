@@ -590,6 +590,100 @@ def new_award(request):
     return HttpResponseRedirect(reverse('film_awards', args=(film.id, film.slug_cache)))
 
 
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('new_film')
+def accept_film(request):
+    suggested_content = get_object_or_404(models.SuggestedContent, id=request.POST.get('id', 0), domain=models.SuggestedContent.DOMAIN_FILM)
+    content = json.loads(suggested_content.content)
+    film = models.Film.objects.create(
+        created_by=suggested_content.created_by,
+        orig_title=content['orig_title'],
+        second_title=content['second_title'],
+        third_title=content['third_title'],
+        year=content['year'],
+        main_premier=content['main_premier'],
+        main_premier_year=content['main_premier_year'],
+        plot_summary=content['plot_summary'],
+        imdb_link=content['imdb_link'],
+        porthu_link=content['porthu_link'],
+        wikipedia_link_en=content['wikipedia_link_en'],
+        wikipedia_link_hu=content['wikipedia_link_hu'],
+    )
+
+    directors = set()
+    for director_name in content['directors'].split(','):
+        director_name = kt_utils.strip_whitespace_and_separator(director_name)
+        if director_name == '':
+            continue
+        director = models.Artist.get_artist_by_name(director_name)
+        if director is None:
+            director = models.Artist.objects.create(name=director_name)
+        directors.add(director)
+    for director in directors:
+        models.FilmArtistRelationship.objects.create(
+            film=film,
+            artist=director,
+            role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR,
+            created_by=suggested_content.created_by,
+        )
+
+    for keyword_str, type_code in [(content['countries'], 'C'), (content['genres'], 'G')]:
+        new_keywords = set()
+        for keyword_name in keyword_str.split(','):
+            keyword_name = kt_utils.strip_whitespace_and_separator(keyword_name)
+            if keyword_name.endswith('*'):
+                keyword_name = keyword_name[:-1]
+            if not keyword_name:
+                continue
+            keyword = models.Keyword.get_keyword_by_name(keyword_name, type_code)
+            if keyword:
+                new_keywords.add(keyword.id)
+        for keyword_id in new_keywords:
+            models.FilmKeywordRelationship.objects.create(
+                film=film,
+                keyword=models.Keyword.objects.get(id=keyword_id),
+                created_by=suggested_content.created_by,
+                spoiler=False,
+            )
+    film.fix_keywords()
+
+    state_before = {}
+    state_after = {
+        'orig_title': film.orig_title,
+        'second_title': film.second_title,
+        'third_title': film.third_title,
+        'year': film.year,
+        'main_premier': film.main_premier,
+        'main_premier_year': film.main_premier_year,
+        'plot_summary': film.plot_summary,
+        'imdb_link': film.imdb_link,
+        'porthu_link': film.porthu_link,
+        'wikipedia_link_en': film.wikipedia_link_en,
+        'wikipedia_link_hu': film.wikipedia_link_hu,
+    }
+    kt_utils.changelog(
+        models.Change,
+        suggested_content.created_by,
+        'new_film',
+        'film:%s' % film.id,
+        state_before, state_after
+    )
+    suggested_content.delete()
+    return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('new_film')
+def reject_film(request):
+    suggested_content = get_object_or_404(models.SuggestedContent, id=request.POST.get('id', 0))
+    suggested_content.delete()
+    return HttpResponseRedirect(reverse('suggested_films'))
+
+
 @require_POST
 @login_required
 @kt_utils.kt_permission_required('merge_artist')

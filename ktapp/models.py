@@ -1324,3 +1324,14 @@ class UserProfileSegment(models.Model):
 
     class Meta:
         unique_together = ['user', 'segment']
+
+
+class SuggestedContent(models.Model):
+    created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    DOMAIN_FILM = 'F'
+    DOMAINS = [
+        (DOMAIN_FILM, 'Film'),
+    ]
+    domain = models.CharField(max_length=1, choices=DOMAINS, default=DOMAIN_FILM)
+    content = models.TextField(blank=True)

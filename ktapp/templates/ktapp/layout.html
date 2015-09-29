@@ -131,12 +131,15 @@
                         <li><a href="{% url 'awards' %}">Díjak</a></li>
                     </ul>
                 </li>
-                {% if user.is_authenticated and user.is_staff or user.is_reliable %}
+                {% if user.is_authenticated and user.is_staff or user.is_reliable or user.core_member %}
                     <li>Szerk<br />
                         <ul class="submenu">
                             {% if user.is_staff or user.is_reliable %}
                                 <li><a href="{% url 'new_film' %}">Filmfeltöltés</a></li>
+                            {% else %}
+                                <li><a href="{% url 'suggest_film' %}">Új film beküldése</a></li>
                             {% endif %}
+                            <li><a href="{% url 'suggested_films' %}">Beküldött filmek</a></li>
                             {% if user.is_staff or user.is_reliable %}
                                 <li><a href="{% url 'changes' %}">Változások</a></li>
                             {% endif %}

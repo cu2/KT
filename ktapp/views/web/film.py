@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 import math
 
 from django.shortcuts import render, get_object_or_404
@@ -340,6 +341,7 @@ def new_film(request):
                     created_by=request.user,
                     spoiler=False,
                 )
+        film.fix_keywords()
 
         film.plot_summary = request.POST.get('film_plot', '').strip()
 
@@ -386,4 +388,83 @@ def new_film(request):
         return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
     return render(request, 'ktapp/new_film.html', {
         'permission_edit_premiers': kt_utils.check_permission('edit_premiers', request.user),
+    })
+
+
+@login_required
+@kt_utils.kt_permission_required('suggest_film')
+def suggest_film(request):
+    if request.POST:
+        film_orig_title = kt_utils.strip_whitespace(request.POST.get('film_orig_title', ''))
+        if film_orig_title == '':
+            return render(request, 'ktapp/suggest_film.html')
+        try:
+            film_year = int(request.POST.get('film_year', None))
+        except ValueError:
+            film_year = None
+        if film_year == 0:
+            film_year = None
+        main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
+        film_main_premier = None
+        film_main_premier_year = None
+        if len(main_premier) == 4 and main_premier.isdigit():
+            film_main_premier_year = int(main_premier)
+        elif len(main_premier) == 10 and kt_utils.is_date(main_premier):
+            film_main_premier = main_premier
+            film_main_premier_year = int(main_premier[:4])
+
+        film_imdb_link = kt_utils.strip_whitespace(request.POST.get('film_imdb_link', ''))
+        if film_imdb_link.startswith('tt'):
+            film_imdb_link = film_imdb_link
+        elif 'imdb.com' in film_imdb_link and '/tt' in film_imdb_link:
+            film_imdb_link = film_imdb_link[film_imdb_link.index('/tt')+1:].split('/')[0]
+        else:
+            film_imdb_link = ''
+        film_porthu_link = kt_utils.strip_whitespace(request.POST.get('film_porthu_link', ''))
+        if film_porthu_link.isdigit():
+            film_porthu_link = film_porthu_link
+        elif 'i_film_id' in film_porthu_link:
+            try:
+                film_porthu_link = int(film_porthu_link[film_porthu_link.index('i_film_id')+10:].split('&')[0])
+            except ValueError:
+                film_porthu_link = None
+        else:
+            film_porthu_link = None
+
+        models.SuggestedContent.objects.create(
+            created_by=request.user,
+            domain=models.SuggestedContent.DOMAIN_FILM,
+            content=json.dumps({
+                'orig_title': film_orig_title,
+                'second_title': kt_utils.strip_whitespace(request.POST.get('film_second_title', '')),
+                'third_title': kt_utils.strip_whitespace(request.POST.get('film_third_title', '')),
+                'year': film_year,
+                'main_premier': film_main_premier,
+                'main_premier_year': film_main_premier_year,
+                'directors': kt_utils.strip_whitespace(request.POST.get('film_directors', '')),
+                'countries': kt_utils.strip_whitespace(request.POST.get('countries', '')),
+                'genres': kt_utils.strip_whitespace(request.POST.get('genres', '')),
+                'plot_summary': request.POST.get('film_plot', '').strip(),
+                'imdb_link': film_imdb_link,
+                'porthu_link': film_porthu_link,
+                'wikipedia_link_en': kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_en', '')),
+                'wikipedia_link_hu': kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_hu', '')),
+            }),
+        )
+
+        return HttpResponseRedirect(reverse('suggested_films'))
+    return render(request, 'ktapp/suggest_film.html')
+
+
+def suggested_films(request):
+    return render(request, 'ktapp/suggested_films.html', {
+        'films': [
+            {
+                'id': f.id,
+                'created_by': f.created_by,
+                'created_at': f.created_at,
+                'content': json.loads(f.content),
+            }
+            for f in models.SuggestedContent.objects.select_related('created_by').filter(domain=models.SuggestedContent.DOMAIN_FILM).order_by('-created_at')
+        ],
     })

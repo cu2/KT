@@ -76,7 +76,7 @@ urlpatterns += patterns(
     url(r'^elemzes_elfogadasa$', post_views.approve_review, name='approve_review'),
     url(r'^elemzes_elutasitasa$', post_views.disapprove_review, name='disapprove_review'),
 
-    url(r'^uj_film$', web_views.new_film, name='new_film'),
+    url(r'^uj_film$', film_views.new_film, name='new_film'),
     url(r'^szerk_film$', post_views.edit_film, name='edit_film'),
     url(r'^szerk_sztori$', post_views.edit_plot, name='edit_plot'),
     url(r'^szerk_bemutatok$', post_views.edit_premiers, name='edit_premiers'),
@@ -84,6 +84,11 @@ urlpatterns += patterns(
     url(r'^szerk_folytatasok$', post_views.edit_sequels, name='edit_sequels'),
     url(r'^uj_dij$', post_views.new_award, name='new_award'),
     url(r'^offba$', post_views.move_to_off, name='move_to_off'),
+
+    url(r'^bekuldott_filmek/$', film_views.suggested_films, name='suggested_films'),
+    url(r'^bekuld_film$', film_views.suggest_film, name='suggest_film'),
+    url(r'^film_elfogadasa$', post_views.accept_film, name='accept_film'),
+    url(r'^film_elutasitasa$', post_views.reject_film, name='reject_film'),
 
     url(r'^valtozasok/$', web_views.changes, name='changes'),
 
