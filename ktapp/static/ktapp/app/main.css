@@ -51,7 +51,7 @@ body {
     width: 48px;
     height: 47px; line-height: 48px;
     font-size: 30px;
-    background: rgb(176, 171, 150) url(/static/ktapp/images/logo_40x40_transparent.png) no-repeat 4px 4px;
+    background: rgb(176, 171, 150) url(images/logo_40x40_transparent.png) no-repeat 4px 4px;
     cursor: pointer;
     color: rgb(147, 24, 24);
     text-align: center;
