@@ -1,4 +1,18 @@
 $(function() {
+    $('#hamburger_menu').click(function() {
+        if ($('#leftmenu').position().left < 0) {
+            $('#leftmenu').offset({
+                top: $(window).scrollTop() + 45,
+                left: -120
+            }).animate({
+                left: 0
+            });
+        } else {
+            $('#leftmenu').animate({
+                left: -120
+            });
+        }
+    });
     $('.show_spoilers').click(function() {
         $('.spoiler').removeClass('spoiler').addClass('visible_spoiler');
         $('.show_spoilers_section').css('visibility', 'hidden');

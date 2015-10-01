@@ -1,7 +1,8 @@
 /* GENERAL LAYOUT */
 
 #toptopmenu {
-    display: none;
+    display: block;
+    position: fixed;
     z-index: 10;
     top: 0;
     width: 100%;
@@ -12,32 +13,37 @@
     border-bottom: solid rgba(109,106,92,0.5) 1px;
     box-shadow: 0 2px 5px rgba(109,106,92,0.5);
 }
-#toptopmenu_left {
+.toptopmenu_left {
     float: left;
-    margin: 0 10px;
+    margin: 0;
 }
-#toptopmenu_left ul {
+.toptopmenu_left ul {
     margin: 0;
     padding: 0;
     list-style: none;
 }
-#toptopmenu_left ul li {
+.toptopmenu_left ul li {
     float: left;
-    padding: 0 50px 0 0;
+    padding: 0 10px 0 0;
 }
-#toptopmenu_left ul li:last-child {
+.toptopmenu_left ul li:last-child {
     padding: 0;
 }
 
-#toptopmenu_right {
+.toptopmenu_right {
     float: right;
-    margin: 0 10px;
+    margin: 0;
 }
 
 @media (min-width: 800px) {
-    #toptopmenu {
-        display: block;
-        position: fixed;
+    .toptopmenu_left {
+        margin: 0 10px;
+    }
+    .toptopmenu_left ul li {
+        padding: 0 50px 0 0;
+    }
+    .toptopmenu_right {
+        margin: 0 10px;
     }
 }
 
@@ -46,12 +52,12 @@
 
 #leftmenu {
     position: absolute;
-    left: 0; width: 100px;
-    top: 0;
     z-index: 5;
+    top: 45px;
     box-sizing: border-box;
-    font-size: 9pt;
-    overflow: auto;
+    left: -120px; width: 120px;
+    overflow: hidden;
+    font-size: 10pt;
     border-right: solid rgba(109,106,92,0.5) 1px;
     padding: 10px 0 0 10px;
 }
@@ -63,9 +69,6 @@
     line-height: 1.6;
     font-weight: bold;
 }
-#leftmenu ul.mobilemenu li {
-    font-weight: normal;
-}
 #leftmenu ul li ul.submenu li {
     font-weight: normal;
 }
@@ -73,20 +76,15 @@
     #leftmenu {
         position: fixed;
         z-index: 20;
-        top: 45px; bottom: 0;
-        width: 160px;
+        bottom: 0;
+        left: 0; width: 160px;
+        overflow: auto;
         font-size: 10pt;
+        padding: 10px 0 0 10px;
     }
 }
 
 
-
-
-@media (min-width: 800px) {
-    .mobilemenu {
-        display: none;
-    }
-}
 
 
 #logo a {
@@ -98,6 +96,9 @@
     padding-left: 35px;
     font-weight: bold;
     font-size: 14pt;
+    text-indent: -9999px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 #mobilelogo a {
     display: inline-block;
@@ -109,22 +110,27 @@
     font-weight: bold;
     font-size: 14pt;
 }
+@media (min-width: 800px) {
+    #logo a {
+        text-indent: 0;
+    }
+}
 
 
 header {
-    margin-left: 100px;
+    margin-top: 55px;
+    margin-left: 0;
     padding: 0 10px;
 }
 @media (min-width: 800px) {
     header {
-        margin-top: 55px;
         margin-left: 160px;
     }
 }
 
 
 #main {
-    margin-left: 100px;
+    margin-left: 0;
     padding: 0 10px;
 }
 @media (min-width: 800px) {
@@ -134,7 +140,7 @@ header {
 }
 
 footer {
-    margin: 50px 0 20px 100px;
+    margin: 50px 5px 20px 5px;
 }
 footer ul {
     margin: 0 auto;
@@ -275,17 +281,21 @@ footer ul {
 
 
 h1 {
-    font-size: 14pt;
+    font-size: 12pt;
     font-weight: bold;
 }
 h2 {
-    font-size: 12pt;
+    font-size: 10pt;
     font-weight: bold;
 }
 h3 {
     font-size: 9pt;
     font-weight: bold;
     margin-bottom: 6px;
+}
+.title_comment {
+    margin-top: -10px;
+    font-size: 8pt;
 }
 @media (min-width: 800px) {
     h1 {
@@ -297,13 +307,13 @@ h3 {
     h3 {
         font-size: 10pt;
     }
+    .title_comment {
+        margin-top: -15px;
+        font-size: 9pt;
+    }
 }
 
 
-.title_comment {
-    margin-top: -17px;
-    font-size: 9pt;
-}
 
 .textblock {
     background: rgb(249,244,218);
@@ -379,6 +389,13 @@ input.inactive_action {
     border-radius: 10px;
     padding: 1px 10px;
 }
+#hamburger_menu {
+    font-size: 30px;
+    margin-top: -10px;
+}
+#login_menu {
+    display: none;
+}
 #login_menu #login_username {
     width: 120px;
     font-size: 11pt;
@@ -387,8 +404,34 @@ input.inactive_action {
     width: 80px;
     font-size: 11pt;
 }
-#toptopmenu_right input {
+.toptopmenu_right input {
     font-size: 11pt;
+}
+#reg_menu {
+    display: none;
+}
+#user_profile_menu, #messages_menu, #logout_menu {
+    display: none;
+}
+#mobile_login_menu, #mobile_user_profile_menu, #mobile_messages_menu, #mobile_logout_menu {
+    margin-top: -5px;
+}
+@media (min-width: 800px) {
+    #hamburger_menu {
+        display: none;
+    }
+    #login_menu {
+        display: block;
+    }
+    #reg_menu {
+        display: block;
+    }
+    #user_profile_menu, #messages_menu, #logout_menu {
+        display: block;
+    }
+    #mobile_login_menu, #mobile_user_profile_menu, #mobile_messages_menu, #mobile_logout_menu {
+        display: none;
+    }
 }
 
 .input_format {
@@ -455,7 +498,7 @@ table {
     border-collapse: separate;
     border-spacing: 1px;
     background: rgb(249,244,218);
-    font-size: 10pt;
+    font-size: 8pt;
     text-align: left;
     margin-bottom: 20px;
 }
@@ -479,7 +522,7 @@ table.fullsize {
     width: 100%;
 }
 .td_sub {
-    font-size: 9pt;
+    font-size: 7pt;
 }
 tr.selected_film_tr {
     font-weight: bold;
@@ -490,6 +533,14 @@ tr.selected_film_tr {
 table.sortable tr.header_tr {
     cursor: pointer;
     color: rgb(146,23,23);
+}
+@media (min-width: 800px) {
+    table {
+        font-size: 10pt;
+    }
+    .td_sub {
+        font-size: 9pt;
+    }
 }
 
 
@@ -910,7 +961,7 @@ ul.poll li {
 }
 
 .search_input {
-    width: 80px;
+    width: 70px;
 }
 @media (min-width: 800px) {
     .search_input {
@@ -925,6 +976,17 @@ ul.poll li {
 @media (min-width: 1000px) {
     .search_input {
         width: 300px;
+    }
+}
+#search_submit_button {
+    display: none;
+}
+@media (min-width: 800px) {
+    #search_submit_button {
+        display: inline-block;
+    }
+    #mobile_search_submit_button {
+        display: none;
     }
 }
 

@@ -8,7 +8,7 @@
 {% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=30" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=31" />
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <base href="/" />
         <script>
@@ -31,18 +31,27 @@
         </section>
 
         <nav id="toptopmenu" class="clearfix">
-            <div id="toptopmenu_left">
+            <div class="toptopmenu_left">
                 <ul>
+                    <li id="hamburger_menu" class="action_text">&equiv;</li>
                     <li id="logo"><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
                     {% if user.is_authenticated %}
-                        <li><b><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></b></li>
-                        <li><a href="{% url 'messages' %}">Üzenetek{% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %} <span class="new_message_warning">új</span>{% endif %}</a></li>
-                        <li><form action="{% url 'logout' %}" method="post" class="inline">
+                        <li id="user_profile_menu"><b><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></b></li>
+                        <li id="messages_menu"><a href="{% url 'messages' %}">Üzenetek{% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %} <span class="new_message_warning">új</span>{% endif %}</a></li>
+                        <li id="logout_menu"><form action="{% url 'logout' %}" method="post" class="inline">
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
                             <input type="submit" value="Kijelentkezés" class="small_button" />
                         </form></li>
+                        <li id="mobile_user_profile_menu"><b><a href="{% url 'user_profile' user.id user.slug_cache %}"><img src="{% static 'ktapp/images/kt-user-32x32.png' %}" /></a></b></li>
+                        <li id="mobile_messages_menu"><a href="{% url 'messages' %}"><img src="{% static 'ktapp/images/kt-envelope-32x32.png' %}" />{% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %} <span class="new_message_warning">új</span>{% endif %}</a></li>
+                        <li id="mobile_logout_menu"><form action="{% url 'logout' %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+                            <input type="image" src="{% static 'ktapp/images/kt-logout-32x32.png' %}" style="border: none" />
+                        </form></li>
                     {% else %}
+                        <li id="mobile_login_menu"><a href="{% url 'login' %}"><img src="{% static 'ktapp/images/kt-user-32x32.png' %}" /></a></li>
                         <li id="login_menu"><form action="{% url 'login' %}" method="post" class="inline">
                             {% csrf_token %}
                             <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
@@ -51,42 +60,20 @@
                             <span class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></span>
                             <input type="submit" value="Bejelentkezés" class="small_button" tabindex="4" />
                         </form> <a href="{% url 'reset_password' '' %}" style="font-size: 9pt">Mi a jelszavam?</a></li>
-                        <li><a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">Regisztráció</a></li>
+                        <li id="reg_menu"><a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">Regisztráció</a></li>
                     {% endif %}
                 </ul>
             </div>
-            <div id="toptopmenu_right">
+            <div class="toptopmenu_right">
                 <form class="inline" action="{% url 'search' %}" method="get">
                     <input type="text" placeholder="Keresés..." tabindex="1" name="q" class="search_input" />
-                    <input type="submit" value="Keresés" class="small_button" />
+                    <input type="submit" value="Keresés" class="small_button" id="search_submit_button" />
+                    <input type="submit" value="?" class="small_button" id="mobile_search_submit_button" />
                 </form>
             </div>
         </nav>
 
         <nav id="leftmenu">
-            <ul class="mobilemenu">
-                <li id="mobilelogo"><a href="{% url 'index' %}">KT</a></li>
-                {% if user.is_authenticated %}
-                    <li><b><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></b></li>
-                    <li><a href="{% url 'messages' %}">Üzenetek{% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %} <span class="new_message_warning">új</span>{% endif %}</a></li>
-                {% else %}
-                    <li id="login_menu"><form action="{% url 'login' %}" method="post" class="inline">
-                        {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
-                        <input type="text" name="username" value="" id="login_username" placeholder="név vagy email" tabindex="2" />
-                        <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
-                        <span class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></span>
-                        <input type="submit" value="Bejelentkezés" class="small_button" tabindex="4" />
-                    </form> <a href="{% url 'reset_password' '' %}" style="font-size: 7pt">Mi a jelszavam?</a></li>
-                    <li><a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">Regisztráció</a></li>
-                {% endif %}
-                <li>
-                    <form class="inline" action="{% url 'search' %}" method="get">
-                        <input type="text" placeholder="Keresés..." tabindex="1" name="q" class="search_input" />
-                        <input type="submit" value="Keresés" class="small_button" />
-                    </form>
-                </li>
-            </ul>
             <ul>
                 <li>Filmek<br />
                     <ul class="submenu">
@@ -167,6 +154,6 @@
         <script src="{% static 'ktapp/js/jquery.cookie.js' %}"></script>
         <script src="{% static 'ktapp/js/rangyinputs-jquery.js' %}"></script>
         <script src="{% static 'ktapp/js/stupidtable.min.js' %}"></script>
-        <script src="{% static 'ktapp/js/main.js' %}?v=13"></script>
+        <script src="{% static 'ktapp/js/main.js' %}?v=14"></script>
     </body>
 </html>
