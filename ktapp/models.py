@@ -1335,3 +1335,16 @@ class SuggestedContent(models.Model):
     ]
     domain = models.CharField(max_length=1, choices=DOMAINS, default=DOMAIN_FILM)
     content = models.TextField(blank=True)
+
+
+class OfTheDay(models.Model):
+    DOMAIN_FILM = 'F'
+    DOMAINS = [
+        (DOMAIN_FILM, 'Film'),
+    ]
+    domain = models.CharField(max_length=1, choices=DOMAINS, default=DOMAIN_FILM)
+    day = models.DateField()
+    film = models.ForeignKey(Film)
+
+    class Meta:
+        unique_together = ['domain', 'day']
