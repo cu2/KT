@@ -20,6 +20,18 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                 filter_value = kt_utils.strip_whitespace(filter_value)
             except AttributeError:
                 filter_value = int(filter_value)
+            if filter_type == 'no_music_video':
+                if filter_value:
+                    additional_where.append('''f.genre_cache_is_music_video = 0''')
+                nice_filters.append((filter_type, filter_value))
+            if filter_type == 'no_mini':
+                if filter_value:
+                    additional_where.append('''f.genre_cache_is_mini = 0''')
+                nice_filters.append((filter_type, filter_value))
+            if filter_type == 'no_short':
+                if filter_value:
+                    additional_where.append('''f.genre_cache_is_short = 0''')
+                nice_filters.append((filter_type, filter_value))
             if filter_type == 'title':
                 title_pieces = []
                 for idx, title_piece in enumerate(filter_value.split(' ')):

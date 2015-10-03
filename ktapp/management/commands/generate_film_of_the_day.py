@@ -112,6 +112,9 @@ class Command(BaseCommand):
             main_poster__isnull=False,
             number_of_ratings__gte=100,
             average_rating__gte=4,
+            genre_cache_is_music_video=False,
+            genre_cache_is_mini=False,
+            genre_cache_is_short=False,
         ).exclude(
             main_premier__gte=self.from_date,
         ).order_by('-average_rating')[:250]

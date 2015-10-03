@@ -252,6 +252,18 @@ def _get_film_list(user_id, toplist_type, filter_type, filter_value):
     elif filter_type == 'mufaj':
         filters.append(('genre', filter_value.name))
 
+    if filter_type == 'mufaj':
+        if filter_value.id != 314:
+            filters.append(('no_music_video', 1))
+        if filter_value.id != 4150:
+            filters.append(('no_mini', 1))
+        if filter_value.id != 120:
+            filters.append(('no_short', 1))
+    else:
+        filters.append(('no_music_video', 1))
+        filters.append(('no_mini', 1))
+        filters.append(('no_short', 1))
+
     if toplist_type in {'legjobb', 'legrosszabb', 'legnezettebb'}:
         if toplist_type == 'legjobb':
             filters.append(('average_rating', '3.5-'))
