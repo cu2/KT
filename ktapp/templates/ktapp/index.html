@@ -31,7 +31,7 @@
             <p><b><a href="{% url 'poll' random_poll.id random_poll.slug_cache %}">{{ random_poll.title }}</a></b></p>
         {% endif %}
         <h2>A nap toplistája</h2>
-        <p><b><a href="{% url 'usertoplist' toplist.id toplist.slug_cache %}">{{ toplist.title }}</a></b>{% if toplist.created_by %}<br />{{ toplist.created_at|date:"Y-m-d" }} <a href="{% url 'user_profile' toplist.created_by.id toplist.created_by.slug_cache %}">{{ toplist.created_by.username }}</a>{% endif %}</p>
+        <p><b><a href="{% url 'usertoplist' toplist.id toplist.slug_cache %}">{{ toplist.title }}</a></b>{% if toplist.created_by %} (<a href="{% url 'user_profile' toplist.created_by.id toplist.created_by.slug_cache %}">{{ toplist.created_by.username }}</a>){% endif %}</p>
         {% if toplist.toplist_type == 'F' %}
             <table class="fullsize">
                 <tr class="header_tr">
