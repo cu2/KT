@@ -690,7 +690,6 @@ class Link(models.Model):
     name = models.CharField(max_length=250)
     url = models.CharField(max_length=250)
     film = models.ForeignKey(Film)
-    linksite = models.ForeignKey(LinkSite, blank=True, null=True, on_delete=models.SET_NULL)
     link_domain = models.CharField(max_length=250)
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
