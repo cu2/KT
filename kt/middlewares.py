@@ -20,7 +20,7 @@ class LoggingMiddleware(object):
         utcnow = datetime.datetime.utcnow()
         if request.user.is_authenticated():
             request.user.last_activity_at = datetime.datetime.now()
-            request.user.save()
+            request.user.save(update_fields=['last_activity_at'])
         ip = get_ip(request)
         jsonlog(kt_pageview_logger, logging.INFO, {
             'utc_timestamp': utcnow.strftime('%s.%f'),

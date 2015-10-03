@@ -1,2 +1,2 @@
-<h3>{% if link.linksite %}[<a href="{{ link.linksite.url }}">{{ link.linksite.name }}</a>] {% endif %}<a href="{{ link.url }}">{{ link.name }}</a></h3>
+<h3>[{{ link.link_domain }}] <a href="{{ link.url }}" target="_blank">{{ link.name }}</a></h3>
 <p>{{ link.lead|linebreaksbr }}</p>

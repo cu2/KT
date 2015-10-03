@@ -3,16 +3,16 @@
 {% block film_main %}
 
     <div id="film_centered">
-        <h2>Hivatalos oldalak</h2>
-        {% for link in links_official %}
-            {% include 'ktapp/blocks/film_link_block.html' with link=link %}
-        {% endfor %}
         <h2>Kritikák, írások a filmről</h2>
         {% for link in links_reviews %}
             {% include 'ktapp/blocks/film_link_block.html' with link=link %}
         {% endfor %}
         <h2>Interjúk</h2>
         {% for link in links_interviews %}
+            {% include 'ktapp/blocks/film_link_block.html' with link=link %}
+        {% endfor %}
+        <h2>Hivatalos oldalak</h2>
+        {% for link in links_official %}
             {% include 'ktapp/blocks/film_link_block.html' with link=link %}
         {% endfor %}
         <h2>Egyéb oldalak</h2>

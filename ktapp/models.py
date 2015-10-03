@@ -3,6 +3,7 @@ import os
 import random
 import string
 from PIL import Image
+from urlparse import urlparse
 
 from django.db import models, connection
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
@@ -690,6 +691,7 @@ class Link(models.Model):
     url = models.CharField(max_length=250)
     film = models.ForeignKey(Film)
     linksite = models.ForeignKey(LinkSite, blank=True, null=True, on_delete=models.SET_NULL)
+    link_domain = models.CharField(max_length=250)
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     LINK_TYPE_OFFICIAL = 'O'
@@ -706,6 +708,7 @@ class Link(models.Model):
     lead = models.TextField(blank=True)
 
     def save(self, *args, **kwargs):
+        self.link_domain = urlparse(self.url).netloc
         super(Link, self).save(*args, **kwargs)
         self.film.number_of_links = self.film.link_set.count()
         self.film.save()
