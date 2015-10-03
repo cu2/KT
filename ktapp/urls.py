@@ -85,6 +85,13 @@ urlpatterns += patterns(
     url(r'^uj_dij$', post_views.new_award, name='new_award'),
     url(r'^offba$', post_views.move_to_off, name='move_to_off'),
 
+    url(r'^uj_link$', post_views.new_link, name='new_link'),
+    url(r'^bekuldott_linkek/$', web_views.suggested_links, name='suggested_links'),
+    url(r'^bekuld_link$', post_views.suggest_link, name='suggest_link'),
+    url(r'^link_elfogadasa$', post_views.accept_link, name='accept_link'),
+    url(r'^link_elutasitasa$', post_views.reject_link, name='reject_link'),
+    url(r'^linkek/$', web_views.links, name='links'),
+
     url(r'^bekuldott_filmek/$', film_views.suggested_films, name='suggested_films'),
     url(r'^bekuld_film$', film_views.suggest_film, name='suggest_film'),
     url(r'^film_elfogadasa$', post_views.accept_film, name='accept_film'),

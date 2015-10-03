@@ -1,37 +1,58 @@
-{% extends "ktapp/film_subpages/film_base.html" %}
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
 
-{% block film_main %}
+{% block title %}Kritikus Tömeg{% endblock %}
 
-    <div id="film_centered">
-        <h2>Kritikák, elemzések</h2>
-        {% for link in links_reviews %}
-            {% include 'ktapp/blocks/film_link_block.html' with link=link %}
+{% block header %}
+    <h1>Linkek</h1>
+{% endblock %}
+
+{% block main %}
+
+    <table class="fullsize">
+        <tr class="header_tr">
+            <th>Szerző</th>
+            <th>Cím</th>
+            <th style="width: 50%">Lead</th>
+            <th>Mikor</th>
+            <th>Film</th>
+            <th>Típus</th>
+        </tr>
+        {% for link in links %}
+            <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                <td>{% if link.author %}<a href="{% url 'user_profile' link.author.id link.author.slug_cache %}">{{ link.author.username }}</a>{% endif %}</td>
+                <td>[{{ link.link_domain }}] <a href="{{ link.url }}" target="_blank">{{ link.name }}</a></td>
+                <td>{{ link.lead }}</td>
+                <td>{{ link.created_at|date:"Y-m-d" }}</td>
+                <td>
+                    {% if link.film %}
+                        <a href="{% url 'film_main' link.film.id link.film.slug_cache %}">{{ link.film.orig_title }} ({{ link.film.year }})</a>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if link.link_type == 'R' %}
+                        Kritika/elemzés
+                    {% elif link.link_type == 'I' %}
+                        Interjú
+                    {% elif link.link_type == 'O' %}
+                        Hivatalos oldal
+                    {% else %}
+                        Egyéb oldal
+                    {% endif %}
+                </td>
+            </tr>
         {% endfor %}
-        <h2>Interjúk</h2>
-        {% for link in links_interviews %}
-            {% include 'ktapp/blocks/film_link_block.html' with link=link %}
-        {% endfor %}
-        <h2>Hivatalos oldalak</h2>
-        {% for link in links_official %}
-            {% include 'ktapp/blocks/film_link_block.html' with link=link %}
-        {% endfor %}
-        <h2>Egyéb oldalak</h2>
-        {% for link in links_other %}
-            {% include 'ktapp/blocks/film_link_block.html' with link=link %}
-        {% endfor %}
-    </div>
+    </table>
 
     {% if permission_new_link %}
         <h3>Új link felvétele</h3>
         <form action="{% url 'new_link' %}" method="post" class="inline">
             {% csrf_token %}
-            <input type="hidden" name="film_id" value="{{ film.pk }}" />
             <p>
                 <label for="id_link_type">Típus:</label>
                 <select name="link_type" id="id_link_type">
                     <option value="R" selected="selected">Kritika/elemzés</option>
                     <option value="I">Interjú</option>
-                    <option value="O">Hivatalos oldal</option>
                     <option value="-">Egyéb oldal</option>
                 </select>
             </p>
@@ -53,19 +74,17 @@
             </p>
             <p><input type="submit" value="Link mentése" /></p>
         </form>
-    {% else %}
+    {% endif %}
 
     {% if permission_suggest_link %}
         <h3>Új link beküldése</h3>
         <form action="{% url 'suggest_link' %}" method="post" class="inline">
             {% csrf_token %}
-            <input type="hidden" name="film_id" value="{{ film.pk }}" />
             <p>
                 <label for="id_link_type">Típus:</label>
                 <select name="link_type" id="id_link_type">
                     <option value="R" selected="selected">Kritika/elemzés</option>
                     <option value="I">Interjú</option>
-                    <option value="O">Hivatalos oldal</option>
                     <option value="-">Egyéb oldal</option>
                 </select>
             </p>
@@ -87,8 +106,6 @@
             </p>
             <p><input type="submit" value="Link beküldése" /></p>
         </form>
-    {% endif %}
-
     {% endif %}
 
 {% endblock %}

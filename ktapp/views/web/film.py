@@ -190,14 +190,19 @@ def film_awards(request, id, film_slug):
 
 def film_links(request, id, film_slug):
     film = get_object_or_404(models.Film, pk=id)
+    links = film.link_set.select_related('author')
     return render(request, 'ktapp/film_subpages/film_links.html', {
         'active_tab': 'links',
         'film': film,
-        'links_official': film.link_set.filter(link_type=models.Link.LINK_TYPE_OFFICIAL),
-        'links_reviews': film.link_set.filter(link_type=models.Link.LINK_TYPE_REVIEWS),
-        'links_interviews': film.link_set.filter(link_type=models.Link.LINK_TYPE_INTERVIEWS),
-        'links_other': film.link_set.filter(link_type=models.Link.LINK_TYPE_OTHER),
+        'links_reviews': links.filter(link_type=models.Link.LINK_TYPE_REVIEWS),
+        'links_interviews': links.filter(link_type=models.Link.LINK_TYPE_INTERVIEWS),
+        'links_official': links.filter(link_type=models.Link.LINK_TYPE_OFFICIAL),
+        'links_other': links.filter(link_type=models.Link.LINK_TYPE_OTHER),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
+        'permission_suggest_link': kt_utils.check_permission('suggest_link', request.user),
+        'permission_new_link': kt_utils.check_permission('new_link', request.user),
+        'permission_edit_link': kt_utils.check_permission('edit_link', request.user),
+        'permission_delete_link': kt_utils.check_permission('delete_link', request.user),
     })
 
 

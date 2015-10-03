@@ -88,6 +88,10 @@ def check_permission(perm, user, silent=True):
             'check_changes': 'reliable',
             'poll_admin': 'admin',
             'new_poll': 'core',
+            'suggest_link': 'core',
+            'new_link': 'reliable',
+            'edit_link': 'reliable',
+            'delete_link': 'reliable',
         }.get(perm, perm)
         if grp == 'admin' and user.is_staff:
             return True

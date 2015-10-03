@@ -26,6 +26,27 @@
             </p>
             <br class="clear" />
         </div>
+        {% if latest_links %}
+            <h2>Legfrissebb írások</h2>
+            {% for link in latest_links %}
+                <div class="film_addon">
+                    {% if link.film %}
+                        <div class="film_addon_source">
+                            <a href="{% url 'film_main' link.film.id link.film.slug_cache %}">{{ link.film.orig_title }} ({{ link.film.year }}){% if link.film.second_title %} / {{ link.film.second_title }}{% endif %}</a>
+                        </div>
+                    {% endif %}
+                    <div class="film_addon_content">
+                        <p>[{{ link.link_domain }}] <b><a href="{{ link.url }}" target="_blank">{{ link.name }}</a></b></p>
+                        <p>{{ link.lead|linebreaksbr }}</p>
+                    </div>
+                    {% if link.author %}
+                        <div class="film_addon_author">
+                            <a href="{% url 'user_profile' link.author.id link.author.slug_cache %}">{{ link.author.username }}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% endif %}
         {% if random_poll %}
             <h2>Aktuális közkérdés</h2>
             <p><b><a href="{% url 'poll' random_poll.id random_poll.slug_cache %}">{{ random_poll.title }}</a></b></p>

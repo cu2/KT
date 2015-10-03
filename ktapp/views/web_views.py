@@ -30,6 +30,8 @@ def index(request):
     hash_of_the_day = int(hashlib.md5(datetime.datetime.now().strftime('%Y-%m-%d')).hexdigest(), 16)
     # film of the day
     film_of_the_day = models.OfTheDay.objects.filter(domain='F').order_by('-day')[0].film
+    # latest_links
+    latest_links = models.Link.objects.exclude(lead='').select_related('author', 'created_by', 'film', 'artist').order_by('-created_at')[:10]
     # toplist of the day
     number_of_toplists = models.UserToplist.objects.filter(quality=True).count()
     toplist_no_of_the_day = hash_of_the_day % number_of_toplists
@@ -54,6 +56,7 @@ def index(request):
         random_poll = None
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
+        'latest_links': latest_links,
         'toplist': toplist_of_the_day,
         'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
         'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids),
@@ -801,6 +804,31 @@ def awards(request):
     return render(request, 'ktapp/awards.html', {
         'award_name': award_name,
         'award_list': award_list,
+    })
+
+
+
+def links(request):
+    return render(request, 'ktapp/links.html', {
+        'links': models.Link.objects.exclude(lead='').select_related('author', 'created_by', 'film', 'artist').order_by('-created_at'),
+        'permission_suggest_link': kt_utils.check_permission('suggest_link', request.user),
+        'permission_new_link': kt_utils.check_permission('new_link', request.user),
+        'permission_edit_link': kt_utils.check_permission('edit_link', request.user),
+        'permission_delete_link': kt_utils.check_permission('delete_link', request.user),
+    })
+
+
+def suggested_links(request):
+    return render(request, 'ktapp/suggested_links.html', {
+        'links': [
+            {
+                'id': sc.id,
+                'created_by': sc.created_by,
+                'created_at': sc.created_at,
+                'content': json.loads(sc.content),
+            }
+            for sc in models.SuggestedContent.objects.select_related('created_by').filter(domain=models.SuggestedContent.DOMAIN_LINK).order_by('-created_at')
+        ],
     })
 
 

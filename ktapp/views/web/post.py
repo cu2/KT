@@ -590,6 +590,131 @@ def new_award(request):
     return HttpResponseRedirect(reverse('film_awards', args=(film.id, film.slug_cache)))
 
 
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('new_link')
+def new_link(request):
+    film_id = request.POST.get('film_id', 0)
+    if film_id:
+        film = get_object_or_404(models.Film, id=film_id)
+    else:
+        film = None
+    name = kt_utils.strip_whitespace(request.POST.get('name', ''))
+    url = kt_utils.strip_whitespace(request.POST.get('url', ''))
+    if name == '' or url == '':
+        if film:
+            return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+        else:
+            return HttpResponseRedirect(reverse('links'))
+    link_type = kt_utils.strip_whitespace(request.POST.get('link_type', ''))
+    if link_type not in {'R', 'I', 'O', '-'}:
+        link_type = '-'
+    lead = request.POST.get('lead', '').strip()
+    author_name = kt_utils.strip_whitespace(request.POST.get('author', ''))
+    author = models.KTUser.get_user_by_name(author_name)
+    models.Link.objects.create(
+        name=name,
+        url=url,
+        link_type=link_type,
+        lead=lead,
+        author=author,
+        film=film,
+        created_by_id=request.user.id,
+    )
+    if film:
+        return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+    else:
+        return HttpResponseRedirect(reverse('links'))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('suggest_link')
+def suggest_link(request):
+    film_id = request.POST.get('film_id', 0)
+    if film_id:
+        film = get_object_or_404(models.Film, id=film_id)
+    else:
+        film = None
+    name = kt_utils.strip_whitespace(request.POST.get('name', ''))
+    url = kt_utils.strip_whitespace(request.POST.get('url', ''))
+    if name == '' or url == '':
+        if film:
+            return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+        else:
+            return HttpResponseRedirect(reverse('links'))
+    link_type = kt_utils.strip_whitespace(request.POST.get('link_type', ''))
+    if link_type not in {'R', 'I', 'O', '-'}:
+        link_type = '-'
+    lead = request.POST.get('lead', '').strip()
+    author_name = kt_utils.strip_whitespace(request.POST.get('author', ''))
+    author = models.KTUser.get_user_by_name(author_name)
+
+    models.SuggestedContent.objects.create(
+        created_by=request.user,
+        domain=models.SuggestedContent.DOMAIN_LINK,
+        content=json.dumps({
+            'name': name,
+            'url': url,
+            'link_type': link_type,
+            'lead': lead,
+            'author': {
+                'id': author.id,
+                'slug_cache': author.slug_cache,
+                'username': author.username,
+            } if author else None,
+            'film': {
+                'id': film.id,
+                'slug_cache': film.slug_cache,
+                'orig_title': film.orig_title,
+                'year': film.year,
+            } if film else None,
+        }),
+    )
+    return HttpResponseRedirect(reverse('suggested_links'))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('new_link')
+def accept_link(request):
+    suggested_content = get_object_or_404(models.SuggestedContent, id=request.POST.get('id', 0), domain=models.SuggestedContent.DOMAIN_LINK)
+    content = json.loads(suggested_content.content)
+    author = None
+    if content['author']:
+        try:
+            author = models.KTUser.objects.get(id=content['author']['id'])
+        except models.KTUser.DoesNotExist:
+            pass
+    film = None
+    if content['film']:
+        try:
+            film = models.Film.objects.get(id=content['film']['id'])
+        except models.Film.DoesNotExist:
+            pass
+    models.Link.objects.create(
+        name=content['name'],
+        url=content['url'],
+        link_type=content['link_type'],
+        lead=content['lead'],
+        author=author,
+        film=film,
+        created_by=suggested_content.created_by,
+    )
+    suggested_content.delete()
+    if film:
+        return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+    else:
+        return HttpResponseRedirect(reverse('links'))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('new_link')
+def reject_link(request):
+    suggested_content = get_object_or_404(models.SuggestedContent, id=request.POST.get('id', 0), domain=models.SuggestedContent.DOMAIN_LINK)
+    suggested_content.delete()
+    return HttpResponseRedirect(reverse('suggested_links'))
 
 
 @require_POST
@@ -679,7 +804,7 @@ def accept_film(request):
 @login_required
 @kt_utils.kt_permission_required('new_film')
 def reject_film(request):
-    suggested_content = get_object_or_404(models.SuggestedContent, id=request.POST.get('id', 0))
+    suggested_content = get_object_or_404(models.SuggestedContent, id=request.POST.get('id', 0), domain=models.SuggestedContent.DOMAIN_FILM)
     suggested_content.delete()
     return HttpResponseRedirect(reverse('suggested_films'))
 

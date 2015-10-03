@@ -386,6 +386,21 @@ $(function() {
             }
         });
 
+    $('.input_for_user')
+        .autocomplete({
+            source: function(request, response) {
+                $.getJSON('api/autocomplete/users/', {
+                    q: request.term
+                }, response);
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                if (ui.item) {
+                    this.value = ui.item.value;
+                }
+            }
+        });
+
     var award_type = 'N';
     $('.input_for_award')
         .focus(function() {
