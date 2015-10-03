@@ -678,14 +678,6 @@ def delete_award(sender, instance, **kwargs):
     instance.film.save()
 
 
-class LinkSite(models.Model):
-    name = models.CharField(max_length=250)
-    url = models.CharField(max_length=250)
-
-    def __unicode__(self):
-        return self.name
-
-
 class Link(models.Model):
     name = models.CharField(max_length=250)
     url = models.CharField(max_length=250)
