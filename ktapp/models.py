@@ -162,6 +162,9 @@ class Film(models.Model):
     genre_names_cache = models.CharField(max_length=250, blank=True)
     number_of_genres = models.PositiveSmallIntegerField(default=0)
     number_of_countries = models.PositiveSmallIntegerField(default=0)
+    genre_cache_is_short = models.BooleanField(default=False)
+    genre_cache_is_mini = models.BooleanField(default=False)
+    genre_cache_is_music_video = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'
@@ -205,7 +208,16 @@ class Film(models.Model):
         ids = []
         slugs = []
         names = []
+        self.genre_cache_is_music_video = False
+        self.genre_cache_is_mini = False
+        self.genre_cache_is_short = False
         for g in self.genres():
+            if g.id == 314:
+                self.genre_cache_is_music_video = True
+            if g.id == 4150:
+                self.genre_cache_is_mini = True
+            if g.id == 120:
+                self.genre_cache_is_short = True
             ids.append(unicode(g.id))
             slugs.append(g.slug_cache)
             names.append(g.name)
