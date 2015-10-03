@@ -681,7 +681,8 @@ def delete_award(sender, instance, **kwargs):
 class Link(models.Model):
     name = models.CharField(max_length=250)
     url = models.CharField(max_length=250)
-    film = models.ForeignKey(Film)
+    film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
+    artist = models.ForeignKey('Artist', blank=True, null=True, on_delete=models.SET_NULL)
     link_domain = models.CharField(max_length=250)
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -697,12 +698,14 @@ class Link(models.Model):
     ]
     link_type = models.CharField(max_length=1, choices=LINK_TYPES, default=LINK_TYPE_OTHER)
     lead = models.TextField(blank=True)
+    author = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL, related_name='authored_link')
 
     def save(self, *args, **kwargs):
         self.link_domain = urlparse(self.url).netloc
         super(Link, self).save(*args, **kwargs)
-        self.film.number_of_links = self.film.link_set.count()
-        self.film.save()
+        if self.film:
+            self.film.number_of_links = self.film.link_set.count()
+            self.film.save()
 
     def __unicode__(self):
         return self.name
@@ -710,8 +713,9 @@ class Link(models.Model):
 
 @receiver(post_delete, sender=Link)
 def delete_link(sender, instance, **kwargs):
-    instance.film.number_of_links = instance.film.link_set.count()
-    instance.film.save()
+    if instance.film:
+        instance.film.number_of_links = instance.film.link_set.count()
+        instance.film.save()
 
 
 class Artist(models.Model):
@@ -1336,8 +1340,10 @@ class SuggestedContent(models.Model):
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     DOMAIN_FILM = 'F'
+    DOMAIN_LINK = 'L'
     DOMAINS = [
         (DOMAIN_FILM, 'Film'),
+        (DOMAIN_LINK, 'Link'),
     ]
     domain = models.CharField(max_length=1, choices=DOMAINS, default=DOMAIN_FILM)
     content = models.TextField(blank=True)
