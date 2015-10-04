@@ -26,23 +26,38 @@
             </p>
             <br class="clear" />
         </div>
-        {% if latest_links %}
+        {% if latest_content %}
             <h2>Legfrissebb írások</h2>
-            {% for link in latest_links %}
+            {% for _, content_type, content in latest_content %}
                 <div class="film_addon">
-                    {% if link.film %}
+                    {% if content.film %}
                         <div class="film_addon_source">
-                            <a href="{% url 'film_main' link.film.id link.film.slug_cache %}">{{ link.film.orig_title }} ({{ link.film.year }}){% if link.film.second_title %} / {{ link.film.second_title }}{% endif %}</a>
+                            <a href="{% url 'film_main' content.film.id content.film.slug_cache %}">{{ content.film.orig_title }} ({{ content.film.year }}){% if content.film.second_title %} / {{ content.film.second_title }}{% endif %}</a>
                         </div>
                     {% endif %}
-                    <div class="film_addon_content">
-                        <p>[{{ link.link_domain }}] <b><a href="{{ link.url }}" target="_blank">{{ link.name }}</a></b></p>
-                        <p>{{ link.lead|linebreaksbr }}</p>
-                    </div>
-                    {% if link.author %}
-                        <div class="film_addon_author">
-                            <a href="{% url 'user_profile' link.author.id link.author.slug_cache %}">{{ link.author.username }}</a>
+                    {% if content_type == 'review' %}
+                        <div class="film_addon_content">
+                            {% autoescape off %}
+                                {{ content.content_html|striptags|truncatechars:400|linebreaks }}
+                            {% endautoescape %}
+                            <p style="text-align: right"><a href="{% url 'film_review' content.film.id content.film.slug_cache content.id %}">Tovább...</a></p>
                         </div>
+                        {% if content.created_by %}
+                            <div class="film_addon_author">
+                                <a href="{% url 'user_profile' content.created_by.id content.created_by.slug_cache %}">{{ content.created_by.username }}</a>
+                            </div>
+                        {% endif %}
+                    {% elif content_type == 'link' %}
+                        <div class="film_addon_content">
+                            <p>[{{ content.link_domain }}] <b>{{ content.name }}</b></p>
+                            <p>{{ content.lead|linebreaksbr }}</p>
+                            <p style="text-align: right"><a href="{{ content.url }}" target="_blank">Tovább...</a></p>
+                        </div>
+                        {% if content.author %}
+                            <div class="film_addon_author">
+                                <a href="{% url 'user_profile' content.author.id content.author.slug_cache %}">{{ content.author.username }}</a>
+                            </div>
+                        {% endif %}
                     {% endif %}
                 </div>
             {% endfor %}

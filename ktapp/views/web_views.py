@@ -30,8 +30,12 @@ def index(request):
     hash_of_the_day = int(hashlib.md5(datetime.datetime.now().strftime('%Y-%m-%d')).hexdigest(), 16)
     # film of the day
     film_of_the_day = models.OfTheDay.objects.filter(domain='F').order_by('-day')[0].film
-    # latest_links
-    latest_links = models.Link.objects.exclude(lead='').select_related('author', 'created_by', 'film', 'artist').order_by('-created_at')[:10]
+    # latest_content
+    latest_content = []
+    for item in models.Review.objects.select_related('film', 'created_by').filter(approved=True).order_by('-created_at')[:10]:
+        latest_content.append((item.created_at, 'review', item))
+    for item in models.Link.objects.exclude(lead='').select_related('author', 'created_by', 'film', 'artist').order_by('-created_at')[:10]:
+        latest_content.append((item.created_at, 'link', item))
     # toplist of the day
     number_of_toplists = models.UserToplist.objects.filter(quality=True).count()
     toplist_no_of_the_day = hash_of_the_day % number_of_toplists
@@ -56,7 +60,7 @@ def index(request):
         random_poll = None
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
-        'latest_links': latest_links,
+        'latest_content': sorted(latest_content, key=lambda x: x[0], reverse=True)[:10],
         'toplist': toplist_of_the_day,
         'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
         'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids),
