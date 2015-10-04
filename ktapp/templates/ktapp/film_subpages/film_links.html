@@ -53,9 +53,7 @@
             </p>
             <p><input type="submit" value="Link mentése" /></p>
         </form>
-    {% else %}
-
-    {% if permission_suggest_link %}
+    {% elif permission_suggest_link %}
         <h3>Új link beküldése</h3>
         <form action="{% url 'suggest_link' %}" method="post" class="inline">
             {% csrf_token %}
@@ -87,8 +85,6 @@
             </p>
             <p><input type="submit" value="Link beküldése" /></p>
         </form>
-    {% endif %}
-
     {% endif %}
 
 {% endblock %}
