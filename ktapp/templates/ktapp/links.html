@@ -14,7 +14,6 @@
             <th>Szerző</th>
             <th>Cím</th>
             <th style="width: 50%">Lead</th>
-            <th>Mikor</th>
             <th>Film</th>
             <th>Típus</th>
         </tr>
@@ -23,7 +22,6 @@
                 <td>{% if link.author %}<a href="{% url 'user_profile' link.author.id link.author.slug_cache %}">{{ link.author.username }}</a>{% endif %}</td>
                 <td>[{{ link.link_domain }}] <a href="{{ link.url }}" target="_blank">{{ link.name }}</a></td>
                 <td>{{ link.lead }}</td>
-                <td>{{ link.created_at|date:"Y-m-d" }}</td>
                 <td>
                     {% if link.film %}
                         <a href="{% url 'film_main' link.film.id link.film.slug_cache %}">{{ link.film.orig_title }} ({{ link.film.year }})</a>
