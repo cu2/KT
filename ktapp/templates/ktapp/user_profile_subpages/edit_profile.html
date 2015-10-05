@@ -37,7 +37,7 @@
         </p>
         <p>
             <label for="id_fav_period">Korszakaid:</label>
-            <input type="text" id="id_fav_period" name="fav_period" value="{{ selected_user.fav_period }}" class="wide_input" />
+            <input type="text" id="id_fav_period" name="fav_period" value="{% if selected_user.fav_period %}{{ selected_user.fav_period }}{% endif %}" class="wide_input" />
         </p>
 
         <h2>Demográfiai adatok</h2>

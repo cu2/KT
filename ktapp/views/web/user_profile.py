@@ -507,9 +507,10 @@ def edit_profile(request):
         new_items = set()
         for name in kt_utils.strip_whitespace(request.POST.get(field_name, '')).split(','):
             name = kt_utils.strip_whitespace(name)
-            item = get_object_function(name)
-            if item:
-                new_items.add(item.id)
+            if name:
+                item = get_object_function(name)
+                if item:
+                    new_items.add(item.id)
         for item_id in old_items - new_items:
             models.UserFavourite.objects.filter(user=request.user, domain=domain, fav_id=item_id).delete()
         for item_id in new_items - old_items:
