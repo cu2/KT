@@ -41,6 +41,7 @@
                                 {{ content.content_html|striptags|truncatechars:400|linebreaks }}
                             {% endautoescape %}
                             <p style="text-align: right"><a href="{% url 'film_review' content.film.id content.film.slug_cache content.id %}">Tovább...</a></p>
+                            {% if user.is_authenticated and user.is_staff %}<p>(Mióta van kint? {{ content.created_at|timesince }})</p>{% endif %}
                         </div>
                         {% if content.created_by %}
                             <div class="film_addon_author">
@@ -52,6 +53,7 @@
                             <p>[{{ content.link_domain }}] <b>{{ content.name }}</b></p>
                             <p>{{ content.lead|linebreaksbr }}</p>
                             <p style="text-align: right"><a href="{{ content.url }}" target="_blank">Tovább...</a></p>
+                            {% if user.is_authenticated and user.is_staff %}<p>(Mióta van kint? {{ content.created_at|timesince }})</p>{% endif %}
                         </div>
                         {% if content.author %}
                             <div class="film_addon_author">
