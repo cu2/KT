@@ -38,6 +38,11 @@ class LoggingMiddleware(object):
                 username = request.user.username
         except AttributeError:
             pass
+        session_key = ''
+        try:
+            session_key = request.session.session_key
+        except AttributeError:
+            pass
         ip = get_ip(request)
         jsonlog(kt_pageview_logger, logging.INFO, {
             'utc_timestamp': utcnow.strftime('%s.%f'),
@@ -51,7 +56,7 @@ class LoggingMiddleware(object):
             'server_name': request.META.get('SERVER_NAME', ''),
             'user_id': user_id,
             'user_name': username,
-            'session': request.session.session_key,
+            'session': session_key,
             'kutma': kutma,
             'cohort': cohort,
         })
@@ -61,9 +66,6 @@ class LoggingMiddleware(object):
 
     def process_response(self, request, response):
         utcnow = datetime.datetime.utcnow()
-        response_time = None
-        kutma = None
-        cohort = None
         user_id = 0
         username = ''
         try:
@@ -72,11 +74,25 @@ class LoggingMiddleware(object):
                 username = request.user.username
         except AttributeError:
             pass
+        session_key = ''
+        try:
+            session_key = request.session.session_key
+        except AttributeError:
+            pass
+        response_time = None
         try:
             if 'received_time' in request.session:
                 response_time = time.time() - request.session['received_time']
+        except AttributeError:
+            pass
+        kutma = None
+        try:
             if 'kutma' in request.session:
                 kutma = request.session['kutma']
+        except AttributeError:
+            pass
+        cohort = None
+        try:
             if 'cohort' in request.session:
                 cohort = request.session['cohort']
         except AttributeError:
@@ -94,7 +110,7 @@ class LoggingMiddleware(object):
             'server_name': request.META.get('SERVER_NAME', ''),
             'user_id': user_id,
             'user_name': username,
-            'session': request.session.session_key,
+            'session': session_key,
             'kutma': kutma,
             'cohort': cohort,
             'response_time_ms': 1000.0 * response_time if response_time else None,
