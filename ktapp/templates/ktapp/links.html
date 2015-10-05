@@ -46,7 +46,7 @@
 
     {% if permission_new_link %}
         <h3>Új link felvétele</h3>
-        <p>Ha egy konkrét filmről akarsz írást felvenni, azt megteheted ott (a film lapján a linkek fül alatt). Ha egyéb filmes témáról, azt itt.</p>
+        <p class="error">Ha egy konkrét filmről akarsz írást felvenni, azt ott tedd (a film lapján a linkek fül alatt). Ha egyéb filmes témáról, azt itt.</p>
         <form action="{% url 'new_link' %}" method="post" class="inline">
             {% csrf_token %}
             <p>
@@ -77,7 +77,7 @@
         </form>
     {% elif permission_suggest_link %}
         <h3>Új link beküldése</h3>
-        <p>Ha egy konkrét filmről akarsz írást beküldeni, azt megteheted ott (a film lapján a linkek fül alatt). Ha egyéb filmes témáról, azt itt.</p>
+        <p class="error">Ha egy konkrét filmről akarsz írást beküldeni, azt ott tedd (a film lapján a linkek fül alatt). Ha egyéb filmes témáról, azt itt.</p>
         <form action="{% url 'suggest_link' %}" method="post" class="inline">
             {% csrf_token %}
             <p>

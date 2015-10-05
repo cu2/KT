@@ -15,8 +15,7 @@
             <th>Mikor</th>
             <th>Film</th>
             <th>Típus</th>
-            <th>Cím</th>
-            <th>Link</th>
+            <th>Cím/Link</th>
             <th>Lead</th>
             <th>Szerző</th>
             {% if user.is_authenticated and user.is_staff %}
@@ -43,8 +42,7 @@
                         Egyéb oldal
                     {% endif %}
                 </td>
-                <td>{{ link.content.name }}</td>
-                <td>{{ link.content.url }}</td>
+                <td><a href="{{ link.content.url }}" target="_blank">{{ link.content.name }}</a></td>
                 <td>{{ link.content.lead }}</td>
                 <td>{% if link.content.author %}<a href="{% url 'user_profile' link.content.author.id link.content.author.slug_cache %}">{{ link.content.author.username }}</a>{% endif %}</td>
                 {% if user.is_authenticated and user.is_staff %}
