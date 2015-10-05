@@ -28,9 +28,16 @@ class LoggingMiddleware(object):
         if kutma == '':
             kutma = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(32))
         cohort = int(hashlib.md5(kutma).hexdigest(), 16) % 100
-        if request.user.is_authenticated():
-            request.user.last_activity_at = datetime.datetime.now()
-            request.user.save(update_fields=['last_activity_at'])
+        user_id = 0
+        username = ''
+        try:
+            if request.user.is_authenticated():
+                request.user.last_activity_at = datetime.datetime.now()
+                request.user.save(update_fields=['last_activity_at'])
+                user_id = request.user.id
+                username = request.user.username
+        except AttributeError:
+            pass
         ip = get_ip(request)
         jsonlog(kt_pageview_logger, logging.INFO, {
             'utc_timestamp': utcnow.strftime('%s.%f'),
@@ -42,8 +49,8 @@ class LoggingMiddleware(object):
             'query_string': request.META.get('QUERY_STRING', ''),
             'request_method': request.META.get('REQUEST_METHOD', ''),
             'server_name': request.META.get('SERVER_NAME', ''),
-            'user_id': request.user.id if request.user.id else 0,
-            'user_name': request.user.username,
+            'user_id': user_id,
+            'user_name': username,
             'session': request.session.session_key,
             'kutma': kutma,
             'cohort': cohort,
@@ -57,6 +64,14 @@ class LoggingMiddleware(object):
         response_time = None
         kutma = None
         cohort = None
+        user_id = 0
+        username = ''
+        try:
+            if request.user.is_authenticated():
+                user_id = request.user.id
+                username = request.user.username
+        except AttributeError:
+            pass
         try:
             if 'received_time' in request.session:
                 response_time = time.time() - request.session['received_time']
@@ -64,7 +79,7 @@ class LoggingMiddleware(object):
                 kutma = request.session['kutma']
             if 'cohort' in request.session:
                 cohort = request.session['cohort']
-        except AttributeError:  # for some redirects there's no request.session
+        except AttributeError:
             pass
         ip = get_ip(request)
         jsonlog(kt_loadtime_logger, logging.INFO, {
@@ -77,8 +92,8 @@ class LoggingMiddleware(object):
             'query_string': request.META.get('QUERY_STRING', ''),
             'request_method': request.META.get('REQUEST_METHOD', ''),
             'server_name': request.META.get('SERVER_NAME', ''),
-            'user_id': request.user.id if request.user.id else 0,
-            'user_name': request.user.username,
+            'user_id': user_id,
+            'user_name': username,
             'session': request.session.session_key,
             'kutma': kutma,
             'cohort': cohort,
@@ -91,9 +106,17 @@ class LoggingMiddleware(object):
         return response
 
     def process_exception(self, request, exc):
+        user_id = 0
+        username = ''
+        try:
+            if request.user.is_authenticated():
+                user_id = request.user.id
+                username = request.user.username
+        except AttributeError:
+            pass
         kt_exception_logger.exception(u'-----\nDATETIME={dt}\nURL={url}\nUSER_ID={user_id}\nUSER_NAME={user_name}'.format(
             dt=datetime.datetime.strftime(datetime.datetime.utcnow(), '%Y-%m-%d %H:%M:%S.%f'),
             url=request.get_full_path(),
-            user_id=request.user.id if request.user.id else 0,
-            user_name=request.user.username,
+            user_id=user_id,
+            user_name=username,
         ).encode('utf-8', errors='ignore'))
