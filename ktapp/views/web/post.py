@@ -575,7 +575,10 @@ def new_award(request):
         return HttpResponseRedirect(reverse('film_awards', args=(film.id, film.slug_cache)))
     artist_name = kt_utils.strip_whitespace(request.POST.get('artist', ''))
     note = kt_utils.strip_whitespace(request.POST.get('note', ''))
-    artist = models.Artist.get_artist_by_name(artist_name)
+    if artist_name:
+        artist = models.Artist.get_artist_by_name(artist_name)
+    else:
+        artist = None
     if artist_name != '' and artist is None and note == '':
         note = artist_name
     models.Award.objects.create(
