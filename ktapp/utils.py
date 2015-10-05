@@ -10,6 +10,18 @@ from django.core.exceptions import PermissionDenied
 
 
 def bbcode_to_html(value):
+    value = re.sub('\[link\](http://kritikustomeg.org.*?)\[/link\]', '<a href="\\1">\\1</a>', value, flags=re.S)
+    value = re.sub('\[link=\](http://kritikustomeg.org.*?)\[/link\]', '<a href="\\1">\\1</a>', value, flags=re.S)
+    value = re.sub('\[link=(http://kritikustomeg.org[^\]]*)\](.*?)\[/link\]', '<a href="\\1">\\2</a>', value, flags=re.S)
+    value = re.sub('\[link\](https://kritikustomeg.org.*?)\[/link\]', '<a href="\\1">\\1</a>', value, flags=re.S)
+    value = re.sub('\[link=\](https://kritikustomeg.org.*?)\[/link\]', '<a href="\\1">\\1</a>', value, flags=re.S)
+    value = re.sub('\[link=(https://kritikustomeg.org[^\]]*)\](.*?)\[/link\]', '<a href="\\1">\\2</a>', value, flags=re.S)
+    value = re.sub('\[link\](http://.*?)\[/link\]', '<a href="\\1" target="_blank" rel="nofollow">\\1</a>', value, flags=re.S)
+    value = re.sub('\[link=\](http://.*?)\[/link\]', '<a href="\\1" target="_blank" rel="nofollow">\\1</a>', value, flags=re.S)
+    value = re.sub('\[link=(http://[^\]]*)\](.*?)\[/link\]', '<a href="\\1" target="_blank" rel="nofollow">\\2</a>', value, flags=re.S)
+    value = re.sub('\[link\](https://.*?)\[/link\]', '<a href="\\1" target="_blank" rel="nofollow">\\1</a>', value, flags=re.S)
+    value = re.sub('\[link=\](https://.*?)\[/link\]', '<a href="\\1" target="_blank" rel="nofollow">\\1</a>', value, flags=re.S)
+    value = re.sub('\[link=(https://[^\]]*)\](.*?)\[/link\]', '<a href="\\1" target="_blank" rel="nofollow">\\2</a>', value, flags=re.S)
     value = re.sub('\[link\](.*?)\[/link\]', '<a href="\\1">\\1</a>', value, flags=re.S)
     value = re.sub('\[link=\](.*?)\[/link\]', '<a href="\\1">\\1</a>', value, flags=re.S)
     value = re.sub('\[link=([^\]]*)\](.*?)\[/link\]', '<a href="\\1">\\2</a>', value, flags=re.S)

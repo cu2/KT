@@ -76,6 +76,9 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_wishes_get = models.PositiveIntegerField(default=0)
     number_of_toplists = models.PositiveIntegerField(default=0)
     is_reliable = models.BooleanField(default=False)
+    bio = models.TextField(blank=True)
+    bio_html = models.TextField(blank=True)
+    fav_period = models.CharField(max_length=250, blank=True, null=True)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -109,6 +112,8 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
         self.slug_cache = slugify(self.username)
+        self.bio = strip_tags(self.bio)
+        self.bio_html = kt_utils.bbcode_to_html(self.bio)
         super(KTUser, self).save(*args, **kwargs)
 
     @classmethod
@@ -1360,3 +1365,26 @@ class OfTheDay(models.Model):
 
     class Meta:
         unique_together = ['domain', 'day']
+
+
+class UserFavourite(models.Model):
+    user = models.ForeignKey(KTUser)
+    DOMAIN_FILM = 'F'
+    DOMAIN_DIRECTOR = 'D'
+    DOMAIN_ACTOR = 'A'
+    DOMAIN_GENRE = 'G'
+    DOMAIN_COUNTRY = 'C'
+    DOMAIN_PERIOD = 'P'
+    DOMAINS = [
+        (DOMAIN_FILM, 'Film'),
+        (DOMAIN_DIRECTOR, 'Director'),
+        (DOMAIN_ACTOR, 'Actor'),
+        (DOMAIN_GENRE, 'Genre'),
+        (DOMAIN_COUNTRY, 'Country'),
+        (DOMAIN_PERIOD, 'Period'),
+    ]
+    domain = models.CharField(max_length=1, choices=DOMAINS, default=DOMAIN_FILM)
+    fav_id = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ['user', 'domain', 'fav_id']

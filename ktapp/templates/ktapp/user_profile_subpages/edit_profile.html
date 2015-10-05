@@ -1,0 +1,71 @@
+{% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
+{% load kt_extras %}
+
+{% block user_profile_main %}
+
+    <div class="form_container">
+    <form action="{% url 'edit_profile' %}" method="post">
+        {% csrf_token %}
+
+    <div class="left_content">
+        <h2>Bemutatkozás</h2>
+        {% include 'ktapp/blocks/bbcode_buttons.html' %}
+        <p>
+            <label for="id_bio">Írj magadról bármit, amit fontosnak tartasz elmondani. Ha blogot írsz, linkeld be, hogy akit érdekel, rátaláljon.</label>
+            <textarea id="id_bio" name="bio" style="height: 200px">{{ selected_user.bio }}</textarea>
+        </p>
+    </div>
+
+    <div class="right_content">
+
+        <h2>Kedvenceid</h2>
+        <p>
+            <label for="id_fav_director">Rendezőid:</label>
+            <input type="text" id="id_fav_director" name="fav_director" value="{% if fav_directors %}{% for item in fav_directors %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}" class="wide_input input_for_artists" />
+        </p>
+        <p>
+            <label for="id_fav_actor">Színészeid:</label>
+            <input type="text" id="id_fav_actor" name="fav_actor" value="{% if fav_actors %}{% for item in fav_actors %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}" class="wide_input input_for_artists" />
+        </p>
+        <p>
+            <label for="id_genres">Műfajaid:</label>
+            <input type="text" id="id_genres" name="fav_genre" value="{% if fav_genres %}{% for item in fav_genres %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}" class="wide_input input_for_keywords" />
+        </p>
+        <p>
+            <label for="id_countries">Országaid:</label>
+            <input type="text" id="id_countries" name="fav_country" value="{% if fav_countries %}{% for item in fav_countries %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}" class="wide_input input_for_keywords" />
+        </p>
+        <p>
+            <label for="id_fav_period">Korszakaid:</label>
+            <input type="text" id="id_fav_period" name="fav_period" value="{{ selected_user.fav_period }}" class="wide_input" />
+        </p>
+
+        <h2>Demográfiai adatok</h2>
+        <p>
+            <label for="id_gender">Nemed:</label>
+            <select id="id_gender" name="gender">
+                <option value="U"{% if selected_user.gender == 'U' %} selected="selected"{% endif %}>?</option>
+                <option value="F"{% if selected_user.gender == 'F' %} selected="selected"{% endif %}>nő</option>
+                <option value="M"{% if selected_user.gender == 'M' %} selected="selected"{% endif %}>férfi</option>
+            </select>
+            <input type="checkbox" id="id_public_gender" name="public_gender"{% if selected_user.public_gender %} checked="checked"{% endif %} /> <label for="id_public_gender">(ikszeld be, ha publikus)</label>
+        </p>
+        <p>
+            <label for="id_year_of_birth">Születési éved:</label>
+            <input type="text" id="id_year_of_birth" name="year_of_birth" value="{% if selected_user.year_of_birth %}{{ selected_user.year_of_birth }}{% endif %}" />
+            <input type="checkbox" id="id_public_year_of_birth" name="public_year_of_birth"{% if selected_user.public_year_of_birth %} checked="checked"{% endif %} /> <label for="id_public_year_of_birth">(ikszeld be, ha publikus)</label>
+        </p>
+        <p>
+            <label for="id_location">Lakhelyed:</label>
+            <input type="text" id="id_location" name="location" value="{% if selected_user.location %}{{ selected_user.location }}{% endif %}" />
+            <input type="checkbox" id="id_public_location" name="public_location"{% if selected_user.public_location %} checked="checked"{% endif %} /> <label for="id_public_location">(ikszeld be, ha publikus)</label>
+        </p>
+    </div>
+
+    <br class="clear" />
+
+        <p class="center"><input type="submit" value="Profil mentése" /></p>
+    </form>
+    </div>
+
+{% endblock %}

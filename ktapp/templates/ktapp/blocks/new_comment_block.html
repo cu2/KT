@@ -1,27 +1,6 @@
     {% if user.is_authenticated %}
         <div class="form_container">
-            <div>
-                <button class="button insert_bbcode insert_bbcode_b" style="font-weight: bold" title="félkövér">F</button>
-                <button class="button insert_bbcode insert_bbcode_i" style="font-style: italic" title="dőlt">D</button>
-                <button class="button insert_bbcode insert_bbcode_u" style="text-decoration: underline" title="aláhúzott">A</button>
-                <button class="button insert_bbcode insert_bbcode_del" style="text-decoration: line-through" title="áthúzott">Á</button>
-                <button class="button insert_bbcode insert_bbcode_img" title="kép beszúrása">kép</button>
-                <button class="button insert_bbcode insert_bbcode_link" title="link beszúrása">link</button>
-                <button class="button insert_bbcode insert_bbcode_spoiler" title="szöveg elrejtése">spoiler</button>
-                <span class="show_bbcode_help_button button small_button">segítség a gombok használatához</span>
-            </div>
-            <div class="bbcode_help" style="display: none; font-size: 9pt">
-                <p>
-                    [b]szöveg[/b] <b>szöveg</b><br />
-                    [i]szöveg[/i] <i>szöveg</i><br />
-                    [u]szöveg[/u] <span class="underlined">szöveg</span><br />
-                    [del]szöveg[/del] <span class="deleted">szöveg</span><br />
-                    [img]http://...[/img] (megjelenik az adott címen látható kép)<br />
-                    [link=http://kritikustomeg.org/]Kritikus Tömeg[/link] <a href="http://kritikustomeg.org/">Kritikus Tömeg</a><br />
-                    [link=]http://kritikustomeg.org/[/link] <a href="http://kritikustomeg.org/">http://kritikustomeg.org/</a><br />
-                    A vége, [spoiler]mikor meghal a főszereplő,[/spoiler] nagyon megrázó volt. A vége, <span class="spoiler">mikor meghal a főszereplő,</span> nagyon megrázó volt.<br />
-                </p>
-            </div>
+            {% include 'ktapp/blocks/bbcode_buttons.html' %}
             <form action="{% url 'new_comment' %}" method="post">
                 {% csrf_token %}
                 {% for hidden in comment_form.hidden_fields %}

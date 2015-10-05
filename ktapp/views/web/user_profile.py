@@ -110,6 +110,34 @@ def user_profile(request, id, name_slug):
         'latest_comments': models.Comment.objects.filter(id__in=latest_comments).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by'),
         'myfav': models.Follow.objects.filter(who=request.user, whom=selected_user).count() if request.user.is_authenticated() else 0,
         'profile': profile,
+        'fav_directors': list(models.Artist.objects.raw('''
+            SELECT a.*
+            FROM ktapp_artist a
+            INNER JOIN ktapp_userfavourite uf ON uf.fav_id = a.id
+            WHERE uf.user_id = %s AND uf.domain = %s
+            ORDER BY a.name, a.id
+        ''', [selected_user.id, models.UserFavourite.DOMAIN_DIRECTOR])),
+        'fav_actors': list(models.Artist.objects.raw('''
+            SELECT a.*
+            FROM ktapp_artist a
+            INNER JOIN ktapp_userfavourite uf ON uf.fav_id = a.id
+            WHERE uf.user_id = %s AND uf.domain = %s
+            ORDER BY a.name, a.id
+        ''', [selected_user.id, models.UserFavourite.DOMAIN_ACTOR])),
+        'fav_genres': list(models.Keyword.objects.raw('''
+            SELECT k.*
+            FROM ktapp_keyword k
+            INNER JOIN ktapp_userfavourite uf ON uf.fav_id = k.id
+            WHERE uf.user_id = %s AND uf.domain = %s AND k.keyword_type = %s
+            ORDER BY k.name, k.id
+        ''', [selected_user.id, models.UserFavourite.DOMAIN_GENRE, models.Keyword.KEYWORD_TYPE_GENRE])),
+        'fav_countries': list(models.Keyword.objects.raw('''
+            SELECT k.*
+            FROM ktapp_keyword k
+            INNER JOIN ktapp_userfavourite uf ON uf.fav_id = k.id
+            WHERE uf.user_id = %s AND uf.domain = %s AND k.keyword_type = %s
+            ORDER BY k.name, k.id
+        ''', [selected_user.id, models.UserFavourite.DOMAIN_COUNTRY, models.Keyword.KEYWORD_TYPE_COUNTRY])),
     })
 
 
@@ -466,4 +494,86 @@ def user_messages(request, id, name_slug):
         'messages': messages_qs.order_by('-sent_at')[(p-1) * MESSAGES_PER_PAGE:p * MESSAGES_PER_PAGE],
         'p': p,
         'max_pages': max_pages,
+    })
+
+
+@login_required()
+def edit_profile(request):
+
+    def set_fav(field_name, domain, get_object_function):
+        old_items = set()
+        for item in models.UserFavourite.objects.filter(user=request.user, domain=domain):
+            old_items.add(item.fav_id)
+        new_items = set()
+        for name in kt_utils.strip_whitespace(request.POST.get(field_name, '')).split(','):
+            name = kt_utils.strip_whitespace(name)
+            item = get_object_function(name)
+            if item:
+                new_items.add(item.id)
+        for item_id in old_items - new_items:
+            models.UserFavourite.objects.filter(user=request.user, domain=domain, fav_id=item_id).delete()
+        for item_id in new_items - old_items:
+            models.UserFavourite.objects.create(user=request.user, domain=domain, fav_id=item_id)
+
+    next_url = request.GET.get('next', request.POST.get('next', reverse('user_profile', args=(request.user.id, request.user.slug_cache))))
+    if not request.user.validated_email:
+        return HttpResponseRedirect(next_url)
+    if request.POST:
+        request.user.bio = request.POST.get('bio', '').strip()
+        gender = request.POST.get('gender', '')
+        if gender not in {'U', 'M', 'F'}:
+            gender = 'U'
+        request.user.gender = gender
+        try:
+            request.user.year_of_birth = int(request.POST.get('year_of_birth', 0))
+        except ValueError:
+            request.user.year_of_birth = 0
+        request.user.location = kt_utils.strip_whitespace(request.POST.get('location', ''))
+        request.user.public_gender = bool(request.POST.get('public_gender', ''))
+        request.user.public_year_of_birth = bool(request.POST.get('public_year_of_birth', ''))
+        request.user.public_location = bool(request.POST.get('public_location', ''))
+        set_fav('fav_director', models.UserFavourite.DOMAIN_DIRECTOR, models.Artist.get_artist_by_name)
+        set_fav('fav_actor', models.UserFavourite.DOMAIN_ACTOR, models.Artist.get_artist_by_name)
+        set_fav('fav_genre', models.UserFavourite.DOMAIN_GENRE, lambda name: models.Keyword.get_keyword_by_name(name, models.Keyword.KEYWORD_TYPE_GENRE))
+        set_fav('fav_country', models.UserFavourite.DOMAIN_COUNTRY, lambda name: models.Keyword.get_keyword_by_name(name, models.Keyword.KEYWORD_TYPE_COUNTRY))
+        request.user.fav_period = kt_utils.strip_whitespace(request.POST.get('fav_period', ''))
+        request.user.save()
+        return HttpResponseRedirect(next_url)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, request.user)
+    return render(request, 'ktapp/user_profile_subpages/edit_profile.html', {
+        'active_tab': 'profile',
+        'selected_user': request.user,
+        'number_of_votes': number_of_votes,
+        'number_of_comments': number_of_comments,
+        'number_of_wishes': number_of_wishes,
+        'number_of_toplists': number_of_toplists,
+        'tab_width': USER_PROFILE_TAB_WIDTH[False],
+        'fav_directors': models.Artist.objects.raw('''
+            SELECT a.*
+            FROM ktapp_artist a
+            INNER JOIN ktapp_userfavourite uf ON uf.fav_id = a.id
+            WHERE uf.user_id = %s AND uf.domain = %s
+            ORDER BY a.name, a.id
+        ''', [request.user.id, models.UserFavourite.DOMAIN_DIRECTOR]),
+        'fav_actors': models.Artist.objects.raw('''
+            SELECT a.*
+            FROM ktapp_artist a
+            INNER JOIN ktapp_userfavourite uf ON uf.fav_id = a.id
+            WHERE uf.user_id = %s AND uf.domain = %s
+            ORDER BY a.name, a.id
+        ''', [request.user.id, models.UserFavourite.DOMAIN_ACTOR]),
+        'fav_genres': models.Keyword.objects.raw('''
+            SELECT k.*
+            FROM ktapp_keyword k
+            INNER JOIN ktapp_userfavourite uf ON uf.fav_id = k.id
+            WHERE uf.user_id = %s AND uf.domain = %s AND k.keyword_type = %s
+            ORDER BY k.name, k.id
+        ''', [request.user.id, models.UserFavourite.DOMAIN_GENRE, models.Keyword.KEYWORD_TYPE_GENRE]),
+        'fav_countries': models.Keyword.objects.raw('''
+            SELECT k.*
+            FROM ktapp_keyword k
+            INNER JOIN ktapp_userfavourite uf ON uf.fav_id = k.id
+            WHERE uf.user_id = %s AND uf.domain = %s AND k.keyword_type = %s
+            ORDER BY k.name, k.id
+        ''', [request.user.id, models.UserFavourite.DOMAIN_COUNTRY, models.Keyword.KEYWORD_TYPE_COUNTRY]),
     })

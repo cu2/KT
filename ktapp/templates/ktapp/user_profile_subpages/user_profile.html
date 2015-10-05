@@ -11,48 +11,57 @@
             Kompetenci{% if selected_user.id == user.id %}ád{% else %}a{% endif %}: {{ number_of_vapiti_votes }} film
             <br />
             Súly{% if selected_user.id == user.id %}od{% endif %}: {{ vapiti_weight }}
-            <br />
-            Műfajok:
-            {% if profile.major_genres %}{% for genre in profile.major_genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
-            {% if profile.minor_genres %}({% for genre in profile.minor_genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
-            <br />
-            Országok:
-            {% if profile.major_countries %}{% for country in profile.major_countries %}{{ country.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
-            {% if profile.minor_countries %}({% for country in profile.minor_countries %}{{ country.name }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
-            <br />
-            Korszakok:
-            {% if profile.major_years %}{% for year in profile.major_years %}{{ year }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
-            {% if profile.minor_years %}({% for year in profile.minor_years %}{{ year }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
         </p>
-
-        {% if user.is_authenticated %}
-            {% if selected_user.id == user.id %}
-                {% if selected_user.core_member %}
-                    <p>Törzstag vagy.</p>
-                {% endif %}
-            {% else %}
-                {% if myfav %}
-                    <form action="{% url 'unfollow' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="whom" value="{{ selected_user.id }}" />
-                        <p>
-                            Kedvencnek jelölted.
-                            <input type="submit" value="Törlés a kedvencek közül" class="small_button" />
-                        </p>
-                    </form>
-                {% else %}
-                    <form action="{% url 'follow' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="whom" value="{{ selected_user.id }}" />
-                        <p>
-                            Érdekel {{ selected_user.username }}? Jelöld kedvencnek, hogy követni tudd a szavazatait és kommentjeit:
-                            <input type="submit" value="Hozzáadás a kedvencekhez" class="small_button" />
-                        </p>
-                    </form>
-                {% endif %}
+        {% if selected_user.bio_html %}
+            <h2>Bemutatkozás</h2>
+            {% autoescape off %}
+                <p>{{ selected_user.bio_html|linebreaksbr }}</p>
+            {% endautoescape %}
+        {% endif %}
+        {% if fav_directors or fav_actors %}
+            <h2>Kedvencek</h2>
+            <p>
+            {% if fav_directors %}
+                Rendezők: {% for item in fav_directors %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
             {% endif %}
+            {% if fav_actors %}
+                Színészek: {% for item in fav_actors %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
+            {% endif %}
+            {% if fav_genres %}
+                Műfajok: {% for item in fav_genres %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
+            {% endif %}
+            {% if fav_countries %}
+                Országok: {% for item in fav_countries %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
+            {% endif %}
+            {% if selected_user.fav_period %}
+                Korszakok: {{ selected_user.fav_period }}<br />
+            {% endif %}
+            </p>
         {% endif %}
 
+        <p>
+            {% if user.is_authenticated %}
+                {% if selected_user.id == user.id %}
+                    A gép szerint ez jellemző rád:
+                    <br />
+                    Műfajok:
+                    {% if profile.major_genres %}{% for genre in profile.major_genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
+                    {% if profile.minor_genres %}({% for genre in profile.minor_genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
+                    <br />
+                    Országok:
+                    {% if profile.major_countries %}{% for country in profile.major_countries %}{{ country.name }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
+                    {% if profile.minor_countries %}({% for country in profile.minor_countries %}{{ country.name }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
+                    <br />
+                    Korszakok:
+                    {% if profile.major_years %}{% for year in profile.major_years %}{{ year }}{% if not forloop.last %}, {% endif %}{% endfor %}{% else %}mindenevő{% endif %}
+                    {% if profile.minor_years %}({% for year in profile.minor_years %}{{ year }}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}
+                    <br />
+                    <a href="{% url 'edit_profile' %}">Szerkeszd meg a profilodat</a>, ha ennél jobbat tudsz (és nyilván jobbat tudsz).
+                {% endif %}
+            {% endif %}
+        </p>
+
+        <h2>Demográfiai adatok</h2>
         {% if selected_user.id == user.id %}
             <p>
                 Nemed:
@@ -110,15 +119,38 @@
         {% endif %}
 
         {% if user.is_authenticated %}
-            {% if selected_user.id == user.id and user.validated_email %}
-                <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
-                <div class="mobilemenu">
-                    <form action="{% url 'logout' %}" method="post">
+            <h2>Egyéb</h2>
+            {% if selected_user.id == user.id %}
+                {% if selected_user.core_member %}
+                    <p>Törzstag vagy.</p>
+                {% endif %}
+            {% else %}
+                {% if myfav %}
+                    <form action="{% url 'unfollow' %}" method="post">
                         {% csrf_token %}
-                        <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
-                        <p><input type="submit" value="Kijelentkezés" class="small_button" /></p>
+                        <input type="hidden" name="whom" value="{{ selected_user.id }}" />
+                        <p>
+                            Kedvencnek jelölted.
+                            <input type="submit" value="Törlés a kedvencek közül" class="small_button" />
+                        </p>
                     </form>
-                </div>
+                {% else %}
+                    <form action="{% url 'follow' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="whom" value="{{ selected_user.id }}" />
+                        <p>
+                            Érdekel {{ selected_user.username }}? Jelöld kedvencnek, hogy követni tudd a szavazatait és kommentjeit:
+                            <input type="submit" value="Hozzáadás a kedvencekhez" class="small_button" />
+                        </p>
+                    </form>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            {% if selected_user.id == user.id and user.validated_email %}
+                <p><a href="{% url 'edit_profile' %}">Profil szerkesztése</a></p>
+                <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
             {% endif %}
         {% endif %}
 
