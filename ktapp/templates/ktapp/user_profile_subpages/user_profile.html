@@ -22,10 +22,10 @@
             <h2>Kedvencek</h2>
             <p>
             {% if fav_directors %}
-                Rendezők: {% for item in fav_directors %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
+                Rendezők: {% for item in fav_directors %}<a href="{% url 'artist' item.id item.slug_cache %}">{{ item.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}<br />
             {% endif %}
             {% if fav_actors %}
-                Színészek: {% for item in fav_actors %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
+                Színészek: {% for item in fav_actors %}<a href="{% url 'artist' item.id item.slug_cache %}">{{ item.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}<br />
             {% endif %}
             {% if fav_genres %}
                 Műfajok: {% for item in fav_genres %}{{ item.name }}{% if not forloop.last %}, {% endif %}{% endfor %}<br />
