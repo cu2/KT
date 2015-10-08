@@ -8,6 +8,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
     table_alias_idx = 0
     role_idx = 0
     additional_inner_joins = []
+    additional_left_joins = []
     my_rating_join_type = 'LEFT'
     additional_where = []
     additional_param = {}
@@ -64,8 +65,19 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'main_premier_year':
                 if filter_value:
-                    additional_where.append('''f.main_premier_year = %(main_premier_year)s''')
+                    additional_where.append('''
+                        (f.main_premier_year = %(main_premier_year)s OR alternative_premiers.`when` BETWEEN '{year}-01-01' AND '{year}-12-31')
+                    '''.format(year=int(filter_value)))
                     additional_param['main_premier_year'] = filter_value
+                    additional_left_joins.append('''
+                        LEFT JOIN ktapp_premier {table_name}
+                        ON {table_name}.film_id = f.id
+                    '''.format(
+                        table_name='alternative_premiers',
+                    ))
+                    additional_select.append('''
+                        COALESCE(alternative_premiers.`when`, f.main_premier) AS premier_date,
+                    ''')
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'director':
                 director_names = []
@@ -390,6 +402,8 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
             order_fields = ['f.year', 'f.orig_title', 'f.id']
         if order_field == 'main_premier':
             order_fields = ['f.main_premier', 'f.orig_title', 'f.id']
+        if order_field == 'premier_date':
+            order_fields = ['premier_date', 'f.orig_title', 'f.id']
         if order_field == 'director':
             order_fields = ['f.director_names_cache', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'genre':
@@ -462,11 +476,13 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
             SELECT COUNT(DISTINCT f.id)
             FROM ktapp_film f
             {additional_inner_joins}
+            {additional_left_joins}
             {sql_user}
             {additional_where}
         '''.format(
             additional_select='\n'.join(additional_select) if additional_select else '',
             additional_inner_joins='\n'.join(additional_inner_joins),
+            additional_left_joins='\n'.join(additional_left_joins),
             sql_user_select=sql_user_select,
             sql_user=sql_user,
             additional_where='WHERE %s' % '\nAND\n'.join(additional_where) if additional_where else '',
@@ -480,6 +496,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
           {sql_user_select}
         FROM ktapp_film f
         {additional_inner_joins}
+        {additional_left_joins}
         {sql_user}
         {additional_where}
         {order_by}
@@ -487,6 +504,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
     '''.format(
         additional_select='\n'.join(additional_select) if additional_select else '',
         additional_inner_joins='\n'.join(additional_inner_joins),
+        additional_left_joins='\n'.join(additional_left_joins),
         sql_user_select=sql_user_select,
         sql_user=sql_user,
         additional_where='WHERE %s' % '\nAND\n'.join(additional_where) if additional_where else '',

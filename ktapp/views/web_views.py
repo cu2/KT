@@ -75,14 +75,20 @@ def premiers(request):
     from_date = today - datetime.timedelta(days=offset+14)
     until_date = today - datetime.timedelta(days=offset-6)
     premier_list = []
-    # TODO: add alternative premier dates
-    for film in models.Film.objects.filter(main_premier__gte=from_date, main_premier__lte=until_date).order_by('-main_premier', 'orig_title', 'id'):
+    film_list = []
+    for film in models.Film.objects.filter(main_premier__gte=from_date, main_premier__lte=until_date):
+        film_list.append((film.main_premier, film))
+    for item in models.Premier.objects.filter(when__gte=from_date, when__lte=until_date).select_related('film'):
+        film_list.append((item.when, item.film))
+    film_list.sort(key=lambda item: (item[0], item[1].orig_title, item[1].id))
+    for premier_date, film in film_list:
         if premier_list:
-            if premier_list[-1][0] != film.main_premier:
-                premier_list.append([film.main_premier, []])
+            if premier_list[-1][0] != premier_date:
+                premier_list.append([premier_date, []])
         else:
-            premier_list.append([film.main_premier, []])
+            premier_list.append([premier_date, []])
         premier_list[-1][1].append(film)
+    premier_list.sort(reverse=True)
     return render(request, 'ktapp/premier_subpages/premiers.html', {
         'active_tab': 'nowadays',
         'last_premier_year': settings.LAST_PREMIER_YEAR,
@@ -100,7 +106,7 @@ def premiers_in_a_year(request, year):
     films, nice_filters = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('main_premier_year', year)],
-        ordering='main_premier',
+        ordering='premier_date',
         films_per_page=None,
     )
     return render(request, 'ktapp/premier_subpages/premiers_in_a_year.html', {

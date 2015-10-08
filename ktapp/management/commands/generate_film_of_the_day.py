@@ -100,12 +100,16 @@ class Command(BaseCommand):
         return models.Film.objects.raw('''
         SELECT f.*, COUNT(DISTINCT w.wished_by_id) AS wish_count
         FROM ktapp_film f
+        LEFT JOIN ktapp_premier p ON p.film_id = f.id
         LEFT JOIN ktapp_wishlist w ON w.film_id = f.id AND w.wish_type = 'Y'
-        WHERE main_premier BETWEEN %s AND %s
+        WHERE main_premier BETWEEN %s AND %s OR p.`when` BETWEEN %s AND %s
         GROUP BY f.id
         ORDER BY COUNT(DISTINCT w.wished_by_id) + f.number_of_ratings_4 + f.number_of_ratings_5 DESC
         LIMIT 1
-        ''', [self.from_date, self.until_date])[0]
+        ''', [
+            self.from_date, self.until_date,
+            self.from_date, self.until_date,
+        ])[0]
 
     def get_top250_film(self):
         films = models.Film.objects.filter(
