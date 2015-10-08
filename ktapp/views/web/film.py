@@ -463,6 +463,7 @@ def suggest_film(request):
 
 def suggested_films(request):
     return render(request, 'ktapp/suggested_films.html', {
+        'permission_new_film': kt_utils.check_permission('new_film', request.user),
         'films': [
             {
                 'id': f.id,

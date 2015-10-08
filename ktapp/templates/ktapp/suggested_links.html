@@ -18,7 +18,7 @@
             <th>Cím/Link</th>
             <th>Lead</th>
             <th>Szerző</th>
-            {% if user.is_authenticated and user.is_staff %}
+            {% if user.is_authenticated and permission_new_link %}
                 <th colspan="2"></th>
             {% endif %}
         </tr>
@@ -45,7 +45,7 @@
                 <td><a href="{{ link.content.url }}" target="_blank">{{ link.content.name }}</a></td>
                 <td>{{ link.content.lead }}</td>
                 <td>{% if link.content.author %}<a href="{% url 'user_profile' link.content.author.id link.content.author.slug_cache %}">{{ link.content.author.username }}</a>{% endif %}</td>
-                {% if user.is_authenticated and user.is_staff %}
+                {% if user.is_authenticated and permission_new_link %}
                     <td>
                         <form action="{% url 'accept_link' %}" method="post" class="inline">
                             {% csrf_token %}

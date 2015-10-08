@@ -866,6 +866,7 @@ def links(request):
 
 def suggested_links(request):
     return render(request, 'ktapp/suggested_links.html', {
+        'permission_new_link': kt_utils.check_permission('new_link', request.user),
         'links': [
             {
                 'id': sc.id,

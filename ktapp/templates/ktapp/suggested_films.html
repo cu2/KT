@@ -18,7 +18,7 @@
             <th>Ország</th>
             <th>Műfaj</th>
             <th>Leírás</th>
-            {% if user.is_authenticated and user.is_staff %}
+            {% if user.is_authenticated and permission_new_film %}
                 <th colspan="2"></th>
             {% endif %}
         </tr>
@@ -35,7 +35,7 @@
                 <td>{{ film.content.countries }}</td>
                 <td>{{ film.content.genres }}</td>
                 <td>{{ film.content.plot_summary }}</td>
-                {% if user.is_authenticated and user.is_staff %}
+                {% if user.is_authenticated and permission_new_film %}
                     <td>
                         <form action="{% url 'accept_film' %}" method="post" class="inline">
                             {% csrf_token %}
