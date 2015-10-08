@@ -363,7 +363,8 @@ def new_message(request):
     if message_to_reply_to:
         for recipient in message_to_reply_to.recipients():
             users.add(recipient)
-        users.add(message_to_reply_to.sent_by)
+        if message_to_reply_to.sent_by:
+            users.add(message_to_reply_to.sent_by)
     else:
         for raw_user_id in request.GET.get('u', '').split(','):
             try:
