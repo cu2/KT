@@ -79,6 +79,18 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                         COALESCE(alternative_premiers.`when`, f.main_premier) AS premier_date,
                     ''')
                     nice_filters.append((filter_type, filter_value))
+            if filter_type == 'of_the_day':
+                if filter_value:
+                    additional_inner_joins.append('''
+                        INNER JOIN ktapp_oftheday {table_name}
+                        ON {table_name}.film_id = f.id AND {table_name}.domain = 'F'
+                    '''.format(
+                        table_name='film_of_the_day',
+                    ))
+                    additional_select.append('''
+                        film_of_the_day.day AS day_of_the_day,
+                    ''')
+                    nice_filters.append((filter_type, filter_value))
             if filter_type == 'director':
                 director_names = []
                 for director_name in filter_value.split(','):
@@ -404,6 +416,8 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
             order_fields = ['f.main_premier', 'f.orig_title', 'f.id']
         if order_field == 'premier_date':
             order_fields = ['premier_date', 'f.orig_title', 'f.id']
+        if order_field == 'of_the_day':
+            order_fields = ['day_of_the_day', 'f.orig_title', 'f.id']
         if order_field == 'director':
             order_fields = ['f.director_names_cache', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'genre':

@@ -52,7 +52,7 @@ def index(request):
         else:
             if comment.created_at > buzz_comment_domains[key][1]:
                 buzz_comment_domains[key] = (comment.id, comment.created_at)
-    buzz_comment_ids = [id for id, _ in sorted(buzz_comment_domains.values(), key=lambda x: x[1], reverse=True)[:10]]
+    buzz_comment_ids = [id for id, _ in sorted(buzz_comment_domains.values(), key=lambda x: x[1], reverse=True)[:20]]
     # random poll
     try:
         random_poll = models.Poll.objects.filter(state=models.Poll.STATE_OPEN).order_by('?')[0]
@@ -116,6 +116,18 @@ def premiers_in_a_year(request, year):
         'premier_list_full': films,
         'this_year': year,
         'premier_years': range(settings.FIRST_PREMIER_YEAR, settings.LAST_PREMIER_YEAR + 1),
+    })
+
+
+def films_of_past_days(request):
+    films, nice_filters = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[('of_the_day', 1)],
+        ordering=('of_the_day', 'DESC'),
+        films_per_page=None,
+    )
+    return render(request, 'ktapp/films_of_past_days.html', {
+        'films': films,
     })
 
 

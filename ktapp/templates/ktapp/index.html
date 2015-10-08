@@ -26,6 +26,7 @@
             </p>
             <br class="clear" />
         </div>
+        <p><a href="{% url 'films_of_past_days' %}">Korábbi napok filmjei...</a></p>
         {% if latest_content %}
             <h2>Legfrissebb írások</h2>
             {% for _, content_type, content in latest_content %}
@@ -103,12 +104,14 @@
                 {% endfor %}
             </table>
         {% endif %}
+        <p><a href="{% url 'usertoplists' %}">További toplisták...</a></p>
     </div>
     <div class="right_content">
         <h2>Buzz</h2>
         {% for c in buzz_comments %}
             {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
         {% endfor %}
+        <p><a href="{% url 'latest_comments' %}">További kommentek...</a></p>
     </div>
     <br class="clear" />
 

@@ -48,6 +48,7 @@ urlpatterns += patterns(
     url(r'^bemutatok/(?P<year>\d+)/$', web_views.premiers_in_a_year, name='premiers_in_a_year'),
     url(r'^bemutatok/$', web_views.premiers, name='premiers'),
     url(r'^top_filmek/$', web_views.top_films, name='top_films'),
+    url(r'^napok_filmjei/$', web_views.films_of_past_days, name='films_of_past_days'),
 
     url(r'^folytatasok/$', web_views.sequels, name='sequels'),
     url(r'^folytatas/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.sequel, name='sequel'),

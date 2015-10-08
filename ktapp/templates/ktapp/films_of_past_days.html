@@ -1,0 +1,61 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+
+{% block title %}Korábbi napok filmjei - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Korábbi napok filmjei</h1>
+{% endblock %}
+
+{% block main %}
+
+    <table class="fullsize sortable">
+        <thead>
+        <tr class="header_tr">
+            <th data-sort="string">Nap</th>
+            <th data-sort="string">Film</th>
+            <th data-sort="int" data-sort-default="desc">Év</th>
+            <th data-sort="string">Rendező</th>
+            <th data-sort="string">Műfaj</th>
+            <th data-sort="int" data-sort-default="desc">Nézettség</th>
+            <th data-sort="float" data-sort-default="desc">Átlag</th>
+            {% if request.user.is_authenticated %}
+                <th data-sort="int" data-sort-default="desc">Kedvenceid</th>
+                <th data-sort="int" data-sort-default="desc">Szerinted</th>
+                <th data-sort="int" data-sort-default="desc">&#9733;</th>
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for film in films %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td>{{ film.day_of_the_day|date:"Y-m-d l" }}</td>
+                <td>{{ film|film_url_html }}</td>
+                <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
+                <td>{{ film|film_directors }}</td>
+                <td>{{ film|film_genres }}</td>
+                <td class="center" data-sort-value="{{ film.number_of_ratings }}">{{ film|film_num_rating_html }}</td>
+                <td class="center" data-sort-value="{{ film|film_rating_sort_value }}">{{ film|film_avg_rating_html }}</td>
+                {% if request.user.is_authenticated %}
+                    <td class="center" data-sort-value="{{ film|film_fav_rating_sort_value }}">{{ film|film_fav_rating_html }}</td>
+                    <td class="center" data-sort-value="{% if film.my_rating %}{{ film.my_rating }}{% else %}0{% endif %}">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
+                    <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if film.my_wish %}{{ film.my_wish }}{% else %}0{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <p>A nap filmjét az alábbi szabályok alapján választja a rendszer:</p>
+    <ul>
+        <li><b>hétfő: régi film</b> (legkésőbb a 80-as évekből, minimum 4-es átlag, minimum 50 szavazat, minimum 5 komment)</li>
+        <li><b>kedd: nemzetközi film</b> (nem magyar és nem amerikai, minimum 4-es átlag, minimum 50 szavazat, minimum 5 komment)</li>
+        <li><b>szerda: ismeretlen gyöngyszem</b> (kevesebb, mint 30 szavazat, de legalább 10, minimum 4-es átlag, minimum 1 komment)</li>
+        <li><b>csütörtök: premier film</b> (a héten bemutatott filmek közül, amit a legtöbben akarnak megnézni, illetve a legtöbb 4-est/5-öst kapta)</li>
+        <li><b>péntek: top 250</b> (film a <a href="{% url 'top_films' %}">top 250 listáról</a>)</li>
+        <li><b>szombat: új film</b> (2000-ben vagy később készült, minimum 4-es átlag, minimum 50 szavazat, minimum 5 komment)</li>
+        <li><b>vasárnap: magyar film</b> (magyar, minimum 4-es átlag, minimum 50 szavazat, minimum 5 komment)</li>
+    </ul>
+
+{% endblock %}
