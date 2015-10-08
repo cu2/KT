@@ -388,6 +388,8 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
             '''.format(title_matches='+'.join(title_matches))]
         if order_field == 'year':
             order_fields = ['f.year', 'f.orig_title', 'f.id']
+        if order_field == 'main_premier':
+            order_fields = ['f.main_premier', 'f.orig_title', 'f.id']
         if order_field == 'director':
             order_fields = ['f.director_names_cache', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'genre':

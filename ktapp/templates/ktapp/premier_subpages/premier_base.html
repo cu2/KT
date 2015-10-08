@@ -1,0 +1,21 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Filmbemutatók - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Filmbemutatók</h1>
+{% endblock %}
+
+{% block main %}
+
+    <nav id="tabs" class="clearfix">
+        <ul>
+            <li style="width: 34%"{% if active_tab == 'nowadays' %} class="active_tab"{% endif %}><a href="{% url 'premiers' %}">mostanában</a></li>
+            <li style="width: 33%"{% if active_tab == 'this_year' %} class="active_tab"{% endif %}><a href="{% url 'premiers_in_a_year' last_premier_year %}">idén</a></li>
+            <li style="width: 33%"{% if active_tab == 'last_year' %} class="active_tab"{% endif %}><a href="{% url 'premiers_in_a_year' before_last_premier_year %}">régebben</a></li>
+        </ul>
+    </nav>
+
+    {% block premier_main %}{% endblock %}
+
+{% endblock %}
