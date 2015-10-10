@@ -20,14 +20,19 @@ def jsonlog(logger, level, payload):
     logger.log(level, json.dumps(payload, sort_keys=True))
 
 
+def randomstring(length):
+    return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
+
+
 class LoggingMiddleware(object):
 
     def process_request(self, request):
         utcnow = datetime.datetime.utcnow()
         kutma = request.COOKIES.get('kutma', '')
         if kutma == '':
-            kutma = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(32))
+            kutma = randomstring(32)
         cohort = int(hashlib.md5(kutma).hexdigest(), 16) % 100
+        request_id = '%s_%s_%s' % (utcnow.strftime('%Y%m%d-%H%M%S%f'), kutma, randomstring(8))
         user_id = 0
         username = ''
         try:
@@ -59,10 +64,12 @@ class LoggingMiddleware(object):
             'session': session_key,
             'kutma': kutma,
             'cohort': cohort,
+            'request_id': request_id,
         })
-        request.session['received_time'] = time.time()
-        request.session['kutma'] = kutma
-        request.session['cohort'] = cohort
+        request.META['KT_RECEIVE_TIME'] = time.time()
+        request.META['KT_KUTMA'] = kutma
+        request.META['KT_COHORT'] = cohort
+        request.META['KT_REQUEST_ID'] = request_id
 
     def process_response(self, request, response):
         utcnow = datetime.datetime.utcnow()
@@ -80,23 +87,11 @@ class LoggingMiddleware(object):
         except AttributeError:
             pass
         response_time = None
-        try:
-            if 'received_time' in request.session:
-                response_time = time.time() - request.session['received_time']
-        except AttributeError:
-            pass
-        kutma = None
-        try:
-            if 'kutma' in request.session:
-                kutma = request.session['kutma']
-        except AttributeError:
-            pass
-        cohort = None
-        try:
-            if 'cohort' in request.session:
-                cohort = request.session['cohort']
-        except AttributeError:
-            pass
+        if 'KT_RECEIVE_TIME' in request.META:
+            response_time = time.time() - request.META['KT_RECEIVE_TIME']
+        kutma = request.META.get('KT_KUTMA', None)
+        cohort = request.META.get('KT_COHORT', None)
+        request_id = request.META.get('KT_REQUEST_ID', None)
         ip = get_ip(request)
         jsonlog(kt_loadtime_logger, logging.INFO, {
             'utc_timestamp': utcnow.strftime('%s.%f'),
@@ -113,12 +108,12 @@ class LoggingMiddleware(object):
             'session': session_key,
             'kutma': kutma,
             'cohort': cohort,
+            'request_id': request_id,
             'response_time_ms': 1000.0 * response_time if response_time else None,
             'response_status_code': response.status_code,
         })
         if kutma:
             response.set_cookie('kutma', kutma, max_age=SECONDS_IN_A_YEAR, domain='.kritikustomeg.org')
-            # response.set_cookie('kutma', kutma, max_age=SECONDS_IN_A_YEAR)
         return response
 
     def process_exception(self, request, exc):
