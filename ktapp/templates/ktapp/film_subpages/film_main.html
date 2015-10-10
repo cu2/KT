@@ -27,17 +27,25 @@
                 {% endif %}
                 <br class="clear" />
             </div>
+            {% if roles or permission_new_role %}
             <div class="hover_show_button_context">
                 <h3>Szereplők{% if permission_new_role %} <span class="hover_show_button button small_button" id="show_new_role_form">új szereplő felvétele</span>{% endif %}</h3>
                 <table class="fullsize" id="table_of_roles">
+                    <thead>
+                        <th>Szerep</th>
+                        <th>Színész</th>
+                    </thead>
+                    <tbody>
                     {% for role in roles %}
                         <tr class="{% cycle 'odd' '' %}">
                             <td class="half_td"><a href="{% url 'role' role.id role.slug_cache %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</td>
                             <td><a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a></td>
                         </tr>
                     {% endfor %}
+                    </tbody>
                 </table>
             </div>
+            {% endif %}
             {% if permission_new_role %}
                 <div id="new_role_form" style="display: none">
                     <h3>Új szereplő</h3>
