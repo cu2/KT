@@ -274,7 +274,7 @@ class Vote(models.Model):
         Wishlist.objects.filter(film=self.film, wished_by=self.user, wish_type=Wishlist.WISH_TYPE_YES).delete()
         self.user.latest_votes = ','.join([unicode(v.id) for v in self.user.vote_set.all().order_by('-when', '-id')[:100]])
         self.user.number_of_ratings = self.user.vote_set.count()
-        self.user.save()
+        self.user.save(update_fields=['latest_votes', 'number_of_ratings'])
         Recommendation.recalculate_fav_for_users_and_film(self.user.get_followed_by(), self.film)
 
 
@@ -286,7 +286,7 @@ def delete_vote(sender, instance, **kwargs):
         pass
     instance.user.latest_votes = ','.join([unicode(v.id) for v in instance.user.vote_set.all().order_by('-when', '-id')[:100]])
     instance.user.number_of_ratings = instance.user.vote_set.count()
-    instance.user.save()
+    instance.user.save(update_fields=['latest_votes', 'number_of_ratings'])
     Recommendation.recalculate_fav_for_users_and_film(instance.user.get_followed_by(), instance.film)
 
 
@@ -412,10 +412,10 @@ class Comment(models.Model):
         if 'domain' in kwargs:
             kwargs['domain'].number_of_comments = kwargs['domain'].comment_set.count()
             kwargs['domain'].last_comment = kwargs['domain'].comment_set.latest()
-            kwargs['domain'].save()
+            kwargs['domain'].save(update_fields=['number_of_comments', 'last_comment'])
             self.created_by.latest_comments = ','.join([unicode(c.id) for c in self.created_by.comment_set.all().order_by('-created_at', '-id')[:100]])
             self.created_by.number_of_comments = self.created_by.comment_set.count()
-            self.created_by.save()
+            self.created_by.save(update_fields=['latest_comments', 'number_of_comments'])
 
     @classmethod
     def fix_comments(cls, domain, domain_object):
@@ -454,7 +454,7 @@ class Comment(models.Model):
             domain_object.last_comment = domain_object.comment_set.latest()
         else:
             domain_object.last_comment = None
-        domain_object.save()
+        domain_object.save(update_fields=['number_of_comments', 'last_comment'])
 
 
 @receiver(post_delete, sender=Comment)
@@ -478,13 +478,13 @@ def delete_comment(sender, instance, **kwargs):
         domain.last_comment = domain.comment_set.latest()
     else:
         domain.last_comment = None
-    domain.save()
+    domain.save(update_fields=['number_of_comments', 'last_comment'])
     for idx, remaining_comment in enumerate(Comment.objects.filter(created_by=instance.created_by).order_by('created_at', 'id')):
         remaining_comment.serial_number_by_user = idx + 1
         remaining_comment.save()
     instance.created_by.latest_comments = ','.join([unicode(c.id) for c in instance.created_by.comment_set.all().order_by('-created_at', '-id')[:100]])
     instance.created_by.number_of_comments = instance.created_by.comment_set.count()
-    instance.created_by.save()
+    instance.created_by.save(update_fields=['latest_comments', 'number_of_comments'])
 
 
 class Topic(models.Model):
@@ -568,27 +568,27 @@ class PollVote(models.Model):
     def save(self, *args, **kwargs):
         super(PollVote, self).save(*args, **kwargs)
         self.pollchoice.number_of_votes = self.pollchoice.pollvote_set.count()
-        self.pollchoice.save()
+        self.pollchoice.save(update_fields=['number_of_votes'])
         self.pollchoice.poll.number_of_votes = sum([pc.number_of_votes for pc in self.pollchoice.poll.pollchoice_set.all()])
         users = set()
         for pc in self.pollchoice.poll.pollchoice_set.all():
             for pv in PollVote.objects.filter(pollchoice=pc):
                 users.add(pv.user)
         self.pollchoice.poll.number_of_people = len(users)
-        self.pollchoice.poll.save()
+        self.pollchoice.poll.save(update_fields=['number_of_votes', 'number_of_people'])
 
 
 @receiver(post_delete, sender=PollVote)
 def delete_pollvote(sender, instance, **kwargs):
     instance.pollchoice.number_of_votes = instance.pollchoice.pollvote_set.count()
-    instance.pollchoice.save()
+    instance.pollchoice.save(update_fields=['number_of_votes'])
     instance.pollchoice.poll.number_of_votes = sum([pc.number_of_votes for pc in instance.pollchoice.poll.pollchoice_set.all()])
     users = set()
     for pc in instance.pollchoice.poll.pollchoice_set.all():
         for pv in PollVote.objects.filter(pollchoice=pc):
             users.add(pv.user)
     instance.pollchoice.poll.number_of_people = len(users)
-    instance.pollchoice.poll.save()
+    instance.pollchoice.poll.save(update_fields=['number_of_votes', 'number_of_people'])
 
 
 class FilmUserContent(models.Model):
@@ -612,13 +612,13 @@ class Quote(FilmUserContent):
         self.content_html = kt_utils.bbcode_to_html(self.content)
         super(Quote, self).save(*args, **kwargs)
         self.film.number_of_quotes = self.film.quote_set.count()
-        self.film.save()
+        self.film.save(update_fields=['number_of_quotes'])
 
 
 @receiver(post_delete, sender=Quote)
 def delete_quote(sender, instance, **kwargs):
     instance.film.number_of_quotes = instance.film.quote_set.count()
-    instance.film.save()
+    instance.film.save(update_fields=['number_of_quotes'])
 
 
 class Trivia(FilmUserContent):
@@ -629,13 +629,13 @@ class Trivia(FilmUserContent):
         self.content_html = kt_utils.bbcode_to_html(self.content)
         super(Trivia, self).save(*args, **kwargs)
         self.film.number_of_trivias = self.film.trivia_set.count()
-        self.film.save()
+        self.film.save(update_fields=['number_of_trivias'])
 
 
 @receiver(post_delete, sender=Trivia)
 def delete_trivia(sender, instance, **kwargs):
     instance.film.number_of_trivias = instance.film.trivia_set.count()
-    instance.film.save()
+    instance.film.save(update_fields=['number_of_trivias'])
 
 
 class Review(FilmUserContent):
@@ -646,7 +646,7 @@ class Review(FilmUserContent):
         self.content_html = kt_utils.bbcode_to_html(self.content)
         super(Review, self).save(*args, **kwargs)
         self.film.number_of_reviews = self.film.review_set.filter(approved=True).count()
-        self.film.save()
+        self.film.save(update_fields=['number_of_reviews'])
 
     def __unicode__(self):
         return self.content[:50]
@@ -655,7 +655,7 @@ class Review(FilmUserContent):
 @receiver(post_delete, sender=Review)
 def delete_review(sender, instance, **kwargs):
     instance.film.number_of_reviews = instance.film.review_set.filter(approved=True).count()
-    instance.film.save()
+    instance.film.save(update_fields=['number_of_reviews'])
 
 
 class Award(models.Model):
@@ -671,7 +671,7 @@ class Award(models.Model):
     def save(self, *args, **kwargs):
         super(Award, self).save(*args, **kwargs)
         self.film.number_of_awards = self.film.award_set.count()
-        self.film.save()
+        self.film.save(update_fields=['number_of_awards'])
 
     def __unicode__(self):
         return self.name + ' / ' + self.category
@@ -680,7 +680,7 @@ class Award(models.Model):
 @receiver(post_delete, sender=Award)
 def delete_award(sender, instance, **kwargs):
     instance.film.number_of_awards = instance.film.award_set.count()
-    instance.film.save()
+    instance.film.save(update_fields=['number_of_awards'])
 
 
 class Link(models.Model):
@@ -710,7 +710,7 @@ class Link(models.Model):
         super(Link, self).save(*args, **kwargs)
         if self.film:
             self.film.number_of_links = self.film.link_set.count()
-            self.film.save()
+            self.film.save(update_fields=['number_of_links'])
 
     def __unicode__(self):
         return self.name
@@ -720,7 +720,7 @@ class Link(models.Model):
 def delete_link(sender, instance, **kwargs):
     if instance.film:
         instance.film.number_of_links = instance.film.link_set.count()
-        instance.film.save()
+        instance.film.save(update_fields=['number_of_links'])
 
 
 class Artist(models.Model):
@@ -813,7 +813,7 @@ class FilmArtistRelationship(models.Model):
         else:
             self.film.directors_cache = ''
             self.film.director_names_cache = ''
-        self.film.save()
+        self.film.save(update_fields=['directors_cache', 'director_names_cache'])
 
 
 class Biography(models.Model):
@@ -1010,7 +1010,7 @@ class Picture(models.Model):
                 self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
             except IndexError:
                 self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
-        self.film.save()
+        self.film.save(update_fields=['number_of_pictures', 'main_poster'])
         for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
             self.generate_thumbnail(w, h)
 
@@ -1067,7 +1067,7 @@ def delete_picture(sender, instance, **kwargs):
                 instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_DVD).order_by('id')[0]
             except IndexError:
                 instance.film.main_poster = None
-    instance.film.save()
+    instance.film.save(update_fields=['number_of_pictures', 'main_poster'])
     try:
         os.remove(settings.MEDIA_ROOT + unicode(instance.img))
     except OSError:
@@ -1120,12 +1120,12 @@ class Message(models.Model):
                 message.sent_to.add(recipient)
             message.save()
             owner.number_of_messages = Message.objects.filter(owned_by=owner).count()
-            owner.save()
+            owner.save(update_fields=['number_of_messages'])
             for recipient in recipients:
                 recipient.number_of_messages = Message.objects.filter(owned_by=recipient).count()
                 if recipient.last_message_at is None or recipient.last_message_at < message.sent_at:
                     recipient.last_message_at = message.sent_at
-                recipient.save()
+                recipient.save(update_fields=['number_of_messages', 'last_message_at'])
         if sent_by and len(recipients)==1:
             other = list(recipients)[0]
             MessageCountCache.update_cache(owned_by=sent_by, partner=other)
@@ -1139,8 +1139,8 @@ def delete_message(sender, instance, **kwargs):
         instance.owned_by.last_message_at = Message.objects.filter(owned_by=instance.owned_by).exclude(sent_by=instance.owned_by).latest('sent_at').sent_at
     else:
         instance.owned_by.last_message_at = None
-    instance.owned_by.save()
-    # recipients are not available here, so MessageCountCache.update_cache lives in view function
+    instance.owned_by.save(update_fields=['number_of_messages', 'last_message_at'])
+    # NOTE: recipients are not available here, so MessageCountCache.update_cache lives in view function
 
 
 class MessageCountCache(models.Model):
@@ -1194,22 +1194,26 @@ class Wishlist(models.Model):
         super(Wishlist, self).save(*args, **kwargs)
         if self.wish_type == Wishlist.WISH_TYPE_YES:
             self.wished_by.number_of_wishes_yes = Wishlist.objects.filter(wished_by=self.wished_by, wish_type=Wishlist.WISH_TYPE_YES).count()
+            self.wished_by.save(update_fields=['number_of_wishes_yes'])
         elif self.wish_type == Wishlist.WISH_TYPE_NO:
             self.wished_by.number_of_wishes_no = Wishlist.objects.filter(wished_by=self.wished_by, wish_type=Wishlist.WISH_TYPE_NO).count()
+            self.wished_by.save(update_fields=['number_of_wishes_no'])
         else:
             self.wished_by.number_of_wishes_get = Wishlist.objects.filter(wished_by=self.wished_by, wish_type=Wishlist.WISH_TYPE_GET).count()
-        self.wished_by.save()
+            self.wished_by.save(update_fields=['number_of_wishes_get'])
 
 
 @receiver(post_delete, sender=Wishlist)
 def delete_wish(sender, instance, **kwargs):
     if instance.wish_type == Wishlist.WISH_TYPE_YES:
         instance.wished_by.number_of_wishes_yes = Wishlist.objects.filter(wished_by=instance.wished_by, wish_type=Wishlist.WISH_TYPE_YES).count()
+        instance.wished_by.save(update_fields=['number_of_wishes_yes'])
     elif instance.wish_type == Wishlist.WISH_TYPE_NO:
         instance.wished_by.number_of_wishes_no = Wishlist.objects.filter(wished_by=instance.wished_by, wish_type=Wishlist.WISH_TYPE_NO).count()
+        instance.wished_by.save(update_fields=['number_of_wishes_no'])
     else:
         instance.wished_by.number_of_wishes_get = Wishlist.objects.filter(wished_by=instance.wished_by, wish_type=Wishlist.WISH_TYPE_GET).count()
-    instance.wished_by.save()
+        instance.wished_by.save(update_fields=['number_of_wishes_get'])
 
 
 class TVChannel(models.Model):
@@ -1253,13 +1257,13 @@ class UserToplist(models.Model):
         self.slug_cache = slugify(self.title)
         super(UserToplist, self).save(*args, **kwargs)
         self.created_by.number_of_toplists = UserToplist.objects.filter(created_by=self.created_by).count()
-        self.created_by.save()
+        self.created_by.save(update_fields=['number_of_toplists'])
 
 
 @receiver(post_delete, sender=UserToplist)
 def delete_usertoplist(sender, instance, **kwargs):
     instance.created_by.number_of_toplists = UserToplist.objects.filter(created_by=instance.created_by).count()
-    instance.created_by.save()
+    instance.created_by.save(update_fields=['number_of_toplists'])
 
 
 class UserToplistItem(models.Model):
