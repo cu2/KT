@@ -827,19 +827,22 @@ def merge_artist(request):
             artist_to_leave = artist_2
         for role in artist_to_delete.filmartistrelationship_set.all():
             role.artist = artist_to_leave
-            role.save()
+            role.save(update_fields=['artist'])
+        for pic in models.Picture.objects.filter(artist=artist_to_delete):
+            pic.artist = artist_to_leave
+            pic.save(update_fields=['artist'])
         for bio in models.Biography.objects.filter(artist=artist_to_delete):
             bio.artist = artist_to_leave
-            bio.save()
+            bio.save(update_fields=['artist'])
         for aw in models.Award.objects.filter(artist=artist_to_delete):
             aw.artist = artist_to_leave
-            aw.save()
+            aw.save(update_fields=['artist'])
         for utli in models.UserToplistItem.objects.filter(director=artist_to_delete):
             utli.director = artist_to_leave
-            utli.save()
+            utli.save(update_fields=['director'])
         for utli in models.UserToplistItem.objects.filter(actor=artist_to_delete):
             utli.actor = artist_to_leave
-            utli.save()
+            utli.save(update_fields=['actor'])
         if artist_to_leave.name != artist_to_delete.name:
             artist_to_leave.name = '%s / %s' % (artist_to_leave.name, artist_to_delete.name)
             artist_to_leave.save()
