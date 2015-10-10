@@ -65,6 +65,11 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'main_premier_year':
                 if filter_value:
+                    additional_where.append('''f.main_premier_year = %(main_premier_year)s''')
+                    additional_param['main_premier_year'] = filter_value
+                    nice_filters.append((filter_type, filter_value))
+            if filter_type == 'premier_year':
+                if filter_value:
                     additional_where.append('''
                         (f.main_premier_year = %(main_premier_year)s OR alternative_premiers.`when` BETWEEN '{year}-01-01' AND '{year}-12-31')
                     '''.format(year=int(filter_value)))
@@ -72,12 +77,13 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     additional_left_joins.append('''
                         LEFT JOIN ktapp_premier {table_name}
                         ON {table_name}.film_id = f.id
-                    '''.format(
-                        table_name='alternative_premiers',
-                    ))
+                    '''.format(table_name='alternative_premiers'))
                     additional_select.append('''
-                        COALESCE(alternative_premiers.`when`, f.main_premier) AS premier_date,
-                    ''')
+                        CASE
+                            WHEN alternative_premiers.`when` IS NOT NULL AND alternative_premiers.`when` BETWEEN '{year}-01-01' AND '{year}-12-31' THEN alternative_premiers.`when`
+                            ELSE f.main_premier
+                        END AS premier_date,
+                    '''.format(year=int(filter_value)))
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'of_the_day':
                 if filter_value:

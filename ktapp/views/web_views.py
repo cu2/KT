@@ -105,7 +105,7 @@ def premiers_in_a_year(request, year):
         return HttpResponseRedirect(reverse('premiers_in_a_year', args=(settings.LAST_PREMIER_YEAR,)))
     films, nice_filters = filmlist.filmlist(
         user_id=request.user.id,
-        filters=[('main_premier_year', year)],
+        filters=[('premier_year', year)],
         ordering='premier_date',
         films_per_page=None,
     )
