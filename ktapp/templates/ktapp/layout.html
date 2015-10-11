@@ -6,6 +6,8 @@
         <meta name="description" content="{% block meta_description %}{% endblock %}" />
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta property="fb:app_id" content="259204284100889" />
+        <meta property="og:site_name" content="Kritikus Tömeg" />
+        {% block other_meta %}{% endblock %}
 {% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />

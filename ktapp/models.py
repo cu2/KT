@@ -8,6 +8,7 @@ from urlparse import urlparse
 from django.db import models, connection
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
@@ -234,6 +235,9 @@ class Film(models.Model):
             self.genres_cache = ''
             self.genre_names_cache = ''
         self.save()
+
+    def absolute_url(self):
+        return 'http://kritikustomeg.org%s' % reverse('film_main', args=(self.id, self.slug_cache))
 
 
 class PremierType(models.Model):
