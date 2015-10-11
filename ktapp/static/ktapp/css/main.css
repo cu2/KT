@@ -973,7 +973,7 @@ ul.poll li {
         width: 200px;
     }
 }
-@media (min-width: 1000px) {
+@media (min-width: 1200px) {
     .search_input {
         width: 300px;
     }
