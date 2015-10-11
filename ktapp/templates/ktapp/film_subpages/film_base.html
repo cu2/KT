@@ -3,14 +3,14 @@
 
 {% block title %}{{ film.orig_title }}{% if film.second_title %} / {{ film.second_title }}{% endif %} ({{ film.year }}) - Kritikus Tömeg{% endblock %}
 
-{% block meta_description %}{% with directors=film.directors countries=film.countries genres=film.genres_cache %}{% if countries or genres %}{% for country in countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{{ film|film_genres:"all" }}{% else %}film{% endif %}{% endif %}, {% if directors %}rendezte: {% for director in directors|slice:":3" %}{{ director.name }}{% if not forloop.last %} - {% endif %}{% endfor %}{% endif %}. {{ film.plot_summary|strip_whitespace }}{% endwith %}{% endblock %}
+{% block meta_description %}{% with directors=film.directors countries=film.countries genres=film.genres_cache %}{% if countries or genres %}{% for country in countries %}{% if forloop.first %}{{ country.name|title }}{% else %}{{ country.name }}{% endif %}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{{ film|film_genres:"all" }}{% else %}film{% endif %}{% endif %}, {% if directors %}rendezte: {% for director in directors|slice:":3" %}{{ director.name }}{% if not forloop.last %} - {% endif %}{% endfor %}{% endif %}{% if film.average_rating %}, átlaga: {{ film.average_rating }}{% endif %}. {{ film.plot_summary|strip_whitespace }}{% endwith %}{% endblock %}
 
 {% block other_meta %}
     <meta property="og:type" content="video.movie" />
     <meta property="og:url" content="{{ film.absolute_url }}" />
     <meta property="og:image" content="{{ film.main_poster.get_display_urls.max }}" />
     <meta property="og:title" content="{{ film.orig_title }}{% if film.second_title %} / {{ film.second_title }}{% endif %} ({{ film.year }})" />
-    <meta property="og:description" content="{% with directors=film.directors countries=film.countries genres=film.genres_cache %}{% if countries or genres %}{% for country in countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{{ film|film_genres:"all" }}{% else %}film{% endif %}{% endif %}, {% if directors %}rendezte: {% for director in directors|slice:":3" %}{{ director.name }}{% if not forloop.last %} - {% endif %}{% endfor %}{% endif %}. {{ film.plot_summary|strip_whitespace }}{% endwith %}" />
+    <meta property="og:description" content="{% with directors=film.directors countries=film.countries genres=film.genres_cache %}{% if countries or genres %}{% for country in countries %}{% if forloop.first %}{{ country.name|title }}{% else %}{{ country.name }}{% endif %}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{{ film|film_genres:"all" }}{% else %}film{% endif %}{% endif %}, {% if directors %}rendezte: {% for director in directors|slice:":3" %}{{ director.name }}{% if not forloop.last %} - {% endif %}{% endfor %}{% endif %}{% if film.average_rating %}, átlaga: {{ film.average_rating }}{% endif %}. {{ film.plot_summary|strip_whitespace }}{% endwith %}" />
 {% endblock %}
 
 {% block header %}
