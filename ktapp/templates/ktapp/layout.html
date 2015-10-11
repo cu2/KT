@@ -8,7 +8,7 @@
 {% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=32" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=33" />
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <base href="/" />
         <script>
@@ -59,7 +59,7 @@
                             <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
                             <span class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></span>
                             <input type="submit" value="Bejelentkezés" class="small_button" tabindex="4" />
-                        </form> <a href="{% url 'reset_password' '' %}" style="font-size: 9pt">Mi a jelszavam?</a></li>
+                        </form></li>
                         <li id="reg_menu"><a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">Regisztráció</a></li>
                     {% endif %}
                 </ul>

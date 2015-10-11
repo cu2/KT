@@ -29,13 +29,16 @@
 .toptopmenu_left ul li:last-child {
     padding: 0;
 }
+.toptopmenu_left ul li#logout_menu {
+    padding: 0;
+}
 
 .toptopmenu_right {
     float: right;
     margin: 0;
 }
 
-@media (min-width: 800px) {
+@media (min-width: 1000px) {
     .toptopmenu_left {
         margin: 0 10px;
     }
@@ -965,10 +968,15 @@ ul.poll li {
 }
 @media (min-width: 800px) {
     .search_input {
-        width: 120px;
+        width: 100px;
     }
 }
-@media (min-width: 900px) {
+@media (min-width: 950px) {
+    .search_input {
+        width: 150px;
+    }
+}
+@media (min-width: 1050px) {
     .search_input {
         width: 200px;
     }
