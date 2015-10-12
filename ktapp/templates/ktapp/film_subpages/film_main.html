@@ -185,11 +185,9 @@
                         <div>
                             <button id="vote_button_0" class="button small_button vote_button" data-rating="0" data-film="{{ film.id }}"{% if 0 == rating %} style="display: none"{% endif %}>???</button>
                         </div>
-                        {% if user.id == 1 %}
                         <div>
                             <p><label for="share_on_facebook">Meg szeretnéd osztani Facebook-on?</label> <input type="checkbox" id="share_on_facebook"{% if user.facebook_rating_share %} checked="checked"{% endif %} /></p>
                         </div>
-                        {% endif %}
                     </div>
                 {% else %}
                     <p>Ahhoz, hogy szavazhass, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>

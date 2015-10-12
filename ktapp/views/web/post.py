@@ -38,7 +38,9 @@ def vote(request):
             'shared_on_facebook': fb == '1',
         })
         vote.rating = rating
-        vote.shared_on_facebook = (fb == '1')
+        if not created:  # don't reset shared_on_facebook once a vote has been shared
+            if fb == '1':
+                vote.shared_on_facebook = True
         vote.save()
     if request.POST.get('ajax', '') == '1':
         special_users = {request.user.id}
