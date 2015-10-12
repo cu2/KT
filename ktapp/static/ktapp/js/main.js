@@ -1,4 +1,37 @@
 $(function() {
+    $('.vote_button').click(function() {
+        var rating = $(this).data('rating');
+        var film_id = $(this).data('film');
+        $.post('szavaz', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            ajax: '1',
+            film_id: film_id,
+            rating: rating
+        }, function(data) {
+            if (data.success) {
+                var r, i, v;
+                for(r = 1; r <= 5; r++) {
+                    v = [];
+                    for(i = 0; i < data.votes[r].length; i++) {
+                        v.push('<a href="' + data.votes[r][i].url + '">' + data.votes[r][i].username + '</a>')
+                    }
+                    $('#fav_users_voted_' + r).html(v.join(', '));
+                    if (r === data.rating) {
+                        $('#vote_button_' + r).hide();
+                        $('#vote_button_' + r + '_selected').show();
+                    } else {
+                        $('#vote_button_' + r).show();
+                        $('#vote_button_' + r + '_selected').hide();
+                    }
+                }
+                if (0 === data.rating) {
+                    $('#vote_button_0').hide();
+                } else {
+                    $('#vote_button_0').show();
+                }
+            }
+        });
+    });
     $('#hamburger_menu').click(function() {
         if ($('#leftmenu').position().left < 0) {
             $('#leftmenu').offset({
@@ -251,7 +284,7 @@ $(function() {
         });
 
     $('#submit_new_role').click(function() {
-        if ($('#new_role_gender').val() == 'U') {
+        if ($('#new_role_gender').val() === 'U') {
             $('#new_role_gender').focus();
         } else {
             $.post('uj_szereplo', {
@@ -264,7 +297,7 @@ $(function() {
             }, function(data) {
                 if (data.success) {
                     var role_name = $('#new_role_name').val();
-                    if ($('#new_role_type').val() == 'V') role_name += ' (hangja)';
+                    if ($('#new_role_type').val() === 'V') role_name += ' (hangja)';
                     var artist_name = $('#new_role_artist').val();
                     $('#table_of_roles').append('<tr><td>' + role_name + '</td><td>' + artist_name + '</td></tr>');
                     $('#new_role_name').val('');
@@ -311,10 +344,10 @@ $(function() {
     var keyword_type = 'C';
     $('.input_for_keywords')
         .focus(function() {
-            if ($(this).attr('id') == 'id_countries') keyword_type = 'C';
-            else if ($(this).attr('id') == 'id_genres') keyword_type = 'G';
-            else if ($(this).attr('id') == 'id_major_keywords') keyword_type = 'M';
-            else if ($(this).attr('id') == 'id_keywords') keyword_type = 'MO';
+            if ($(this).attr('id') === 'id_countries') keyword_type = 'C';
+            else if ($(this).attr('id') === 'id_genres') keyword_type = 'G';
+            else if ($(this).attr('id') === 'id_major_keywords') keyword_type = 'M';
+            else if ($(this).attr('id') === 'id_keywords') keyword_type = 'MO';
             else keyword_type = 'O';
         })
         .bind('keydown', function(event) {
@@ -404,8 +437,8 @@ $(function() {
     var award_type = 'N';
     $('.input_for_award')
         .focus(function() {
-            if ($(this).attr('id') == 'id_name') award_type = 'N';
-            else if ($(this).attr('id') == 'id_year') award_type = 'Y';
+            if ($(this).attr('id') === 'id_name') award_type = 'N';
+            else if ($(this).attr('id') === 'id_year') award_type = 'Y';
             else award_type = 'C';
         })
         .autocomplete({

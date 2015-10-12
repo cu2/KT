@@ -178,28 +178,13 @@
                         {% for r in ratings reversed %}
                             {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
                             <div>
-                            {% if r == rating %}
-                                <span class="my_rating">{{ named_rating }}</span>
-                            {% else %}
-                                <form action="{% url 'vote' %}" method="post" class="inline">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
-                                    <input type="hidden" name="rating" value="{{ r }}" />
-                                    <input type="submit" value="{{ named_rating }}"{% if rating %} class=""{% endif %} />
-                                </form>
-                            {% endif %}
+                                <span id="vote_button_{{ r }}_selected" class="my_rating"{% if r != rating %} style="display: none"{% endif %}>{{ named_rating }}</span>
+                                <button id="vote_button_{{ r }}" class="button vote_button" data-rating="{{ r }}" data-film="{{ film.id }}"{% if r == rating %} style="display: none"{% endif %}>{{ named_rating }}</button>
                             </div>
                         {% endfor %}
-                        {% if rating %}
-                            <div>
-                            <form action="{% url 'vote' %}" method="post" class="inline">
-                                {% csrf_token %}
-                                <input type="hidden" name="film_id" value="{{ film.pk }}" />
-                                <input type="hidden" name="rating" value="0" />
-                                <input type="submit" value="???" class="small_button" />
-                            </form>
-                            </div>
-                        {% endif %}
+                        <div>
+                            <button id="vote_button_0" class="button small_button vote_button" data-rating="0" data-film="{{ film.id }}"{% if 0 == rating %} style="display: none"{% endif %}>???</button>
+                        </div>
                     </div>
                 {% else %}
                     <p>Ahhoz, hogy szavazhass, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
@@ -209,13 +194,16 @@
                 <h3>Szavazatok{% if film.number_of_ratings %} <span class="button very_small_button" id="show_rating_details_button">összes &gt;</span> <span class="button very_small_button" id="hide_rating_details_button">összes v</span>{% endif %}</h3>
                 <ul class="mini_list">
                     {% for num_vote, vote in votes %}
+                        {% cycle 5 4 3 2 1 as numbered_rating silent %}
                         {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
                         {% if vote %}
                             <li>{{ num_vote }} {{ named_rating }}{% if vote.0 %}:{% endif %}
+                                <span id="fav_users_voted_{{ numbered_rating }}">
                                 {% for voteuser in vote.0 %}
                                     <a href="{% url 'user_profile' voteuser.user.id voteuser.user.slug_cache %}">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
                                 {% endfor %}
-                                <span class="rating_details" style="display: none">
+                                </span>
+                                <span id="all_users_voted_{{ numbered_rating }}" class="rating_details" style="display: none">
                                     <br />
                                     {% for voteuser in vote.1 %}
                                         <a href="{% url 'user_profile' voteuser.user.id voteuser.user.slug_cache %}">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}

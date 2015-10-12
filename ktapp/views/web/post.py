@@ -17,18 +17,43 @@ from ktapp import utils as kt_utils
 @require_POST
 @login_required
 def vote(request):
-    film = get_object_or_404(models.Film, pk=request.POST["film_id"])
     try:
-        rating = int(request.POST["rating"])
+        film = get_object_or_404(models.Film, pk=request.POST['film_id'])
+    except Http404:
+        if request.POST.get('ajax', '') == '1':
+            return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+        raise
+    try:
+        rating = int(request.POST['rating'])
     except ValueError:
+        rating = 0
+    if rating < 0 or rating > 5:
         rating = 0
     if rating == 0:
         models.Vote.objects.filter(film=film, user=request.user).delete()
     elif 1 <= rating <= 5:
-        vote, created = models.Vote.objects.get_or_create(film=film, user=request.user, defaults={"rating": rating})
+        vote, created = models.Vote.objects.get_or_create(film=film, user=request.user, defaults={'rating': rating})
         vote.rating = rating
         vote.save()
-    return HttpResponseRedirect(reverse("film_main", args=(film.pk, film.slug_cache)))
+    if request.POST.get('ajax', '') == '1':
+        special_users = {request.user.id}
+        for friend in request.user.get_follows():
+            special_users.add(friend.id)
+        votes = {}
+        for idx, r in enumerate(range(5, 0, -1)):
+            votes[r] = []
+            for u in film.vote_set.filter(rating=r).select_related('user').order_by('user__username'):
+                if u.user.id in special_users:
+                    votes[r].append({
+                        'username': u.user.username,
+                        'url': reverse('user_profile', args=(u.user.id, u.user.slug_cache)),
+                    })
+        return HttpResponse(json.dumps({
+            'success': True,
+            'votes': votes,
+            'rating': rating,
+        }), content_type='application/json')
+    return HttpResponseRedirect(reverse('film_main', args=(film.pk, film.slug_cache)))
 
 
 @require_POST
