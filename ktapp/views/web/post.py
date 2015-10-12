@@ -38,6 +38,7 @@ def vote(request):
             'shared_on_facebook': fb == '1',
         })
         vote.rating = rating
+        vote.shared_on_facebook = (fb == '1')
         vote.save()
     if request.POST.get('ajax', '') == '1':
         special_users = {request.user.id}

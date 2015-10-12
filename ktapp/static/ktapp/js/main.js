@@ -49,7 +49,7 @@ $(function() {
                 else rating_string = 'Szerintem zseniális. Szerinted?';
                 FB.ui({
                     method: 'feed',
-                    link: window.location,
+                    link: window.location.href,
                     picture: $('#film_main_poster').attr('src'),
                     name: $('meta[property="og:title"]').attr('content') + ': ' + rating_string,
                     caption: $('meta[property="fb:caption"]').attr('content'),
