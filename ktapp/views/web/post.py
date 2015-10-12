@@ -29,10 +29,14 @@ def vote(request):
         rating = 0
     if rating < 0 or rating > 5:
         rating = 0
+    fb = request.POST.get('fb', '0')
     if rating == 0:
         models.Vote.objects.filter(film=film, user=request.user).delete()
     elif 1 <= rating <= 5:
-        vote, created = models.Vote.objects.get_or_create(film=film, user=request.user, defaults={'rating': rating})
+        vote, created = models.Vote.objects.get_or_create(film=film, user=request.user, defaults={
+            'rating': rating,
+            'shared_on_facebook': fb == '1',
+        })
         vote.rating = rating
         vote.save()
     if request.POST.get('ajax', '') == '1':
@@ -54,6 +58,15 @@ def vote(request):
             'rating': rating,
         }), content_type='application/json')
     return HttpResponseRedirect(reverse('film_main', args=(film.pk, film.slug_cache)))
+
+
+@require_POST
+@login_required
+def edit_share_on_facebook(request):
+    share_on_facebook = request.POST.get('share_on_facebook', '0')
+    request.user.facebook_rating_share = (share_on_facebook == '1')
+    request.user.save(update_fields=['facebook_rating_share'])
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
 @require_POST

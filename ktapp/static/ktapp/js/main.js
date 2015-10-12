@@ -1,12 +1,11 @@
-$(function() {
-    $('.vote_button').click(function() {
-        var rating = $(this).data('rating');
-        var film_id = $(this).data('film');
-        $.post('szavaz', {
+var ktApp = {
+    vote: function(film_id, rating, fb) {
+        $.post('/szavaz', {
             csrfmiddlewaretoken: $.cookie('csrftoken'),
             ajax: '1',
             film_id: film_id,
-            rating: rating
+            rating: rating,
+            fb: fb
         }, function(data) {
             if (data.success) {
                 var r, i, v;
@@ -30,6 +29,45 @@ $(function() {
                     $('#vote_button_0').show();
                 }
             }
+        });
+    }
+};
+
+$(function() {
+    $('.vote_button').click(function() {
+        var film_id = $(this).data('film');
+        var rating = $(this).data('rating');
+        if ($('#share_on_facebook').is(':checked')) {
+            if (rating == 0) {
+                ktApp.vote(film_id, rating, 0);
+            } else {
+                var rating_string = '';
+                if (rating == 1) rating_string = 'Szerintem nézhetetlen. Szerinted?';
+                else if (rating == 2) rating_string = 'Szerintem rossz. Szerinted?';
+                else if (rating == 3) rating_string = 'Szerintem oké/elmegy. Szerinted?';
+                else if (rating == 4) rating_string = 'Szerintem jó. Szerinted?';
+                else rating_string = 'Szerintem zseniális. Szerinted?';
+                FB.ui({
+                    method: 'feed',
+                    link: window.location,
+                    picture: $('#film_main_poster').attr('src'),
+                    name: $('meta[property="og:title"]').attr('content') + ': ' + rating_string,
+                    caption: $('meta[property="fb:caption"]').attr('content'),
+                    description: $('meta[property="fb:description"]').attr('content')
+                }, function(response) {
+                    if (response && response.post_id) {
+                        ktApp.vote(film_id, rating, 1);
+                    }
+                });
+            }
+        } else {
+            ktApp.vote(film_id, rating, 0);
+        }
+    });
+    $('#share_on_facebook').click(function() {
+        $.post('/szerk_facebook', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            share_on_facebook: ($(this).is(':checked'))?'1':'0'
         });
     });
     $('#hamburger_menu').click(function() {
@@ -55,7 +93,7 @@ $(function() {
         $('.comment_to_move_to_off:checked').each(function() {
             list_of_ids += $(this).data('id') + ',';
         });
-        $.post('offba', {
+        $.post('/offba', {
             csrfmiddlewaretoken: $.cookie('csrftoken'),
             list_of_ids: list_of_ids
         }, function(data) {
@@ -73,7 +111,7 @@ $(function() {
         }
         $.ajax({
             type: 'POST',
-            url: 'kivan',
+            url: '/kivan',
             data: {
                 csrfmiddlewaretoken: $.cookie('csrftoken'),
                 film_id: $(this).data('id'),
@@ -244,7 +282,7 @@ $(function() {
         })
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/users/', {
+                $.getJSON('/api/autocomplete/users/', {
                     q: extractLast(request.term)
                 }, response);
             },
@@ -270,7 +308,7 @@ $(function() {
     $('#new_role_artist')
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/artists/', {
+                $.getJSON('/api/autocomplete/artists/', {
                     q: request.term
                 }, response);
             },
@@ -287,7 +325,7 @@ $(function() {
         if ($('#new_role_gender').val() === 'U') {
             $('#new_role_gender').focus();
         } else {
-            $.post('uj_szereplo', {
+            $.post('/uj_szereplo', {
                 csrfmiddlewaretoken: $.cookie('csrftoken'),
                 film_id: $('#new_role_film').val(),
                 role_name: $('#new_role_name').val(),
@@ -318,7 +356,7 @@ $(function() {
         })
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/artists/', {
+                $.getJSON('/api/autocomplete/artists/', {
                     q: extractLast(request.term)
                 }, response);
             },
@@ -358,7 +396,7 @@ $(function() {
         })
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/keywords/', {
+                $.getJSON('/api/autocomplete/keywords/', {
                     q: extractLast(request.term),
                     t: keyword_type
                 }, response);
@@ -383,7 +421,7 @@ $(function() {
         });
 
     $('#id_film_orig_title').blur(function() {
-        $.getJSON('api/autocomplete/films/', {
+        $.getJSON('/api/autocomplete/films/', {
             q: $(this).val()
         }, function(data) {
             if (data.length) {
@@ -407,7 +445,7 @@ $(function() {
     $('.input_for_sequel')
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/sequels/', {
+                $.getJSON('/api/autocomplete/sequels/', {
                     q: request.term
                 }, response);
             },
@@ -422,7 +460,7 @@ $(function() {
     $('.input_for_user')
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/users/', {
+                $.getJSON('/api/autocomplete/users/', {
                     q: request.term
                 }, response);
             },
@@ -443,7 +481,7 @@ $(function() {
         })
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/awards/', {
+                $.getJSON('/api/autocomplete/awards/', {
                     q: request.term,
                     t: award_type
                 }, response);
@@ -463,7 +501,7 @@ $(function() {
         })
         .autocomplete({
             source: function(request, response) {
-                $.getJSON('api/autocomplete/artists/', {
+                $.getJSON('/api/autocomplete/artists/', {
                     q: request.term,
                     f: film_id
                 }, response);
@@ -480,6 +518,13 @@ $(function() {
 
     $('.comment_block_content .spoiler').each(function() {
         $('.show_spoilers_section').css('visibility', 'visible');
+    });
+
+    $.getScript('//connect.facebook.net/hu_HU/sdk.js', function(){
+        FB.init({
+            appId: '259204284100889',
+            version: 'v2.4'
+        });
     });
 
 });
