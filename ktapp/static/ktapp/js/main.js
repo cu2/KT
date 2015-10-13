@@ -57,6 +57,8 @@ $(function() {
                 }, function(response) {
                     if (response && response.post_id) {
                         ktApp.vote(film_id, rating, 1);
+                    } else {
+                        ktApp.vote(film_id, rating, 0);
                     }
                 });
             }
