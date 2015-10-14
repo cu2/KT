@@ -23,6 +23,10 @@ def vote(request):
         if request.POST.get('ajax', '') == '1':
             return HttpResponse(json.dumps({'success': False}), content_type='application/json')
         raise
+    if not film.is_open_for_vote_from():
+        if request.POST.get('ajax', '') == '1':
+            return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+        raise
     try:
         rating = int(request.POST['rating'])
     except ValueError:
@@ -376,9 +380,17 @@ def edit_premiers(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     if request.POST:
         state_before = {
+            'open_for_vote_from': film.open_for_vote_from.strftime('%Y-%m-%d') if film.open_for_vote_from else None,
             'main_premier': film.main_premier.strftime('%Y-%m-%d') if film.main_premier else None,
             'main_premier_year': film.main_premier_year,
         }
+        open_for_vote_from = kt_utils.strip_whitespace(request.POST.get('open_for_vote_from', ''))
+        if len(open_for_vote_from) == 10 and kt_utils.is_date(open_for_vote_from):
+            film.open_for_vote_from = open_for_vote_from
+            film.save()
+        elif open_for_vote_from == '':
+            film.open_for_vote_from = None
+            film.save()
         main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
         if len(main_premier) == 4 and main_premier.isdigit():
             film.main_premier = None
@@ -393,6 +405,7 @@ def edit_premiers(request):
             film.main_premier_year = None
             film.save()
         state_after = {
+            'open_for_vote_from': film.open_for_vote_from,
             'main_premier': film.main_premier,
             'main_premier_year': film.main_premier_year,
         }

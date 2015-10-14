@@ -163,6 +163,10 @@
                             </select><br />
                         </p>
                         <p>
+                            <label for="id_open_for_vote_from">Mikortól lehet rá szavazni? (ÉÉÉÉ-HH-NN) [hagyd üresen, ha bármikor]:</label><br />
+                            <input type="text" name="open_for_vote_from" id="id_open_for_vote_from" value="{% if film.open_for_vote_from %}{{ film.open_for_vote_from|date:"Y-m-d" }}{% endif %}" />
+                        </p>
+                        <p>
                             <input type="submit" value="Bemutatók mentése" />
                             <span class="button small_button" style="float: right" id="hide_premier_form">Mégsem</span>
                         </p>
@@ -171,6 +175,9 @@
             {% endif %}
         </div>
         <div id="film_main_right">
+
+            {% if film.is_open_for_vote_from %}
+
             <div id="film_main_voting_block">
                 <h3>Szerinted?</h3>
                 {% if user.is_authenticated %}
@@ -217,6 +224,10 @@
                     {% endfor %}
                 </ul>
             </div>
+
+            {% else %}
+                <p>Erre a filmre még nem lehet szavazni.</p>
+            {% endif %}
 
             <h3>Kívánságok</h3>
             <ul class="mini_list">

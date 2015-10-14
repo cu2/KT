@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 import os
 import random
@@ -238,6 +239,11 @@ class Film(models.Model):
 
     def absolute_url(self):
         return 'http://kritikustomeg.org%s' % reverse('film_main', args=(self.id, self.slug_cache))
+
+    def is_open_for_vote_from(self):
+        if self.open_for_vote_from is None:
+            return True
+        return self.open_for_vote_from <= datetime.date.today()
 
 
 class PremierType(models.Model):
