@@ -389,6 +389,8 @@ class Comment(models.Model):
             ['created_at'],
             ['domain', 'created_at'],
             ['created_by', 'serial_number_by_user', 'created_at'],
+            ['film', 'serial_number'],
+            ['topic', 'serial_number'],
         ]
 
     @property
