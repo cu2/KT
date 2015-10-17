@@ -71,12 +71,9 @@ urlpatterns += patterns(
     url(r'^szerk_komment$', post_views.edit_comment, name='edit_comment'),
     url(r'^uj_idezet$', post_views.new_quote, name='new_quote'),
     url(r'^uj_erdekesseg$', post_views.new_trivia, name='new_trivia'),
-    url(r'^uj_elemzes$', post_views.new_review, name='new_review'),
     url(r'^uj_kep$', post_views.new_picture, name='new_picture'),
     url(r'^szerk_kep$', post_views.edit_picture, name='edit_picture'),
     url(r'^torol_kep$', post_views.delete_picture, name='delete_picture'),
-    url(r'^elemzes_elfogadasa$', post_views.approve_review, name='approve_review'),
-    url(r'^elemzes_elutasitasa$', post_views.disapprove_review, name='disapprove_review'),
 
     url(r'^uj_film$', film_views.new_film, name='new_film'),
     url(r'^szerk_film$', post_views.edit_film, name='edit_film'),
@@ -92,12 +89,19 @@ urlpatterns += patterns(
     url(r'^bekuld_link$', post_views.suggest_link, name='suggest_link'),
     url(r'^link_elfogadasa$', post_views.accept_link, name='accept_link'),
     url(r'^link_elutasitasa$', post_views.reject_link, name='reject_link'),
-    url(r'^linkek/$', web_views.links, name='links'),
+    url(r'^cikkek/$', web_views.articles, name='articles'),
+    url(r'^linkek/$', RedirectView.as_view(pattern_name='articles')),
 
     url(r'^bekuldott_filmek/$', film_views.suggested_films, name='suggested_films'),
     url(r'^bekuld_film$', film_views.suggest_film, name='suggest_film'),
     url(r'^film_elfogadasa$', post_views.accept_film, name='accept_film'),
     url(r'^film_elutasitasa$', post_views.reject_film, name='reject_film'),
+
+    url(r'^uj_elemzes$', post_views.new_review, name='new_review'),
+    url(r'^bekuldott_elemzesek/$', web_views.suggested_reviews, name='suggested_reviews'),
+    url(r'^bekuldott_portrek/$', web_views.suggested_bios, name='suggested_bios'),
+    url(r'^elemzes_elfogadasa$', post_views.approve_review, name='approve_review'),
+    url(r'^elemzes_elutasitasa$', post_views.disapprove_review, name='disapprove_review'),
 
     url(r'^valtozasok/$', web_views.changes, name='changes'),
 
@@ -127,8 +131,8 @@ urlpatterns += patterns(
     url(r'^kozkerdest_tamogat', post_views.poll_support, name='poll_support'),
     url(r'^uj_kozkerdes', post_views.new_poll, name='new_poll'),
 
-    url(r'^elemzesek/$', web_views.list_of_reviews, name='list_of_reviews'),
-    url(r'^portrek/$', web_views.list_of_bios, name='list_of_bios'),
+    url(r'^elemzesek/$', RedirectView.as_view(pattern_name='articles')),
+    url(r'^portrek/$', RedirectView.as_view(url='/cikkek/?t=muveszek')),
     url(r'^kepek/$', web_views.latest_pictures, name='latest_pictures'),
     url(r'^idezetek/$', web_views.latest_quotes, name='latest_quotes'),
     url(r'^erdekessegek/$', web_views.latest_trivias, name='latest_trivias'),

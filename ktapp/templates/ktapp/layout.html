@@ -117,10 +117,8 @@
                         <li><a href="{% url 'latest_quotes' %}">Idézetek</a></li>
                         <li><a href="{% url 'latest_trivias' %}">Érdekességek</a></li>
                         <li><a href="{% url 'latest_pictures' %}">Képek</a></li>
-                        <li><a href="{% url 'list_of_reviews' %}">Elemzések</a></li>
-                        <li><a href="{% url 'list_of_bios' %}">Portrék</a></li>
+                        <li><a href="{% url 'articles' %}">Cikkek</a></li>
                         <li><a href="{% url 'awards' %}">Díjak</a></li>
-                        <li><a href="{% url 'links' %}">Linkek</a></li>
                     </ul>
                 </li>
                 {% if user.is_authenticated and user.is_staff or user.is_reliable or user.core_member %}
@@ -133,6 +131,8 @@
                             {% endif %}
                             <li><a href="{% url 'suggested_films' %}">Beküldött filmek</a></li>
                             <li><a href="{% url 'suggested_links' %}">Beküldött linkek</a></li>
+                            <li><a href="{% url 'suggested_reviews' %}">Beküldött elemzések</a></li>
+                            <li><a href="{% url 'suggested_bios' %}">Beküldött portrék</a></li>
                             {% if user.is_staff or user.is_reliable %}
                                 <li><a href="{% url 'changes' %}">Változások</a></li>
                             {% endif %}

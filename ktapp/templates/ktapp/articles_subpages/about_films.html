@@ -1,0 +1,28 @@
+{% extends "ktapp/articles_subpages/articles_base.html" %}
+{% load kt_extras %}
+
+{% block premier_main %}
+
+    <table class="fullsize">
+        <tr class="header_tr">
+            <th style="width: 20%">Film</th>
+            <th style="width: 15%">Oldal</th>
+            <th style="width: 50%">Cikk</th>
+            <th style="width: 15%">Szerző</th>
+        </tr>
+        {% for article in articles %}
+            <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                <td><a href="{% url 'film_main' article.film_id article.film_slug_cache %}">{{ article.film_orig_title }} ({{ article.film_year }})</a></td>
+                <td>{{ article.link_domain }}</td>
+                <td>
+                    <b><a href="{{ article.url }}" target="_blank">{{ article.name }}</a></b><br />
+                    {% autoescape off %}
+                    {{ article.lead }}
+                    {% endautoescape %}
+                </td>
+                <td>{% if article.author_user_id %}<a href="{% url 'user_profile' article.author_user_id article.author_slug_cache %}">{{ article.author_name }}</a>{% endif %}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

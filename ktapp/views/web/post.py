@@ -664,7 +664,7 @@ def new_link(request):
         if film:
             return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
         else:
-            return HttpResponseRedirect(reverse('links'))
+            return HttpResponseRedirect(reverse('articles') + '?t=egyeb')
     link_type = kt_utils.strip_whitespace(request.POST.get('link_type', ''))
     if link_type not in {'R', 'I', 'O', '-'}:
         link_type = '-'
@@ -684,7 +684,7 @@ def new_link(request):
     if film:
         return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
     else:
-        return HttpResponseRedirect(reverse('links'))
+        return HttpResponseRedirect(reverse('articles') + '?t=egyeb')
 
 
 @require_POST
@@ -702,7 +702,7 @@ def suggest_link(request):
         if film:
             return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
         else:
-            return HttpResponseRedirect(reverse('links'))
+            return HttpResponseRedirect(reverse('articles') + '?t=egyeb')
     link_type = kt_utils.strip_whitespace(request.POST.get('link_type', ''))
     if link_type not in {'R', 'I', 'O', '-'}:
         link_type = '-'

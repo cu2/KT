@@ -772,25 +772,19 @@ def changes(request):
     })
 
 
-def list_of_reviews(request):
-    unapproved_reviews = []
-    if request.user.is_authenticated():
-        if kt_utils.check_permission('approve_review', request.user):
-            unapproved_reviews = models.Review.objects.select_related('film', 'created_by').filter(approved=False).order_by('-created_at')
+@login_required
+@kt_utils.kt_permission_required('approve_review')
+def suggested_reviews(request):
     return render(request, 'ktapp/list_of_reviews.html', {
-        'reviews': models.Review.objects.select_related('film', 'created_by').filter(approved=True).order_by('-created_at'),
-        'unapproved_reviews': unapproved_reviews,
+        'unapproved_reviews': models.Review.objects.select_related('film', 'created_by').filter(approved=False).order_by('-created_at'),
     })
 
 
-def list_of_bios(request):
-    unapproved_bios = []
-    if request.user.is_authenticated():
-        if kt_utils.check_permission('approve_bio', request.user):
-            unapproved_bios = models.Biography.objects.select_related('artist', 'created_by').filter(approved=False).order_by('-created_at')
+@login_required
+@kt_utils.kt_permission_required('approve_bio')
+def suggested_bios(request):
     return render(request, 'ktapp/list_of_bios.html', {
-        'bios': models.Biography.objects.select_related('artist', 'created_by').filter(approved=True).order_by('-created_at'),
-        'unapproved_bios': unapproved_bios,
+        'unapproved_bios': models.Biography.objects.select_related('artist', 'created_by').filter(approved=False).order_by('-created_at'),
     })
 
 
@@ -856,17 +850,6 @@ def awards(request):
     })
 
 
-
-def links(request):
-    return render(request, 'ktapp/links.html', {
-        'links': models.Link.objects.exclude(lead='').select_related('author', 'created_by', 'film', 'artist').order_by('-created_at'),
-        'permission_suggest_link': kt_utils.check_permission('suggest_link', request.user),
-        'permission_new_link': kt_utils.check_permission('new_link', request.user),
-        'permission_edit_link': kt_utils.check_permission('edit_link', request.user),
-        'permission_delete_link': kt_utils.check_permission('delete_link', request.user),
-    })
-
-
 def suggested_links(request):
     return render(request, 'ktapp/suggested_links.html', {
         'permission_new_link': kt_utils.check_permission('new_link', request.user),
@@ -879,6 +862,91 @@ def suggested_links(request):
             }
             for sc in models.SuggestedContent.objects.select_related('created_by').filter(domain=models.SuggestedContent.DOMAIN_LINK)
         ], key=lambda link: (link['content'].get('film', {'orig_title': ''})['orig_title'], link['created_at'])),
+    })
+
+
+def articles(request):
+    t = request.GET.get('t', 'filmek')
+    if t not in {'filmek', 'muveszek', 'egyeb'}:
+        t = 'filmek'
+    if t == 'filmek':
+        active_tab = 'films'
+        list_of_articles = list(models.Link.objects.raw(u'''
+            SELECT
+              CONCAT('L', l.id) AS id, l.name,
+              l.url,
+              l.link_domain, l.lead,
+              f.id AS film_id, f.orig_title AS film_orig_title, f.slug_cache AS film_slug_cache, f.year AS film_year,
+              u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
+            FROM ktapp_link l
+            INNER JOIN ktapp_film f ON f.id = l.film_id
+            LEFT JOIN ktapp_ktuser u ON u.id = l.author_id
+            WHERE l.lead != '' AND l.artist_id IS NULL
+
+            UNION
+
+            SELECT
+              CONCAT('R', r.id) AS id, CONCAT(f.orig_title, ' (', f.year, ')') AS name,
+              CONCAT('/film/', f.id, '/', f.slug_cache, '/elemzesek/', r.id) AS url,
+              'Kritikus Tömeg' AS link_domain, CONCAT(r.snippet, '...') AS lead,
+              f.id AS film_id, f.orig_title AS film_orig_title, f.slug_cache AS film_slug_cache, f.year AS film_year,
+              u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
+            FROM ktapp_review r
+            INNER JOIN ktapp_film f ON f.id = r.film_id
+            LEFT JOIN ktapp_ktuser u ON u.id = r.created_by_id
+            WHERE r.approved = 1
+
+            ORDER BY film_orig_title, film_year, film_id, id
+        '''))
+    elif t == 'muveszek':
+        active_tab = 'artists'
+        list_of_articles = list(models.Link.objects.raw(u'''
+            SELECT
+              CONCAT('L', l.id) AS id, l.name,
+              l.url,
+              l.link_domain, l.lead,
+              a.id AS artist_id, a.name AS artist_name, a.slug_cache AS artist_slug_cache,
+              u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
+            FROM ktapp_link l
+            INNER JOIN ktapp_artist a ON a.id = l.artist_id
+            LEFT JOIN ktapp_ktuser u ON u.id = l.author_id
+            WHERE l.lead != '' AND l.film_id IS NULL
+
+            UNION
+
+            SELECT
+              CONCAT('B', b.id) AS id, a.name AS name,
+              CONCAT('/muvesz/', a.id, '/', a.slug_cache) AS url,
+              'Kritikus Tömeg' AS link_domain, CONCAT(b.snippet, '...') AS lead,
+              a.id AS artist_id, a.name AS artist_name, a.slug_cache AS artist_slug_cache,
+              u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
+            FROM ktapp_biography b
+            INNER JOIN ktapp_artist a ON a.id = b.artist_id
+            LEFT JOIN ktapp_ktuser u ON u.id = b.created_by_id
+            WHERE b.approved = 1
+
+            ORDER BY artist_name, artist_id, id
+        '''))
+    else:
+        active_tab = 'misc'
+        list_of_articles = list(models.Link.objects.raw(u'''
+            SELECT
+              CONCAT('L', l.id) AS id, l.name,
+              l.url,
+              l.link_domain, l.lead,
+              u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
+            FROM ktapp_link l
+            LEFT JOIN ktapp_ktuser u ON u.id = l.author_id
+            WHERE l.lead != '' AND l.film_id IS NULL AND l.artist_id IS NULL
+            ORDER BY name, id
+        '''))
+    return render(request, 'ktapp/articles_subpages/about_%s.html' % active_tab, {
+        'active_tab': active_tab,
+        'articles': list_of_articles,
+        'permission_suggest_link': kt_utils.check_permission('suggest_link', request.user),
+        'permission_new_link': kt_utils.check_permission('new_link', request.user),
+        'permission_edit_link': kt_utils.check_permission('edit_link', request.user),
+        'permission_delete_link': kt_utils.check_permission('delete_link', request.user),
     })
 
 

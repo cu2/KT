@@ -1,49 +1,31 @@
-{% extends "ktapp/layout.html" %}
+{% extends "ktapp/articles_subpages/articles_base.html" %}
 {% load kt_extras %}
 
-{% block title %}Kritikus Tömeg{% endblock %}
-
-{% block header %}
-    <h1>Linkek</h1>
-{% endblock %}
-
-{% block main %}
+{% block premier_main %}
 
     <table class="fullsize">
         <tr class="header_tr">
-            <th>Szerző</th>
-            <th>Cím</th>
-            <th style="width: 50%">Lead</th>
-            <th>Film</th>
-            <th>Típus</th>
+            <th style="width: 15%">Oldal</th>
+            <th style="width: 70%">Cikk</th>
+            <th style="width: 15%">Szerző</th>
         </tr>
-        {% for link in links %}
+        {% for article in articles %}
             <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
-                <td>{% if link.author %}<a href="{% url 'user_profile' link.author.id link.author.slug_cache %}">{{ link.author.username }}</a>{% endif %}</td>
-                <td>[{{ link.link_domain }}] <a href="{{ link.url }}" target="_blank">{{ link.name }}</a></td>
-                <td>{{ link.lead }}</td>
+                <td>{{ article.link_domain }}</td>
                 <td>
-                    {% if link.film %}
-                        <a href="{% url 'film_main' link.film.id link.film.slug_cache %}">{{ link.film.orig_title }} ({{ link.film.year }})</a>
-                    {% endif %}
+                    <b><a href="{{ article.url }}" target="_blank">{{ article.name }}</a></b><br />
+                    {% autoescape off %}
+                    {{ article.lead }}
+                    {% endautoescape %}
                 </td>
-                <td>
-                    {% if link.link_type == 'R' %}
-                        Kritika/elemzés
-                    {% elif link.link_type == 'I' %}
-                        Interjú
-                    {% elif link.link_type == 'O' %}
-                        Hivatalos oldal
-                    {% else %}
-                        Egyéb oldal
-                    {% endif %}
-                </td>
+                <td>{% if article.author_user_id %}<a href="{% url 'user_profile' article.author_user_id article.author_slug_cache %}">{{ article.author_name }}</a>{% endif %}</td>
             </tr>
         {% endfor %}
     </table>
 
+
     {% if permission_new_link %}
-        <h3>Új link felvétele</h3>
+        <h3>Új cikk felvétele</h3>
         <p class="error">Ha egy konkrét filmről akarsz írást felvenni, azt ott tedd (a film lapján a linkek fül alatt). Ha egyéb filmes témáról, azt itt.</p>
         <form action="{% url 'new_link' %}" method="post" class="inline">
             {% csrf_token %}
@@ -71,10 +53,10 @@
                 <label for="id_author">Szerző KT-s neve (ha van):</label>
                 <input type="text" name="author" id="id_author" class="input_for_user wide_input" />
             </p>
-            <p><input type="submit" value="Link mentése" /></p>
+            <p><input type="submit" value="Cikk mentése" /></p>
         </form>
     {% elif permission_suggest_link %}
-        <h3>Új link beküldése</h3>
+        <h3>Új cikk beküldése</h3>
         <p class="error">Ha egy konkrét filmről akarsz írást beküldeni, azt ott tedd (a film lapján a linkek fül alatt). Ha egyéb filmes témáról, azt itt.</p>
         <form action="{% url 'suggest_link' %}" method="post" class="inline">
             {% csrf_token %}
@@ -102,8 +84,9 @@
                 <label for="id_author">Szerző KT-s neve (ha van):</label>
                 <input type="text" name="author" id="id_author" class="input_for_user wide_input" />
             </p>
-            <p><input type="submit" value="Link beküldése" /></p>
+            <p><input type="submit" value="Cikk beküldése" /></p>
         </form>
     {% endif %}
+
 
 {% endblock %}
