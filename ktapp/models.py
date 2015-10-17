@@ -81,6 +81,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     bio = models.TextField(blank=True)
     bio_html = models.TextField(blank=True)
     fav_period = models.CharField(max_length=250, blank=True, null=True)
+    is_game_master = models.BooleanField(default=False)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
