@@ -12,20 +12,18 @@
     <table class="fullsize">
         <tr class="header_tr">
             <th>Ki</th>
-            <th>Mikor</th>
             <th>Film</th>
             <th>Típus</th>
             <th>Cím/Link</th>
             <th>Lead</th>
             <th>Szerző</th>
             {% if user.is_authenticated and permission_new_link %}
-                <th colspan="2"></th>
+                <th colspan="3"></th>
             {% endif %}
         </tr>
         {% for link in links %}
             <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
                 <td>{% if link.created_by %}<a href="{% url 'user_profile' link.created_by.id link.created_by.slug_cache %}">{{ link.created_by.username }}</a>{% endif %}</td>
-                <td>{{ link.created_at|date:"Y-m-d" }}</td>
                 <td>
                     {% if link.content.film %}
                         <a href="{% url 'film_main' link.content.film.id link.content.film.slug_cache %}">{{ link.content.film.orig_title }} ({{ link.content.film.year }})</a>
@@ -50,6 +48,15 @@
                         <form action="{% url 'accept_link' %}" method="post" class="inline">
                             {% csrf_token %}
                             <input type="hidden" name="id" value="{{ link.id }}" />
+                            <input type="hidden" name="f" value="1" />
+                            <input type="submit" value="&check; főoldalra" class="small_button" />
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{% url 'accept_link' %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="id" value="{{ link.id }}" />
+                            <input type="hidden" name="f" value="0" />
                             <input type="submit" value="&check;" class="small_button" />
                         </form>
                     </td>

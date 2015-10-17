@@ -677,6 +677,7 @@ def new_link(request):
         author=author,
         film=film,
         created_by_id=request.user.id,
+        featured=True,
     )
     if film:
         return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
@@ -757,12 +758,10 @@ def accept_link(request):
         author=author,
         film=film,
         created_by=suggested_content.created_by,
+        featured=request.POST.get('f', '0') == '1'
     )
     suggested_content.delete()
-    if film:
-        return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
-    else:
-        return HttpResponseRedirect(reverse('links'))
+    return HttpResponseRedirect(reverse('suggested_links'))
 
 
 @require_POST

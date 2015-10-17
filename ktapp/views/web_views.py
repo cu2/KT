@@ -867,15 +867,15 @@ def links(request):
 def suggested_links(request):
     return render(request, 'ktapp/suggested_links.html', {
         'permission_new_link': kt_utils.check_permission('new_link', request.user),
-        'links': [
+        'links': sorted([
             {
                 'id': sc.id,
                 'created_by': sc.created_by,
                 'created_at': sc.created_at,
                 'content': json.loads(sc.content),
             }
-            for sc in models.SuggestedContent.objects.select_related('created_by').filter(domain=models.SuggestedContent.DOMAIN_LINK).order_by('-created_at')
-        ],
+            for sc in models.SuggestedContent.objects.select_related('created_by').filter(domain=models.SuggestedContent.DOMAIN_LINK)
+        ], key=lambda link: (link['content'].get('film', {'orig_title': ''})['orig_title'], link['created_at'])),
     })
 
 

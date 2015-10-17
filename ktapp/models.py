@@ -714,6 +714,7 @@ class Link(models.Model):
     link_type = models.CharField(max_length=1, choices=LINK_TYPES, default=LINK_TYPE_OTHER)
     lead = models.TextField(blank=True)
     author = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL, related_name='authored_link')
+    featured = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         self.link_domain = urlparse(self.url).netloc
