@@ -462,6 +462,12 @@ def suggest_film(request):
 
 
 def suggested_films(request):
+
+    def get_real_imdb_link(film_imdb_link):
+        if film_imdb_link:
+            return 'http://www.imdb.com/title/%s/' % film_imdb_link
+        return None
+
     return render(request, 'ktapp/suggested_films.html', {
         'permission_new_film': kt_utils.check_permission('new_film', request.user),
         'films': [
@@ -470,6 +476,7 @@ def suggested_films(request):
                 'created_by': f.created_by,
                 'created_at': f.created_at,
                 'content': json.loads(f.content),
+                'imdb_link': get_real_imdb_link(json.loads(f.content).get('imdb_link', '')),
             }
             for f in models.SuggestedContent.objects.select_related('created_by').filter(domain=models.SuggestedContent.DOMAIN_FILM).order_by('-created_at')
         ],

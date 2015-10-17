@@ -27,9 +27,11 @@
                 <td>{% if film.created_by %}<a href="{% url 'user_profile' film.created_by.id film.created_by.slug_cache %}">{{ film.created_by.username }}</a>{% endif %}</td>
                 <td>{{ film.created_at|date:"Y-m-d" }}</td>
                 <td>
+                    {% if film.imdb_link %}<a href="{{ film.imdb_link }}" target="_blank">{% endif %}
                     {{ film.content.orig_title }} ({{ film.content.year }})<br />
                     {{ film.content.second_title }}<br />
                     {{ film.content.third_title }}
+                    {% if film.imdb_link %}</a>{% endif %}
                 </td>
                 <td>{{ film.content.directors }}</td>
                 <td>{{ film.content.countries }}</td>
