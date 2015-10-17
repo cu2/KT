@@ -10,7 +10,13 @@
 {% block main %}
 <div class="centered_content">
 
-    {% include 'ktapp/blocks/new_comment_block.html' %}
+    {% if closed %}
+        <p class="error">A topik {{ topic.closed_until|date:"Y-m-d H:i" }}-ig le van zárva. A megnyitásig hátravan {% if closed_seconds > 300 %}{{ topic.closed_until|timeuntil }}{% else %}{{ closed_seconds }} másodperc{% endif %}.</p>
+    {% endif %}
+
+    {% if not closed or request.user.is_authenticated and request.user.is_game_master and topic.id == 38 %}
+        {% include 'ktapp/blocks/new_comment_block.html' %}
+    {% endif %}
 
     {% if max_pages >= 2 %}
         <ul class="paging">
@@ -32,6 +38,18 @@
             {% endif %}
             <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'forum' topic.id topic.slug_cache %}?p={{ max_pages }}">{{ max_pages }}</a>{% endif %}</li>
         </ul>
+    {% endif %}
+
+    {% if request.user.is_authenticated and request.user.is_game_master and topic.id == 38 %}
+        <p><span id="close_topic_opener" class="action_text">Topik lezárása</span></p>
+        <div id="close_topic_div" style="display: none">
+            <form action="{% url 'close_topic' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="topic_id" value="{{ topic.id }}" />
+                <p>Meddig (ÉÉÉÉ-HH-NN ÓÓ:PP): <input type="text" name="closed_until" value="{% if topic.closed_until %}{{ topic.closed_until|date:"Y-m-d H:i" }}{% endif %}" /></p>
+                <p><input type="submit" value="Topik lezárása" /></p>
+            </form>
+        </div>
     {% endif %}
 
     {% for c in comments %}

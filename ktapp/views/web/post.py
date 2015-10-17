@@ -109,12 +109,14 @@ def new_comment(request):
         domain = get_object_or_404(models.Poll, pk=request.POST['poll'])
     else:
         raise Http404
-    if request.POST:
-        comment_form = kt_forms.CommentForm(data=request.POST)
-        if comment_form.is_valid():
-            comment = comment_form.save(commit=False)
-            comment.created_by = request.user
-            comment.save(domain=domain)  # Comment model updates domain object
+    if domain_type == models.Comment.DOMAIN_TOPIC:
+        if domain.closed_until and domain.closed_until > datetime.datetime.now() and not request.user.is_game_master:
+            return HttpResponseForbidden()
+    comment_form = kt_forms.CommentForm(data=request.POST)
+    if comment_form.is_valid():
+        comment = comment_form.save(commit=False)
+        comment.created_by = request.user
+        comment.save(domain=domain)  # Comment model updates domain object
     if domain_type == models.Comment.DOMAIN_FILM:
         return HttpResponseRedirect(reverse('film_comments', args=(domain.pk, domain.slug_cache)))
     elif domain_type == models.Comment.DOMAIN_TOPIC:
@@ -1139,3 +1141,19 @@ def move_to_off(request):
         models.Comment.fix_comments(domain, domain_object)
         models.Comment.fix_comments('T', off_topic)
     return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+@require_POST
+@login_required
+def close_topic(request):
+    if not request.user.is_game_master:
+        return HttpResponseForbidden()
+    topic = get_object_or_404(models.Topic, id=request.POST.get('topic_id', 0))
+    closed_until = kt_utils.strip_whitespace(request.POST.get('closed_until'))
+    closed_until = closed_until[:16] + ':00'
+    if len(closed_until) == 19 and kt_utils.is_datetime(closed_until):
+        topic.closed_until = closed_until
+    else:
+        topic.closed_until = None
+    topic.save(update_fields=['closed_until'])
+    return HttpResponseRedirect(reverse('forum', args=(topic.id, topic.slug_cache)))

@@ -68,6 +68,14 @@ def is_date(value):
     return True
 
 
+def is_datetime(value):
+    try:
+        datetime.datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+    except ValueError:
+        return False
+    return True
+
+
 def strip_whitespace(value):
     return value.replace('\n', ' ').replace('\r', ' ').replace('\t', ' ').strip()
 

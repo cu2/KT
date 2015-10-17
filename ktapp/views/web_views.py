@@ -594,8 +594,11 @@ def forum(request, id, title_slug):
     comment_form.fields['topic'].widget = forms.HiddenInput()
     comment_form.fields['poll'].widget = forms.HiddenInput()
     comment_form.fields['reply_to'].widget = forms.HiddenInput()
+    now = datetime.datetime.now()
     return render(request, 'ktapp/forum.html', {
         'topic': topic,
+        'closed': (topic.closed_until > now) if topic.closed_until else False,
+        'closed_seconds': int((topic.closed_until - now).total_seconds()) if topic.closed_until else 0,
         'comments': comments,
         'comment_form': comment_form,
         'reply_to_comment': reply_to_comment,

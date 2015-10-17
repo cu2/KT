@@ -90,6 +90,9 @@ $(function() {
         $('.spoiler').removeClass('spoiler').addClass('visible_spoiler');
         $('.show_spoilers_section').css('visibility', 'hidden');
     });
+    $('#close_topic_opener').click(function() {
+        $('#close_topic_div').toggle();
+    });
     $('.move_to_off').click(function() {
         var list_of_ids = '';
         $('.comment_to_move_to_off:checked').each(function() {
