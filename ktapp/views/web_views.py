@@ -45,7 +45,7 @@ def index(request):
         toplist_of_the_day = models.UserToplist.objects.get(id=1)
     # buzz
     buzz_comment_domains = {}
-    for comment in models.Comment.objects.all()[:100]:
+    for comment in models.Comment.objects.exclude(topic_id=38).exclude(topic_id=87)[:100]:  # skip OFF and Game topics
         key = (comment.domain, comment.film_id, comment.topic_id, comment.poll_id)
         if key not in buzz_comment_domains:
             buzz_comment_domains[key] = (comment.id, comment.created_at)
