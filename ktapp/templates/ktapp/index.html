@@ -108,6 +108,14 @@
         <p><a href="{% url 'usertoplists' %}">További toplisták...</a></p>
     </div>
     <div class="right_content">
+        {% if before_game %}
+            <h2>Játék</h2>
+            <p>Azt hiszed, ismered a filmeket? Teszteld magad! Vasárnap este 8-tól újra <a href="{% url 'forum' 38 'jatek' %}">képes játék</a>!</p>
+        {% endif %}
+        {% if during_game %}
+            <h2>Játék</h2>
+            <p>Azt hiszed, ismered a filmeket? Teszteld magad a <a href="{% url 'forum' 38 'jatek' %}">képes játékban</a>!</p>
+        {% endif %}
         <h2>Legfrissebb kommentek</h2>
         {% for c in buzz_comments %}
             {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}

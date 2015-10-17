@@ -10,6 +10,15 @@
 {% block main %}
 <div class="centered_content">
 
+    {% if topic.id == 38 %}
+        <ul>
+            <li>Vasárnaponként, 20:00-kor megjelenik 10 kép (az időpont és a képek száma változhat, de a játékvezető erről előre szólni fog). A feladat egyszerű: ki kell találni, melyik kép melyik filmből való.</li>
+            <li>Megfejtésként csak magyar címet fogad el a játékvezető.</li>
+            <li>Amennyiben több filmnek is ugyanaz a magyar címe, abban az esetben kötelező a tipp mögé zárójelbe odaírni vagy a rendező nevét, vagy a film gyártási évét!</li>
+            <li>A segítség nélkül kitalált képekért 2, a segítséggel kitalált képekért 1 pont jár! (Holtverseny: Az adott forduló kezdésétől számított egy órán belül a 20 másodpercen belül érkező, ugyanarra a képre leadott helyes válasz minden megfejtője 2 pontot kap. Ezt követően az időkorlát 5 másodpercre szűkül.)</li>
+        </ul>
+    {% endif %}
+
     {% if closed %}
         <p class="error">A topik {{ topic.closed_until|date:"Y-m-d H:i" }}-ig le van zárva. A megnyitásig hátravan {% if closed_seconds > 300 %}{{ topic.closed_until|timeuntil }}{% else %}{{ closed_seconds }} másodperc{% endif %}.</p>
     {% endif %}

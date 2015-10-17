@@ -10,7 +10,6 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django import forms
-from django.db.models import Q
 
 from kt import settings
 from ktapp import models
@@ -27,7 +26,8 @@ MINIMUM_YEAR = 1920
 
 
 def index(request):
-    hash_of_the_day = int(hashlib.md5(datetime.datetime.now().strftime('%Y-%m-%d')).hexdigest(), 16)
+    now = datetime.datetime.now()
+    hash_of_the_day = int(hashlib.md5(now.strftime('%Y-%m-%d')).hexdigest(), 16)
     # film of the day
     film_of_the_day = models.OfTheDay.objects.filter(domain='F').order_by('-day')[0].film
     # latest_content
@@ -58,6 +58,10 @@ def index(request):
         random_poll = models.Poll.objects.filter(state=models.Poll.STATE_OPEN).order_by('?')[0]
     except IndexError:
         random_poll = None
+    # game
+    before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
+    during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
+    #
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
         'latest_content': sorted(latest_content, key=lambda x: x[0], reverse=True)[:10],
@@ -65,6 +69,8 @@ def index(request):
         'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
         'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids),
         'random_poll': random_poll,
+        'before_game': before_game,
+        'during_game': during_game,
     })
 
 
