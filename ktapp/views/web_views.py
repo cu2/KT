@@ -34,7 +34,7 @@ def index(request):
     latest_content = []
     for item in models.Review.objects.select_related('film', 'created_by').filter(approved=True).order_by('-created_at')[:10]:
         latest_content.append((item.created_at, 'review', item))
-    for item in models.Link.objects.exclude(lead='').select_related('author', 'created_by', 'film', 'artist').order_by('-created_at')[:10]:
+    for item in models.Link.objects.filter(featured=True).exclude(lead='').select_related('author', 'created_by', 'film', 'artist').order_by('-created_at')[:10]:
         latest_content.append((item.created_at, 'link', item))
     # toplist of the day
     number_of_toplists = models.UserToplist.objects.filter(quality=True).count()
