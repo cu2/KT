@@ -883,9 +883,9 @@ def merge_artist(request):
         for role in artist_to_delete.filmartistrelationship_set.all():
             role.artist = artist_to_leave
             role.save(update_fields=['artist'])
-        for pic in models.Picture.objects.filter(artist=artist_to_delete):
-            pic.artist = artist_to_leave
-            pic.save(update_fields=['artist'])
+        for pic in artist_to_delete.picture_set.all():
+            pic.artists.add(artist_to_leave)
+            pic.artists.remove(artist_to_delete)
         for bio in models.Biography.objects.filter(artist=artist_to_delete):
             bio.artist = artist_to_leave
             bio.save(update_fields=['artist'])
