@@ -45,7 +45,7 @@ def index(request):
         toplist_of_the_day = models.UserToplist.objects.get(id=1)
     # buzz
     buzz_comment_domains = {}
-    for comment in models.Comment.objects.exclude(topic_id=38).exclude(topic_id=87)[:100]:  # skip OFF and Game topics
+    for comment in models.Comment.objects.exclude(topic_id=87)[:100]:  # skip OFF topic
         key = (comment.domain, comment.film_id, comment.topic_id, comment.poll_id)
         if key not in buzz_comment_domains:
             buzz_comment_domains[key] = (comment.id, comment.created_at)
@@ -59,8 +59,10 @@ def index(request):
     except IndexError:
         random_poll = None
     # game
-    before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
-    during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
+    # before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
+    # during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
+    before_game = False
+    during_game = False
     #
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
@@ -620,7 +622,7 @@ def latest_comments(request):
     if t == 'filmes':
         comments = models.Comment.objects.filter(domain='F').select_related('film', 'created_by', 'reply_to', 'reply_to__created_by').all()[:100]
     else:
-        comments = models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').all()[:100]
+        comments = models.Comment.objects.exclude(topic_id=38).exclude(topic_id=87).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').all()[:100]  # skip Game and OFF topics
     return render(request, 'ktapp/latest_comments.html', {
         'comments': comments,
         't': t,
