@@ -1,2 +1,35 @@
-<h3>[{{ link.link_domain }}] <a href="{{ link.url }}" target="_blank">{{ link.name }}</a>{% if link.author %} (<a href="{% url 'user_profile' link.author.id link.author.slug_cache %}">{{ link.author.username }}</a>){% endif %}</h3>
+<div class="link_edit_block">
+<h3>[{{ link.link_domain }}] <a href="{{ link.url }}" target="_blank">{{ link.name }}</a>{% if link.author %} (<a href="{% url 'user_profile' link.author.id link.author.slug_cache %}">{{ link.author.username }}</a>){% endif %}{% if permission_edit_link %} <span class="normal_text">(<span class="action_text toggle_link_edit_form_button">szerk</span>)</span>{% endif %}</h3>
 <p>{{ link.lead|linebreaksbr }}</p>
+<form action="{% url 'edit_link' %}" method="post" style="display: none">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+    <input type="hidden" name="link_id" value="{{ link.id }}" />
+    <p>
+        <label for="id_link_type">Típus:</label>
+        <select name="link_type" id="id_link_type">
+            <option value="R"{% if link.link_type == 'R' %} selected="selected"{% endif %}>Kritika/elemzés</option>
+            <option value="I"{% if link.link_type == 'I' %} selected="selected"{% endif %}>Interjú</option>
+            <option value="O"{% if link.link_type == 'O' %} selected="selected"{% endif %}>Hivatalos oldal</option>
+            <option value="-"{% if link.link_type == '-' %} selected="selected"{% endif %}>Egyéb oldal</option>
+        </select>
+    </p>
+    <p>
+        <label for="id_name">Cím:</label>
+        <input type="text" name="name" id="id_name" class="wide_input" value="{{ link.name }}" />
+    </p>
+    <p>
+        <label for="id_url">URL:</label>
+        <input type="text" name="url" id="id_url" class="wide_input" value="{{ link.url }}" />
+    </p>
+    <p>
+        <label for="id_lead">Lead (pár mondat, ami annyira felcsigázza az olvasót, hogy mindenképp rákattint a linkre):</label><br />
+        <textarea name="lead" id="id_lead" rows="5">{{ link.lead }}</textarea>
+    </p>
+    <p>
+        <label for="id_author">Szerző KT-s neve (ha van):</label>
+        <input type="text" name="author" id="id_author" class="input_for_user wide_input" value="{{ link.author.username }}" />
+    </p>
+    <p><input type="submit" value="Link mentése" /></p>
+</form>
+</div>

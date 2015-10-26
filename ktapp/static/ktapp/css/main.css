@@ -1038,7 +1038,9 @@ ul.poll li {
 .small_heading_3 {
     font-size: 10pt;
 }
-
+.normal_text {
+    font-weight: normal;
+}
 
 
 

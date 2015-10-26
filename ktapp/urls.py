@@ -85,6 +85,7 @@ urlpatterns += patterns(
     url(r'^offba$', post_views.move_to_off, name='move_to_off'),
 
     url(r'^uj_link$', post_views.new_link, name='new_link'),
+    url(r'^szerk_link$', post_views.edit_link, name='edit_link'),
     url(r'^bekuldott_linkek/$', web_views.suggested_links, name='suggested_links'),
     url(r'^bekuld_link$', post_views.suggest_link, name='suggest_link'),
     url(r'^link_elfogadasa$', post_views.accept_link, name='accept_link'),

@@ -689,6 +689,31 @@ def new_link(request):
 
 @require_POST
 @login_required
+@kt_utils.kt_permission_required('edit_link')
+def edit_link(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    link = get_object_or_404(models.Link, id=request.POST.get('link_id', 0))
+    name = kt_utils.strip_whitespace(request.POST.get('name', ''))
+    url = kt_utils.strip_whitespace(request.POST.get('url', ''))
+    if name == '' or url == '':
+        return HttpResponseRedirect(next_url)
+    link_type = kt_utils.strip_whitespace(request.POST.get('link_type', ''))
+    if link_type not in {'R', 'I', 'O', '-'}:
+        link_type = '-'
+    lead = request.POST.get('lead', '').strip()
+    author_name = kt_utils.strip_whitespace(request.POST.get('author', ''))
+    author = models.KTUser.get_user_by_name(author_name)
+    link.name = name
+    link.url = url
+    link.link_type = link_type
+    link.lead = lead
+    link.author = author
+    link.save()
+    return HttpResponseRedirect(next_url)
+
+
+@require_POST
+@login_required
 @kt_utils.kt_permission_required('suggest_link')
 def suggest_link(request):
     film_id = request.POST.get('film_id', 0)
