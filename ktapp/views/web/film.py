@@ -284,9 +284,7 @@ def new_film(request):
     if request.POST:
         film_orig_title = kt_utils.strip_whitespace(request.POST.get('film_orig_title', ''))
         if film_orig_title == '':
-            return render(request, 'ktapp/new_film.html', {
-                'permission_edit_premiers': kt_utils.check_permission('edit_premiers', request.user),
-            })
+            return render(request, 'ktapp/new_film.html')
         state_before = {}
         film = models.Film.objects.create(
             orig_title=film_orig_title,
@@ -301,15 +299,6 @@ def new_film(request):
         if film_year == 0:
             film_year = None
         film.year = film_year
-
-        if kt_utils.check_permission('edit_premiers', request.user):
-            main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
-            if len(main_premier) == 4 and main_premier.isdigit():
-                film.main_premier = None
-                film.main_premier_year = int(main_premier)
-            elif len(main_premier) == 10 and kt_utils.is_date(main_premier):
-                film.main_premier = main_premier
-                film.main_premier_year = int(main_premier[:4])
 
         directors = set()
         for director_name in kt_utils.strip_whitespace(request.POST.get('film_directors', '')).split(','):
@@ -375,8 +364,6 @@ def new_film(request):
             'second_title': film.second_title,
             'third_title': film.third_title,
             'year': film.year,
-            'main_premier': film.main_premier,
-            'main_premier_year': film.main_premier_year,
             'plot_summary': film.plot_summary,
             'imdb_link': film.imdb_link,
             'porthu_link': film.porthu_link,
@@ -391,9 +378,7 @@ def new_film(request):
             state_before, state_after
         )
         return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
-    return render(request, 'ktapp/new_film.html', {
-        'permission_edit_premiers': kt_utils.check_permission('edit_premiers', request.user),
-    })
+    return render(request, 'ktapp/new_film.html')
 
 
 @login_required
@@ -409,14 +394,6 @@ def suggest_film(request):
             film_year = None
         if film_year == 0:
             film_year = None
-        main_premier = kt_utils.strip_whitespace(request.POST.get('main_premier', ''))
-        film_main_premier = None
-        film_main_premier_year = None
-        if len(main_premier) == 4 and main_premier.isdigit():
-            film_main_premier_year = int(main_premier)
-        elif len(main_premier) == 10 and kt_utils.is_date(main_premier):
-            film_main_premier = main_premier
-            film_main_premier_year = int(main_premier[:4])
 
         film_imdb_link = kt_utils.strip_whitespace(request.POST.get('film_imdb_link', ''))
         if film_imdb_link.startswith('tt'):
@@ -444,8 +421,6 @@ def suggest_film(request):
                 'second_title': kt_utils.strip_whitespace(request.POST.get('film_second_title', '')),
                 'third_title': kt_utils.strip_whitespace(request.POST.get('film_third_title', '')),
                 'year': film_year,
-                'main_premier': film_main_premier,
-                'main_premier_year': film_main_premier_year,
                 'directors': kt_utils.strip_whitespace(request.POST.get('film_directors', '')),
                 'countries': kt_utils.strip_whitespace(request.POST.get('countries', '')),
                 'genres': kt_utils.strip_whitespace(request.POST.get('genres', '')),
