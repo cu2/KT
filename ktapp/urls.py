@@ -120,6 +120,7 @@ urlpatterns += patterns(
     url(r'^lezar$', post_views.close_topic, name='close_topic'),
     url(r'^legfrissebb_kommentek/$', web_views.latest_comments, name='latest_comments'),
     url(r'^kedvencek/$', web_views.favourites, name='favourites'),
+    url(r'^hasonlok/$', web_views.similar_users, name='similar_users'),
 
     url(r'^felhasznaloi_toplista/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.usertoplist, name='usertoplist'),
     url(r'^felhasznaloi_toplistak/$', web_views.usertoplists, name='usertoplists'),

@@ -1,0 +1,62 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Hozzád hasonló userek - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Hozzád hasonló userek</h1>
+{% endblock %}
+
+{% block main %}
+    <div class="centered_content">
+
+    {% if request.user.is_authenticated %}
+
+        <p>
+            {% for link_genre, link_text in links %}
+                {% if link_genre == genre_slug_cache %}
+                    <b>{{ link_text }}</b>
+                {% else %}
+                    <a href="{% url 'similar_users' %}{% if link_genre %}?mufaj={{ link_genre }}{% endif %}">{{ link_text }}</a>
+                {% endif %}
+            {% endfor %}
+        </p>
+
+        {% if user_list %}
+
+            <table class="centered_pos">
+                <thead>
+                    <tr class="header_tr">
+                        <th>Hasonlóság</th>
+                        <th>Filmek</th>
+                        <th>Felhasználó</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for similar_user in user_list %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td class="center">{{ similar_user.1 }}%</td>
+                        <td class="center"><a href="{% url 'user_films' similar_user.2 similar_user.4 %}{% if genre_name %}?genre={{ genre_name|urlencode }}{% endif %}"{% if similar_user.0 >= number_of_ratings_limit %} class="bold"{% endif %}>{{ similar_user.0 }}</a></td>
+                        <td><a href="{% url 'user_profile' similar_user.2 similar_user.4 %}">{{ similar_user.3 }}</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            {% if genre_slug_cache %}
+                <p>Nem osztályoztál elég filmet ebből a műfajból, ezért sajnos nem tudunk olyan usereket mondani, akiknek ebben a műfajban hozzád hasonló az ízlése.</p>
+            {% else %}
+                <p>Nem osztályoztál elég filmet, ezért sajnos nem tudunk olyan usereket mondani, akiknek hozzád hasonló az ízlése.</p>
+            {% endif %}
+
+        {% endif %}
+
+    {% else %}
+
+        <p>Ha <a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">regisztrálsz</a> az oldalon, és elkezdesz leosztályozni filmeket, egy idő (vagyis elegendő szavazat) után itt megjelennek azok a userek, akiknek hozzád hasonló az ízlése, akár általában, akár műfaj szerinti bontásban. Így az ő szavazataik alapján egy csomó szuper filmre bukkanhatsz, amiket még nem láttál.</p>
+
+    {% endif %}
+
+    </div>
+{% endblock %}

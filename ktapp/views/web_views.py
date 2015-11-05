@@ -5,6 +5,7 @@ import hashlib
 import math
 import json
 
+from django.db import connection
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
@@ -16,6 +17,7 @@ from ktapp import models
 from ktapp import forms as kt_forms
 from ktapp import utils as kt_utils
 from ktapp.helpers import filmlist
+from ktapp import sqls as kt_sqls
 
 
 COMMENTS_PER_PAGE = 100
@@ -629,8 +631,10 @@ def latest_comments(request):
     })
 
 
-@login_required
 def favourites(request):
+    if not request.user.is_authenticated():
+        return render(request, 'ktapp/favourites.html')
+
     favourites = []
     favourite_ids = []
     latest_fav_votes = []
@@ -646,6 +650,54 @@ def favourites(request):
         'favourites': favourites,
         'latest_votes': models.Vote.objects.filter(id__in=latest_fav_votes).select_related('user', 'film').order_by('-when', '-id')[:50],
         'latest_comments': models.Comment.objects.filter(id__in=latest_fav_comments).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').all()[:20],
+    })
+
+
+def similar_users(request):
+    if not request.user.is_authenticated():
+        return render(request, 'ktapp/similar_users.html')
+
+    genre_slug_cache = kt_utils.strip_whitespace(request.GET.get('mufaj', ''))
+    try:
+        genre = models.Keyword.objects.get(slug_cache=genre_slug_cache, keyword_type=models.Keyword.KEYWORD_TYPE_GENRE)
+    except models.Keyword.DoesNotExist:
+        genre = None
+    if genre:
+        genre_slug_cache = genre.slug_cache
+        genre_name = genre.name
+    else:
+        genre_slug_cache = ''
+        genre_name = ''
+    links = [('', u'általában')]
+    for keyword in models.Keyword.objects.filter(keyword_type=models.Keyword.KEYWORD_TYPE_GENRE).order_by('name'):
+        links.append((keyword.slug_cache, keyword.name))
+
+    user_list = []
+    cursor = connection.cursor()
+    if genre:
+        try:
+            self_uur = models.UserUserRating.objects.get(user_1=request.user, user_2=request.user, keyword=genre)
+        except models.UserUserRating.DoesNotExist:
+            self_uur = None
+        if self_uur:
+            number_of_ratings_limit = self_uur.number_of_ratings / 4
+        else:
+            number_of_ratings_limit = 0
+        cursor.execute(kt_sqls.SIMILAR_USERS_PER_GENRE, (request.user.id, request.user.id, number_of_ratings_limit, genre.id))
+    else:
+        number_of_ratings_limit = request.user.number_of_ratings / 5
+        cursor.execute(kt_sqls.SIMILAR_USERS, (request.user.id, request.user.id, number_of_ratings_limit))
+    for row in cursor.fetchall():
+        if row[1] < 75:
+            break
+        user_list.append(row)
+
+    return render(request, 'ktapp/similar_users.html', {
+        'links': links,
+        'genre_name': genre_name,
+        'genre_slug_cache': genre_slug_cache,
+        'user_list': user_list,
+        'number_of_ratings_limit': number_of_ratings_limit * 2,
     })
 
 

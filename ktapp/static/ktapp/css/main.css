@@ -524,6 +524,10 @@ td {
 table.fullsize {
     width: 100%;
 }
+table.centered_pos {
+    margin-left: auto;
+    margin-right: auto;
+}
 .td_sub {
     font-size: 7pt;
 }
@@ -555,6 +559,10 @@ table.sortable tr.header_tr {
 
 .center {
     text-align: center;
+}
+
+.bold {
+    font-weight: bold;
 }
 
 .hidden {

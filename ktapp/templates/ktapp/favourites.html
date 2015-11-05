@@ -9,6 +9,8 @@
 
 {% block main %}
 
+    {% if request.user.is_authenticated %}
+
     {% if favourites %}
         <p>Kedvenceid: {% for fav in favourites %}<a href="{% url 'user_profile' fav.id fav.slug_cache %}">{{ fav.username }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
     {% endif %}
@@ -49,5 +51,13 @@
 
     </div>
     <br class="clear" />
+
+    {% else %}
+
+        <div class="centered_content">
+            <p>Ha <a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">regisztrálsz</a> az oldalon, bejelölheted azokat a usereket, akiknek hozzád hasonló az ízlése vagy számodra érdekes kommenteket írnak. Ezután ebben a menüben láthatod az ő legfrissebb szavazataikat és hozzászólásaikat.</p>
+        </div>
+
+    {% endif %}
 
 {% endblock %}
