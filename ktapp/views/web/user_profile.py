@@ -14,6 +14,7 @@ from ktapp import models
 from ktapp import utils as kt_utils
 from ktapp.helpers import filmlist
 from ktapp.texts import LONG_YEARS
+from ktapp import sqls as kt_sqls
 
 
 COMMENTS_PER_PAGE = 100
@@ -95,6 +96,17 @@ def user_profile(request, id, name_slug):
             profile['major_years'].append(year_str)
         else:
             profile['minor_years'].append(year_str)
+    similarity = None
+    similarity_per_genre = []
+    if request.user.is_authenticated():
+        cursor = connection.cursor()
+        cursor.execute(kt_sqls.SIMILARITY, (request.user.id, selected_user.id))
+        row = cursor.fetchone()
+        if row:
+            similarity = row
+        cursor.execute(kt_sqls.SIMILARITY_PER_GENRE, (request.user.id, selected_user.id))
+        for row in cursor.fetchall():
+            similarity_per_genre.append(row)
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,
@@ -138,6 +150,8 @@ def user_profile(request, id, name_slug):
             WHERE uf.user_id = %s AND uf.domain = %s AND k.keyword_type = %s
             ORDER BY k.name, k.id
         ''', [selected_user.id, models.UserFavourite.DOMAIN_COUNTRY, models.Keyword.KEYWORD_TYPE_COUNTRY])),
+        'similarity': similarity,
+        'similarity_per_genre': similarity_per_genre,
     })
 
 

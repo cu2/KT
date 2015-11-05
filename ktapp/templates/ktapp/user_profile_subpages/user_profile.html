@@ -61,6 +61,19 @@
             {% endif %}
         </p>
 
+        {% if user.is_authenticated and selected_user.id != user.id and similarity %}
+            <h2>Hasonlóság</h2>
+            <p>{{ similarity.1 }}% ({{ similarity.0 }} film alapján)</p>
+            {% if similarity_per_genre %}
+                <p>Műfajonként:</p>
+                <ul class="nobullet">
+                    {% for sim in similarity_per_genre %}
+                        <li>{{ sim.1 }}% ({{ sim.0 }}) <a href="{% url 'user_films' selected_user.id selected_user.slug_cache %}?genre={{ sim.3|urlencode }}">{{ sim.3 }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+
         <h2>Demográfiai adatok</h2>
         {% if selected_user.id == user.id %}
             <p>
