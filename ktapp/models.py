@@ -1443,3 +1443,4 @@ class UserUserRating(models.Model):
     number_of_ratings_53 = models.IntegerField(default=0)
     number_of_ratings_54 = models.IntegerField(default=0)
     number_of_ratings_55 = models.IntegerField(default=0)
+    similarity = models.PositiveSmallIntegerField(blank=True, null=True)
