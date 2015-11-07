@@ -8,6 +8,19 @@
 {% block main %}
 
     <div class="left_content">
+        {% if not request.user.is_authenticated %}
+            <div style="width: 100%; height: 140px; margin-top: 15px">
+                <div id="fb-root"></div>
+                <script>(function(d, s, id) {
+                    var js, fjs = d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) return;
+                    js = d.createElement(s); js.id = id;
+                    js.src = "//connect.facebook.net/hu_HU/sdk.js#xfbml=1&version=v2.5&appId=259204284100889";
+                    fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));</script>
+                <div class="fb-page" data-href="https://www.facebook.com/kritikustomeg" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="false" data-show-posts="false"><div class="fb-xfbml-parse-ignore"><blockquote cite="https://www.facebook.com/kritikustomeg"><a href="https://www.facebook.com/kritikustomeg">Kritikus Tömeg</a></blockquote></div></div>
+            </div>
+        {% endif %}
         <h2>A nap filmje</h2>
         <div class="film_block">
             {% if film.main_poster %}
