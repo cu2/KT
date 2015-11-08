@@ -120,7 +120,7 @@
                         <li><a href="{% url 'awards' %}">Díjak</a></li>
                     </ul>
                 </li>
-                {% if user.is_authenticated and user.is_staff or user.is_reliable or user.core_member %}
+                {% if user.is_staff or user.is_reliable or user.core_member %}
                     <li>Szerk<br />
                         <ul class="submenu">
                             {% if user.is_staff or user.is_reliable %}
@@ -130,8 +130,10 @@
                             {% endif %}
                             <li><a href="{% url 'suggested_films' %}">Beküldött filmek</a></li>
                             <li><a href="{% url 'suggested_links' %}">Beküldött linkek</a></li>
-                            <li><a href="{% url 'suggested_reviews' %}">Beküldött elemzések</a></li>
-                            <li><a href="{% url 'suggested_bios' %}">Beküldött portrék</a></li>
+                            {% if user.is_staff %}
+                                <li><a href="{% url 'suggested_reviews' %}">Beküldött elemzések</a></li>
+                                <li><a href="{% url 'suggested_bios' %}">Beküldött portrék</a></li>
+                            {% endif %}
                             {% if user.is_staff or user.is_reliable %}
                                 <li><a href="{% url 'changes' %}">Változások</a></li>
                             {% endif %}
