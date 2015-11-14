@@ -17,8 +17,23 @@ from ktapp import utils as kt_utils
 COMMENTS_PER_PAGE = 100
 
 
-def film_main(request, id, film_slug):
-    film = get_object_or_404(models.Film, pk=id)
+def _generic_film_view(view_function):
+
+    def extended_view_function(request, id, film_slug, *args, **kwargs):
+        film = get_object_or_404(models.Film, pk=id)
+        base_context = {
+            'film': film,
+            'film_directors': list(film.directors()),
+            'countries': list(film.countries()),
+            'genres': film.genres_cache,
+        }
+        return view_function(request, id, film_slug, film, base_context, *args, **kwargs)
+
+    return extended_view_function
+
+
+@_generic_film_view
+def film_main(request, id, film_slug, film, base_context):
     rating = 0
     special_users = set()
     if request.user.is_authenticated():
@@ -48,9 +63,8 @@ def film_main(request, id, film_slug):
             wish_count[1] += 1
         if wish.wished_by_id == request.user.id:
             my_wishes[wish.wish_type] = True
-    return render(request, 'ktapp/film_subpages/film_main.html', {
+    return render(request, 'ktapp/film_subpages/film_main.html', dict(base_context, **{
         'active_tab': 'main',
-        'film': film,
         'rating': rating,
         'ratings': range(1, 6),
         'roles': film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).select_related('artist').order_by('role_name'),
@@ -67,11 +81,11 @@ def film_main(request, id, film_slug):
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
         'permission_edit_premiers': kt_utils.check_permission('edit_premiers', request.user),
         'permission_new_role': kt_utils.check_permission('new_role', request.user),
-    })
+    }))
 
 
-def film_comments(request, id, film_slug):
-    film = get_object_or_404(models.Film, pk=id)
+@_generic_film_view
+def film_comments(request, id, film_slug, film, base_context):
     p = int(request.GET.get('p', 0))
     if p == 1:
         return HttpResponseRedirect(reverse('film_comments', args=(film.id, film.slug_cache)))
@@ -109,91 +123,84 @@ def film_comments(request, id, film_slug):
     comment_form.fields['topic'].widget = forms.HiddenInput()
     comment_form.fields['poll'].widget = forms.HiddenInput()
     comment_form.fields['reply_to'].widget = forms.HiddenInput()
-    return render(request, 'ktapp/film_subpages/film_comments.html', {
+    return render(request, 'ktapp/film_subpages/film_comments.html', dict(base_context, **{
         'active_tab': 'comments',
-        'film': film,
         'comments': comments,
         'comment_form': comment_form,
         'reply_to_comment': reply_to_comment,
         'p': p,
         'max_pages': max_pages,
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-    })
+    }))
 
 
-def film_quotes(request, id, film_slug):
-    film = get_object_or_404(models.Film, pk=id)
+@_generic_film_view
+def film_quotes(request, id, film_slug, film, base_context):
     quote_form = kt_forms.QuoteForm(initial={'film': film})
     quote_form.fields['film'].widget = forms.HiddenInput()
-    return render(request, 'ktapp/film_subpages/film_quotes.html', {
+    return render(request, 'ktapp/film_subpages/film_quotes.html', dict(base_context, **{
         'active_tab': 'quotes',
-        'film': film,
         'quotes': film.quote_set.all(),
         'quote_form': quote_form,
         'permission_new_quote': kt_utils.check_permission('new_quote', request.user),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-    })
+    }))
 
 
-def film_trivias(request, id, film_slug):
-    film = get_object_or_404(models.Film, pk=id)
+@_generic_film_view
+def film_trivias(request, id, film_slug, film, base_context):
     trivia_form = kt_forms.TriviaForm(initial={'film': film})
     trivia_form.fields['film'].widget = forms.HiddenInput()
-    return render(request, 'ktapp/film_subpages/film_trivias.html', {
+    return render(request, 'ktapp/film_subpages/film_trivias.html', dict(base_context, **{
         'active_tab': 'trivias',
-        'film': film,
         'trivias': film.trivia_set.all(),
         'trivia_form': trivia_form,
         'permission_new_trivia': kt_utils.check_permission('new_trivia', request.user),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-    })
+    }))
 
 
-def film_reviews(request, id, film_slug):
-    film = get_object_or_404(models.Film, pk=id)
+@_generic_film_view
+def film_reviews(request, id, film_slug, film, base_context):
     review_form = kt_forms.ReviewForm(initial={'film': film})
     review_form.fields['film'].widget = forms.HiddenInput()
-    return render(request, 'ktapp/film_subpages/film_reviews.html', {
+    return render(request, 'ktapp/film_subpages/film_reviews.html', dict(base_context, **{
         'active_tab': 'reviews',
-        'film': film,
         'reviews': film.review_set.filter(approved=True).all(),
         'unapproved_reviews': film.review_set.filter(approved=False).all(),
         'review_form': review_form,
         'permission_new_review': kt_utils.check_permission('new_review', request.user),
         'permission_approve_review': kt_utils.check_permission('approve_review', request.user),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-    })
+    }))
 
 
-def film_review(request, id, film_slug, review_id):
-    film = get_object_or_404(models.Film, pk=id)
+@_generic_film_view
+def film_review(request, id, film_slug, film, base_context, review_id):
     review = get_object_or_404(models.Review, pk=review_id, approved=True)
     if review.film != film:
         raise Http404
-    return render(request, 'ktapp/film_subpages/film_review.html', {
+    return render(request, 'ktapp/film_subpages/film_review.html', dict(base_context, **{
         'active_tab': 'reviews',
-        'film': film,
         'review': review,
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-    })
+    }))
 
 
-def film_awards(request, id, film_slug):
-    film = get_object_or_404(models.Film, pk=id)
-    return render(request, 'ktapp/film_subpages/film_awards.html', {
+@_generic_film_view
+def film_awards(request, id, film_slug, film, base_context):
+    return render(request, 'ktapp/film_subpages/film_awards.html', dict(base_context, **{
         'active_tab': 'awards',
-        'film': film,
         'awards': film.award_set.all().order_by('name', 'year', 'category'),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-    })
+    }))
 
 
-def film_links(request, id, film_slug):
-    film = get_object_or_404(models.Film, pk=id)
+@_generic_film_view
+def film_links(request, id, film_slug, film, base_context):
     links = film.link_set.select_related('author')
-    return render(request, 'ktapp/film_subpages/film_links.html', {
+    return render(request, 'ktapp/film_subpages/film_links.html', dict(base_context, **{
         'active_tab': 'links',
-        'film': film,
         'links_reviews': links.filter(link_type=models.Link.LINK_TYPE_REVIEWS),
         'links_interviews': links.filter(link_type=models.Link.LINK_TYPE_INTERVIEWS),
         'links_official': links.filter(link_type=models.Link.LINK_TYPE_OFFICIAL),
@@ -203,17 +210,16 @@ def film_links(request, id, film_slug):
         'permission_new_link': kt_utils.check_permission('new_link', request.user),
         'permission_edit_link': kt_utils.check_permission('edit_link', request.user),
         'permission_delete_link': kt_utils.check_permission('delete_link', request.user),
-    })
+    }))
 
 
-def film_pictures(request, id, film_slug):
-    film = get_object_or_404(models.Film, pk=id)
+@_generic_film_view
+def film_pictures(request, id, film_slug, film, base_context):
     pictures = sorted(film.picture_set.all(), key=lambda pic: (pic.order_key, pic.id))
     upload_form = kt_forms.PictureUploadForm(initial={'film': film})
     upload_form.fields['film'].widget = forms.HiddenInput()
-    context = {
+    context = dict(base_context, **{
         'active_tab': 'pictures',
-        'film': film,
         'pictures': pictures,
         'upload_form': upload_form,
         'all_artists_in_film': film.artists.filter(filmartistrelationship__role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).all().order_by('name'),
@@ -221,15 +227,15 @@ def film_pictures(request, id, film_slug):
         'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
         'permission_delete_picture': kt_utils.check_permission('delete_picture', request.user),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-    }
+    })
     if len(pictures) == 1:
         next_picture = kt_utils.get_next_picture(pictures, pictures[0])
         context.update(kt_utils.get_selected_picture_details(models.Picture, film, pictures[0], next_picture))
     return render(request, 'ktapp/film_subpages/film_pictures.html', context)
 
 
-def film_picture(request, id, film_slug, picture_id):
-    film = get_object_or_404(models.Film, pk=id)
+@_generic_film_view
+def film_picture(request, id, film_slug, film, base_context, picture_id):
     picture = get_object_or_404(models.Picture, pk=picture_id)
     if picture.film != film:
         raise Http404
@@ -237,9 +243,8 @@ def film_picture(request, id, film_slug, picture_id):
     next_picture = kt_utils.get_next_picture(pictures, picture)
     upload_form = kt_forms.PictureUploadForm(initial={'film': film})
     upload_form.fields['film'].widget = forms.HiddenInput()
-    context = {
+    context = dict(base_context, **{
         'active_tab': 'pictures',
-        'film': film,
         'pictures': pictures,
         'upload_form': upload_form,
         'all_artists_in_film': film.artists.filter(filmartistrelationship__role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).all().order_by('name'),
@@ -247,13 +252,13 @@ def film_picture(request, id, film_slug, picture_id):
         'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
         'permission_delete_picture': kt_utils.check_permission('delete_picture', request.user),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-    }
+    })
     context.update(kt_utils.get_selected_picture_details(models.Picture, film, picture, next_picture))
     return render(request, 'ktapp/film_subpages/film_pictures.html', context)
 
 
-def film_keywords(request, id, film_slug):
-    film = get_object_or_404(models.Film, pk=id)
+@_generic_film_view
+def film_keywords(request, id, film_slug, film, base_context):
     rating = 0
     if request.user.is_authenticated():
         try:
@@ -268,14 +273,13 @@ def film_keywords(request, id, film_slug):
         major_keywords = major_keywords.exclude(spoiler=True)
         other_keywords = other_keywords.exclude(spoiler=True)
         major_and_other_keywords = major_and_other_keywords.exclude(spoiler=True)
-    return render(request, 'ktapp/film_subpages/film_keywords.html', {
+    return render(request, 'ktapp/film_subpages/film_keywords.html', dict(base_context, **{
         'active_tab': 'keywords',
-        'film': film,
         'major_keywords': [(x.keyword, x.spoiler) for x in major_keywords.order_by('keyword__name', 'keyword__id')],
         'other_keywords': [(x.keyword, x.spoiler) for x in other_keywords.order_by('keyword__name', 'keyword__id')],
         'major_and_other_keywords': [(x.keyword, x.spoiler) for x in major_and_other_keywords.order_by('keyword__name', 'keyword__id')],
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-    })
+    }))
 
 
 @login_required

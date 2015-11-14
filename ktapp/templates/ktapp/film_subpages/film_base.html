@@ -3,20 +3,19 @@
 
 {% block title %}{{ film.orig_title }}{% if film.second_title %} / {{ film.second_title }}{% endif %} ({{ film.year }}) - Kritikus Tömeg{% endblock %}
 
-{% block meta_description %}{% with directors=film.directors countries=film.countries genres=film.genres_cache %}{% if countries or genres %}{% for country in countries %}{% if forloop.first %}{{ country.name|title }}{% else %}{{ country.name }}{% endif %}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{{ film|film_genres:"all" }}{% else %}film{% endif %}{% endif %}, {% if directors %}rendezte: {% for director in directors|slice:":3" %}{{ director.name }}{% if not forloop.last %} - {% endif %}{% endfor %}{% endif %}{% if film.average_rating %}, átlaga: {{ film.average_rating }}{% endif %}. {{ film.plot_summary|strip_whitespace }}{% endwith %}{% endblock %}
+{% block meta_description %}{% if countries or genres %}{% for country in countries %}{% if forloop.first %}{{ country.name|title }}{% else %}{{ country.name }}{% endif %}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{{ film|film_genres:"all" }}{% else %}film{% endif %}{% endif %}, {% if film_directors %}rendezte: {% for director in film_directors|slice:":3" %}{{ director.name }}{% if not forloop.last %} - {% endif %}{% endfor %}{% endif %}{% if film.average_rating %}, átlaga: {{ film.average_rating }}{% endif %}. {{ film.plot_summary|strip_whitespace }}{% endblock %}
 
 {% block other_meta %}
     <meta property="og:type" content="video.movie" />
     <meta property="og:url" content="{{ film.absolute_url }}" />
     <meta property="og:image" content="{{ film.main_poster.get_display_urls.max }}" />
     <meta property="og:title" content="{{ film.orig_title }}{% if film.second_title %} / {{ film.second_title }}{% endif %} ({{ film.year }})" />
-    <meta property="og:description" content="{% with directors=film.directors countries=film.countries genres=film.genres_cache %}{% if countries or genres %}{% for country in countries %}{% if forloop.first %}{{ country.name|title }}{% else %}{{ country.name }}{% endif %}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{{ film|film_genres:"all" }}{% else %}film{% endif %}{% endif %}, {% if directors %}rendezte: {% for director in directors|slice:":3" %}{{ director.name }}{% if not forloop.last %} - {% endif %}{% endfor %}{% endif %}{% if film.average_rating %}, átlaga: {{ film.average_rating }}{% endif %}. {{ film.plot_summary|strip_whitespace }}{% endwith %}" />
-    <meta property="fb:caption" content="{% with countries=film.countries genres=film.genres_cache %}{% if countries or genres %}{% for country in countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{{ film|film_genres:"all" }}{% else %}film{% endif %}{% endif %}{% endwith %}" />
+    <meta property="og:description" content="{% if countries or genres %}{% for country in countries %}{% if forloop.first %}{{ country.name|title }}{% else %}{{ country.name }}{% endif %}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{{ film|film_genres:"all" }}{% else %}film{% endif %}{% endif %}, {% if film_directors %}rendezte: {% for director in film_directors|slice:":3" %}{{ director.name }}{% if not forloop.last %} - {% endif %}{% endfor %}{% endif %}{% if film.average_rating %}, átlaga: {{ film.average_rating }}{% endif %}. {{ film.plot_summary|strip_whitespace }}" />
+    <meta property="fb:caption" content="{% if countries or genres %}{% for country in countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %} {% if genres %}{{ film|film_genres:"all" }}{% else %}film{% endif %}{% endif %}" />
     <meta property="fb:description" content="{{ film.plot_summary|strip_whitespace }}" />
 {% endblock %}
 
 {% block header %}
-    {% with directors=film.directors countries=film.countries genres=film.genres_cache %}
     <div id="film_header" class="hover_show_button_context">
         <div id="film_title">
             <h1>{{ film.orig_title }}{% if film.year %} <span class="film_year">({{ film.year }})</span>{% endif %}</h1>
@@ -29,8 +28,8 @@
                     {% endif %}
                 </h2>
             {% endif %}
-            {% if directors %}
-                <h3>({% for director in directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
+            {% if film_directors %}
+                <h3>({% for director in film_directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %} - {% endif %}{% endfor %})</h3>
             {% endif %}
             {% if countries or genres %}
                 <p>
@@ -93,7 +92,7 @@
                 </p>
                 <p>
                     <label for="id_film_directors">Rendező(k) (vesszővel elválasztva):</label><br />
-                    <input type="text" name="film_directors" id="id_film_directors" class="input_for_artists" value="{% for d in directors %}{{ d }}{% if not forloop.last %}, {% endif %}{% endfor %}" />
+                    <input type="text" name="film_directors" id="id_film_directors" class="input_for_artists" value="{% for d in film_directors %}{{ d }}{% if not forloop.last %}, {% endif %}{% endfor %}" />
                 </p>
                 <p>
                     <label for="id_film_imdb_link">IMDb link (a film imdb-s oldalának teljes url-je):</label><br />
@@ -118,7 +117,6 @@
             </form>
         </div>
     {% endif %}
-    {% endwith %}
 {% endblock %}
 
 {% block main %}
