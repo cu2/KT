@@ -275,6 +275,22 @@
                 </ul>
             {% endif %}
 
+            {% if recommended_films %}
+                <h3>Ajánlott filmek</h3>
+                <table class="fullsize">
+                    <tr class="header_tr">
+                        <th>Film</th>
+                        <th>Átlag</th>
+                    </tr>
+                    {% for f in recommended_films %}
+                        <tr class="{% cycle '' 'odd' %}">
+                            <td>{{ f|film_url_html_w_year }}</td>
+                            <td class="center">{{ f|film_rating_html }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+
             {% if utls %}
                 <h3>Felhasználói toplisták</h3>
                 <table>

@@ -1419,3 +1419,10 @@ class UserUserRating(models.Model):
     last_calculated_at = models.DateTimeField()
     number_of_ratings = models.IntegerField(default=0)
     similarity = models.PositiveSmallIntegerField(blank=True, null=True)
+
+
+class FilmFilmRecommendation(models.Model):
+    film_1 = models.ForeignKey(Film, related_name='film_1')
+    film_2 = models.ForeignKey(Film, related_name='film_2')
+    last_calculated_at = models.DateTimeField()
+    score = models.IntegerField(default=0)

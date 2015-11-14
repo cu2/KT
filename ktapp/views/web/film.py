@@ -12,6 +12,7 @@ from django import forms
 from ktapp import models
 from ktapp import forms as kt_forms
 from ktapp import utils as kt_utils
+from ktapp import sqls as kt_sqls
 
 
 COMMENTS_PER_PAGE = 100
@@ -63,6 +64,10 @@ def film_main(request, id, film_slug, film, base_context):
             wish_count[1] += 1
         if wish.wished_by_id == request.user.id:
             my_wishes[wish.wish_type] = True
+    if request.user.is_authenticated():
+        recommended_films = list(models.Film.objects.raw(kt_sqls.RECOMMENDED_FILMS_LOGGED_IN.format(film_id=film.id, user_id=request.user.id)))
+    else:
+        recommended_films = list(models.Film.objects.raw(kt_sqls.RECOMMENDED_FILMS.format(film_id=film.id)))
     return render(request, 'ktapp/film_subpages/film_main.html', dict(base_context, **{
         'active_tab': 'main',
         'rating': rating,
@@ -75,6 +80,7 @@ def film_main(request, id, film_slug, film, base_context):
         'special_users': special_users,
         'my_wishes': my_wishes,
         'wish_count': wish_count,
+        'recommended_films': recommended_films,
         'utls': utls,
         'premier_types': models.PremierType.objects.all().order_by('name'),
         'other_premiers': film.other_premiers(),

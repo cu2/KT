@@ -45,3 +45,23 @@ AND uur.number_of_ratings >= %s
 AND uur.keyword_id = %s
 ORDER BY sim DESC, uur.number_of_ratings DESC, u.username, u.id
 '''
+
+
+RECOMMENDED_FILMS = '''
+SELECT f.*
+FROM ktapp_film f
+INNER JOIN ktapp_filmfilmrecommendation ffr ON ffr.film_1_id = {film_id} AND ffr.film_2_id = f.id
+ORDER BY ffr.score DESC, f.number_of_ratings DESC
+LIMIT 10
+'''
+
+
+RECOMMENDED_FILMS_LOGGED_IN = '''
+SELECT f.*
+FROM ktapp_film f
+INNER JOIN ktapp_filmfilmrecommendation ffr ON ffr.film_1_id = {film_id} AND ffr.film_2_id = f.id
+LEFT JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = {user_id}
+WHERE v.id IS NULL
+ORDER BY ffr.score DESC, f.number_of_ratings DESC
+LIMIT 10
+'''
