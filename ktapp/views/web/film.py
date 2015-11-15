@@ -64,10 +64,11 @@ def film_main(request, id, film_slug, film, base_context):
             wish_count[1] += 1
         if wish.wished_by_id == request.user.id:
             my_wishes[wish.wish_type] = True
-    if request.user.is_authenticated():
-        recommended_films = list(models.Film.objects.raw(kt_sqls.RECOMMENDED_FILMS_LOGGED_IN.format(film_id=film.id, user_id=request.user.id)))
-    else:
-        recommended_films = list(models.Film.objects.raw(kt_sqls.RECOMMENDED_FILMS.format(film_id=film.id)))
+    # if request.user.is_authenticated():
+    #     recommended_films = list(models.Film.objects.raw(kt_sqls.RECOMMENDED_FILMS_LOGGED_IN.format(film_id=film.id, user_id=request.user.id)))
+    # else:
+    #     recommended_films = list(models.Film.objects.raw(kt_sqls.RECOMMENDED_FILMS.format(film_id=film.id)))
+    recommended_films = list(models.Film.objects.raw(kt_sqls.RECOMMENDED_FILMS.format(film_id=film.id)))
     return render(request, 'ktapp/film_subpages/film_main.html', dict(base_context, **{
         'active_tab': 'main',
         'rating': rating,
