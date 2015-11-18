@@ -87,12 +87,20 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'of_the_day':
                 if filter_value:
-                    additional_inner_joins.append('''
-                        INNER JOIN ktapp_oftheday {table_name}
-                        ON {table_name}.film_id = f.id AND {table_name}.domain = 'F'
-                    '''.format(
-                        table_name='film_of_the_day',
-                    ))
+                    if filter_value == 1:
+                        additional_inner_joins.append('''
+                            INNER JOIN ktapp_oftheday {table_name}
+                            ON {table_name}.film_id = f.id AND {table_name}.domain = 'F' AND {table_name}.public = 1
+                        '''.format(
+                            table_name='film_of_the_day',
+                        ))
+                    else:
+                        additional_inner_joins.append('''
+                            INNER JOIN ktapp_oftheday {table_name}
+                            ON {table_name}.film_id = f.id AND {table_name}.domain = 'F' AND {table_name}.public = 0
+                        '''.format(
+                            table_name='film_of_the_day',
+                        ))
                     additional_select.append('''
                         film_of_the_day.day AS day_of_the_day,
                     ''')

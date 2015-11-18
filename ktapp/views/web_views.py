@@ -31,7 +31,7 @@ def index(request):
     now = datetime.datetime.now()
     hash_of_the_day = int(hashlib.md5(now.strftime('%Y-%m-%d')).hexdigest(), 16)
     # film of the day
-    film_of_the_day = models.OfTheDay.objects.filter(domain='F').order_by('-day')[0].film
+    film_of_the_day = models.OfTheDay.objects.filter(domain='F', public=True).order_by('-day')[0].film
     # latest_content
     latest_content = []
     for item in models.Review.objects.select_related('film', 'created_by').filter(approved=True).order_by('-created_at')[:10]:
@@ -130,14 +130,24 @@ def premiers_in_a_year(request, year):
 
 
 def films_of_past_days(request):
-    films, nice_filters = filmlist.filmlist(
+    public_films, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('of_the_day', 1)],
         ordering=('of_the_day', 'DESC'),
         films_per_page=None,
     )
+    if request.user.is_authenticated() and request.user.id in {1, 13114}:
+        secret_films, _ = filmlist.filmlist(
+            user_id=request.user.id,
+            filters=[('of_the_day', 2)],
+            ordering=('of_the_day', 'DESC'),
+            films_per_page=None,
+        )
+    else:
+        secret_films = []
     return render(request, 'ktapp/films_of_past_days.html', {
-        'films': films,
+        'public_films': public_films,
+        'secret_films': secret_films,
     })
 
 

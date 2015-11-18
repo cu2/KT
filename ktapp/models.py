@@ -1384,6 +1384,7 @@ class OfTheDay(models.Model):
     domain = models.CharField(max_length=1, choices=DOMAINS, default=DOMAIN_FILM)
     day = models.DateField()
     film = models.ForeignKey(Film)
+    public = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ['domain', 'day']
