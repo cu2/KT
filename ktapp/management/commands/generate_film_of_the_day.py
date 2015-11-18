@@ -11,21 +11,23 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.today = datetime.date.today()
-        self.stdout.write('Generating Film Of the Day for %s...' % self.today)
+        models.OfTheDay.objects.filter(domain=models.OfTheDay.DOMAIN_FILM).filter(day__lte=self.today).update(public=True)
+        self.future = datetime.date.today() + datetime.timedelta(days=2)
+        self.stdout.write('Generating Film Of the Day for %s...' % self.future)
         try:
             fotd = models.OfTheDay.objects.get(
                 domain=models.OfTheDay.DOMAIN_FILM,
-                day=self.today,
+                day=self.future,
             )
         except models.OfTheDay.DoesNotExist:
             fotd = None
         if fotd:
             self.stdout.write('Film Of the Day generated: %s' % unicode(fotd.film))
             return
-        offset = self.today.weekday()
-        self.from_date = self.today - datetime.timedelta(days=offset)  # this Monday
-        self.until_date = self.today - datetime.timedelta(days=offset-6)  # this Sunday
-        weekday = self.today.isoweekday()
+        offset = self.future.weekday()
+        self.from_date = self.future - datetime.timedelta(days=offset)  # this Monday
+        self.until_date = self.future - datetime.timedelta(days=offset-6)  # this Sunday
+        weekday = self.future.isoweekday()
         while True:
             film_of_the_day = {
                 1: self.get_old_film,
@@ -42,7 +44,7 @@ class Command(BaseCommand):
                 break
         fotd = models.OfTheDay.objects.create(
             domain=models.OfTheDay.DOMAIN_FILM,
-            day=self.today,
+            day=self.future,
             film=film_of_the_day,
         )
         self.stdout.write('Film Of the Day generated: %s' % unicode(fotd.film))
@@ -50,7 +52,7 @@ class Command(BaseCommand):
     def is_it_duplicate(self, film_of_the_day):
         fotd_from_the_last_year = models.OfTheDay.objects.filter(
             domain=models.OfTheDay.DOMAIN_FILM,
-            day__gte=self.today - datetime.timedelta(days=365),
+            day__gte=self.future - datetime.timedelta(days=365),
         )
         fotds = set()
         for f in fotd_from_the_last_year:
