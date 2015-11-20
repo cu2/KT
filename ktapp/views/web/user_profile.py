@@ -107,6 +107,21 @@ def user_profile(request, id, name_slug):
         cursor.execute(kt_sqls.SIMILARITY_PER_GENRE, (request.user.id, selected_user.id))
         for row in cursor.fetchall():
             similarity_per_genre.append(row)
+    my_directors = list(models.Artist.objects.raw('''
+SELECT
+  a.*,
+  AVG(v.rating) AS my_average_rating,
+  ROUND(10.0 * AVG(v.rating)) AS my_average_rating_sort_value,
+  COUNT(1) AS my_film_count,
+  ROUND(100.0 * COUNT(1) / a.number_of_films_as_director) AS my_film_ratio,
+  SUM(v.rating = 5) AS my_5_count
+FROM ktapp_artist a
+INNER JOIN ktapp_filmartistrelationship fa ON fa.artist_id = a.id AND fa.role_type = 'D'
+INNER JOIN ktapp_vote v ON v.film_id = fa.film_id AND v.user_id = %s
+GROUP BY a.id
+HAVING COUNT(1) >= %s
+ORDER BY my_average_rating DESC, my_film_count DESC, name, id
+    ''', [selected_user.id, selected_user.number_of_ratings / 400.0]))
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,
@@ -152,6 +167,7 @@ def user_profile(request, id, name_slug):
         ''', [selected_user.id, models.UserFavourite.DOMAIN_COUNTRY, models.Keyword.KEYWORD_TYPE_COUNTRY])),
         'similarity': similarity,
         'similarity_per_genre': similarity_per_genre,
+        'my_directors': my_directors,
     })
 
 

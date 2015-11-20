@@ -131,6 +131,36 @@
             </p>
         {% endif %}
 
+        {% if my_directors %}
+            {% if selected_user.id == user.id %}
+                <h2>Rendezőid</h2>
+            {% else %}
+                <h2>Rendezők</h2>
+            {% endif %}
+            <table class="fullsize sortable">
+                <thead>
+                    <tr class="header_tr">
+                        <th data-sort="string">Rendező</th>
+                        <th data-sort="int" data-sort-default="desc">Átlag</th>
+                        <th data-sort="int" data-sort-default="desc">Film</th>
+                        <th data-sort="int" data-sort-default="desc">Film%</th>
+                        <th data-sort="int" data-sort-default="desc">5-ösök</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for a in my_directors %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td><a href="{% url 'artist' a.id a.slug_cache %}">{{ a.name }}</a></td>
+                        <td class="center" data-sort-value="{{ a.my_average_rating_sort_value }}">{{ a.my_average_rating|floatformat:1 }}</td>
+                        <td class="center">{{ a.my_film_count }}</td>
+                        <td class="center">{{ a.my_film_ratio }}</td>
+                        <td class="center">{{ a.my_5_count }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
         {% if user.is_authenticated %}
             <h2>Egyéb</h2>
             {% if selected_user.id == user.id %}
