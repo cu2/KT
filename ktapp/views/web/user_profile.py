@@ -119,7 +119,7 @@ FROM ktapp_artist a
 INNER JOIN ktapp_filmartistrelationship fa ON fa.artist_id = a.id AND fa.role_type = 'D'
 INNER JOIN ktapp_vote v ON v.film_id = fa.film_id AND v.user_id = %s
 GROUP BY a.id
-HAVING COUNT(1) >= %s
+HAVING COUNT(1) >= GREATEST(%s, 3)
 ORDER BY my_average_rating DESC, my_film_count DESC, name, id
     ''', [selected_user.id, selected_user.number_of_ratings / 400.0]))
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
