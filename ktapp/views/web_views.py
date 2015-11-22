@@ -182,7 +182,7 @@ def browse(request):
     )
     querystring = {}
     for filter_type, filter_value in nice_filters:
-        if filter_type in {'title', 'year', 'director', 'actor', 'country', 'genre', 'keyword', 'my_rating', 'other_rating', 'my_wish'}:
+        if filter_type in {'title', 'year', 'director', 'actor', 'country', 'genre', 'keyword', 'my_rating', 'my_wish'}:
             querystring[filter_type] = filter_value
         elif filter_type == 'number_of_ratings':
             min_value, max_value = filter_value.split('-')

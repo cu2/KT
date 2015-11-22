@@ -66,27 +66,19 @@
                         <a href="{% url 'browse' %}?o={% if ordering_str != '-my_rating' %}-{% endif %}my_rating{{ qs_combined }}">Szerinted{% if ordering_str == 'my_rating' %}&uarr;{% elif ordering_str == '-my_rating' %}&darr;{% endif %}</a><br />
                         <input type="text" class="full_input" name="my_rating" value="{{ querystring.my_rating }}" />
                     </th>
-                    {% if selected_user.id != user.id %}
-                        <th>
-                            <a href="{% url 'browse' %}?o={% if ordering_str != '-my_wish' %}-{% endif %}my_wish{{ qs_combined }}">&#9733;{% if ordering_str == 'my_wish' %}&uarr;{% elif ordering_str == '-my_wish' %}&darr;{% endif %}</a><br />
-                            <select name="my_wish">
-                                <option value="">-</option>
-                                <option value="1"{% if querystring.my_wish == '1' %} selected="selected"{% endif %}>&#9733;</option>
-                                <option value="0"{% if querystring.my_wish == '0' %} selected="selected"{% endif %}>&#9734;</option>
-                            </select>
-                        </th>
-                    {% endif %}
-                {% endif %}
-                {% if selected_user.id != user.id %}
                     <th>
-                        <a href="{% url 'browse' %}?o={% if ordering_str != '-other_rating' %}-{% endif %}other_rating{{ qs_combined }}">Szerinte{% if ordering_str == 'other_rating' %}&uarr;{% elif ordering_str == '-other_rating' %}&darr;{% endif %}</a><br />
-                        <input type="text" class="full_input" name="other_rating" value="{{ querystring.other_rating }}" />
+                        <a href="{% url 'browse' %}?o={% if ordering_str != '-my_wish' %}-{% endif %}my_wish{{ qs_combined }}">&#9733;{% if ordering_str == 'my_wish' %}&uarr;{% elif ordering_str == '-my_wish' %}&darr;{% endif %}</a><br />
+                        <select name="my_wish">
+                            <option value="">-</option>
+                            <option value="1"{% if querystring.my_wish == '1' %} selected="selected"{% endif %}>&#9733;</option>
+                            <option value="0"{% if querystring.my_wish == '0' %} selected="selected"{% endif %}>&#9734;</option>
+                        </select>
+                    </th>
+                    <th>
+                        <a href="{% url 'browse' %}?o={% if ordering_str != '-my_rating_when' %}-{% endif %}my_rating_when{{ qs_combined }}">Osztályoztad{% if ordering_str == 'my_rating_when' %}&uarr;{% elif ordering_str == '-my_rating_when' %}&darr;{% endif %}</a><br />
+                        &nbsp;
                     </th>
                 {% endif %}
-                <th>
-                    <a href="{% url 'browse' %}?o={% if ordering_str != '-other_rating_when' %}-{% endif %}other_rating_when{{ qs_combined }}">Osztályozta{% if selected_user.id == user.id %}d{% endif %}{% if ordering_str == 'other_rating_when' %}&uarr;{% elif ordering_str == '-other_rating_when' %}&darr;{% endif %}</a><br />
-                    &nbsp;
-                </th>
             </tr>
             {% for film in films %}
                 <tr class="{% cycle '' 'odd' %}">
@@ -99,14 +91,17 @@
                     {% if request.user.is_authenticated %}
                         <td class="center">{{ film|film_fav_rating_html }}</td>
                         <td class="center">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
-                        {% if selected_user.id != user.id %}
-                            <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
-                        {% endif %}
+                        <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+                        <td class="center">
+                            {% if film.my_rating %}
+                                {% if film.my_rating_when %}
+                                    {{ film.my_rating_when|date:"Y-m-d" }}
+                                {% else %}
+                                    ?
+                                {% endif %}
+                            {% endif %}
+                        </td>
                     {% endif %}
-                    {% if selected_user.id != user.id %}
-                        <td class="center">{{ film.other_rating }}</td>
-                    {% endif %}
-                    <td class="center">{{ film.other_rating_when|date:"Y-m-d" }}</td>
                 </tr>
             {% endfor %}
         </table>
