@@ -10,16 +10,24 @@
 {% block main %}
 <div class="centered_contentx">
 
-    <table class="fullsize">
+    <table class="fullsize sortable">
+        <thead>
         <tr class="header_tr">
-            <th>Film</th>
-            <th>Év</th>
-            <th>Rendező</th>
-            <th>Átlag</th>
-            <th>Szavazatszám</th>
-            <th>Kommentek száma</th>
+            <th data-sort="string">Film</th>
+            <th data-sort="int" data-sort-default="desc">Év</th>
+            <th data-sort="string">Rendező</th>
+            <th data-sort="string">Műfaj</th>
+            <th data-sort="int" data-sort-default="desc">Nézettség</th>
+            <th data-sort="float" data-sort-default="desc">Átlag</th>
+            {% if request.user.is_authenticated %}
+                <th data-sort="int" data-sort-default="desc">Kedvenceid</th>
+                <th data-sort="int" data-sort-default="desc">Szerinted</th>
+                <th data-sort="int" data-sort-default="desc">&#9733;</th>
+            {% endif %}
         </tr>
-        {% for film in sequel.all_films %}
+        </thead>
+        <tbody>
+        {% for film in films %}
             <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
                 <td>
                     {% if film.main_poster %}
@@ -36,11 +44,17 @@
                 </td>
                 <td class="center">{{ film.year }}</td>
                 <td>{{ film|film_directors }}</td>
-                <td class="center">{{ film|film_avg_rating_html }}</td>
-                <td class="center">{{ film|film_num_rating_html }}</td>
-                <td class="center">{{ film.number_of_comments }}</td>
+                <td>{{ film|film_genres }}</td>
+                <td class="center" data-sort-value="{{ film.number_of_ratings }}">{{ film|film_num_rating_html }}</td>
+                <td class="center" data-sort-value="{{ film|film_rating_sort_value }}">{{ film|film_avg_rating_html }}</td>
+                {% if request.user.is_authenticated %}
+                    <td class="center" data-sort-value="{{ film|film_fav_rating_sort_value }}">{{ film|film_fav_rating_html }}</td>
+                    <td class="center" data-sort-value="{% if film.my_rating %}{{ film.my_rating }}{% else %}0{% endif %}">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
+                    <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if film.my_wish %}{{ film.my_wish }}{% else %}0{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+                {% endif %}
             </tr>
         {% endfor %}
+        </tbody>
     </table>
 
 </div>

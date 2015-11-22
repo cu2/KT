@@ -85,6 +85,15 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                         END AS premier_date,
                     '''.format(year=int(filter_value)))
                     nice_filters.append((filter_type, filter_value))
+            if filter_type == 'sequel':
+                additional_inner_joins.append('''
+                    INNER JOIN ktapp_filmsequelrelationship {table_name}
+                    ON {table_name}.film_id = f.id AND {table_name}.sequel_id = {sequel_id}
+                '''.format(
+                    table_name='sequel',
+                    sequel_id=int(filter_value),
+                ))
+                nice_filters.append((filter_type, filter_value))
             if filter_type == 'of_the_day':
                 if filter_value:
                     if filter_value == 1:

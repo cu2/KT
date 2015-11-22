@@ -903,8 +903,15 @@ def sequels(request):
 
 def sequel(request, id, title_slug):
     selected_sequel = get_object_or_404(models.Sequel, pk=id)
+    films, _ = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[('sequel', selected_sequel.id)],
+        ordering='year',
+        films_per_page=None,
+    )
     return render(request, 'ktapp/sequel.html', {
         'sequel': selected_sequel,
+        'films': films,
     })
 
 
