@@ -7,7 +7,7 @@ import json
 
 from django.db import connection
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django import forms
@@ -1025,6 +1025,13 @@ def articles(request):
         'permission_edit_link': kt_utils.check_permission('edit_link', request.user),
         'permission_delete_link': kt_utils.check_permission('delete_link', request.user),
     })
+
+
+def email_header(request):
+    email_header_jpg = open('/home/publisher/kt/current/static/ktapp/images/email_header.jpg', 'rb')
+    response = HttpResponse(content=email_header_jpg.read())
+    response['Content-Type']= 'image/jpg'
+    return response
 
 
 def old_url(request):

@@ -164,6 +164,8 @@ urlpatterns += patterns(
     url(r'^uj_kedvenc$', post_views.follow, name='follow'),
     url(r'^torol_kedvenc$', post_views.unfollow, name='unfollow'),
 
+    url(r'^email_header.jpg$', web_views.email_header, name='email_header'),
+
     # legacy redirects:
     url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # old php urls
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', RedirectView.as_view(pattern_name='user_films')),
