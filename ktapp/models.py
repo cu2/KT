@@ -1475,6 +1475,7 @@ class EmailCampaign(models.Model):
     subject = models.CharField(max_length=250)
     html_message = models.TextField(blank=True)
     text_message = models.TextField(blank=True)
+    pm_message = models.TextField(blank=True)
     sent_at = models.DateTimeField()
 
 

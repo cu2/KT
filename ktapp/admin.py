@@ -71,6 +71,16 @@ class KTUserAdmin(UserAdmin):
     filter_horizontal = ()
 
 
+class EmailCampaignAdmin(admin.ModelAdmin):
+    list_display = ['title', 'subject', 'recipients', 'sent_at']
+    ordering = ['-id']
+
+
+class EmailBounceAdmin(admin.ModelAdmin):
+    list_display = ['email', 'bounced_at']
+    ordering = ['email', 'bounced_at']
+
+
 admin.site.register(models.Film, FilmAdmin)
 admin.site.register(models.Comment, CommentAdmin)
 admin.site.register(models.Topic)
@@ -93,6 +103,8 @@ admin.site.register(models.TVChannel)
 admin.site.register(models.TVFilm)
 admin.site.register(models.UserToplist)
 admin.site.register(models.UserToplistItem)
+admin.site.register(models.EmailCampaign, EmailCampaignAdmin)
+admin.site.register(models.EmailBounce, EmailBounceAdmin)
 
 admin.site.register(models.KTUser, KTUserAdmin)
 admin.site.unregister(Group)
