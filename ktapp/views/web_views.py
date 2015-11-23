@@ -1034,6 +1034,13 @@ def email_header(request):
     return response
 
 
+def click(request):
+    url = request.GET.get('url', '')
+    if url:
+        return HttpResponseRedirect(url)
+    raise Http404
+
+
 def old_url(request):
     print request.path
     if request.path == '/film.php':

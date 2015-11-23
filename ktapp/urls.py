@@ -165,6 +165,7 @@ urlpatterns += patterns(
     url(r'^torol_kedvenc$', post_views.unfollow, name='unfollow'),
 
     url(r'^email_header.jpg$', web_views.email_header, name='email_header'),
+    url(r'^click/$', web_views.click, name='click'),
 
     # legacy redirects:
     url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # old php urls
