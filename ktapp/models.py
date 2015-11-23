@@ -126,7 +126,23 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
             print html_content
             print '[/HTML]'
         else:
-            email.send()
+            success = email.send()
+            if campaign_id:
+                try:
+                    campaign = EmailCampaign.objects.get(id=campaign_id)
+                except EmailCampaign.DoesNotExist:
+                    campaign = None
+            else:
+                campaign = None
+            EmailSend.objects.create(
+                user=self,
+                email_type=email_type,
+                campaign=campaign,
+                email=self.email,
+                is_pm=True,
+                is_email=True,
+                is_success=success,
+            )
 
     def votes(self):
         return self.vote_set.all()
@@ -1451,3 +1467,43 @@ class FilmFilmRecommendation(models.Model):
     film_2 = models.ForeignKey(Film, related_name='film_2')
     last_calculated_at = models.DateTimeField()
     score = models.IntegerField(default=0)
+
+
+class EmailCampaign(models.Model):
+    title = models.CharField(max_length=250)
+    recipients = models.CharField(max_length=250, blank=True, null=True)
+    subject = models.CharField(max_length=250)
+    html_message = models.TextField(blank=True)
+    text_message = models.TextField(blank=True)
+    sent_at = models.DateTimeField()
+
+
+class EmailSend(models.Model):
+    user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
+    email_type = models.CharField(max_length=250, blank=True, null=True)
+    campaign = models.ForeignKey(EmailCampaign, blank=True, null=True, on_delete=models.SET_NULL)
+    email = models.CharField(max_length=250)
+    sent_at = models.DateTimeField(auto_now_add=True)
+    is_pm = models.BooleanField(default=False)
+    is_email = models.BooleanField(default=False)
+    is_success = models.BooleanField(default=False)
+
+
+class EmailBounce(models.Model):
+    email = models.CharField(max_length=250)
+    bounced_at = models.DateTimeField()
+
+
+class EmailOpen(models.Model):
+    user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
+    email_type = models.CharField(max_length=250, blank=True, null=True)
+    campaign = models.ForeignKey(EmailCampaign, blank=True, null=True, on_delete=models.SET_NULL)
+    opened_at = models.DateTimeField(auto_now_add=True)
+
+
+class EmailClick(models.Model):
+    user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
+    email_type = models.CharField(max_length=250, blank=True, null=True)
+    campaign = models.ForeignKey(EmailCampaign, blank=True, null=True, on_delete=models.SET_NULL)
+    clicked_at = models.DateTimeField(auto_now_add=True)
+    url = models.CharField(max_length=250)

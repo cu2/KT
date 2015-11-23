@@ -1028,6 +1028,28 @@ def articles(request):
 
 
 def email_header(request):
+    user_id = request.GET.get('u', 0)
+    email_type = request.GET.get('t', '')
+    campaign_id = request.GET.get('c', 0)
+    if user_id:
+        try:
+            user = models.KTUser.objects.get(id=user_id)
+        except models.KTUser.DoesNotExist:
+            user = None
+    else:
+        user = None
+    if campaign_id:
+        try:
+            campaign = models.EmailCampaign.objects.get(id=campaign_id)
+        except models.EmailCampaign.DoesNotExist:
+            campaign = None
+    else:
+        campaign = None
+    models.EmailOpen.objects.create(
+        user=user,
+        email_type=email_type,
+        campaign=campaign,
+    )
     email_header_jpg = open('/home/publisher/kt/current/static/ktapp/images/email_header.jpg', 'rb')
     response = HttpResponse(content=email_header_jpg.read())
     response['Content-Type']= 'image/jpg'
@@ -1035,7 +1057,30 @@ def email_header(request):
 
 
 def click(request):
+    user_id = request.GET.get('u', 0)
+    email_type = request.GET.get('t', '')
+    campaign_id = request.GET.get('c', 0)
+    if user_id:
+        try:
+            user = models.KTUser.objects.get(id=user_id)
+        except models.KTUser.DoesNotExist:
+            user = None
+    else:
+        user = None
+    if campaign_id:
+        try:
+            campaign = models.EmailCampaign.objects.get(id=campaign_id)
+        except models.EmailCampaign.DoesNotExist:
+            campaign = None
+    else:
+        campaign = None
     url = request.GET.get('url', '')
+    models.EmailClick.objects.create(
+        user=user,
+        email_type=email_type,
+        campaign=campaign,
+        url=url,
+    )
     if url:
         return HttpResponseRedirect(url)
     raise Http404
