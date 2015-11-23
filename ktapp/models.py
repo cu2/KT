@@ -8,7 +8,7 @@ from urlparse import urlparse
 
 from django.db import models, connection
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.db.models.signals import post_delete
@@ -18,6 +18,7 @@ from django.utils.html import strip_tags
 
 from kt import settings
 from ktapp import utils as kt_utils
+from ktapp import texts
 
 
 class KTUser(AbstractBaseUser, PermissionsMixin):
@@ -93,16 +94,39 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.username
 
-    def email_user(self, subject, message, from_email=settings.DEFAULT_FROM_EMAIL, **kwargs):
+    def email_user(self, subject, html_message, text_message=None, email_type='', campaign_id=0, from_email=settings.DEFAULT_FROM_EMAIL, **kwargs):
+        if text_message is None:
+            text_message = strip_tags(html_message.replace('</p>\n<p>', '\n\n'))
+        html_content = texts.EMAIL_TEMPLATE_HTML.format(
+            username=self.username,
+            html_message=html_message,
+            user_id=self.id,
+            type=email_type,
+            campaign_id=campaign_id,
+        )
+        text_content = texts.EMAIL_TEMPLATE_TEXT.format(
+            username=self.username,
+            text_message=text_message,
+        )
+        email = EmailMultiAlternatives(
+            subject,
+            text_content,
+            from_email,
+            [self.email],
+        )
+        email.attach_alternative(html_content, 'text/html')
         if settings.LOCAL_MAIL:
-            print '[SUBJECT] %s' % subject
-            print '[FROM] %s' % from_email
+            print '[SUBJECT] %s' % email.subject
+            print '[FROM] %s' % email.from_email
             print '[TO] %s' % self.email
             print '[BODY]'
-            print message
+            print email.body
             print '[/BODY]'
+            print '[HTML]'
+            print html_content
+            print '[/HTML]'
         else:
-            send_mail(subject, message, from_email, [self.email], **kwargs)
+            email.send()
 
     def votes(self):
         return self.vote_set.all()

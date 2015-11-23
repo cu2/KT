@@ -547,8 +547,6 @@ def edit_profile(request):
             models.UserFavourite.objects.create(user=request.user, domain=domain, fav_id=item_id)
 
     next_url = request.GET.get('next', request.POST.get('next', reverse('user_profile', args=(request.user.id, request.user.slug_cache))))
-    if not request.user.validated_email:
-        return HttpResponseRedirect(next_url)
     if request.POST:
         request.user.bio = request.POST.get('bio', '').strip()
         gender = request.POST.get('gender', '')

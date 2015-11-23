@@ -5,17 +5,15 @@
 
     <div class="centered_content">
 
-        {% if user.validated_email %}
-            <form action="{% url 'new_message' %}" method="post">
-                {% csrf_token %}
-                <input type="hidden" name="recipients" value="{{ selected_user.username }}" />
-                <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
-                <p>
-                    <textarea name="content" rows="10"></textarea>
-                </p>
-                <p class="center"><input type="submit" value="Üzenet elküldése" /></p>
-            </form>
-        {% endif %}
+        <form action="{% url 'new_message' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="recipients" value="{{ selected_user.username }}" />
+            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+            <p>
+                <textarea name="content" rows="10"></textarea>
+            </p>
+            <p class="center"><input type="submit" value="Üzenet elküldése" /></p>
+        </form>
 
         {% if max_pages >= 2 %}
             <ul class="paging">

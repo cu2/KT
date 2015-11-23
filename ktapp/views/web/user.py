@@ -66,12 +66,13 @@ def registration(request):
                 belongs_to=user,
                 valid_until=datetime.datetime.now() + datetime.timedelta(days=30),
             )
+            html_message = texts.WELCOME_EMAIL_BODY.format(
+                verification_url=request.build_absolute_uri(reverse('verify_email', args=(token,))),
+            )
             user.email_user(
                 texts.WELCOME_EMAIL_SUBJECT,
-                texts.WELCOME_EMAIL_BODY.format(
-                    username=user.username,
-                    verification_url=request.build_absolute_uri(reverse('verify_email', args=(token,))),
-                )
+                html_message,
+                email_type='reg',
             )
             login(request, kt_utils.custom_authenticate(models.KTUser, username, password))
             models.Message.send_message(
@@ -205,12 +206,13 @@ def reset_password(request, token):
                         belongs_to=user,
                         valid_until=datetime.datetime.now() + datetime.timedelta(hours=24),
                     )
+                    html_message = texts.PASSWORD_RESET_EMAIL_BODY.format(
+                        reset_password_url=request.build_absolute_uri(reverse('reset_password', args=(token,))),
+                    )
                     user.email_user(
                         texts.PASSWORD_RESET_EMAIL_SUBJECT,
-                        texts.PASSWORD_RESET_EMAIL_BODY.format(
-                            username=user.username,
-                            reset_password_url=request.build_absolute_uri(reverse('reset_password', args=(token,))),
-                        )
+                        html_message,
+                        email_type='resetpw',
                     )
                     error_type = 'ok'
                     email = user.email
@@ -321,8 +323,6 @@ def messages(request):
 @login_required
 def new_message(request):
     next_url = request.GET.get('next', request.POST.get('next', reverse('messages')))
-    if not request.user.validated_email:
-        return HttpResponseRedirect(next_url)
     if request.POST:
         raw_content = request.POST['content']
         content = strip_tags(raw_content).strip()

@@ -1015,18 +1015,17 @@ def unfollow(request):
 @login_required
 def delete_message(request):
     next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
-    if request.user.validated_email:
-        try:
-            message = models.Message.objects.get(id=request.POST.get('message_id', 0), owned_by=request.user)
-        except models.Message.DoesNotExist:
-            return HttpResponseRedirect(next_url)
-        is_private = message.private
-        owned_by = message.owned_by
-        other = message.recipients()[0]
-        message.delete()
-        if is_private:
-            models.MessageCountCache.update_cache(owned_by=owned_by, partner=other)
-            models.MessageCountCache.update_cache(owned_by=other, partner=owned_by)
+    try:
+        message = models.Message.objects.get(id=request.POST.get('message_id', 0), owned_by=request.user)
+    except models.Message.DoesNotExist:
+        return HttpResponseRedirect(next_url)
+    is_private = message.private
+    owned_by = message.owned_by
+    other = message.recipients()[0]
+    message.delete()
+    if is_private:
+        models.MessageCountCache.update_cache(owned_by=owned_by, partner=other)
+        models.MessageCountCache.update_cache(owned_by=other, partner=owned_by)
     return HttpResponseRedirect(next_url)
 
 
