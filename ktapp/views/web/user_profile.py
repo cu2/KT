@@ -136,6 +136,7 @@ ORDER BY my_average_rating DESC, my_film_count DESC, name, id
         'latest_votes': selected_user.vote_set.filter(id__in=latest_votes).select_related('film').order_by('-when', '-id'),
         'latest_comments': models.Comment.objects.filter(id__in=latest_comments).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by'),
         'myfav': models.Follow.objects.filter(who=request.user, whom=selected_user).count() if request.user.is_authenticated() else 0,
+        'fav_count': models.Follow.objects.filter(whom=selected_user).count(),
         'profile': profile,
         'fav_directors': list(models.Artist.objects.raw('''
             SELECT a.*

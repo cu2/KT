@@ -11,6 +11,10 @@
             Kompetenci{% if selected_user.id == user.id %}ád{% else %}a{% endif %}: {{ number_of_vapiti_votes }} film
             <br />
             Súly{% if selected_user.id == user.id %}od{% endif %}: {{ vapiti_weight }}
+            {% if fav_count %}
+                <br />
+                Kedvencnek jelölt{% if selected_user.id != user.id %}ék{% endif %}: {{ fav_count }} user
+            {% endif %}
         </p>
         {% if selected_user.bio_html %}
             <h2>Bemutatkozás</h2>
