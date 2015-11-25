@@ -56,7 +56,7 @@ class Command(BaseCommand):
         )
         fotds = set()
         for f in fotd_from_the_last_year:
-            fotds.add(f.id)
+            fotds.add(f.film_id)
         return film_of_the_day.id in fotds
 
     def get_old_film(self):
