@@ -19,6 +19,7 @@
         <tr class="header_tr">
             <th>Szerkesztő</th>
             <th>Bemutatkozás</th>
+            <th>Tapasztalat</th>
         </tr>
         </thead>
         <tbody>
@@ -26,6 +27,7 @@
             <tr class="{% cycle '' 'odd' %}">
                 <td class="nowrap"><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></td>
                 <td>{{ user.bio_html|striptags|truncatechars:400|linebreaksbr }}</td>
+                <td class="nowrap">{{ user.number_of_ratings }} film</td>
             </tr>
         {% endfor %}
         </tbody>

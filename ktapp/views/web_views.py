@@ -1107,7 +1107,7 @@ def finance(request):
       SUM(money),
       ROUND(TIMESTAMPDIFF(day, MIN(given_at), NOW())/365*100000),
       ROUND(SUM(money) - TIMESTAMPDIFF(day, MIN(given_at), NOW())/365*100000)
-    FROM ktdb_20151125.ktapp_donation
+    FROM ktapp_donation
     ''')
     sum_amount, sum_cost, missing = cursor.fetchone()
     missing = int(missing)
