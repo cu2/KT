@@ -1,0 +1,30 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+
+{% block title %}Szabályzat - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Szabályzat</h1>
+{% endblock %}
+
+{% block main %}
+
+    <p class="right">„<i>Tégy úgy másokkal, ahogy szeretnéd hogy veled tegyenek!</i>”<br />(Aranyszabály)</p>
+    <p>A Kritikus Tömeg használata során kérjük kövesd a békés egymás mellett élés és a normális emberi viselkedés általánosan bevett szabályait. Ha kételyeid merülnek fel, olvasd el az alábbi előírásokat, vagy kérdezd meg a szerkesztőséget.</p>
+    <ol class="normal">
+        <li>A fórum a filmekkel kapcsolatos véleménynyilvánításra való, nem ingyenes reklámfelület. Ne spamelj, ne szúrd be saját oldalaid linkjét. Tartsd magad az egyes topikok témáihoz, ne offolj (ne térj el a topik témájától), mielőtt új topikot nyitnál, nézz szét, nincs-e már hasonló. A politizálást máshol műveld, ne itt!</li>
+        <li>Ne floodolj, vagyis ne áraszd el a fórumot a kommentjeiddel! Nem kell minden egyes kommentre reagálni, főleg ha a reakciónak nem sok tartalma van. Mellőzd a "csetjellegű", kizárólag az aktuális társalgási partner számára értelmezhető hozzászólásokat. Gondolj bele, hogy ez nem a te személyes oldalad, hanem több száz ember közössége, akik nem csak téged akarnak hallgatni, hanem a többieket is. Ha elgépeltél valamit, csak akkor írd meg a hibát egy újabb kommentben, ha anélkül lehetetlen megérteni az elsőt! Ha egy kommented látszólag több topikba is passzolna, válaszd ki a legmegfelelőbb helyet, és csak oda küldd el!</li>
+        <li>Mielőtt kérdezel, olvass vissza kicsit, ne kérdezz olyat, amire pár hozzászólással korábban ott a válasz.</li>
+        <li>Tolerancia! Ne személyeskedj és gorombáskodj, légy megértő, türelmes, légy tisztelettel mások iránt, még akkor is, ha nehéz. A fórum a filmek véleményezésére van, nem a fórumtársakéra. (pl. "Ki az a hülye, aki erre egyest ad?"-jellegű kirohanásoknak nem fogunk örülni.) Ne provokálj! (Természetesen nyugodtan nyilváníthatsz negatív véleményt sokak által szeretett filmekről is, de csak értelmesen – ha pl. annyit írsz be A keresztapa fórumába, hogy "Ez szar!", az bizony provokáció.)</li>
+        <li>Érthetően, magyarul fogalmazz, nézd át a hozzászólásod, mielőtt elküldöd, tiszteld meg a fórumtársaidat azzal, hogy helyesen, olvashatóan írsz, ne használj csupa nagybetűt, se obszcén szavakat (főleg ne másokra)!</li>
+        <li>Ne tedd tönkre mások szórakozását, ne lődd le a filmek/sorozatok poénjait, vagyis ne spoilerezz láthatóan! Még régi és/vagy különösen népszerű filmeknél se, mert biztos van, aki még azokat sem látta. Erre a célra van a spoiler gomb, használd! Ennek elmulasztása főbenjáró vétség!</li>
+        <li>A fórum lehetőséget nyújt kiemelésekre, linkelésekre. Ezekhez találsz segítséget a szövegdoboz fölött. Ha bizonytalan vagy a használatukban, gyakorolj bátran az <a href="{% url 'forum' 87 'off-ide-offolj-mert-ez-a-helye' %}">offtopik</a>ban.</li>
+        <li>Ha új vagy az oldalon, először lehetőleg nézz szét, tájékozódj, milyen topikok vannak, miféle beszélgetések folynak, mi szokás és mi nem, ne úgy gyere ide, hogy rögtön kritizálsz és "megmondod a frankót".</li>
+        <li>Ha kérdésed van, tedd fel bátran az <a href="{% url 'forum' 8 'eszrevetelek-keresek-es-kerdesek-a-lappal-kapcsolatban' %}">Észrevételek</a> topikban, vagy lépj kapcsolatba a szerkesztőséggel.</li>
+        <li>Egy ember csak egyszer regisztrálhat. Aki ezt rosszhiszeműen megszegi, annak az összes regisztrációját töröljük. Ha elfelejtetted a jelszavat, <a href="{% url 'reset_password' '' %}">kérjél újat</a>.</li>
+    </ol>
+    <p>A szabályok betartása kötelező! Megszegése először figyelmeztetést, többszöri megszegése szankciókat (hozzászólási jog ideiglenes megvonása), extrém esetekben teljes és végleges kizárást vonhat maga után.</p>
+    <p>Jó fórumozást, érdekes, konstruktív vitákat kívánunk! :)</p>
+
+{% endblock %}

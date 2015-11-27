@@ -166,6 +166,10 @@ urlpatterns += patterns(
 
     url(r'^email_header.jpg$', web_views.email_header, name='email_header'),
     url(r'^click/$', web_views.click, name='click'),
+    url(r'^impresszum/$', web_views.impressum, name='impressum'),
+    url(r'^rolunk/$', web_views.about_page, name='about_page'),
+    url(r'^szabalyzat/$', web_views.rulez, name='rulez'),
+    url(r'^kassza/$', web_views.finance, name='finance'),
 
     # legacy redirects:
     url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # old php urls

@@ -1,5 +1,6 @@
 {% extends "ktapp/layout.html" %}
 {% load kt_extras %}
+{% load staticfiles %}
 
 {% block title %}{{ poll.title }} - Közkérdés - Kritikus Tömeg{% endblock %}
 
@@ -47,6 +48,12 @@
                 {% endif %}
             {% endfor %}
         </ul>
+
+        {% if poll.id == 767 %}
+            <p>A Kritikus Tömeg születése óta folyamatosan növekszik. Ez az egyébként örvendetes növekedés azonban azzal is jár, hogy a szerverköltség is kúszik felfelé. Mivel az oldal nonprofit és reklámmentes jellegét továbbra is szeretnénk fenntartani, arra kérjük a lelkes tagokat, hogy akinek van kedve és lehetősége, támogassa az oldalt egy (vagy több) KT-póló megvásárlásával. A póló elején az alábbi kép és szöveg található:</p>
+            <p align="center"><img src="{% static 'ktapp/images/logo_1000x1000_transparent.png' %}" style="width: 100%" /></p>
+            <p>Egy vapiti-fej, ami az oldal logója is lesz a továbbiakban, és az url. A póló ára 2500 forint, amiből kb 1000 forint az előállítás, vagyis a maradék 1500 az oldal fennmaradását támogatja. Ez a szavazás egy igényfelmérés. Ez alapján fogom megrendelni a pólókat. Vagyis csak az ikszeljen (emmeljen), aki tényleg kér. Az átvétel történhet majd személyesen <a href="{% url 'user_messages' 1 'cucu' %}">nálam</a>, KT-találkozón vagy postai úton. De erről majd ráérünk akkor egyeztetni, ha már megvannak a pólók. A póló megvásárlása természetesen nem kötelező, semmi hátrány nem éri azt, aki nem kér, leszámítva, hogy nem lesz ilyen frankó pólója. :-)</p>
+        {% endif %}
 
         {% include 'ktapp/blocks/new_comment_block.html' %}
 

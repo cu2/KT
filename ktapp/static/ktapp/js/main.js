@@ -535,4 +535,14 @@ $(function() {
         });
     });
 
+    var kt_email = '';
+    kt_email += 'krit';
+    kt_email += 'ikust';
+    kt_email += 'ome';
+    kt_email += 'g@g';
+    kt_email += 'ma';
+    kt_email += 'il.c';
+    kt_email += 'om';
+    $('#kt_email').html(kt_email);
+
 });

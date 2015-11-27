@@ -1086,6 +1086,46 @@ def click(request):
     raise Http404
 
 
+def impressum(request):
+    return render(request, 'ktapp/impressum.html', {
+        'staff': models.KTUser.objects.filter(is_staff=True).order_by('username', 'id'),
+        })
+
+
+def about_page(request):
+    return render(request, 'ktapp/about_page.html')
+
+
+def rulez(request):
+    return render(request, 'ktapp/rulez.html')
+
+
+def finance(request):
+    cursor = connection.cursor()
+    cursor.execute('''
+    SELECT
+      SUM(money),
+      ROUND(TIMESTAMPDIFF(day, MIN(given_at), NOW())/365*100000),
+      ROUND(SUM(money) - TIMESTAMPDIFF(day, MIN(given_at), NOW())/365*100000)
+    FROM ktdb_20151125.ktapp_donation
+    ''')
+    sum_amount, sum_cost, missing = cursor.fetchone()
+    missing = int(missing)
+    percent = 100.0 * (missing + 100000) / 100000
+    if percent > 100:
+        percent = 100
+    return render(request, 'ktapp/finance.html', {
+        'status': int(round(4.0 * percent)),
+        'amount': missing,
+        'donators': models.KTUser.objects.raw('''
+        SELECT DISTINCT u.*
+        FROM ktapp_ktuser u
+        INNER JOIN ktapp_donation d ON d.given_by_id = u.id
+        ORDER BY u.username, u.id
+        '''),
+    })
+
+
 def old_url(request):
     print request.path
     if request.path == '/film.php':

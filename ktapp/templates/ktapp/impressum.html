@@ -1,0 +1,47 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+
+{% block title %}Impresszum - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Impresszum</h1>
+{% endblock %}
+
+{% block main %}
+
+    <h2>Alapítva</h2>
+    <p>2003. október 22.</p>
+
+    <h2>Szerkesztőség</h2>
+    <table class="fullsize">
+        <thead>
+        <tr class="header_tr">
+            <th>Szerkesztő</th>
+            <th>Bemutatkozás</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in staff %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td class="nowrap"><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></td>
+                <td>{{ user.bio_html|striptags|truncatechars:400|linebreaksbr }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Hoszting/Üzemeltetés</h2>
+    <p><a href="https://github.com/cu2" target="_blank">Németh András</a></p>
+
+    <h2>Forráskód</h2>
+    <p><a href="https://github.com/cu2/KT" target="_blank">github.com/cu2/KT</a></p>
+
+    <h2>Kapcsolat</h2>
+    <p>
+        <b>web:</b> kritikustomeg.org<br />
+        <b>facebook:</b> <a href="https://www.facebook.com/kritikustomeg/" target="_blank">www.facebook.com/kritikustomeg</a><br />
+        <b>email:</b> <span id="kt_email"></span>
+    </p>
+
+{% endblock %}

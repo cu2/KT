@@ -11,7 +11,7 @@
 {% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=35" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=36" />
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <base href="/" />
         <script>
@@ -148,11 +148,11 @@
 
         <footer>
             <ul class="clearfix">
-                <li>Impresszum</li>
+                <li><a href="{% url 'about_page' %}">Rólunk</a></li>
+                <li><a href="{% url 'impressum' %}">Impresszum</a></li>
+                <li><a href="{% url 'rulez' %}">Szabályzat</a></li>
+                <li><a href="{% url 'finance' %}">Kassza</a></li>
                 <li><a href="https://www.facebook.com/kritikustomeg/" target="_blank">Facebook</a></li>
-                <li>Rulez</li>
-                <li>Kassza</li>
-                <li>Üzenet a szerk-nek</li>
             </ul>
         </footer>
 
@@ -161,6 +161,6 @@
         <script src="{% static 'ktapp/js/jquery.cookie.js' %}"></script>
         <script src="{% static 'ktapp/js/rangyinputs-jquery.js' %}"></script>
         <script src="{% static 'ktapp/js/stupidtable.min.js' %}"></script>
-        <script src="{% static 'ktapp/js/main.js' %}?v=21"></script>
+        <script src="{% static 'ktapp/js/main.js' %}?v=22"></script>
     </body>
 </html>

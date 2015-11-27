@@ -1,0 +1,60 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+{% load humanize %}
+
+{% block title %}Kassza - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Kassza</h1>
+{% endblock %}
+
+{% block main %}
+
+    <p>A Kritikus Tömeg éves szerverköltsége jelenleg cirka 100 ezer forint. Ez egy embernek kicsit sok. De ha csak 50 ember dönt úgy, hogy rászán évi 2000 forintot, ami fejenként nem nagy összeg, akkor máris meg van oldva a kérdés. Ez az oldal ezt a pénzgyűjtést szolgálja. Itt mindig láthatod, mennyi van a kasszában, és ha úgy érzed, belefér a büdzsédbe, támogathatsz minket. Előre is köszönjük!</p>
+
+    <div style="text-align: center; margin-bottom: 20px">
+        <div style="position: relative; margin: 0 auto; width: 404px; height: 40px; background: black">
+            <div style="position: absolute; left: 1px; top: 1px; width: 402px; height: 38px; background: #DAD3B8">
+                <div style="position: absolute; left: 1px; top: 1px; width: {{ status }}px; height: 36px; background: #931818"></div>
+                <div style="position: absolute; left: 150px; top: 6px; color: #F9F4DA; font-size: 16pt">{{ amount|intcomma }} Ft</div>
+            </div>
+        </div>
+    </div>
+
+    <p>Ha szeretnéd pénzzel támogatni az oldalt, az alábbi módon teheted meg:</p>
+    <ul class="normal">
+        <li>Bankátutalás/postai befizetés:<br>
+            Németh András<br>
+            12010154-00562473-00100006 (Raiffeisen Bank)<br>
+            megjegyzés/közlemény: az itteni felhasználóneved<br>
+            <br>
+            Ha külföldről utalsz, akkor a nemzetközi számlaszám:<br>
+            IBAN: HU64-12010154-00562473-00100006<br>
+            SWIFT: UBRT HU HB</li>
+        <li>PayPal:<br>
+
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                <input type="hidden" name="cmd" value="_s-xclick">
+                <input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
+">
+                <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif" style="border:none;background:none" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+            </form>
+
+        </li>
+        <li>KT-póló rendelése:<br>
+            <a href="{% url 'poll' 767 'milyen-meretben-kersz-kt-polot' %}">Itt nézheted meg</a>, milyen pólóról is van szó. Ha ezt a lehetőséget választod, <a href="{% url 'user_messages' 1 'cucu' %}">írj egy üzenetet</a>, hogy egyeztetni tudjuk a póló átadását (posta vagy személyes), és hogy van-e még a kért méretben.</li>
+    </ul>
+
+    <br>
+
+    <p>
+        Eddigi támogatóink:
+        {% for user in donators %}
+            <a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a>{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    </p>
+    <p>Hálás köszönet minden egyes forintért!</p>
+
+{% endblock %}

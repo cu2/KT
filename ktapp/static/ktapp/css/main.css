@@ -276,10 +276,14 @@ header {
 }
 
 footer {
-    font-size: 8pt;
+    font-size: 9pt;
 }
 footer ul {
     border-top: solid 1px rgb(128,128,128);
+}
+#kt_email {
+    display: inline-block;
+    height: 20px;
 }
 
 
@@ -560,6 +564,9 @@ table.sortable tr.header_tr {
 .center {
     text-align: center;
 }
+.right {
+    text-align: right;
+}
 
 .bold {
     font-weight: bold;
@@ -596,6 +603,11 @@ table.sortable tr.header_tr {
 ul.nobullet {
     list-style: none;
     padding: 0;
+}
+
+.normal li {
+    line-height: 1.6;
+    margin-bottom: 5px;
 }
 
 
