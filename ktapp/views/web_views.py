@@ -1089,7 +1089,7 @@ def click(request):
 def impressum(request):
     return render(request, 'ktapp/impressum.html', {
         'staff': models.KTUser.objects.filter(is_staff=True).order_by('username', 'id'),
-        })
+    })
 
 
 def about_page(request):
@@ -1200,4 +1200,24 @@ def old_url(request):
     if request.path == '/pollforum.php' or request.path == '/pollregi.php':
         poll = get_object_or_404(models.Poll, pk=request.GET.get('pkid', 0))
         return HttpResponseRedirect(reverse('poll', args=(poll.id, poll.slug_cache)))
+    if request.path == '/elemzesek.php':
+        return HttpResponseRedirect(reverse('articles'))
+    if request.path == '/idezetek.php':
+        return HttpResponseRedirect(reverse('latest_quotes'))
+    if request.path == '/dijak.php':
+        return HttpResponseRedirect(reverse('awards'))
+    if request.path == '/poll2.php':
+        return HttpResponseRedirect(reverse('polls') + '?tipus=aktualis')
+    if request.path == '/kedvencek.php':
+        return HttpResponseRedirect(reverse('favourites'))
+    if request.path == '/reg.php':
+        return HttpResponseRedirect(reverse('registration'))
+    if request.path == '/bemutatok.php':
+        return HttpResponseRedirect(reverse('premiers_in_a_year', args=(request.GET.get('ev', ''),)))
+    if request.path == '/trivia.php':
+        return HttpResponseRedirect(reverse('latest_trivias'))
+    if request.path == '/kepek.php':
+        return HttpResponseRedirect(reverse('latest_pictures'))
+    if request.path == '/hasonlok.php':
+        return HttpResponseRedirect(reverse('similar_users'))
     raise Http404
