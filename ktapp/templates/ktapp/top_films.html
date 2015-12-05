@@ -10,11 +10,11 @@
         /
         {% if type == 'ismeretlen' %}<b>ismeretlen gyöngyszemek</b>{% else %}<a href="{% url 'top_films' %}?tipus=ismeretlen{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">ismeretlen gyöngyszemek</a>{% endif %}
         /
-        {% if type == 'legrosszabb' %}<b>legrosszabb</b>{% else %}<a href="{% url 'top_films' %}?tipus=legrosszabb{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">legrosszabb</a>{% endif %}
+        {% if type == 'legrosszabb' %}<b>legrosszabbak</b>{% else %}<a href="{% url 'top_films' %}?tipus=legrosszabb{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">legrosszabbak</a>{% endif %}
         /
-        {% if type == 'legerdekesebb' %}<b>legérdekesebb</b>{% else %}<a href="{% url 'top_films' %}?tipus=legerdekesebb{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">legérdekesebb</a>{% endif %}
+        {% if type == 'legerdekesebb' %}<b>legérdekesebbek</b>{% else %}<a href="{% url 'top_films' %}?tipus=legerdekesebb{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">legérdekesebbek</a>{% endif %}
         /
-        {% if type == 'legnezettebb' %}<b>legnézettebb</b>{% else %}<a href="{% url 'top_films' %}?tipus=legnezettebb{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">legnézettebb</a>{% endif %}
+        {% if type == 'legnezettebb' %}<b>legnézettebbek</b>{% else %}<a href="{% url 'top_films' %}?tipus=legnezettebb{% if filter_type %}&{{ filter_type }}={{ filter_value }}{% endif %}">legnézettebbek</a>{% endif %}
     </h3>
 {% endblock %}
 
