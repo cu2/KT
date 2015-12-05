@@ -11,6 +11,8 @@
             Kompetenci{% if selected_user.id == user.id %}ád{% else %}a{% endif %}: {{ number_of_vapiti_votes }} film
             <br />
             Súly{% if selected_user.id == user.id %}od{% endif %}: {{ vapiti_weight }}
+            <br />
+            Regisztráció{% if selected_user.id == user.id %}d{% endif %}: {{ selected_user.date_joined|date:"Y. F j." }} ({{ selected_user.date_joined|timesince }})
             {% if fav_count %}
                 <br />
                 Kedvencnek jelölt{% if selected_user.id != user.id %}ék{% endif %}: {{ fav_count }} user
@@ -103,8 +105,6 @@
                 {% else %}
                     <i>nem adtad meg</i>
                 {% endif %}
-                <br />
-                Regisztrációd: {{ selected_user.date_joined|date:"Y. F j." }} ({{ selected_user.date_joined|timesince }})
             </p>
         {% else %}
             <p>
@@ -116,22 +116,23 @@
                     {% else %}
                         <i>?</i>
                     {% endif %}
-                {% else %}<i>nem publikus</i>{% endif %}<br />
+                {% else %}<i>nem publikus</i>{% endif %}
+                <br />
                 Születési év: {% if selected_user.public_year_of_birth %}
                     {% if selected_user.year_of_birth %}
                         {{ selected_user.year_of_birth }}
                     {% else %}
                         <i>?</i>
                     {% endif %}
-                {% else %}<i>nem publikus</i>{% endif %}<br />
+                {% else %}<i>nem publikus</i>{% endif %}
+                <br />
                 Lakhely: {% if selected_user.public_location %}
                     {% if selected_user.location %}
                         {{ selected_user.location }}
                     {% else %}
                         <i>?</i>
                     {% endif %}
-                {% else %}<i>nem publikus</i>{% endif %}<br />
-                Regisztráció: {{ selected_user.date_joined|date:"Y. F j." }} ({{ selected_user.date_joined|timesince }})
+                {% else %}<i>nem publikus</i>{% endif %}
             </p>
         {% endif %}
 
