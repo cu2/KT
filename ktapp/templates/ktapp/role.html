@@ -8,8 +8,8 @@
 
 {% block main %}
 
-    <p>Film: <a href="{% url 'film_main' role.film.id role.film.slug_cache %}">{{ role.film.orig_title }} ({{ role.film.year }})</a> {{ role.film.second_title }}</p>
     <p>Színész: <a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}</p>
+    <p>Film: <a href="{% url 'film_main' role.film.id role.film.slug_cache %}">{{ role.film.orig_title }} ({{ role.film.year }})</a> {{ role.film.second_title }}</p>
 
     <div class="centered_content">
         {% if picture %}

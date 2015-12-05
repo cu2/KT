@@ -64,6 +64,19 @@ def film_url_html(film, subpage='film_main'):
 
 
 @register.filter
+def film_url_html_from_role(role, subpage='film_main'):
+    if role.film_second_title:
+        second_row = role.film_second_title
+    else:
+        second_row = '&nbsp;'
+    return mark_safe(u'<a href="{url}">{orig_title}</a><br />\n<span class="td_sub">{second_row}</span>'.format(
+        url=reverse(subpage, args=(role.film_id, role.film_slug_cache)),
+        orig_title=role.film_orig_title,
+        second_row=second_row,
+    ))
+
+
+@register.filter
 def film_url_html_w_year(film, subpage='film_main'):
     if film.second_title:
         second_row = film.second_title

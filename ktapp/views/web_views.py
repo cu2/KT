@@ -1126,6 +1126,102 @@ def finance(request):
     })
 
 
+def vapiti_gold(request):
+    films, _ = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[('main_premier_year', settings.VAPITI_YEAR)],
+        ordering='main_premier',
+        films_per_page=None,
+    )
+    films_yes = []
+    films_no = []
+    for film in films:
+        if request.user.is_authenticated():
+            if film.my_rating:
+                films_yes.append(film)
+            else:
+                films_no.append(film)
+        else:
+            films_no.append(film)
+    films_yes.sort(key=lambda film: (film.my_rating, film.average_rating, film.number_of_ratings), reverse=True)
+    return render(request, 'ktapp/vapiti_subpages/vapiti_gold.html', {
+        'vapiti_year': settings.VAPITI_YEAR,
+        'active_tab': '',
+        'films_yes': films_yes,
+        'films_no': films_no,
+    })
+
+
+# def vapiti_gold_2(request):
+#     return render(request, 'ktapp/vapiti_subpages/vapiti_gold_2.html', {
+#         'vapiti_year': settings.VAPITI_YEAR,
+#         'active_tab': '2',
+#     })
+#
+#
+# def vapiti_gold_winners(request):
+#     return render(request, 'ktapp/vapiti_subpages/vapiti_gold_winners.html', {
+#         'vapiti_year': settings.VAPITI_YEAR,
+#         'active_tab': 'winners',
+#     })
+
+
+def vapiti_silver(request, gender):
+    if request.user.is_authenticated():
+        my_rating_select = 'v.rating AS my_rating'
+        my_rating_join = 'LEFT JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = {user_id}'.format(user_id=request.user.id)
+    else:
+        my_rating_select = 'NULL AS my_rating'
+        my_rating_join = ''
+    roles_yes = []
+    roles_no = []
+    artist_ids_yes = set()
+    artist_ids_no = set()
+    for role in models.FilmArtistRelationship.objects.raw('''
+    SELECT
+      r.*,
+      a.id AS artist_id,
+      a.slug_cache AS artist_slug_cache,
+      a.name AS artist_name,
+      f.id AS film_id,
+      f.slug_cache AS film_slug_cache,
+      f.orig_title AS film_orig_title,
+      f.second_title AS film_second_title,
+      f.number_of_ratings,
+      f.average_rating,
+      {my_rating_select}
+    FROM ktapp_filmartistrelationship r
+    INNER JOIN ktapp_artist a ON a.id = r.artist_id
+    INNER JOIN ktapp_film f ON f.id = r.film_id
+    {my_rating_join}
+    WHERE r.role_type = 'A' AND r.actor_subtype = 'F'
+    AND f.main_premier_year = {vapiti_year}
+    AND a.gender = '{gender}'
+    ORDER BY a.name, a.id, r.role_name, r.id
+    '''.format(
+        my_rating_select=my_rating_select,
+        my_rating_join=my_rating_join,
+        vapiti_year=settings.VAPITI_YEAR,
+        gender='M' if gender == 'ferfi' else 'F',
+    )):
+        if role.my_rating:
+            roles_yes.append(role)
+            artist_ids_yes.add(role.artist_id)
+        else:
+            roles_no.append(role)
+            artist_ids_no.add(role.artist_id)
+    # roles_yes.sort(key=lambda role: (-role.my_rating, role.artist_name, role.artist_id, role.role_name, role.id))
+    return render(request, 'ktapp/vapiti_subpages/vapiti_silver.html', {
+        'vapiti_year': settings.VAPITI_YEAR,
+        'gender': gender,
+        'active_tab': '',
+        'roles_yes': roles_yes,
+        'roles_no': roles_no,
+        'artists_yes_count': len(artist_ids_yes),
+        'artists_no_count': len(artist_ids_no),
+    })
+
+
 def old_url(request):
     print request.path
     if request.path == '/film.php':

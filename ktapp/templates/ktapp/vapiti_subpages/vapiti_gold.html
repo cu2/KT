@@ -1,0 +1,82 @@
+{% extends "ktapp/vapiti_subpages/vapiti_gold_base.html" %}
+{% load kt_extras %}
+
+{% block premier_main %}
+
+{% if request.user.is_authenticated %}
+
+    <h2>Amiket már láttál ({{ films_yes|length }} film)</h2>
+
+    <table class="fullsize sortable">
+        <thead>
+            <tr class="header_tr">
+                <th data-sort="string">Film</th>
+                <th data-sort="int" data-sort-default="desc">Év</th>
+                <th data-sort="string">Rendező</th>
+                <th data-sort="string">Műfaj</th>
+                <th data-sort="int" data-sort-default="desc">Nézettség</th>
+                <th data-sort="float" data-sort-default="desc">Átlag</th>
+                <th data-sort="int" data-sort-default="desc">Kedvenceid</th>
+                <th data-sort="int" data-sort-default="desc">Szerinted</th>
+                <th data-sort="int" data-sort-default="desc">&#9733;</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for film in films_yes %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td>{{ film|film_url_html }}</td>
+                <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
+                <td>{{ film|film_directors }}</td>
+                <td>{{ film|film_genres }}</td>
+                <td class="center" data-sort-value="{{ film.number_of_ratings }}">{{ film|film_num_rating_html }}</td>
+                <td class="center" data-sort-value="{{ film|film_rating_sort_value }}">{{ film|film_avg_rating_html }}</td>
+                <td class="center" data-sort-value="{{ film|film_fav_rating_sort_value }}">{{ film|film_fav_rating_html }}</td>
+                <td class="center" data-sort-value="{% if film.my_rating %}{{ film.my_rating }}{% else %}0{% endif %}">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
+                <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if film.my_wish %}{{ film.my_wish }}{% else %}0{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endif %}
+
+    {% if request.user.is_authenticated %}
+    <h2>Amiket még nem ({{ films_no|length }} film)</h2>
+    {% endif %}
+
+    <table class="fullsize sortable">
+        <thead>
+        <tr class="header_tr">
+            <th data-sort="string">Bemutató</th>
+            <th data-sort="string">Film</th>
+            <th data-sort="int" data-sort-default="desc">Év</th>
+            <th data-sort="string">Rendező</th>
+            <th data-sort="string">Műfaj</th>
+            <th data-sort="int" data-sort-default="desc">Nézettség</th>
+            <th data-sort="float" data-sort-default="desc">Átlag</th>
+            {% if request.user.is_authenticated %}
+                <th data-sort="int" data-sort-default="desc">Kedvenceid</th>
+                <th data-sort="int" data-sort-default="desc">&#9733;</th>
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody>
+        {% for film in films_no %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td data-sort-value="{{ film.main_premier|date:"Y-m-d" }}">{{ film.main_premier|date:"F j." }}</td>
+                <td>{{ film|film_url_html }}</td>
+                <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
+                <td>{{ film|film_directors }}</td>
+                <td>{{ film|film_genres }}</td>
+                <td class="center" data-sort-value="{{ film.number_of_ratings }}">{{ film|film_num_rating_html }}</td>
+                <td class="center" data-sort-value="{{ film|film_rating_sort_value }}">{{ film|film_avg_rating_html }}</td>
+                {% if request.user.is_authenticated %}
+                    <td class="center" data-sort-value="{{ film|film_fav_rating_sort_value }}">{{ film|film_fav_rating_html }}</td>
+                    <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if film.my_wish %}{{ film.my_wish }}{% else %}0{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+                {% endif %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

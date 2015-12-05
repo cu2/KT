@@ -1,0 +1,64 @@
+{% extends "ktapp/vapiti_subpages/vapiti_silver_base.html" %}
+{% load kt_extras %}
+
+{% block premier_main %}
+
+{% if request.user.is_authenticated %}
+
+    <h2>Akiket már láttál ({{ artists_yes_count }} színész, {{ roles_yes|length }} szerep)</h2>
+
+    <table class="fullsize sortable">
+        <thead>
+            <tr class="header_tr">
+                <th data-sort="string">Színész</th>
+                <th data-sort="string">Szerep</th>
+                <th data-sort="string">Film</th>
+                <th data-sort="int" data-sort-default="desc">Nézettség</th>
+                <th data-sort="float" data-sort-default="desc">Átlag</th>
+                <th data-sort="int" data-sort-default="desc">Szerinted</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for role in roles_yes %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td><a href="{% url 'artist' role.artist_id role.artist_slug_cache %}">{{ role.artist_name }}</a></td>
+                <td><a href="{% url 'role' role.id role.slug_cache %}">{{ role.role_name }}</a></td>
+                <td>{{ role|film_url_html_from_role }}</td>
+                <td class="center" data-sort-value="{{ role.number_of_ratings }}">{{ role|film_num_rating_html }}</td>
+                <td class="center" data-sort-value="{{ role|film_rating_sort_value }}">{{ role|film_avg_rating_html }}</td>
+                <td class="center" data-sort-value="{% if role.my_rating %}{{ role.my_rating }}{% else %}0{% endif %}">{% if role.my_rating %}{{ role.my_rating }}{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endif %}
+
+    {% if request.user.is_authenticated %}
+    <h2>Akiket még nem ({{ artists_no_count }} színész, {{ roles_no|length }} szerep)</h2>
+    {% endif %}
+
+    <table class="fullsize sortable">
+        <thead>
+        <tr class="header_tr">
+            <th data-sort="string">Színész</th>
+            <th data-sort="string">Szerep</th>
+            <th data-sort="string">Film</th>
+            <th data-sort="int" data-sort-default="desc">Nézettség</th>
+            <th data-sort="float" data-sort-default="desc">Átlag</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for role in roles_no %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td><a href="{% url 'artist' role.artist_id role.artist_slug_cache %}">{{ role.artist_name }}</a></td>
+                <td><a href="{% url 'role' role.id role.slug_cache %}">{{ role.role_name }}</a></td>
+                <td>{{ role|film_url_html_from_role }}</td>
+                <td class="center" data-sort-value="{{ role.number_of_ratings }}">{{ role|film_num_rating_html }}</td>
+                <td class="center" data-sort-value="{{ role|film_rating_sort_value }}">{{ role|film_avg_rating_html }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

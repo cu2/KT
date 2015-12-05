@@ -171,6 +171,11 @@ urlpatterns += patterns(
     url(r'^szabalyzat/$', web_views.rulez, name='rulez'),
     url(r'^kassza/$', web_views.finance, name='finance'),
 
+    url(r'^arany_vapiti/$', web_views.vapiti_gold, name='vapiti_gold'),
+    # url(r'^arany_vapiti/masodik_fordulo/$', web_views.vapiti_gold_2, name='vapiti_gold_2'),
+    # url(r'^arany_vapiti/gyoztesek/$', web_views.vapiti_gold_winners, name='vapiti_gold_winners'),
+    url(r'^ezust_vapiti/(?P<gender>ferfi|noi)/$', web_views.vapiti_silver, name='vapiti_silver'),
+
     # legacy redirects:
     url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # old php urls
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', RedirectView.as_view(pattern_name='user_films')),
