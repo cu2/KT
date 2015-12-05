@@ -80,20 +80,30 @@
                     </table>
                 </div>
             {% endif %}
-            {% if film.all_sequels %}
-                {% for seq in film.all_sequels %}
-                    <h3><a href="{% url 'sequel' seq.id seq.slug_cache %}">{{ seq }}{% if seq.sequel_type == 'A' %} adaptációk{% endif %}{% if seq.sequel_type == 'R' %} remake-ek{% endif %}</a></h3>
+            {% if sequels %}
+                {% for seq in sequels %}
+                    <h3><a href="{% url 'sequel' seq.sequel.id seq.sequel.slug_cache %}">{{ seq.sequel.name }}{% if seq.sequel.sequel_type == 'A' %} adaptációk{% endif %}{% if seq.sequel.sequel_type == 'R' %} remake-ek{% endif %}</a></h3>
                     <table class="fullsize">
                         <tr class="header_tr">
                             <th>Film</th>
                             <th>Év</th>
                             <th>Átlag</th>
+                            {% if request.user.is_authenticated %}
+                                <th>Kedvenceid</th>
+                                <th>Szerinted</th>
+                                <th>&#9733;</th>
+                            {% endif %}
                         </tr>
-                        {% for f in seq.all_films %}
+                        {% for f in seq.films %}
                             <tr class="{% cycle '' 'odd' %}{% if f == film %} selected_film_tr{% endif %}">
                                 <td>{{ f|film_url_html }}</td>
                                 <td class="center">{{ f.year }}</td>
                                 <td class="center">{{ f|film_rating_html }}</td>
+                                {% if request.user.is_authenticated %}
+                                    <td class="center">{{ f|film_fav_rating_html }}</td>
+                                    <td class="center">{% if f.my_rating %}{{ f.my_rating }}{% endif %}</td>
+                                    <td class="center wish{% if f.my_wish == 1 %}_active{% endif %}"><span data-id="{{ f.id }}">{% if f.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                     </table>
@@ -103,12 +113,12 @@
                 <span class="button small_button" id="show_sequel_form">folytatások szerkesztése</span>
                 <div id="sequel_form" style="display: none">
                     <h3>Folytatások szerkesztése</h3>
-                    <p>A = adaptáció, S = sequel (folytatás), R = remake</p>
+                    <p>Formátum: (típus) cím, ahol típus: A = adaptáció, S = sequel (folytatás), R = remake</p>
                     <form action="{% url 'edit_sequels' %}" method="post" class="inline">
                         {% csrf_token %}
                         <input type="hidden" name="film_id" value="{{ film.pk }}" />
-                        {% for seq in film.all_sequels %}
-                            <p><input type="text" name="sequel" value="({{ seq.sequel_type }}) {{ seq.name }}" class="input_for_sequel wide_input" /></p>
+                        {% for seq in sequels %}
+                            <p><input type="text" name="sequel" value="({{ seq.sequel.sequel_type }}) {{ seq.sequel.name }}" class="input_for_sequel wide_input" /></p>
                         {% endfor %}
                         <p><input type="text" name="sequel" class="input_for_sequel wide_input" /></p>
                         <p><input type="text" name="sequel" class="input_for_sequel wide_input" /></p>

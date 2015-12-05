@@ -18,6 +18,7 @@
                 {% else %}
                     <a href="{% url 'similar_users' %}{% if link_genre %}?mufaj={{ link_genre }}{% endif %}">{{ link_text }}</a>
                 {% endif %}
+                {% if not forloop.last %}|{% endif %}
             {% endfor %}
         </p>
 

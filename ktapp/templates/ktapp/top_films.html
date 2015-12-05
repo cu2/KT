@@ -38,6 +38,7 @@
                 {% else %}
                     <a href="{% url 'top_films' %}?tipus={{ type }}&{{ filter_type }}={{ link_filter_value }}">{{ link_text }}</a>
                 {% endif %}
+                {% if not forloop.last %}|{% endif %}
             {% endfor %}
         </p>
     {% endif %}
