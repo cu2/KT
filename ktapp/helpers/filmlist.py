@@ -15,6 +15,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
     additional_select = []
     title_matches = []
     nice_filters = []
+    distinct_needed = False
     if filters:
         for filter_type, filter_value in filters:
             try:
@@ -78,6 +79,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                         LEFT JOIN ktapp_premier {table_name}
                         ON {table_name}.film_id = f.id
                     '''.format(table_name='alternative_premiers'))
+                    distinct_needed = True  # if a film has more than 1 alternative premier in a year
                     additional_select.append('''
                         CASE
                             WHEN alternative_premiers.`when` IS NOT NULL AND alternative_premiers.`when` BETWEEN '{year}-01-01' AND '{year}-12-31' THEN alternative_premiers.`when`
@@ -116,12 +118,14 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     nice_filters.append((filter_type, filter_value))
             if filter_type == 'director':
                 director_names = []
+                number_of_directors = 0
                 for director_name in filter_value.split(','):
                     director_name = director_name.strip()
                     if director_name:
                         director_names.append(director_name)
                         directors = models.Artist.objects.filter(name__icontains=director_name)[:500]
                         if directors:
+                            director_id_list = [str(d.id) for d in directors]
                             table_alias_idx += 1
                             additional_inner_joins.append('''
                                 INNER JOIN ktapp_filmartistrelationship {table_name}
@@ -130,8 +134,11 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                                 AND {table_name}.role_type = 'D'
                             '''.format(
                                 table_name='director_%s' % table_alias_idx,
-                                director_ids=','.join([str(d.id) for d in directors]),
+                                director_ids=','.join(director_id_list),
                             ))
+                            number_of_directors += len(director_id_list)
+                if number_of_directors > 1:
+                    distinct_needed = True  # multiple directors
                 if director_names:
                     nice_filters.append((filter_type, ', '.join(director_names)))
             if filter_type == 'actor':
@@ -142,6 +149,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                         actor_names.append(actor_name)
                         actors = models.Artist.objects.filter(name__icontains=actor_name)[:500]
                         if actors:
+                            actor_id_list = [str(a.id) for a in actors]
                             table_alias_idx += 1
                             role_idx += 1
                             additional_select.append('''
@@ -160,8 +168,9 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                                 AND {table_name}.role_type = 'A'
                             '''.format(
                                 table_name='actor_%s' % table_alias_idx,
-                                actor_ids=','.join([str(a.id) for a in actors]),
+                                actor_ids=','.join(actor_id_list),
                             ))
+                            distinct_needed = True  # even one actor can have multiple roles
                 if actor_names:
                     nice_filters.append((filter_type, ', '.join(actor_names)))
             if filter_type == 'director_id':
@@ -207,9 +216,11 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                         table_name='actor_%s' % table_alias_idx,
                         actor_id=actor.id,
                     ))
+                    distinct_needed = True  # even one actor can have multiple roles
                     nice_filters.append((filter_type, actor.id))
             if filter_type in {'country', 'genre', 'keyword'}:
                 keyword_names = []
+                number_of_keywords = 0
                 for keyword_name in filter_value.split(','):
                     keyword_name = keyword_name.strip()
                     if keyword_name:
@@ -223,6 +234,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                             keywords = keywords.filter(keyword_type__in=[models.Keyword.KEYWORD_TYPE_MAJOR, models.Keyword.KEYWORD_TYPE_OTHER])
                         keywords = keywords[:50]
                         if keywords:
+                            keyword_id_list = [str(k.id) for k in keywords]
                             table_alias_idx += 1
                             additional_inner_joins.append('''
                                 INNER JOIN ktapp_filmkeywordrelationship {table_name}
@@ -230,8 +242,11 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                                 AND {table_name}.keyword_id IN ({keyword_ids})
                                 '''.format(
                                 table_name='keyword_%s' % table_alias_idx,
-                                keyword_ids=','.join([str(k.id) for k in keywords])
+                                keyword_ids=','.join(keyword_id_list)
                             ))
+                            number_of_keywords += len(keyword_id_list)
+                if number_of_keywords > 1:
+                    distinct_needed = True  # multiple keywords
                 if keyword_names:
                     nice_filters.append((filter_type, ', '.join(keyword_names)))
             if filter_type == 'average_rating':
@@ -510,13 +525,14 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
     if count:
         cursor = connection.cursor()
         sql = '''
-            SELECT COUNT(DISTINCT f.id)
+            SELECT COUNT({distinct} f.id)
             FROM ktapp_film f
             {additional_inner_joins}
             {additional_left_joins}
             {sql_user}
             {additional_where}
         '''.format(
+            distinct='DISTINCT' if distinct_needed else '',
             additional_select='\n'.join(additional_select) if additional_select else '',
             additional_inner_joins='\n'.join(additional_inner_joins),
             additional_left_joins='\n'.join(additional_left_joins),
@@ -527,7 +543,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
         cursor.execute(sql, additional_param)
         return cursor.fetchone()[0], nice_filters
     sql = '''
-        SELECT DISTINCT
+        SELECT {distinct}
           f.*,
           {additional_select}
           {sql_user_select}
@@ -539,6 +555,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
         {order_by}
         {sql_limit}
     '''.format(
+        distinct='DISTINCT' if distinct_needed else '',
         additional_select='\n'.join(additional_select) if additional_select else '',
         additional_inner_joins='\n'.join(additional_inner_joins),
         additional_left_joins='\n'.join(additional_left_joins),
@@ -562,12 +579,12 @@ def get_filters_from_request(request):
         if val:
             filters.append((field, val))
     val = '%s-%s' % (kt_utils.strip_whitespace(request.GET.get('num_rating_min', '')), kt_utils.strip_whitespace(request.GET.get('num_rating_max', '')))
-    if val != '':
+    if val != '-':
         filters.append(('number_of_ratings', val))
     val = '%s-%s' % (kt_utils.strip_whitespace(request.GET.get('avg_rating_min', '')), kt_utils.strip_whitespace(request.GET.get('avg_rating_max', '')))
-    if val != '':
+    if val != '-':
         filters.append(('average_rating', val))
     val = '%s-%s' % (kt_utils.strip_whitespace(request.GET.get('fav_avg_rating_min', '')), kt_utils.strip_whitespace(request.GET.get('fav_avg_rating_max', '')))
-    if val != '':
+    if val != '-':
         filters.append(('fav_average_rating', val))
     return filters

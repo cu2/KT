@@ -162,20 +162,6 @@ def browse(request):
     else:
         ordering = (ordering_str, 'ASC')
     filters = filmlist.get_filters_from_request(request)
-    # result_count, nice_filters = filmlist.filmlist(
-    #     user_id=request.user.id,
-    #     filters=filters,
-    #     count=True
-    # )
-    # if result_count <= 1000:
-    #     films, nice_filters = filmlist.filmlist(
-    #         user_id=request.user.id,
-    #         filters=filters,
-    #         ordering=ordering,
-    #         films_per_page=1000,
-    #     )
-    # else:
-    #     films = []
     films, nice_filters = filmlist.filmlist(
         user_id=request.user.id,
         filters=filters,
