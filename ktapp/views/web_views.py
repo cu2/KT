@@ -101,13 +101,15 @@ def premiers(request):
     premier_list.sort(reverse=True)
     return render(request, 'ktapp/premier_subpages/premiers.html', {
         'active_tab': 'nowadays',
-        'last_premier_year': settings.LAST_PREMIER_YEAR,
-        'before_last_premier_year': settings.LAST_PREMIER_YEAR - 1,
+        'this_premier_year': this_year,
+        'before_this_premier_year': this_year - 1,
         'premier_list': premier_list,
     })
 
 
 def premiers_in_a_year(request, year):
+    today = datetime.date.today()
+    this_year = today.year
     year = int(year)
     if year < settings.FIRST_PREMIER_YEAR:
         return HttpResponseRedirect(reverse('premiers_in_a_year', args=(settings.FIRST_PREMIER_YEAR,)))
@@ -120,9 +122,9 @@ def premiers_in_a_year(request, year):
         films_per_page=None,
     )
     return render(request, 'ktapp/premier_subpages/premiers_in_a_year.html', {
-        'active_tab': 'this_year' if year == settings.LAST_PREMIER_YEAR else 'last_year',
-        'last_premier_year': settings.LAST_PREMIER_YEAR,
-        'before_last_premier_year': settings.LAST_PREMIER_YEAR - 1,
+        'active_tab': 'this_year' if year == this_year else 'last_year',
+        'this_premier_year': this_year,
+        'before_this_premier_year': this_year - 1,
         'premier_list_full': films,
         'this_year': year,
         'premier_years': range(settings.FIRST_PREMIER_YEAR, settings.LAST_PREMIER_YEAR + 1),
