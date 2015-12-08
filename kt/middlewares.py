@@ -7,6 +7,8 @@ import string
 import time
 from ipware.ip import get_ip
 
+from django.db import connection
+
 
 kt_pageview_logger = logging.getLogger('kt_pageview')
 kt_loadtime_logger = logging.getLogger('kt_loadtime')
@@ -41,6 +43,20 @@ class LoggingMiddleware(object):
                 request.user.save(update_fields=['last_activity_at'])
                 user_id = request.user.id
                 username = request.user.username
+                day = utcnow.strftime('%Y-%m-%d')
+                cursor = connection.cursor()
+                cursor.execute('''
+                INSERT INTO ktapp_hourlyactiveuser
+                (user_id, day, hour, counter)
+                VALUES(%s, %s, %s, 1)
+                ON DUPLICATE KEY UPDATE counter = counter + 1
+                ''', [user_id, day, utcnow.hour])
+                cursor.execute('''
+                INSERT INTO ktapp_dailyactiveuser
+                (user_id, day, counter)
+                VALUES(%s, %s, 1)
+                ON DUPLICATE KEY UPDATE counter = counter + 1
+                ''', [user_id, day])
         except AttributeError:
             pass
         session_key = ''

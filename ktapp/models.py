@@ -1569,3 +1569,22 @@ class EmailClick(models.Model):
     campaign = models.ForeignKey(EmailCampaign, blank=True, null=True, on_delete=models.SET_NULL)
     clicked_at = models.DateTimeField(auto_now_add=True)
     url = models.CharField(max_length=250)
+
+
+class HourlyActiveUser(models.Model):
+    user = models.ForeignKey(KTUser)
+    day = models.DateField()
+    hour = models.PositiveSmallIntegerField(default=0)
+    counter = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ['user', 'day', 'hour']
+
+
+class DailyActiveUser(models.Model):
+    user = models.ForeignKey(KTUser)
+    day = models.DateField()
+    counter = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ['user', 'day']
