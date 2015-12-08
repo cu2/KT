@@ -81,8 +81,18 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     is_reliable = models.BooleanField(default=False)
     bio = models.TextField(blank=True)
     bio_html = models.TextField(blank=True)
+    bio_snippet = models.TextField(blank=True)
     fav_period = models.CharField(max_length=250, blank=True, null=True)
     is_game_master = models.BooleanField(default=False)
+    number_of_ratings_1 = models.PositiveIntegerField(default=0)
+    number_of_ratings_2 = models.PositiveIntegerField(default=0)
+    number_of_ratings_3 = models.PositiveIntegerField(default=0)
+    number_of_ratings_4 = models.PositiveIntegerField(default=0)
+    number_of_ratings_5 = models.PositiveIntegerField(default=0)
+    average_rating = models.DecimalField(default=None, max_digits=2, decimal_places=1, blank=True, null=True)
+    number_of_film_comments = models.PositiveIntegerField(default=0)
+    number_of_topic_comments = models.PositiveIntegerField(default=0)
+    number_of_poll_comments = models.PositiveIntegerField(default=0)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -157,6 +167,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
         self.slug_cache = slugify(self.username)
         self.bio = strip_tags(self.bio)
         self.bio_html = kt_utils.bbcode_to_html(self.bio)
+        self.bio_snippet = strip_tags(self.bio_html)[:500]
         super(KTUser, self).save(*args, **kwargs)
 
     @classmethod
@@ -325,7 +336,26 @@ class Vote(models.Model):
         Wishlist.objects.filter(film=self.film, wished_by=self.user, wish_type=Wishlist.WISH_TYPE_YES).delete()
         self.user.latest_votes = ','.join([unicode(v.id) for v in self.user.vote_set.all().order_by('-when', '-id')[:100]])
         self.user.number_of_ratings = self.user.vote_set.count()
-        self.user.save(update_fields=['latest_votes', 'number_of_ratings'])
+        self.user.number_of_ratings_1 = self.user.vote_set.filter(rating=1).count()
+        self.user.number_of_ratings_2 = self.user.vote_set.filter(rating=2).count()
+        self.user.number_of_ratings_3 = self.user.vote_set.filter(rating=3).count()
+        self.user.number_of_ratings_4 = self.user.vote_set.filter(rating=4).count()
+        self.user.number_of_ratings_5 = self.user.vote_set.filter(rating=5).count()
+        if self.user.number_of_ratings < 10:
+            self.user.average_rating = None
+        else:
+            self.user.average_rating = 1.0 * (
+                1*self.user.number_of_ratings_1+
+                2*self.user.number_of_ratings_2+
+                3*self.user.number_of_ratings_3+
+                4*self.user.number_of_ratings_4+
+                5*self.user.number_of_ratings_5
+            ) / self.user.number_of_ratings
+        self.user.save(update_fields=[
+            'latest_votes', 'number_of_ratings',
+            'number_of_ratings_1', 'number_of_ratings_2', 'number_of_ratings_3', 'number_of_ratings_4', 'number_of_ratings_5',
+            'average_rating',
+        ])
         Recommendation.recalculate_fav_for_users_and_film(self.user.get_followed_by(), self.film)
 
 
@@ -337,7 +367,26 @@ def delete_vote(sender, instance, **kwargs):
         pass
     instance.user.latest_votes = ','.join([unicode(v.id) for v in instance.user.vote_set.all().order_by('-when', '-id')[:100]])
     instance.user.number_of_ratings = instance.user.vote_set.count()
-    instance.user.save(update_fields=['latest_votes', 'number_of_ratings'])
+    instance.user.number_of_ratings_1 = instance.user.vote_set.filter(rating=1).count()
+    instance.user.number_of_ratings_2 = instance.user.vote_set.filter(rating=2).count()
+    instance.user.number_of_ratings_3 = instance.user.vote_set.filter(rating=3).count()
+    instance.user.number_of_ratings_4 = instance.user.vote_set.filter(rating=4).count()
+    instance.user.number_of_ratings_5 = instance.user.vote_set.filter(rating=5).count()
+    if instance.user.number_of_ratings < 10:
+        instance.user.average_rating = None
+    else:
+        instance.user.average_rating = 1.0 * (
+            1*instance.user.number_of_ratings_1+
+            2*instance.user.number_of_ratings_2+
+            3*instance.user.number_of_ratings_3+
+            4*instance.user.number_of_ratings_4+
+            5*instance.user.number_of_ratings_5
+        ) / instance.user.number_of_ratings
+    instance.user.save(update_fields=[
+        'latest_votes', 'number_of_ratings',
+        'number_of_ratings_1', 'number_of_ratings_2', 'number_of_ratings_3', 'number_of_ratings_4', 'number_of_ratings_5',
+        'average_rating',
+    ])
     Recommendation.recalculate_fav_for_users_and_film(instance.user.get_followed_by(), instance.film)
 
 
@@ -468,7 +517,13 @@ class Comment(models.Model):
             kwargs['domain'].save(update_fields=['number_of_comments', 'last_comment'])
             self.created_by.latest_comments = ','.join([unicode(c.id) for c in self.created_by.comment_set.all().order_by('-created_at', '-id')[:100]])
             self.created_by.number_of_comments = self.created_by.comment_set.count()
-            self.created_by.save(update_fields=['latest_comments', 'number_of_comments'])
+            self.created_by.number_of_film_comments = self.created_by.comment_set.filter(domain=Comment.DOMAIN_FILM).count()
+            self.created_by.number_of_topic_comments = self.created_by.comment_set.filter(domain=Comment.DOMAIN_TOPIC).count()
+            self.created_by.number_of_poll_comments = self.created_by.comment_set.filter(domain=Comment.DOMAIN_POLL).count()
+            self.created_by.save(update_fields=[
+                'latest_comments', 'number_of_comments',
+                'number_of_film_comments', 'number_of_topic_comments', 'number_of_poll_comments',
+            ])
 
     @classmethod
     def fix_comments(cls, domain, domain_object):
@@ -537,7 +592,13 @@ def delete_comment(sender, instance, **kwargs):
         remaining_comment.save()
     instance.created_by.latest_comments = ','.join([unicode(c.id) for c in instance.created_by.comment_set.all().order_by('-created_at', '-id')[:100]])
     instance.created_by.number_of_comments = instance.created_by.comment_set.count()
-    instance.created_by.save(update_fields=['latest_comments', 'number_of_comments'])
+    instance.created_by.number_of_film_comments = instance.created_by.comment_set.filter(domain=Comment.DOMAIN_FILM).count()
+    instance.created_by.number_of_topic_comments = instance.created_by.comment_set.filter(domain=Comment.DOMAIN_TOPIC).count()
+    instance.created_by.number_of_poll_comments = instance.created_by.comment_set.filter(domain=Comment.DOMAIN_POLL).count()
+    instance.created_by.save(update_fields=[
+        'latest_comments', 'number_of_comments',
+        'number_of_film_comments', 'number_of_topic_comments', 'number_of_poll_comments',
+    ])
 
 
 class Topic(models.Model):
