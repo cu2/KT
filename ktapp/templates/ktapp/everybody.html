@@ -82,11 +82,11 @@
                 <td class="nowrap center">{% if user.average_rating %}
                     {{ user.average_rating }}
                     {% spaceless %}
-                    <span class="avg_bar avg_bar_1" style="width: {{ user.number_of_ratings_1|percent:user.number_of_ratings }}px"></span>
-                    <span class="avg_bar avg_bar_2" style="width: {{ user.number_of_ratings_2|percent:user.number_of_ratings }}px"></span>
-                    <span class="avg_bar avg_bar_3" style="width: {{ user.number_of_ratings_3|percent:user.number_of_ratings }}px"></span>
-                    <span class="avg_bar avg_bar_4" style="width: {{ user.number_of_ratings_4|percent:user.number_of_ratings }}px"></span>
-                    <span class="avg_bar avg_bar_5" style="width: {{ user.number_of_ratings_5|percent:user.number_of_ratings }}px"></span>
+                    <span class="avg_bar avg_bar_1" style="width: {{ user.number_of_ratings_1|percent:user.number_of_ratings }}px" title="{{ user.number_of_ratings_1 }} nézhetetlen"></span>
+                    <span class="avg_bar avg_bar_2" style="width: {{ user.number_of_ratings_2|percent:user.number_of_ratings }}px" title="{{ user.number_of_ratings_2 }} rossz"></span>
+                    <span class="avg_bar avg_bar_3" style="width: {{ user.number_of_ratings_3|percent:user.number_of_ratings }}px" title="{{ user.number_of_ratings_3 }} oké/elmegy"></span>
+                    <span class="avg_bar avg_bar_4" style="width: {{ user.number_of_ratings_4|percent:user.number_of_ratings }}px" title="{{ user.number_of_ratings_4 }} jó"></span>
+                    <span class="avg_bar avg_bar_5" style="width: {{ user.number_of_ratings_5|percent:user.number_of_ratings }}px" title="{{ user.number_of_ratings_5 }} zseniális"></span>
                     {% endspaceless %}
                 {% endif %}</td>
                 <td class="nowrap center">{% if user.number_of_comments %}{{ user.number_of_comments }}{% endif %}</td>

@@ -1227,6 +1227,10 @@ def everybody(request):
         'number_of_comments', 'number_of_film_comments', 'number_of_topic_comments', 'number_of_poll_comments',
     }:
         ordering_str = 'id'
+    if ordering_str in {'id', 'username', 'number_of_ratings'}:
+        ordering = (ordering_sign + ordering_str,)
+    else:
+        ordering = (ordering_sign + ordering_str, '-number_of_ratings',)
     users = models.KTUser.objects
     if username:
         users = users.filter(username__icontains=username)
@@ -1243,7 +1247,7 @@ def everybody(request):
     if p > max_pages:
         p = max_pages
     return render(request, 'ktapp/everybody.html', {
-        'users': users.order_by(ordering_sign + ordering_str)[(p-1) * USERS_PER_PAGE:p * USERS_PER_PAGE],
+        'users': users.order_by(*ordering)[(p-1) * USERS_PER_PAGE:p * USERS_PER_PAGE],
         'result_count': result_count,
         'p': p,
         'max_pages': max_pages,
