@@ -93,6 +93,8 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_film_comments = models.PositiveIntegerField(default=0)
     number_of_topic_comments = models.PositiveIntegerField(default=0)
     number_of_poll_comments = models.PositiveIntegerField(default=0)
+    number_of_vapiti_votes = models.PositiveIntegerField(default=0)
+    vapiti_weight = models.PositiveIntegerField(default=0)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -341,6 +343,8 @@ class Vote(models.Model):
         self.user.number_of_ratings_3 = self.user.vote_set.filter(rating=3).count()
         self.user.number_of_ratings_4 = self.user.vote_set.filter(rating=4).count()
         self.user.number_of_ratings_5 = self.user.vote_set.filter(rating=5).count()
+        self.user.number_of_vapiti_votes = self.user.vote_set.filter(film__main_premier_year=settings.VAPITI_YEAR).count()
+        self.user.vapiti_weight = self.user.number_of_ratings + 25 * self.user.number_of_vapiti_votes
         if self.user.number_of_ratings < 10:
             self.user.average_rating = None
         else:
@@ -354,7 +358,7 @@ class Vote(models.Model):
         self.user.save(update_fields=[
             'latest_votes', 'number_of_ratings',
             'number_of_ratings_1', 'number_of_ratings_2', 'number_of_ratings_3', 'number_of_ratings_4', 'number_of_ratings_5',
-            'average_rating',
+            'average_rating', 'number_of_vapiti_votes', 'vapiti_weight',
         ])
         Recommendation.recalculate_fav_for_users_and_film(self.user.get_followed_by(), self.film)
 
@@ -372,6 +376,8 @@ def delete_vote(sender, instance, **kwargs):
     instance.user.number_of_ratings_3 = instance.user.vote_set.filter(rating=3).count()
     instance.user.number_of_ratings_4 = instance.user.vote_set.filter(rating=4).count()
     instance.user.number_of_ratings_5 = instance.user.vote_set.filter(rating=5).count()
+    instance.user.number_of_vapiti_votes = instance.user.vote_set.filter(film__main_premier_year=settings.VAPITI_YEAR).count()
+    instance.user.vapiti_weight = instance.user.number_of_ratings + 25 * instance.user.number_of_vapiti_votes
     if instance.user.number_of_ratings < 10:
         instance.user.average_rating = None
     else:
@@ -385,7 +391,7 @@ def delete_vote(sender, instance, **kwargs):
     instance.user.save(update_fields=[
         'latest_votes', 'number_of_ratings',
         'number_of_ratings_1', 'number_of_ratings_2', 'number_of_ratings_3', 'number_of_ratings_4', 'number_of_ratings_5',
-        'average_rating',
+        'average_rating', 'number_of_vapiti_votes', 'vapiti_weight',
     ])
     Recommendation.recalculate_fav_for_users_and_film(instance.user.get_followed_by(), instance.film)
 
