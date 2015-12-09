@@ -511,6 +511,7 @@ table {
 }
 tr {
     background: rgb(228,222,195);
+    vertical-align: top;
 }
 tr.odd {
     background: rgb(249,244,218);
@@ -775,7 +776,7 @@ ul.poll li {
 
 .paging {
     list-style: none;
-    margin: 0 auto;
+    margin: 20px auto;
     text-align: center;
 }
 .paging li {
@@ -793,6 +794,27 @@ ul.poll li {
 .paging li b {
     padding: 5px 10px;
     display: block;
+}
+
+
+.avg_bar {
+    display: inline-block;
+    height: 10px;
+}
+.avg_bar_1 {
+    background: rgb(200,0,0);
+}
+.avg_bar_2 {
+    background: rgb(220,120,120);
+}
+.avg_bar_3 {
+    background: rgb(240,240,240);
+}
+.avg_bar_4 {
+    background: rgb(120,220,120);
+}
+.avg_bar_5 {
+    background: rgb(0,200,0);
 }
 
 

@@ -11,7 +11,7 @@
 {% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=36" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=37" />
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <base href="/" />
         <script>
@@ -101,7 +101,8 @@
                         <li><a href="{% url 'latest_comments' %}">Kommentek</a></li>
                         <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
                         <li><a href="{% url 'similar_users' %}">Hasonlók</a></li>
-                        <li><a href="{% url 'forum' 38 'jatek' %}">Játék</a></li>
+                        <li><a href="{% url 'everybody' %}">Mindenki</a></li>
+{#                        <li><a href="{% url 'forum' 38 'jatek' %}">Játék</a></li>#}
                     </ul>
                 </li>
                 <li>Vapiti<br />

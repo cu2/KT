@@ -23,6 +23,7 @@ from ktapp import sqls as kt_sqls
 COMMENTS_PER_PAGE = 100
 MESSAGES_PER_PAGE = 50
 FILMS_PER_PAGE = 100
+USERS_PER_PAGE = 100
 
 MINIMUM_YEAR = 1920
 
@@ -1207,6 +1208,48 @@ def vapiti_silver(request, gender):
         'roles_no': roles_no,
         'artists_yes_count': len(artist_ids_yes),
         'artists_no_count': len(artist_ids_no),
+    })
+
+
+def everybody(request):
+    username = kt_utils.strip_whitespace(request.GET.get('username', ''))
+    ordering_str = kt_utils.strip_whitespace(request.GET.get('o', ''))
+    if ordering_str == '':
+        ordering_str = 'id'
+    if ordering_str[0] == '-':
+        ordering_sign = '-'
+        ordering_str = ordering_str[1:]
+    else:
+        ordering_sign = ''
+    if ordering_str not in {
+        'id', 'username',
+        'number_of_ratings', 'number_of_vapiti_votes', 'vapiti_weight', 'average_rating',
+        'number_of_comments', 'number_of_film_comments', 'number_of_topic_comments', 'number_of_poll_comments',
+    }:
+        ordering_str = 'id'
+    users = models.KTUser.objects
+    if username:
+        users = users.filter(username__icontains=username)
+    result_count = users.count()
+    try:
+        p = int(request.GET.get('p', 0))
+    except ValueError:
+        p = 0
+    max_pages = int(math.ceil(1.0 * result_count / USERS_PER_PAGE))
+    if max_pages == 0:
+        max_pages = 1
+    if p == 0:
+        p = 1
+    if p > max_pages:
+        p = max_pages
+    return render(request, 'ktapp/everybody.html', {
+        'users': users.order_by(ordering_sign + ordering_str)[(p-1) * USERS_PER_PAGE:p * USERS_PER_PAGE],
+        'result_count': result_count,
+        'p': p,
+        'max_pages': max_pages,
+        'ordering_str': ordering_sign + ordering_str,
+        'username': username,
+        'qs_combined': '&username=%s' % username if username else '',
     })
 
 

@@ -185,3 +185,8 @@ def urlquote_plus(value):
 @register.filter
 def strip_whitespace(value):
     return strip_whitespace_function(value)
+
+
+@register.filter
+def percent(num, denom):
+    return int(round(100.0 * num / denom))

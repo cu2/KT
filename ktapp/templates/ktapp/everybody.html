@@ -1,0 +1,123 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+
+{% block title %}Mindenki - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Mindenki</h1>
+{% endblock %}
+
+{% block main %}
+
+    <form action="{% url 'everybody' %}" method="get">
+        <input type="hidden" name="o" value="{{ ordering_str }}" />
+        <p><label for="id_username">Név: </label><input type="text" class="input_for_user" id="id_username" name="username" value="{{ username }}" /> <input type="submit" value="Userek szűrése" /></p>
+    </form>
+
+    {% if max_pages >= 2 %}
+        <ul class="paging">
+            <li>{% if p == 1 %}<b>1</b>{% else %}<a href="{% url 'everybody' %}?o={{ ordering_str }}{{ qs_combined }}">1</a>{% endif %}</li>
+            {% if p >= 4 %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            {% if p >= 3 %}
+                <li><a href="{% url 'everybody' %}?o={{ ordering_str }}{{ qs_combined }}&p={{ p|add:"-1" }}">{{ p|add:"-1" }}</a></li>
+            {% endif %}
+            {% if 2 <= p and p <= max_pages|add:"-1" %}
+                <li><b>{{ p }}</b></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-2" %}
+                <li><a href="{% url 'everybody' %}?o={{ ordering_str }}{{ qs_combined }}&p={{ p|add:"1" }}">{{ p|add:"1" }}</a></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-3" %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'everybody' %}?o={{ ordering_str }}{{ qs_combined }}&p={{ max_pages }}">{{ max_pages }}</a>{% endif %}</li>
+        </ul>
+    {% endif %}
+
+    <table class="fullsize">
+        <thead>
+        <tr class="header_tr">
+            <th colspan="3">User</th>
+            <th colspan="4">Filmek</th>
+            <th colspan="4">Kommentek</th>
+        </tr>
+        <tr class="header_tr">
+            <th><a href="{% url 'everybody' %}?o={% if ordering_str == 'username' %}-{% endif %}username{{ qs_combined }}">Név{% if ordering_str == 'username' %}&uarr;{% elif ordering_str == '-username' %}&darr;{% endif %}</a></th>
+            <th>Bemutatkozás</th>
+            <th><a href="{% url 'everybody' %}?o={% if ordering_str == 'id' %}-{% endif %}id{{ qs_combined }}">Regisztráció{% if ordering_str == 'id' %}&uarr;{% elif ordering_str == '-id' %}&darr;{% endif %}</a></th>
+            <th><a href="{% url 'everybody' %}?o={% if ordering_str != '-number_of_ratings' %}-{% endif %}number_of_ratings{{ qs_combined }}">Tapasztalat{% if ordering_str == 'number_of_ratings' %}&uarr;{% elif ordering_str == '-number_of_ratings' %}&darr;{% endif %}</a></th>
+            <th><a href="{% url 'everybody' %}?o={% if ordering_str != '-number_of_vapiti_votes' %}-{% endif %}number_of_vapiti_votes{{ qs_combined }}">Kompetencia{% if ordering_str == 'number_of_vapiti_votes' %}&uarr;{% elif ordering_str == '-number_of_vapiti_votes' %}&darr;{% endif %}</a></th>
+            <th><a href="{% url 'everybody' %}?o={% if ordering_str != '-vapiti_weight' %}-{% endif %}vapiti_weight{{ qs_combined }}">Súly{% if ordering_str == 'vapiti_weight' %}&uarr;{% elif ordering_str == '-vapiti_weight' %}&darr;{% endif %}</a></th>
+            <th><a href="{% url 'everybody' %}?o={% if ordering_str != '-average_rating' %}-{% endif %}average_rating{{ qs_combined }}">Átlag{% if ordering_str == 'average_rating' %}&uarr;{% elif ordering_str == '-average_rating' %}&darr;{% endif %}</a></th>
+            <th><a href="{% url 'everybody' %}?o={% if ordering_str != '-number_of_comments' %}-{% endif %}number_of_comments{{ qs_combined }}">Összes{% if ordering_str == 'number_of_comments' %}&uarr;{% elif ordering_str == '-number_of_comments' %}&darr;{% endif %}</a></th>
+            <th><a href="{% url 'everybody' %}?o={% if ordering_str != '-number_of_film_comments' %}-{% endif %}number_of_film_comments{{ qs_combined }}">Filmes{% if ordering_str == 'number_of_film_comments' %}&uarr;{% elif ordering_str == '-number_of_film_comments' %}&darr;{% endif %}</a></th>
+            <th><a href="{% url 'everybody' %}?o={% if ordering_str != '-number_of_topic_comments' %}-{% endif %}number_of_topic_comments{{ qs_combined }}">Fórum{% if ordering_str == 'number_of_topic_comments' %}&uarr;{% elif ordering_str == '-number_of_topic_comments' %}&darr;{% endif %}</a></th>
+            <th><a href="{% url 'everybody' %}?o={% if ordering_str != '-number_of_poll_comments' %}-{% endif %}number_of_poll_comments{{ qs_combined }}">Közkérdés{% if ordering_str == 'number_of_poll_comments' %}&uarr;{% elif ordering_str == '-number_of_poll_comments' %}&darr;{% endif %}</a></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr class="{% cycle '' 'odd' %}"{% if request.user.id == user.id %} style="font-weight: bold"{% endif %}>
+                <td class="">
+                    <a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a>
+                    {% if user.is_staff %}[szerk]{% endif %}
+                    {% if not user.is_active %}
+                        {% if user.reason_of_inactivity == 'B' %}
+                            [kitiltva]
+                        {% elif user.reason_of_inactivity == 'Q' %}
+                            [kilépett]
+                        {% else %}
+                            [inaktív]
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td>{{ user.bio_snippet|linebreaksbr }}</td>
+                <td class="nowrap center">{{ user.date_joined|date:"Y-m-d" }}</td>
+                <td class="nowrap center">{{ user.number_of_ratings }}</td>
+                <td class="nowrap center">{{ user.number_of_vapiti_votes }}</td>
+                <td class="nowrap center">{{ user.vapiti_weight }}</td>
+                <td class="nowrap center">{% if user.average_rating %}
+                    {{ user.average_rating }}
+                    {% spaceless %}
+                    <span class="avg_bar avg_bar_1" style="width: {{ user.number_of_ratings_1|percent:user.number_of_ratings }}px"></span>
+                    <span class="avg_bar avg_bar_2" style="width: {{ user.number_of_ratings_2|percent:user.number_of_ratings }}px"></span>
+                    <span class="avg_bar avg_bar_3" style="width: {{ user.number_of_ratings_3|percent:user.number_of_ratings }}px"></span>
+                    <span class="avg_bar avg_bar_4" style="width: {{ user.number_of_ratings_4|percent:user.number_of_ratings }}px"></span>
+                    <span class="avg_bar avg_bar_5" style="width: {{ user.number_of_ratings_5|percent:user.number_of_ratings }}px"></span>
+                    {% endspaceless %}
+                {% endif %}</td>
+                <td class="nowrap center">{% if user.number_of_comments %}{{ user.number_of_comments }}{% endif %}</td>
+                <td class="nowrap center">{% if user.number_of_film_comments %}{{ user.number_of_film_comments }}{% endif %}</td>
+                <td class="nowrap center">{% if user.number_of_topic_comments %}{{ user.number_of_topic_comments }}{% endif %}</td>
+                <td class="nowrap center">{% if user.number_of_poll_comments %}{{ user.number_of_poll_comments }}{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if max_pages >= 2 %}
+        <ul class="paging">
+            <li>{% if p == 1 %}<b>1</b>{% else %}<a href="{% url 'everybody' %}?o={{ ordering_str }}{{ qs_combined }}">1</a>{% endif %}</li>
+            {% if p >= 4 %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            {% if p >= 3 %}
+                <li><a href="{% url 'everybody' %}?o={{ ordering_str }}{{ qs_combined }}&p={{ p|add:"-1" }}">{{ p|add:"-1" }}</a></li>
+            {% endif %}
+            {% if 2 <= p and p <= max_pages|add:"-1" %}
+                <li><b>{{ p }}</b></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-2" %}
+                <li><a href="{% url 'everybody' %}?o={{ ordering_str }}{{ qs_combined }}&p={{ p|add:"1" }}">{{ p|add:"1" }}</a></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-3" %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'everybody' %}?o={{ ordering_str }}{{ qs_combined }}&p={{ max_pages }}">{{ max_pages }}</a>{% endif %}</li>
+        </ul>
+    {% endif %}
+
+{% endblock %}

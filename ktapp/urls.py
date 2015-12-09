@@ -121,6 +121,7 @@ urlpatterns += patterns(
     url(r'^legfrissebb_kommentek/$', web_views.latest_comments, name='latest_comments'),
     url(r'^kedvencek/$', web_views.favourites, name='favourites'),
     url(r'^hasonlok/$', web_views.similar_users, name='similar_users'),
+    url(r'^mindenki/$', web_views.everybody, name='everybody'),
 
     url(r'^felhasznaloi_toplista/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.usertoplist, name='usertoplist'),
     url(r'^felhasznaloi_toplistak/$', web_views.usertoplists, name='usertoplists'),
@@ -140,10 +141,12 @@ urlpatterns += patterns(
     url(r'^erdekessegek/$', web_views.latest_trivias, name='latest_trivias'),
     url(r'^dijak/$', web_views.awards, name='awards'),
 
+    # url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/izles/(?P<domain>rendezok|mufajok|orszagok|korszakok)/$', user_profile_views.user_taste, name='user_taste'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', user_profile_views.user_films, name='user_films'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', user_profile_views.user_comments, name='user_comments'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', user_profile_views.user_wishlist, name='user_wishlist'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/toplistak/$', user_profile_views.user_toplists, name='user_toplists'),
+    # url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/irasok/$', user_profile_views.user_articles, name='user_articles'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/aktivitas/$', user_profile_views.user_activity, name='user_activity'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', user_profile_views.user_messages, name='user_messages'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)$', user_profile_views.user_profile, name='user_profile'),
