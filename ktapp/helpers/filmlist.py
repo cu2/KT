@@ -225,7 +225,8 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     keyword_name = keyword_name.strip()
                     if keyword_name:
                         keyword_names.append(keyword_name)
-                        keywords = models.Keyword.objects.filter(name__icontains=keyword_name)
+                        # keywords = models.Keyword.objects.filter(name__icontains=keyword_name)
+                        keywords = models.Keyword.objects.filter(name=keyword_name)
                         if filter_type == 'country':
                             keywords = keywords.filter(keyword_type=models.Keyword.KEYWORD_TYPE_COUNTRY)
                         if filter_type == 'genre':
