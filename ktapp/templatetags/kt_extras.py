@@ -189,4 +189,4 @@ def strip_whitespace(value):
 
 @register.filter
 def percent(num, denom):
-    return int(round(100.0 * num / denom))
+    return int(round(100.0 * float(num) / float(denom)))

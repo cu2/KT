@@ -1,0 +1,104 @@
+{% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
+{% load kt_extras %}
+
+{% block user_profile_main %}
+
+    <div class="centered_content">
+
+    <p>
+        {% if active_subtab == 'directors' %}<b>{% else %}<a href="{% url 'user_taste' selected_user.id selected_user.slug_cache 'rendezok' %}">{% endif %}
+        rendezők
+        {% if active_subtab == 'directors' %}</b>{% else %}</a>{% endif %}
+        |
+        {% if active_subtab == 'genres' %}<b>{% else %}<a href="{% url 'user_taste' selected_user.id selected_user.slug_cache 'mufajok' %}">{% endif %}
+        műfajok
+        {% if active_subtab == 'genres' %}</b>{% else %}</a>{% endif %}
+        |
+        {% if active_subtab == 'countries' %}<b>{% else %}<a href="{% url 'user_taste' selected_user.id selected_user.slug_cache 'orszagok' %}">{% endif %}
+        országok
+        {% if active_subtab == 'countries' %}</b>{% else %}</a>{% endif %}
+        |
+        {% if active_subtab == 'periods' %}<b>{% else %}<a href="{% url 'user_taste' selected_user.id selected_user.slug_cache 'korszakok' %}">{% endif %}
+        korszakok
+        {% if active_subtab == 'periods' %}</b>{% else %}</a>{% endif %}
+    </p>
+
+
+    {% if list_of_items %}
+        <table class="fullsize sortable">
+            <thead>
+            <tr class="header_tr">
+                {% if active_subtab == 'directors' %}
+                    <th data-sort="string">Rendező</th>
+                {% elif active_subtab == 'genres' %}
+                    <th data-sort="string">Műfaj</th>
+                {% elif active_subtab == 'countries' %}
+                    <th data-sort="string">Ország</th>
+                {% else %}
+                    <th data-sort="int">Korszak</th>
+                {% endif %}
+                <th data-sort="int" data-sort-default="desc">Átlag</th>
+                <th data-sort="int" data-sort-default="desc">Tapasztalat</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in list_of_items %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td data-sort-value="{% if active_subtab == 'periods' %}{{ item.period }}{% else %}{{ item.name }}{% endif %}">
+                        {% if active_subtab == 'directors' %}
+                            <a href="{% url 'artist' item.id item.slug_cache %}">{{ item.name }}</a>
+                        {% elif active_subtab == 'genres' %}
+                            <a href="{% url 'browse' %}?genre={{ item.name }}">{{ item.name }}</a>
+                        {% elif active_subtab == 'countries' %}
+                            <a href="{% url 'browse' %}?country={{ item.name }}">{{ item.name }}</a>
+                        {% else %}
+                            <a href="{% url 'browse' %}?year={{ item.period_min }}-{{ item.period_max }}">
+                            {% if item.period == 1900 %}
+                                1920 előtt
+                            {% elif item.period < 2000 %}
+                                {% if item.period in years_as %}
+                                    '{{ item.period|stringformat:"d"|slice:"2:" }}-as évek
+                                {% else %}
+                                    '{{ item.period|stringformat:"d"|slice:"2:" }}-es évek
+                                {% endif %}
+                            {% else %}
+                                {% if item.period in years_as %}
+                                    {{ item.period }}-as évek
+                                {% else %}
+                                    {{ item.period }}-es évek
+                                {% endif %}
+                            {% endif %}
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td class="nowrap center" data-sort-value="{{ item.average_rating_sort_value }}">{% if item.average_rating %}
+                        {{ item.average_rating|floatformat:1 }}
+                        {% spaceless %}
+                            <span class="avg_bar avg_bar_1" style="width: {{ item.number_of_ratings_1|percent:item.number_of_ratings }}px" title="{{ item.number_of_ratings_1 }} nézhetetlen"></span>
+                            <span class="avg_bar avg_bar_2" style="width: {{ item.number_of_ratings_2|percent:item.number_of_ratings }}px" title="{{ item.number_of_ratings_2 }} rossz"></span>
+                            <span class="avg_bar avg_bar_3" style="width: {{ item.number_of_ratings_3|percent:item.number_of_ratings }}px" title="{{ item.number_of_ratings_3 }} oké/elmegy"></span>
+                            <span class="avg_bar avg_bar_4" style="width: {{ item.number_of_ratings_4|percent:item.number_of_ratings }}px" title="{{ item.number_of_ratings_4 }} jó"></span>
+                            <span class="avg_bar avg_bar_5" style="width: {{ item.number_of_ratings_5|percent:item.number_of_ratings }}px" title="{{ item.number_of_ratings_5 }} zseniális"></span>
+                        {% endspaceless %}
+                    {% endif %}</td>
+                    <td class="center" data-sort-value="{{ item.number_of_ratings }}">
+                        {% if active_subtab == 'directors' %}
+                            <a href="{% url 'user_films' selected_user.id selected_user.slug_cache %}?director={{ item.name }}">{{ item.number_of_ratings }}</a>
+                        {% elif active_subtab == 'genres' %}
+                            <a href="{% url 'user_films' selected_user.id selected_user.slug_cache %}?genre={{ item.name }}">{{ item.number_of_ratings }}</a>
+                        {% elif active_subtab == 'countries' %}
+                            <a href="{% url 'user_films' selected_user.id selected_user.slug_cache %}?country={{ item.name }}">{{ item.number_of_ratings }}</a>
+                        {% else %}
+                            <a href="{% url 'user_films' selected_user.id selected_user.slug_cache %}?year={{ item.period_min }}-{{ item.period_max }}">{{ item.number_of_ratings }}</a>
+                        {% endif %}
+{#                        {% if active_subtab == 'directors' %}({{ item.film_ratio }}%){% endif %}#}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+
+
+{% endblock %}

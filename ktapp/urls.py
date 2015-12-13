@@ -141,7 +141,7 @@ urlpatterns += patterns(
     url(r'^erdekessegek/$', web_views.latest_trivias, name='latest_trivias'),
     url(r'^dijak/$', web_views.awards, name='awards'),
 
-    # url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/izles/(?P<domain>rendezok|mufajok|orszagok|korszakok)/$', user_profile_views.user_taste, name='user_taste'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/izles/(?P<domain>rendezok|mufajok|orszagok|korszakok)/$', user_profile_views.user_taste, name='user_taste'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/filmek/$', user_profile_views.user_films, name='user_films'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kommentek/$', user_profile_views.user_comments, name='user_comments'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', user_profile_views.user_wishlist, name='user_wishlist'),

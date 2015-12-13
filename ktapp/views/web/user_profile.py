@@ -5,10 +5,11 @@ import math
 
 from django.db import connection
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Max
+from django.conf import settings
 
 from ktapp import models
 from ktapp import utils as kt_utils
@@ -24,8 +25,10 @@ FILMS_PER_PAGE = 100
 MINIMUM_YEAR = 1920
 
 USER_PROFILE_TAB_WIDTH = {
-    True: 14,
-    False: 16,
+    # True: '11',  # 1/9
+    # False: '12.3',  # 1/8
+    True: '12.3',  # 1/8
+    False: '14.2',  # 1/7
 }
 
 
@@ -34,20 +37,24 @@ def _get_user_profile_numbers(request, selected_user):
         number_of_messages = models.MessageCountCache.get_count(owned_by=request.user, partner=selected_user)
     else:
         number_of_messages = 0
+    number_of_articles = 0
+    # number_of_articles += models.Review.objects.filter(created_by=selected_user).count()
+    # number_of_articles += models.Biography.objects.filter(created_by=selected_user).count()
+    # number_of_articles += models.Link.objects.filter(author=selected_user).count()
     return (
         selected_user.number_of_ratings,
         selected_user.number_of_comments,
         selected_user.number_of_wishes_yes + selected_user.number_of_wishes_no + selected_user.number_of_wishes_get,
         selected_user.number_of_toplists,
         number_of_messages,
+        number_of_articles,
     )
 
 
 def user_profile(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
-    this_year = datetime.date.today().year
-    number_of_vapiti_votes = selected_user.vote_set.filter(film__main_premier_year=this_year).count()
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+    number_of_vapiti_votes = selected_user.vote_set.filter(film__main_premier_year=settings.VAPITI_YEAR).count()
     latest_votes = [int(v) for v in selected_user.latest_votes.split(',') if v != ''][:10]
     latest_comments = [int(c) for c in selected_user.latest_comments.split(',') if c != ''][:10]
     # profile
@@ -107,21 +114,6 @@ def user_profile(request, id, name_slug):
         cursor.execute(kt_sqls.SIMILARITY_PER_GENRE, (request.user.id, selected_user.id))
         for row in cursor.fetchall():
             similarity_per_genre.append(row)
-    my_directors = list(models.Artist.objects.raw('''
-SELECT
-  a.*,
-  AVG(v.rating) AS my_average_rating,
-  ROUND(10.0 * AVG(v.rating)) AS my_average_rating_sort_value,
-  COUNT(1) AS my_film_count,
-  ROUND(100.0 * COUNT(1) / a.number_of_films_as_director) AS my_film_ratio,
-  SUM(v.rating = 5) AS my_5_count
-FROM ktapp_artist a
-INNER JOIN ktapp_filmartistrelationship fa ON fa.artist_id = a.id AND fa.role_type = 'D'
-INNER JOIN ktapp_vote v ON v.film_id = fa.film_id AND v.user_id = %s
-GROUP BY a.id
-HAVING COUNT(1) >= GREATEST(%s, 3)
-ORDER BY my_average_rating DESC, my_film_count DESC, name, id
-    ''', [selected_user.id, selected_user.number_of_ratings / 400.0]))
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,
@@ -130,6 +122,7 @@ ORDER BY my_average_rating DESC, my_film_count DESC, name, id
         'number_of_wishes': number_of_wishes,
         'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
+        'number_of_articles': number_of_articles,
         'number_of_vapiti_votes': number_of_vapiti_votes,
         'vapiti_weight': number_of_votes + 25 * number_of_vapiti_votes,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
@@ -168,13 +161,134 @@ ORDER BY my_average_rating DESC, my_film_count DESC, name, id
         ''', [selected_user.id, models.UserFavourite.DOMAIN_COUNTRY, models.Keyword.KEYWORD_TYPE_COUNTRY])),
         'similarity': similarity,
         'similarity_per_genre': similarity_per_genre,
-        'my_directors': my_directors,
+    })
+
+
+def user_taste(request, id, name_slug, domain):
+
+    def dictfetchall(cursor):
+        columns = [col[0] for col in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+    selected_user = get_object_or_404(models.KTUser, pk=id)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+    cursor = connection.cursor()
+    if domain == 'rendezok':
+        active_subtab = 'directors'
+        cursor.execute('''
+SELECT
+  a.id, a.slug_cache, a.name,
+  AVG(v.rating) AS average_rating,
+  ROUND(10.0 * AVG(v.rating)) AS average_rating_sort_value,
+  COUNT(1) AS number_of_ratings,
+  ROUND(100.0 * COUNT(1) / a.number_of_films_as_director) AS film_ratio,
+  SUM(v.rating = 1) AS number_of_ratings_1,
+  SUM(v.rating = 2) AS number_of_ratings_2,
+  SUM(v.rating = 3) AS number_of_ratings_3,
+  SUM(v.rating = 4) AS number_of_ratings_4,
+  SUM(v.rating = 5) AS number_of_ratings_5
+FROM ktapp_artist a
+INNER JOIN ktapp_filmartistrelationship fa ON fa.artist_id = a.id AND fa.role_type = 'D'
+INNER JOIN ktapp_vote v ON v.film_id = fa.film_id AND v.user_id = %s
+GROUP BY a.id
+HAVING COUNT(1) >= 5 OR (2*COUNT(1)>=MIN(a.number_of_films_as_director) AND COUNT(1)>=3)
+ORDER BY average_rating DESC, number_of_ratings DESC, name, id
+        ''', [selected_user.id])
+    elif domain == 'mufajok':
+        active_subtab = 'genres'
+        cursor.execute('''
+SELECT
+  k.id, k.slug_cache, k.name,
+  AVG(v.rating) AS average_rating,
+  ROUND(10.0 * AVG(v.rating)) AS average_rating_sort_value,
+  COUNT(1) AS number_of_ratings,
+  SUM(v.rating = 1) AS number_of_ratings_1,
+  SUM(v.rating = 2) AS number_of_ratings_2,
+  SUM(v.rating = 3) AS number_of_ratings_3,
+  SUM(v.rating = 4) AS number_of_ratings_4,
+  SUM(v.rating = 5) AS number_of_ratings_5
+FROM ktapp_keyword k
+INNER JOIN ktapp_filmkeywordrelationship fk ON fk.keyword_id = k.id
+INNER JOIN ktapp_vote v ON v.film_id = fk.film_id AND v.user_id = %s
+WHERE k.keyword_type = 'G'
+GROUP BY k.id
+HAVING COUNT(1) >= 5
+ORDER BY average_rating DESC, number_of_ratings DESC, name, id
+        ''', [selected_user.id])
+    elif domain == 'orszagok':
+        active_subtab = 'countries'
+        cursor.execute('''
+SELECT
+  k.id, k.slug_cache, k.name,
+  AVG(v.rating) AS average_rating,
+  ROUND(10.0 * AVG(v.rating)) AS average_rating_sort_value,
+  COUNT(1) AS number_of_ratings,
+  SUM(v.rating = 1) AS number_of_ratings_1,
+  SUM(v.rating = 2) AS number_of_ratings_2,
+  SUM(v.rating = 3) AS number_of_ratings_3,
+  SUM(v.rating = 4) AS number_of_ratings_4,
+  SUM(v.rating = 5) AS number_of_ratings_5
+FROM ktapp_keyword k
+INNER JOIN ktapp_filmkeywordrelationship fk ON fk.keyword_id = k.id
+INNER JOIN ktapp_vote v ON v.film_id = fk.film_id AND v.user_id = %s
+WHERE k.keyword_type = 'C'
+GROUP BY k.id
+HAVING COUNT(1) >= 5
+ORDER BY average_rating DESC, number_of_ratings DESC, name, id
+        ''', [selected_user.id])
+    elif domain == 'korszakok':
+        active_subtab = 'periods'
+        cursor.execute('''
+SELECT
+  CASE
+    WHEN f.year < 1920 THEN 1900
+    ELSE FLOOR(f.year / 10) * 10
+  END AS period,
+  CASE
+    WHEN f.year < 1920 THEN ''
+    ELSE CAST((FLOOR(f.year / 10) * 10) AS CHAR)
+  END AS period_min,
+  CASE
+    WHEN f.year < 1920 THEN 1919
+    ELSE FLOOR(f.year / 10) * 10 + 9
+  END AS period_max,
+  AVG(v.rating) AS average_rating,
+  ROUND(10.0 * AVG(v.rating)) AS average_rating_sort_value,
+  COUNT(1) AS number_of_ratings,
+  SUM(v.rating = 1) AS number_of_ratings_1,
+  SUM(v.rating = 2) AS number_of_ratings_2,
+  SUM(v.rating = 3) AS number_of_ratings_3,
+  SUM(v.rating = 4) AS number_of_ratings_4,
+  SUM(v.rating = 5) AS number_of_ratings_5
+FROM ktapp_film f
+INNER JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = %s
+WHERE f.year IS NOT NULL
+GROUP BY period
+HAVING COUNT(1) >= 5
+ORDER BY average_rating DESC, number_of_ratings DESC, period
+        ''', [selected_user.id])
+    else:
+        raise Http404
+    list_of_items = dictfetchall(cursor)
+    return render(request, 'ktapp/user_profile_subpages/user_taste.html', {
+        'active_tab': 'taste',
+        'active_subtab': active_subtab,
+        'selected_user': selected_user,
+        'number_of_votes': number_of_votes,
+        'number_of_comments': number_of_comments,
+        'number_of_wishes': number_of_wishes,
+        'number_of_toplists': number_of_toplists,
+        'number_of_messages': number_of_messages,
+        'number_of_articles': number_of_articles,
+        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
+        'list_of_items': list_of_items,
+        'years_as': [1920, 1930, 1960, 1980, 2020, 2030],
     })
 
 
 def user_films(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
 
     ordering_str = kt_utils.strip_whitespace(request.GET.get('o', ''))
     if ordering_str == '':
@@ -236,6 +350,7 @@ def user_films(request, id, name_slug):
         'number_of_wishes': number_of_wishes,
         'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
+        'number_of_articles': number_of_articles,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'result_count': result_count,
         'querystring': querystring,
@@ -249,7 +364,7 @@ def user_films(request, id, name_slug):
 
 def user_comments(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
     p = int(request.GET.get('p', 0))
     if p == 1:
         return HttpResponseRedirect(reverse('user_comments', args=(selected_user.id, selected_user.slug_cache)))
@@ -264,8 +379,6 @@ def user_comments(request, id, name_slug):
     if max_pages > 1:
         first_comment = selected_user.number_of_comments - COMMENTS_PER_PAGE * (p - 1) - (COMMENTS_PER_PAGE - 1)
         last_comment = selected_user.number_of_comments - COMMENTS_PER_PAGE * (p - 1)
-        print first_comment
-        print last_comment
         comments = comments_qs.filter(serial_number_by_user__lte=last_comment, serial_number_by_user__gte=first_comment)
     else:
         comments = comments_qs.all()
@@ -277,6 +390,7 @@ def user_comments(request, id, name_slug):
         'number_of_wishes': number_of_wishes,
         'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
+        'number_of_articles': number_of_articles,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'comments': comments.order_by('-created_at'),
         'p': p,
@@ -286,7 +400,7 @@ def user_comments(request, id, name_slug):
 
 def user_wishlist(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
     wishlist_type = request.GET.get('t', 'igen')
     if wishlist_type == 'nem':
         wishlist_type = 'N'
@@ -338,6 +452,7 @@ def user_wishlist(request, id, name_slug):
         'number_of_wishes': number_of_wishes,
         'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
+        'number_of_articles': number_of_articles,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'result_count': result_count,
         'querystring': querystring,
@@ -352,7 +467,7 @@ def user_wishlist(request, id, name_slug):
 
 def user_toplists(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
     toplists = models.UserToplist.objects.filter(created_by=selected_user).order_by('-created_at')
     toplist_details = []
     for toplist in toplists:
@@ -389,14 +504,31 @@ def user_toplists(request, id, name_slug):
         'number_of_wishes': number_of_wishes,
         'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
+        'number_of_articles': number_of_articles,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'toplist_details': toplist_details,
     })
 
 
+def user_articles(request, id, name_slug):
+    selected_user = get_object_or_404(models.KTUser, pk=id)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+    return render(request, 'ktapp/user_profile_subpages/user_articles.html', {
+        'active_tab': 'articles',
+        'selected_user': selected_user,
+        'number_of_votes': number_of_votes,
+        'number_of_comments': number_of_comments,
+        'number_of_wishes': number_of_wishes,
+        'number_of_toplists': number_of_toplists,
+        'number_of_articles': number_of_articles,
+        'number_of_messages': number_of_messages,
+        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
+    })
+
+
 def user_activity(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
     cursor = connection.cursor()
     max_max_vote = models.KTUser.objects.all().aggregate(Max('number_of_ratings'))['number_of_ratings__max']
     max_max_comment = models.KTUser.objects.all().aggregate(Max('number_of_comments'))['number_of_comments__max']
@@ -486,6 +618,7 @@ def user_activity(request, id, name_slug):
         'number_of_wishes': number_of_wishes,
         'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
+        'number_of_articles': number_of_articles,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'data_month': data_month,
         'data_year': data_year,
@@ -495,7 +628,7 @@ def user_activity(request, id, name_slug):
 @login_required()
 def user_messages(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, selected_user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
     messages_qs = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(
         Q(sent_by=selected_user)
         | Q(sent_to=selected_user)
@@ -521,6 +654,7 @@ def user_messages(request, id, name_slug):
         'number_of_wishes': number_of_wishes,
         'number_of_toplists': number_of_toplists,
         'number_of_messages': number_of_messages,
+        'number_of_articles': number_of_articles,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'messages': messages_qs.order_by('-sent_at')[(p-1) * MESSAGES_PER_PAGE:p * MESSAGES_PER_PAGE],
         'p': p,
@@ -569,7 +703,7 @@ def edit_profile(request):
         request.user.fav_period = kt_utils.strip_whitespace(request.POST.get('fav_period', ''))
         request.user.save()
         return HttpResponseRedirect(next_url)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages = _get_user_profile_numbers(request, request.user)
+    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, request.user)
     return render(request, 'ktapp/user_profile_subpages/edit_profile.html', {
         'active_tab': 'profile',
         'selected_user': request.user,
@@ -577,6 +711,8 @@ def edit_profile(request):
         'number_of_comments': number_of_comments,
         'number_of_wishes': number_of_wishes,
         'number_of_toplists': number_of_toplists,
+        'number_of_messages': number_of_messages,
+        'number_of_articles': number_of_articles,
         'tab_width': USER_PROFILE_TAB_WIDTH[False],
         'fav_directors': models.Artist.objects.raw('''
             SELECT a.*
