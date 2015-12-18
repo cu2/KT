@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import patterns, url, include
+from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib.auth.views import logout
 from django.views.generic.base import RedirectView
@@ -21,8 +21,7 @@ router.register(r'keywords', api_views.KeywordViewSet)
 router.register(r'artists', api_views.ArtistViewSet)
 router.register(r'sequels', api_views.SequelViewSet)
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # custom api endpoints:
@@ -34,13 +33,12 @@ urlpatterns = patterns(
     url(r'^api/autocomplete/awards/$', api_views.get_awards, name='get_awards'),
     url(r'^api/buzz/$', api_views.buzz, name='buzz'),
     url(r'^api/comment_page/(?P<domain>[^/]*)/(?P<id>\d+)/$', api_views.comment_page, name='comment_page'),
-)
+]
 
 
 # Web urls (should be Hungarian SEO compliant)
 
-urlpatterns += patterns(
-    '',
+urlpatterns += [
     url(r'^$', web_views.index, name='index'),
 
     url(r'^keres/$', web_views.search, name='search'),
@@ -186,7 +184,7 @@ urlpatterns += patterns(
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', RedirectView.as_view(pattern_name='user_wishlist')),
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', RedirectView.as_view(pattern_name='user_messages')),
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)$', RedirectView.as_view(pattern_name='user_profile')),
-)
+]
 
 
 # Static
