@@ -35,12 +35,47 @@ def vote(request):
         rating = 0
     fb = request.POST.get('fb', '0')
     if rating == 0:
-        models.Vote.objects.filter(film=film, user=request.user).delete()
+        try:
+            old_vote = models.Vote.objects.get(film=film, user=request.user)
+        except models.Vote.DoesNotExist:
+            old_vote = None
+        if old_vote:
+            models.Vote.objects.filter(film=film, user=request.user).delete()
+            models.Event.objects.create(
+                user=request.user,
+                event_type=models.Event.EVENT_TYPE_DELETE_VOTE,
+                film=film,
+                details=json.dumps({
+                    'old_rating': old_vote.rating,
+                }),
+            )
     elif 1 <= rating <= 5:
         vote, created = models.Vote.objects.get_or_create(film=film, user=request.user, defaults={
             'rating': rating,
             'shared_on_facebook': fb == '1',
         })
+        if not created:
+            old_rating = vote.rating
+            models.Event.objects.create(
+                user=request.user,
+                event_type=models.Event.EVENT_TYPE_CHANGE_VOTE,
+                film=film,
+                details=json.dumps({
+                    'old_rating': old_rating,
+                    'new_rating': rating,
+                    'shared_on_facebook': fb == '1',
+                }),
+            )
+        else:
+            models.Event.objects.create(
+                user=request.user,
+                event_type=models.Event.EVENT_TYPE_NEW_VOTE,
+                film=film,
+                details=json.dumps({
+                    'new_rating': rating,
+                    'shared_on_facebook': fb == '1',
+                }),
+            )
         vote.rating = rating
         if not created:  # don't reset shared_on_facebook once a vote has been shared
             if fb == '1':
@@ -92,6 +127,12 @@ def wish(request):
             models.Wishlist.objects.get_or_create(film=film, wished_by=request.user, wish_type=wish_type)
         else:
             models.Wishlist.objects.filter(film=film, wished_by=request.user, wish_type=wish_type).delete()
+        if wish_type == models.Wishlist.WISH_TYPE_YES:
+            models.Event.objects.create(
+                user=request.user,
+                event_type=models.Event.EVENT_TYPE_ADD_TO_WISHLIST if action == '+' else models.Event.EVENT_TYPE_REMOVE_FROM_WISHLIST,
+                film=film,
+            )
     if request.POST.get('ajax', '') == '1':
         return HttpResponse(json.dumps({'success': True}), content_type='application/json')
     return HttpResponseRedirect(reverse('film_main', args=(film.pk, film.slug_cache)))
@@ -103,10 +144,13 @@ def new_comment(request):
     domain_type = request.POST['domain']
     if domain_type == models.Comment.DOMAIN_FILM:
         domain = get_object_or_404(models.Film, pk=request.POST['film'])
+        film, topic, poll = domain, None, None
     elif domain_type == models.Comment.DOMAIN_TOPIC:
         domain = get_object_or_404(models.Topic, pk=request.POST['topic'])
+        film, topic, poll = None, domain, None
     elif domain_type == models.Comment.DOMAIN_POLL:
         domain = get_object_or_404(models.Poll, pk=request.POST['poll'])
+        film, topic, poll = None, None, domain
     else:
         raise Http404
     if domain_type == models.Comment.DOMAIN_TOPIC:
@@ -117,6 +161,17 @@ def new_comment(request):
         comment = comment_form.save(commit=False)
         comment.created_by = request.user
         comment.save(domain=domain)  # Comment model updates domain object
+        models.Event.objects.create(
+            user=request.user,
+            event_type=models.Event.EVENT_TYPE_NEW_COMMENT,
+            film=film,
+            topic=topic,
+            poll=poll,
+            details=json.dumps({
+                'domain': domain_type,
+            }),
+            some_id=comment.id,
+        )
     if domain_type == models.Comment.DOMAIN_FILM:
         return HttpResponseRedirect(reverse('film_comments', args=(domain.pk, domain.slug_cache)))
     elif domain_type == models.Comment.DOMAIN_TOPIC:
@@ -137,6 +192,17 @@ def edit_comment(request):
         if content != '':
             comment.content = content
             comment.save()
+            models.Event.objects.create(
+                user=request.user,
+                event_type=models.Event.EVENT_TYPE_EDIT_COMMENT,
+                film=comment.film,
+                topic=comment.topic,
+                poll=comment.poll,
+                details=json.dumps({
+                    'domain': comment.domain,
+                    }),
+                some_id=comment.id,
+            )
         return HttpResponseRedirect(next_url)
     return HttpResponseForbidden()
 
@@ -996,6 +1062,11 @@ def follow(request):
         return HttpResponseRedirect(next_url)
     if request.user.id != other_user.id:
         models.Follow.objects.get_or_create(who=request.user, whom=other_user)
+        models.Event.objects.create(
+            user=other_user,
+            event_type=models.Event.EVENT_TYPE_FOLLOW,
+            some_id=request.user.id,
+        )
     return HttpResponseRedirect(next_url)
 
 
@@ -1008,6 +1079,11 @@ def unfollow(request):
     except models.KTUser.DoesNotExist:
         return HttpResponseRedirect(next_url)
     models.Follow.objects.filter(who=request.user, whom=other_user).delete()
+    models.Event.objects.create(
+        user=other_user,
+        event_type=models.Event.EVENT_TYPE_UNFOLLOW,
+        some_id=request.user.id,
+    )
     return HttpResponseRedirect(next_url)
 
 
@@ -1040,6 +1116,11 @@ def poll_vote(request):
         models.PollVote.objects.get_or_create(user=request.user, pollchoice=pollchoice)
     else:
         models.PollVote.objects.filter(user=request.user, pollchoice=pollchoice).delete()
+    models.Event.objects.create(
+        user=request.user,
+        event_type=models.Event.EVENT_TYPE_POLL_VOTE,
+        poll=poll,
+    )
     return HttpResponseRedirect(reverse('poll', args=(poll.id, poll.slug_cache)))
 
 

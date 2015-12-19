@@ -84,6 +84,10 @@ def registration(request):
                 ),
                 recipients=[user],
             )
+            models.Event.objects.create(
+                user=user,
+                event_type=models.Event.EVENT_TYPE_SIGNUP,
+            )
             return HttpResponseRedirect(next_url)
     return render(request, 'ktapp/registration.html', {
         'next': next_url,

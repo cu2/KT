@@ -1627,5 +1627,7 @@ class Event(models.Model):
     ]
     event_type = models.CharField(max_length=2, choices=EVENT_TYPES, default=EVENT_TYPE_NEW_VOTE)
     film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
+    topic = models.ForeignKey(Topic, blank=True, null=True, on_delete=models.SET_NULL)
+    poll = models.ForeignKey(Poll, blank=True, null=True, on_delete=models.SET_NULL)
     some_id = models.PositiveIntegerField(default=0)
     details = models.CharField(max_length=250, blank=True, null=True)

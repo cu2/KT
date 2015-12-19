@@ -702,6 +702,10 @@ def edit_profile(request):
         set_fav('fav_country', models.UserFavourite.DOMAIN_COUNTRY, lambda name: models.Keyword.get_keyword_by_name(name, models.Keyword.KEYWORD_TYPE_COUNTRY))
         request.user.fav_period = kt_utils.strip_whitespace(request.POST.get('fav_period', ''))
         request.user.save()
+        models.Event.objects.create(
+            user=request.user,
+            event_type=models.Event.EVENT_TYPE_EDIT_PROFILE,
+        )
         return HttpResponseRedirect(next_url)
     number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, request.user)
     return render(request, 'ktapp/user_profile_subpages/edit_profile.html', {
