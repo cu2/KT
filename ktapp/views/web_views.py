@@ -927,7 +927,7 @@ def suggested_links(request):
                 'content': json.loads(sc.content),
             }
             for sc in models.SuggestedContent.objects.select_related('created_by').filter(domain=models.SuggestedContent.DOMAIN_LINK)
-        ], key=lambda link: (link['content'].get('film', {'orig_title': ''})['orig_title'], link['created_at'])),
+        ], key=lambda link: (link['content'].get('film')['orig_title'] if link['content'].get('film') else '', link['created_at'])),
     })
 
 
