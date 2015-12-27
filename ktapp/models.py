@@ -1,5 +1,6 @@
 import datetime
 import hashlib
+import json
 import os
 import random
 import string
@@ -1631,3 +1632,14 @@ class Event(models.Model):
     poll = models.ForeignKey(Poll, blank=True, null=True, on_delete=models.SET_NULL)
     some_id = models.PositiveIntegerField(default=0)
     details = models.CharField(max_length=250, blank=True, null=True)
+
+    def get_details(self):
+        if self.details:
+            return json.loads(self.details)
+        return {}
+
+    def get_comment(self):
+        try:
+            return Comment.objects.get(id=self.some_id)
+        except Comment.DoesNotExist:
+            return None
