@@ -1,0 +1,30 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+
+{% block title %}Arany és Ezüst Vapiti díj - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Arany és Ezüst Vapiti díj</h1>
+{% endblock %}
+
+{% block main %}
+
+    <p class="right">„<i>A vapiti, az zöld, kerek tüskéi vannak, és pluttyan, ha vízbe dobja az ember.</i>”<br />(Boris Vian - Piros fű)</p>
+
+    <p>Az Arany Vapiti egy díj, amit évente oszt ki a Kritikus Tömeg a legjobbnak ítélt filmnek. A megszokott gyakorlattól eltérően a győztest nem egy kis létszámú zsűri választja ki, hanem az összes törzstag. A szavazási rendszer részletei változtak az évek során, a jelenlegi állapot a következő:</p>
+    <ul class="normal">
+        <li>azok a filmek indulnak, amiket az adott évben mutattak be Magyarországon a mozikban</li>
+        <li>a törzstagok szavazhatnak (ezzel próbáljuk kiszűrni azokat, akik csak a szavazás befolyásolása miatt regisztrálnak)</li>
+        <li>az első fordulóban (január 1-21) az összes film közül mindenki 3-at jelölhet, és minden jelölés annyit ér, amennyi a jelölő súlya</li>
+        <li>egy felhasználó súlya a tapasztalat és a kompetencia 25-szörösének az összege</li>
+        <li>a tapasztalat a valaha látott és leosztályzott filmek száma</li>
+        <li>a kompetencia pedig az adott évben bemutatott (vagyis az adott Vapitin induló) filmek közül a látottak és leosztályzottak száma</li>
+        <li>az első fordulóból a 10 legtöbb pontot kapott film kerül a másodikba, ők a jelöltek</li>
+        <li>a második fordulóban (január 22-február 2x) ezen 10 film közül lehet választani egyet, és itt már minden szavazat egyet ér csak</li>
+        <li>végül az nyeri az Arany Vapiti-díjat, aki a legtöbb pontot kapja a második fordulóban</li>
+    </ul>
+
+    <p>Az Ezüst Vapiti szintén egy díj, csak ezt nem a legjobb film, hanem a legjobb női illetve férfi alakítást nyújtó színész(nő) kapja. Hogy fő- vagy mellékszerep, az mindegy, a lényeg, hogy az adott évi filmek közül valamelyikben játsszon. A szavazási rendszer és minden más megegyezik az Arany Vapitiéval.</p>
+
+{% endblock %}

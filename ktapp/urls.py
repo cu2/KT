@@ -172,6 +172,7 @@ urlpatterns += [
     url(r'^szabalyzat/$', web_views.rulez, name='rulez'),
     url(r'^kassza/$', web_views.finance, name='finance'),
 
+    url(r'^vapiti/$', web_views.vapiti_general, name='vapiti_general'),
     url(r'^arany_vapiti/$', web_views.vapiti_gold, name='vapiti_gold'),
     # url(r'^arany_vapiti/masodik_fordulo/$', web_views.vapiti_gold_2, name='vapiti_gold_2'),
     # url(r'^arany_vapiti/gyoztesek/$', web_views.vapiti_gold_winners, name='vapiti_gold_winners'),

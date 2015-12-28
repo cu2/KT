@@ -1115,6 +1115,12 @@ def finance(request):
     })
 
 
+def vapiti_general(request):
+    return render(request, 'ktapp/vapiti_subpages/vapiti_general.html', {
+        'vapiti_year': settings.VAPITI_YEAR,
+    })
+
+
 def vapiti_gold(request):
     films, _ = filmlist.filmlist(
         user_id=request.user.id,
