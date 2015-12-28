@@ -1180,6 +1180,12 @@ class Picture(models.Model):
             thumbnail_type: self.get_height(thumbnail_type) for thumbnail_type in self.THUMBNAIL_SIZES.keys() + ['orig']
         }
 
+    def get_source_domain(self):
+        try:
+            return urlparse(self.source_url).netloc
+        except:
+            return ''
+
 
 @receiver(post_delete, sender=Picture)
 def delete_picture(sender, instance, **kwargs):

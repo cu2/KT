@@ -20,8 +20,13 @@
                         Kép {{ film_title_article }} {{ film.orig_title }} című filmből
                     {% endif %}
                 {% endif %}
-                {% if picture.source_url %}
-                    <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
+                {% if picture.created_by or picture.source_url %}
+                    <span class="picture_source"><br />
+                        {% if picture.source_url %}
+                            forrás: <a href="{{ picture.source_url }}" target="_blank">{{ picture.get_source_domain }}</a>{% endif %}{% if picture.created_by %}{% if picture.source_url %},{% endif %}
+                            feltöltötte: <a href="{% url 'user_profile' picture.created_by.id picture.created_by.slug_cache %}">{{ picture.created_by.username }}</a>
+                        {% endif %}
+                    </span>
                 {% endif %}
             </p>
             {% if permission_edit_picture %}
@@ -64,6 +69,15 @@
         {% endif %}
         {% if permission_new_picture %}
             <h3>Új kép feltöltése</h3>
+            <ul>
+                <li>A kép legyen <b>legalább 720 pixel széles</b>, de inkább 1000-1200 pixel. És maximum kb 2000 pixel.</li>
+                <li>Egy filmnél <b>ne legyen több, mint 15-20 kép (plakátokkal együtt)</b>. Bármennyire is tetszik egy film, ne akard az összes képkockáját felrakni, próbáld kiválogatni a legjobbakat.</li>
+                <li>Legalább egy plakát, és lehetőleg minden főbb szereplőről legalább egy kép legyen fent.</li>
+                <li>Ne tölts fel spoiler-es képet, vagyis olyat, amiből kiderül, hogy "a kertész volt a gyilkos".</li>
+                <li>Ne tölts fel jellegtelen képet. Ez nem a képes játék, vagyis nem az a célja, hogy nehéz legyen felismerni belőle a filmet. Ellenkezőleg, pont az a jó, ha a kép jellemző a filmre vagy az adott színész(ek)re.</li>
+                <li>Plakát esetén jelöld meg, hogy plakát.</li>
+                <li>Aki szereplőt felismersz a képen, azt jelöld meg (plakát esetén ne).</li>
+            </ul>
             <form action="{% url 'new_picture' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="hidden" name="film" value="{{ film.id }}" />
