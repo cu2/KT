@@ -9,9 +9,11 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 
+from kt import settings
 from ktapp import models
 from ktapp import forms as kt_forms
 from ktapp import utils as kt_utils
+from ktapp.helpers import filmlist
 
 
 @require_POST
@@ -1258,3 +1260,135 @@ def close_topic(request):
         topic.closed_until = None
     topic.save(update_fields=['closed_until'])
     return HttpResponseRedirect(reverse('forum', args=(topic.id, topic.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('vote_vapiti')
+def vote_vapiti(request):
+    vapiti_type = request.POST.get('vapiti_type', '')
+    if vapiti_type not in {'G', 'M', 'F'}:
+        vapiti_type = 'G'
+    vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
+    if vapiti_round == 1:
+        if vapiti_type == 'G':
+            models.VapitiVote.objects.filter(
+                user=request.user,
+                year=settings.VAPITI_YEAR,
+                vapiti_round=vapiti_round,
+                vapiti_type=vapiti_type,
+            ).delete()
+            film_ids = set()
+            for serial_number in xrange(1, 4):
+                film_title = request.POST.get('film_%d' % serial_number, '')
+                if '/' in film_title:
+                    orig_title, second_title = film_title.split('/', 1)
+                else:
+                    orig_title, second_title = film_title, ''
+                orig_title = orig_title.strip()
+                second_title = second_title.strip()
+                if orig_title == '':
+                    continue
+                films, _ = filmlist.filmlist(
+                    user_id=request.user.id,
+                    filters=[
+                        ('main_premier_year', settings.VAPITI_YEAR),
+                        ('title', '%s %s' % (orig_title, second_title)),
+                        ('seen_it', '1'),
+                    ],
+                    ordering='title',
+                    films_per_page=10,
+                )
+                film = None
+                for f in films:
+                    if f.orig_title != orig_title:
+                        continue
+                    if second_title:
+                        if f.second_title != second_title:
+                            continue
+                    film = f
+                    break
+                if film and film.id not in film_ids:
+                    film_ids.add(film.id)
+                    models.VapitiVote.objects.create(
+                        user=request.user,
+                        year=settings.VAPITI_YEAR,
+                        vapiti_round=vapiti_round,
+                        vapiti_type=vapiti_type,
+                        serial_number=serial_number,
+                        film=film,
+                    )
+            models.Event.objects.create(
+                user=request.user,
+                event_type=models.Event.EVENT_TYPE_VAPITI_VOTE,
+            )
+            return HttpResponseRedirect(reverse('vapiti_gold'))
+        elif vapiti_type in {'M', 'F'}:
+            models.VapitiVote.objects.filter(
+                user=request.user,
+                year=settings.VAPITI_YEAR,
+                vapiti_round=vapiti_round,
+                vapiti_type=vapiti_type,
+            ).delete()
+            role_ids = set()
+            for serial_number in xrange(1, 4):
+                film_artist_title = request.POST.get('artist_%d' % serial_number, '').strip()[:-1]
+                if '[' not in film_artist_title:
+                    continue
+                artist_name, film_title = film_artist_title.split('[', 1)
+                if '/' in film_title:
+                    orig_title, second_title = film_title.split('/', 1)
+                else:
+                    orig_title, second_title = film_title, ''
+                artist_name = artist_name.strip()
+                orig_title = orig_title.strip()
+                second_title = second_title.strip()
+                if artist_name == '':
+                    continue
+                roles = models.FilmArtistRelationship.objects.raw('''
+                SELECT
+                  r.id,
+                  a.id AS artist_id,
+                  f.id AS film_id
+                FROM ktapp_filmartistrelationship r
+                INNER JOIN ktapp_artist a ON a.id = r.artist_id
+                INNER JOIN ktapp_film f ON f.id = r.film_id
+                INNER JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = {user_id}
+                WHERE r.role_type = 'A' AND r.actor_subtype = 'F'
+                AND f.main_premier_year = {vapiti_year}
+                AND a.gender = '{gender}'
+                AND a.name = %s
+                AND f.orig_title = %s
+                ORDER BY a.name, a.id, r.role_name, r.id
+                LIMIT 1
+                '''.format(
+                    user_id=request.user.id,
+                    vapiti_year=settings.VAPITI_YEAR,
+                    gender=vapiti_type,
+                ), [artist_name, orig_title])
+                if roles:
+                    role = roles[0]
+                else:
+                    continue
+                if role.id not in role_ids:
+                    role_ids.add(role.id)
+                    models.VapitiVote.objects.create(
+                        user=request.user,
+                        year=settings.VAPITI_YEAR,
+                        vapiti_round=vapiti_round,
+                        vapiti_type=vapiti_type,
+                        serial_number=serial_number,
+                        film_id=role.film_id,
+                        artist_id=role.artist_id,
+                    )
+            models.Event.objects.create(
+                user=request.user,
+                event_type=models.Event.EVENT_TYPE_VAPITI_VOTE,
+            )
+            return HttpResponseRedirect(reverse('vapiti_silver', args=('ferfi' if vapiti_type == 'M' else 'noi',)))
+    if vapiti_round == 2:
+        if vapiti_type == 'G':
+            pass
+        elif vapiti_type in {'M', 'F'}:
+            pass
+    return HttpResponseForbidden()

@@ -480,6 +480,36 @@ $(function() {
             }
         });
 
+    $('.input_for_vapiti_film')
+        .autocomplete({
+            source: function(request, response) {
+                $.getJSON('/api/autocomplete/vapiti_films/', {
+                    q: request.term
+                }, response);
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                if (ui.item) {
+                    this.value = ui.item.value;
+                }
+            }
+        });
+    $('.input_for_vapiti_artist')
+        .autocomplete({
+            source: function(request, response) {
+                $.getJSON('/api/autocomplete/vapiti_artists/', {
+                    g: $('#id_vapiti_type').val(),
+                    q: request.term
+                }, response);
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                if (ui.item) {
+                    this.value = ui.item.value;
+                }
+            }
+        });
+
     var award_type = 'N';
     $('.input_for_award')
         .focus(function() {

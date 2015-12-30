@@ -4,12 +4,15 @@ from collections import OrderedDict
 from django.http import HttpResponse
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
+from kt import settings
 from ktapp import models
 from ktapp import serializers
+from ktapp.helpers import filmlist
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -160,6 +163,65 @@ def get_awards(request):
         return HttpResponse(json.dumps(
             [a['category'] for a in models.Award.objects.filter(category__icontains=q).values('category').distinct()[:10]]
         ), content_type='application/json')
+
+
+@login_required
+def get_vapiti_films(request):
+    q = request.GET.get('q', '')
+    if len(q) < 2:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+    films, _ = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[
+            ('main_premier_year', settings.VAPITI_YEAR),
+            ('title', q),
+            ('seen_it', '1'),
+        ],
+        ordering='title',
+        films_per_page=10,
+    )
+    return HttpResponse(json.dumps([
+        ('%s / %s' % (film.orig_title, film.second_title)) if film.second_title else film.orig_title
+        for film in films
+    ]), content_type='application/json')
+
+
+@login_required
+def get_vapiti_artists(request):
+    q = request.GET.get('q', '')
+    if len(q) < 2:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+    gender = request.GET.get('g', '')
+    if gender not in {'M', 'F'}:
+        gender = 'M'
+    roles = models.FilmArtistRelationship.objects.raw('''
+    SELECT
+      r.id,
+      a.name AS name,
+      f.orig_title AS orig_title,
+      f.second_title AS second_title
+    FROM ktapp_filmartistrelationship r
+    INNER JOIN ktapp_artist a ON a.id = r.artist_id
+    INNER JOIN ktapp_film f ON f.id = r.film_id
+    INNER JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = {user_id}
+    WHERE r.role_type = 'A' AND r.actor_subtype = 'F'
+    AND f.main_premier_year = {vapiti_year}
+    AND a.gender = '{gender}'
+    AND a.name LIKE %s
+    ORDER BY a.name, a.id, r.role_name, r.id
+    LIMIT 10
+    '''.format(
+            user_id=request.user.id,
+            vapiti_year=settings.VAPITI_YEAR,
+            gender=gender,
+    ), ['%{name}%'.format(name=q)])
+    return HttpResponse(json.dumps([
+        '%s [%s]' % (
+            role.name,
+            ('%s / %s' % (role.orig_title, role.second_title)) if role.second_title else role.orig_title,
+        )
+        for role in roles
+    ]), content_type='application/json')
 
 
 def buzz(request):

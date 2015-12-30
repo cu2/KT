@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^api/autocomplete/films/$', api_views.get_films, name='get_films'),
     url(r'^api/autocomplete/sequels/$', api_views.get_sequels, name='get_sequels'),
     url(r'^api/autocomplete/awards/$', api_views.get_awards, name='get_awards'),
+    url(r'^api/autocomplete/vapiti_films/$', api_views.get_vapiti_films, name='get_vapiti_films'),
+    url(r'^api/autocomplete/vapiti_artists/$', api_views.get_vapiti_artists, name='get_vapiti_artists'),
     url(r'^api/buzz/$', api_views.buzz, name='buzz'),
     url(r'^api/comment_page/(?P<domain>[^/]*)/(?P<id>\d+)/$', api_views.comment_page, name='comment_page'),
 ]
@@ -177,6 +179,7 @@ urlpatterns += [
     # url(r'^arany_vapiti/masodik_fordulo/$', web_views.vapiti_gold_2, name='vapiti_gold_2'),
     # url(r'^arany_vapiti/gyoztesek/$', web_views.vapiti_gold_winners, name='vapiti_gold_winners'),
     url(r'^ezust_vapiti/(?P<gender>ferfi|noi)/$', web_views.vapiti_silver, name='vapiti_silver'),
+    url(r'^jelol_vapiti$', post_views.vote_vapiti, name='vote_vapiti'),
 
     # legacy redirects:
     url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # old php urls

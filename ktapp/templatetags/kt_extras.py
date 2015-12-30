@@ -1,3 +1,5 @@
+import datetime
+
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.http import urlquote_plus as urlquote_plus_function
@@ -87,6 +89,16 @@ def film_url_html_w_year(film, subpage='film_main'):
         orig_title=film.orig_title,
         year=' (%s)' % film.year if film.year else '',
         second_row=second_row,
+    ))
+
+
+@register.filter
+def oneliner_film_url_html_w_year(film, subpage='film_main'):
+    return mark_safe(u'<a href="{url}">{orig_title}{year}{second_row}</a>'.format(
+        url=reverse(subpage, args=(film.id, film.slug_cache)),
+        orig_title=film.orig_title,
+        year=' (%s)' % film.year if film.year else '',
+        second_row=' / %s' % film.second_title if film.second_title else '',
     ))
 
 
@@ -190,3 +202,8 @@ def strip_whitespace(value):
 @register.filter
 def percent(num, denom):
     return int(round(100.0 * float(num) / float(denom)))
+
+
+@register.filter
+def str2date(str):
+    return datetime.datetime.strptime(str, '%Y-%m-%d')

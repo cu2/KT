@@ -5,6 +5,27 @@
 
 {% if request.user.is_authenticated %}
 
+    {% if request.user.core_member %}
+        {% if vapiti_round == 1 %}
+            <h2>Jelöltjeid</h2>
+            <p>Melyik (legfeljebb három) tavaly bemutatott filmben játszó színészt jelölöd az Ezüst Vapiti díjra? (csak olyat választhatsz, akit láttál és osztályoztad a filmjét)</p>
+            <form action="{% url 'vote_vapiti' %}" method="post" class="inline">
+                {% csrf_token %}
+                <input type="hidden" name="vapiti_type" id="id_vapiti_type" value="{% if gender == 'ferfi' %}M{% else %}F{% endif %}" />
+                <p><input type="text" name="artist_1" value="{{ my_vapiti_votes.1 }}" class="input_for_vapiti_artist wide_input" /></p>
+                <p><input type="text" name="artist_2" value="{{ my_vapiti_votes.2 }}" class="input_for_vapiti_artist wide_input" /></p>
+                <p><input type="text" name="artist_3" value="{{ my_vapiti_votes.3 }}" class="input_for_vapiti_artist wide_input" /></p>
+                <p><input type="submit" value="Jelöltek mentése" /></p>
+            </form>
+        {% elif vapiti_round == 2 %}
+            <p>Az első forduló véget ért, most a második fordulóban vagyunk.</p>
+        {% elif vapiti_round == 3 %}
+            <p>Mindkét forduló véget ért.</p>
+        {% else %}
+            <p>Az első forduló {{ round_1_dates.0|str2date|date:"Y F j" }}-jén kezdődik, onnantól jelölhetsz majd színészeket.</p>
+        {% endif %}
+    {% endif %}
+
     <h2>Akiket már láttál ({{ artists_yes_count }} színész, {{ roles_yes|length }} szerep)</h2>
 
     <table class="fullsize sortable">

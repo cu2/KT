@@ -8,6 +8,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
 
+from kt import settings
+
 
 def bbcode_to_html(value):
     value = re.sub('\[link\](http://kritikustomeg.org.*?)\[/link\]', '<a href="\\1">\\1</a>', value, flags=re.S)
@@ -112,6 +114,7 @@ def check_permission(perm, user, silent=True):
             'new_link': 'reliable',
             'edit_link': 'reliable',
             'delete_link': 'reliable',
+            'vote_vapiti': 'core',
         }.get(perm, perm)
         if grp == 'admin' and user.is_staff:
             return True
@@ -221,3 +224,33 @@ def get_selected_picture_details(model, film, picture, next_picture):
         'artists': picture.artists.all(),
         'film_title_article': 'az' if film.orig_title[:1].lower() in u'aáeéiíoóöőuúüű' else 'a',
     }
+
+
+def get_vapiti_round():
+    today = datetime.date.today()
+    today_str = today.strftime('%Y-%m-%d')
+    round_1_dates = (
+        '%s-01-01' % (settings.VAPITI_YEAR + 1),
+        '%s-01-21' % (settings.VAPITI_YEAR + 1),
+    )
+    last_day_of_round_2 = [22, 21, 20, 19, 25, 24, 23][datetime.date(settings.VAPITI_YEAR + 1, 2, 19).weekday()]
+    result_day = [23, 22, 21, 20, 26, 25, 24][datetime.date(settings.VAPITI_YEAR + 1, 2, 19).weekday()]
+    round_2_dates = (
+        '%s-01-22' % (settings.VAPITI_YEAR + 1),
+        '%s-02-%s' % (settings.VAPITI_YEAR + 1, last_day_of_round_2),
+    )
+    result_day = '%s-02-%s' % (settings.VAPITI_YEAR + 1, result_day)
+    if today_str >= round_1_dates[0] and today_str <= round_1_dates[1]:
+        vapiti_round = 1
+    elif today_str >= round_2_dates[0] and today_str <= round_2_dates[1]:
+        vapiti_round = 2
+    elif today_str >= result_day:
+        vapiti_round = 3
+    else:
+        vapiti_round = 0
+    return (
+        vapiti_round,
+        round_1_dates,
+        round_2_dates,
+        result_day,
+    )

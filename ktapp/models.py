@@ -1618,6 +1618,7 @@ class Event(models.Model):
     EVENT_TYPE_FOLLOW = 'FO'
     EVENT_TYPE_UNFOLLOW = 'UF'
     EVENT_TYPE_POLL_VOTE = 'PV'
+    EVENT_TYPE_VAPITI_VOTE = 'VV'
     EVENT_TYPES = [
         (EVENT_TYPE_NEW_VOTE, 'New vote'),
         (EVENT_TYPE_CHANGE_VOTE, 'Change vote'),
@@ -1631,6 +1632,7 @@ class Event(models.Model):
         (EVENT_TYPE_FOLLOW, 'Follow'),
         (EVENT_TYPE_UNFOLLOW, 'Unfollow'),
         (EVENT_TYPE_POLL_VOTE, 'Poll vote'),
+        (EVENT_TYPE_VAPITI_VOTE, 'Vapiti vote'),
     ]
     event_type = models.CharField(max_length=2, choices=EVENT_TYPES, default=EVENT_TYPE_NEW_VOTE)
     film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
@@ -1649,3 +1651,25 @@ class Event(models.Model):
             return Comment.objects.get(id=self.some_id)
         except Comment.DoesNotExist:
             return None
+
+
+class VapitiVote(models.Model):
+    user = models.ForeignKey(KTUser)
+    year = models.PositiveIntegerField(default=0, blank=True, null=True)
+    vapiti_round = models.PositiveSmallIntegerField(default=0, blank=True, null=True)
+    VAPITI_TYPE_GOLD = 'G'
+    VAPITI_TYPE_SILVER_MALE = 'M'
+    VAPITI_TYPE_SILVER_FEMALE = 'F'
+    VAPITI_TYPES = [
+        (VAPITI_TYPE_GOLD, 'Gold'),
+        (VAPITI_TYPE_SILVER_MALE, 'Silver Male'),
+        (VAPITI_TYPE_SILVER_FEMALE, 'Silver Female'),
+    ]
+    vapiti_type = models.CharField(max_length=1, choices=VAPITI_TYPES, default=VAPITI_TYPE_GOLD)
+    serial_number = models.PositiveSmallIntegerField(default=0, blank=True, null=True)
+    film = models.ForeignKey(Film)
+    artist = models.ForeignKey(Artist, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+
+    class Meta:
+        unique_together = ['user', 'year', 'vapiti_round', 'vapiti_type', 'serial_number']
