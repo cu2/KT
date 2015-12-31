@@ -1124,13 +1124,14 @@ def vapiti_general(request):
 def vapiti_gold(request):
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     my_vapiti_votes = {}
-    for vv in models.VapitiVote.objects.filter(
-        user=request.user,
-        year=settings.VAPITI_YEAR,
-        vapiti_round=vapiti_round,
-        vapiti_type=models.VapitiVote.VAPITI_TYPE_GOLD,
-    ).select_related('film'):
-        my_vapiti_votes[vv.serial_number] = ('%s / %s' % (vv.film.orig_title, vv.film.second_title)) if vv.film.second_title else vv.film.orig_title
+    if request.user.is_authenticated():
+        for vv in models.VapitiVote.objects.filter(
+            user=request.user,
+            year=settings.VAPITI_YEAR,
+            vapiti_round=vapiti_round,
+            vapiti_type=models.VapitiVote.VAPITI_TYPE_GOLD,
+        ).select_related('film'):
+            my_vapiti_votes[vv.serial_number] = ('%s / %s' % (vv.film.orig_title, vv.film.second_title)) if vv.film.second_title else vv.film.orig_title
     films, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('main_premier_year', settings.VAPITI_YEAR)],
@@ -1179,16 +1180,17 @@ def vapiti_silver(request, gender):
     vapiti_type = models.VapitiVote.VAPITI_TYPE_SILVER_MALE if gender == 'ferfi' else models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     my_vapiti_votes = {}
-    for vv in models.VapitiVote.objects.filter(
-            user=request.user,
-            year=settings.VAPITI_YEAR,
-            vapiti_round=vapiti_round,
-            vapiti_type=vapiti_type,
-        ).select_related('film', 'artist'):
-        my_vapiti_votes[vv.serial_number] = '%s [%s]' % (
-            vv.artist.name,
-            ('%s / %s' % (vv.film.orig_title, vv.film.second_title)) if vv.film.second_title else vv.film.orig_title,
-        )
+    if request.user.is_authenticated():
+        for vv in models.VapitiVote.objects.filter(
+                user=request.user,
+                year=settings.VAPITI_YEAR,
+                vapiti_round=vapiti_round,
+                vapiti_type=vapiti_type,
+            ).select_related('film', 'artist'):
+            my_vapiti_votes[vv.serial_number] = '%s [%s]' % (
+                vv.artist.name,
+                ('%s / %s' % (vv.film.orig_title, vv.film.second_title)) if vv.film.second_title else vv.film.orig_title,
+            )
     if request.user.is_authenticated():
         my_rating_select = 'v.rating AS my_rating'
         my_rating_join = 'LEFT JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = {user_id}'.format(user_id=request.user.id)
