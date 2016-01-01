@@ -480,6 +480,52 @@ $(function() {
             }
         });
 
+    $('#id_toplist_type').change(function() {
+        var toplist_type = $('#id_toplist_type').val();
+        if (toplist_type == 'F') {
+            $('.input_for_artist').hide();
+            $('.input_for_film').show();
+        } else {
+            $('.input_for_film').hide();
+            $('.input_for_artist').show();
+        }
+    });
+    $('#id_ordered').change(function() {
+        if ($('#id_ordered').val() == '1') {
+            $('.toplist_serial_number').show();
+        } else {
+            $('.toplist_serial_number').hide();
+        }
+    });
+    $('.input_for_film')
+        .autocomplete({
+            source: function(request, response) {
+                $.getJSON('/api/autocomplete/films/', {
+                    q: request.term,
+                    f: 'plain'
+                }, response);
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                if (ui.item) {
+                    this.value = ui.item.value;
+                }
+            }
+        });
+    $('.input_for_artist')
+        .autocomplete({
+            source: function(request, response) {
+                $.getJSON('/api/autocomplete/artists/', {
+                    q: request.term
+                }, response);
+            },
+            minLength: 2,
+            select: function(event, ui) {
+                if (ui.item) {
+                    this.value = ui.item.value;
+                }
+            }
+        });
     $('.input_for_vapiti_film')
         .autocomplete({
             source: function(request, response) {

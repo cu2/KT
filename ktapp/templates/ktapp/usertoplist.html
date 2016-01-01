@@ -10,6 +10,8 @@
 
 {% block main %}
 
-        {% include 'ktapp/tables/usertoplist.html' %}
+    {% include 'ktapp/tables/usertoplist.html' %}
+
+    <p><a href="{% url 'new_usertoplist' %}">Új lista létrehozása</a></p>
 
 {% endblock %}

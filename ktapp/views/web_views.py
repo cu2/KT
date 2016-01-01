@@ -735,6 +735,93 @@ def usertoplist(request, id, title_slug):
     })
 
 
+@login_required
+@kt_utils.kt_permission_required('new_usertoplist')
+def new_usertoplist(request):
+    next_url = request.GET.get('next', request.POST.get('next', reverse('new_usertoplist')))
+    if request.POST:
+        title = request.POST.get('title', '').strip()
+        if title == '':
+            return HttpResponseRedirect(next_url)
+        toplist_type = request.POST.get('toplist_type', '')
+        if toplist_type not in {'F', 'D', 'A'}:
+            toplist_type = 'F'
+        ordered = 1 if request.POST.get('ordered', '') == '1' else 0
+        items = []
+        for r in xrange(1, 21):
+            raw_comment = request.POST.get('comment_%d' % r, '').strip()
+            if toplist_type == 'F':
+                raw_film = request.POST.get('film_%d' % r, '').strip()
+                if raw_film == '':
+                    continue
+                if '/' in raw_film:
+                    raw_orig_title, raw_second_title = raw_film.split('/')
+                else:
+                    raw_orig_title, raw_second_title = raw_film, ''
+                raw_orig_title = raw_orig_title.strip()
+                if raw_orig_title[-1] == ')':
+                    raw_orig_title, raw_year = raw_orig_title[:-1].rsplit('(', 1)
+                else:
+                    raw_year = None
+                orig_title = raw_orig_title.strip()
+                second_title = raw_second_title.strip()
+                try:
+                    year = int(raw_year)
+                except:
+                    year = None
+                films = models.Film.objects.filter(orig_title=orig_title)
+                if second_title:
+                    films = films.filter(second_title=second_title)
+                if year:
+                    films = films.filter(year=year)
+                films = list(films[:1])
+                if len(films) == 0:
+                    continue
+                film = films[0]
+                items.append((film, raw_comment))
+            else:
+                raw_artist = request.POST.get('artist_%d' % r, '').strip()
+                if raw_artist == '':
+                    continue
+                artist = models.Artist.get_artist_by_name(raw_artist)
+                if artist is None:
+                    continue
+                items.append((artist, raw_comment))
+        if len(items) < 3 or len(items) > 20:
+            return HttpResponseRedirect(next_url)
+        number_of_comments = 0
+        for item_object, comment in items:
+            if comment:
+                number_of_comments += 1
+        utl = models.UserToplist.objects.create(
+            title=title,
+            created_by=request.user,
+            ordered=ordered,
+            quality=1 if number_of_comments == len(items) else 0,
+            number_of_items=len(items),
+            toplist_type=toplist_type,
+        )
+        for idx, (item_object, comment) in enumerate(items):
+            if utl.toplist_type == 'F':
+                film, director, actor = item_object, None, None
+            elif utl.toplist_type == 'D':
+                film, director, actor = None, item_object, None
+            else:
+                film, director, actor = None, None, item_object
+            models.UserToplistItem.objects.create(
+                usertoplist=utl,
+                serial_number=idx + 1,
+                film=film,
+                director=director,
+                actor=actor,
+                comment=comment,
+            )
+        return HttpResponseRedirect(reverse('usertoplist', args=(utl.id, utl.slug_cache)))
+    return render(request, 'ktapp/new_usertoplist.html', {
+        'rows': xrange(1, 21),
+    })
+
+
 def polls(request):
     poll_type = kt_utils.strip_whitespace(request.GET.get('tipus', ''))
     if poll_type not in {'aktualis', 'regi', 'leendo'}:
@@ -816,7 +903,6 @@ def poll(request, id, title_slug):
 @login_required
 @kt_utils.kt_permission_required('check_changes')
 def changes(request):
-
     return render(request, 'ktapp/changes.html', {
         'changes': [{
             'created_by': c.created_by,

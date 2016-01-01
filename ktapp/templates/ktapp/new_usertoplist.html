@@ -1,0 +1,44 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}<h1>Új felhasználói toplista</h1>{% endblock %}
+
+{% block main %}
+    <div class="centered_content">
+
+    <ul>
+        <li>Legalább 3, legfeljebb 20 elemű lehet a lista.</li>
+        <li>A típus jelzi, hogy filmek, rendezők vagy színészek alkotják-e.</li>
+        <li>A "sorszámozott" pedig azt, hogy a legelső a legjobb/rosszabb/valamilyenebb az összes közül (vagyis van értelme sorszámozni őket) vagy a listán belül nincs lényeges/egyértelmű különbség.</li>
+        <li>Megjegyzéseket nem kötelező írni, de általában izgalmasabb egy lista, ha van hozzá magyarázat vagy részletezés.</li>
+    </ul>
+
+    <form action="{% url 'new_usertoplist' %}" method="post">
+        {% csrf_token %}
+        <p><label for="id_title">Cím: </label><input type="text" name="title" id="id_title" class="wide_input focus_this" /></p>
+        <p><label for="id_toplist_type">Típus: </label><select name="toplist_type" id="id_toplist_type">
+            <option value="F">Film</option>
+            <option value="D">Rendező</option>
+            <option value="A">Színész</option>
+        </select></p>
+        <p><label for="id_ordered">Sorszámozott: </label><select name="ordered" id="id_ordered">
+            <option value="1">Igen</option>
+            <option value="0">Nem</option>
+        </select></p>
+        {% for row in rows %}
+            <p>
+                <span class="toplist_serial_number">{{ row }}.</span>
+                <input type="text" name="film_{{ row }}" class="wide_input input_for_film" />
+                <input type="text" name="artist_{{ row }}" class="wide_input input_for_artist" style="display: none" />
+            </p>
+            <p>
+                Opcionális megjegyzés:<br /><textarea name="comment_{{ row }}" rows="5"></textarea>
+            </p>
+        {% endfor %}
+        <p class="center"><input type="submit" value="Toplista beküldése" /></p>
+    </form>
+
+    </div>
+{% endblock %}

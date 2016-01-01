@@ -115,6 +115,9 @@ def check_permission(perm, user, silent=True):
             'edit_link': 'reliable',
             'delete_link': 'reliable',
             'vote_vapiti': 'core',
+            'new_usertoplist': 'core',
+            'edit_usertoplist': 'core',
+            'delete_usertoplist': 'core',
         }.get(perm, perm)
         if grp == 'admin' and user.is_staff:
             return True
