@@ -181,7 +181,7 @@ def get_vapiti_films(request):
         films_per_page=10,
     )
     return HttpResponse(json.dumps([
-        ('%s / %s' % (film.orig_title, film.second_title)) if film.second_title else film.orig_title
+        (u'%s / %s' % (film.orig_title, film.second_title)) if film.second_title else film.orig_title
         for film in films
     ]), content_type='application/json')
 
@@ -214,11 +214,11 @@ def get_vapiti_artists(request):
             user_id=request.user.id,
             vapiti_year=settings.VAPITI_YEAR,
             gender=gender,
-    ), ['%{name}%'.format(name=q)])
+    ), [u'%{name}%'.format(name=q)])
     return HttpResponse(json.dumps([
-        '%s [%s]' % (
+        u'%s [%s]' % (
             role.name,
-            ('%s / %s' % (role.orig_title, role.second_title)) if role.second_title else role.orig_title,
+            (u'%s / %s' % (role.orig_title, role.second_title)) if role.second_title else role.orig_title,
         )
         for role in roles
     ]), content_type='application/json')
