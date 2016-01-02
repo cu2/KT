@@ -1400,5 +1400,11 @@ def vote_vapiti(request):
 def delete_usertoplist(request):
     toplist = get_object_or_404(models.UserToplist, pk=request.POST['id'])
     if toplist.created_by_id == request.user.id:
+        some_id = toplist.id
         toplist.delete()
+        models.Event.objects.create(
+            user=request.user,
+            event_type=models.Event.EVENT_TYPE_DELETE_TOPLIST,
+            some_id=some_id,
+        )
     return HttpResponseRedirect(reverse('usertoplists'))

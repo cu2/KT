@@ -1619,6 +1619,9 @@ class Event(models.Model):
     EVENT_TYPE_UNFOLLOW = 'UF'
     EVENT_TYPE_POLL_VOTE = 'PV'
     EVENT_TYPE_VAPITI_VOTE = 'VV'
+    EVENT_TYPE_NEW_TOPLIST = 'NT'
+    EVENT_TYPE_EDIT_TOPLIST = 'ET'
+    EVENT_TYPE_DELETE_TOPLIST = 'DT'
     EVENT_TYPES = [
         (EVENT_TYPE_NEW_VOTE, 'New vote'),
         (EVENT_TYPE_CHANGE_VOTE, 'Change vote'),
@@ -1633,6 +1636,9 @@ class Event(models.Model):
         (EVENT_TYPE_UNFOLLOW, 'Unfollow'),
         (EVENT_TYPE_POLL_VOTE, 'Poll vote'),
         (EVENT_TYPE_VAPITI_VOTE, 'Vapiti vote'),
+        (EVENT_TYPE_NEW_TOPLIST, 'New toplist'),
+        (EVENT_TYPE_EDIT_TOPLIST, 'Edit toplist'),
+        (EVENT_TYPE_DELETE_TOPLIST, 'Delete toplist'),
     ]
     event_type = models.CharField(max_length=2, choices=EVENT_TYPES, default=EVENT_TYPE_NEW_VOTE)
     film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)

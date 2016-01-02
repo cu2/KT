@@ -786,6 +786,11 @@ def usertoplist(request, id, title_slug):
                 actor=actor,
                 comment=comment,
             )
+        models.Event.objects.create(
+            user=request.user,
+            event_type=models.Event.EVENT_TYPE_EDIT_TOPLIST,
+            some_id=toplist.id,
+        )
         return HttpResponseRedirect(reverse('usertoplist', args=(toplist.id, toplist.slug_cache)))
 
     if toplist.toplist_type == models.UserToplist.TOPLIST_TYPE_FILM:
@@ -899,6 +904,11 @@ def new_usertoplist(request):
                 actor=actor,
                 comment=comment,
             )
+        models.Event.objects.create(
+            user=request.user,
+            event_type=models.Event.EVENT_TYPE_NEW_TOPLIST,
+            some_id=utl.id,
+        )
         return HttpResponseRedirect(reverse('usertoplist', args=(utl.id, utl.slug_cache)))
     return render(request, 'ktapp/new_usertoplist.html', {
         'rows': xrange(1, 21),
