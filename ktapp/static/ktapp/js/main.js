@@ -204,6 +204,9 @@ $(function() {
     $('.show_bbcode_help_button').click(function () {
         $('.bbcode_help').toggle();
     });
+    $('.toggle_form_button').click(function() {
+        $(this).closest('.form_outer_block').find('.form_block').toggle();
+    });
     $('.toggle_link_edit_form_button').click(function() {
         $(this).closest('.link_edit_block').find('form').toggle();
     });

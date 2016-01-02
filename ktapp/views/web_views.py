@@ -703,11 +703,91 @@ def similar_users(request):
 def usertoplists(request):
     return render(request, 'ktapp/usertoplists.html', {
         'usertoplists': models.UserToplist.objects.all().select_related('created_by').order_by('-created_at'),
+        'permission_new_usertoplist': kt_utils.check_permission('new_usertoplist', request.user),
     })
 
 
 def usertoplist(request, id, title_slug):
     toplist = get_object_or_404(models.UserToplist, pk=id)
+    next_url = request.GET.get('next', request.POST.get('next', reverse('usertoplist', args=(toplist.id, toplist.slug_cache))))
+    if request.POST:
+        if not kt_utils.check_permission('edit_usertoplist', request.user):
+            return HttpResponseRedirect(next_url)
+        if request.user.id != toplist.created_by_id:
+            return HttpResponseRedirect(next_url)
+        title = request.POST.get('title', '').strip()
+        if title == '':
+            return HttpResponseRedirect(next_url)
+        ordered = 1 if request.POST.get('ordered', '') == '1' else 0
+        items = []
+        for r in xrange(1, 21):
+            raw_comment = request.POST.get('comment_%d' % r, '').strip()
+            if toplist.toplist_type == 'F':
+                raw_film = request.POST.get('film_%d' % r, '').strip()
+                if raw_film == '':
+                    continue
+                if '/' in raw_film:
+                    raw_orig_title, raw_second_title = raw_film.split('/')
+                else:
+                    raw_orig_title, raw_second_title = raw_film, ''
+                raw_orig_title = raw_orig_title.strip()
+                if raw_orig_title[-1] == ')':
+                    raw_orig_title, raw_year = raw_orig_title[:-1].rsplit('(', 1)
+                else:
+                    raw_year = None
+                orig_title = raw_orig_title.strip()
+                second_title = raw_second_title.strip()
+                try:
+                    year = int(raw_year)
+                except:
+                    year = None
+                films = models.Film.objects.filter(orig_title=orig_title)
+                if second_title:
+                    films = films.filter(second_title=second_title)
+                if year:
+                    films = films.filter(year=year)
+                films = list(films[:1])
+                if len(films) == 0:
+                    continue
+                film = films[0]
+                items.append((film, raw_comment))
+            else:
+                raw_artist = request.POST.get('artist_%d' % r, '').strip()
+                if raw_artist == '':
+                    continue
+                artist = models.Artist.get_artist_by_name(raw_artist)
+                if artist is None:
+                    continue
+                items.append((artist, raw_comment))
+        if len(items) < 3 or len(items) > 20:
+            return HttpResponseRedirect(next_url)
+        number_of_comments = 0
+        for item_object, comment in items:
+            if comment:
+                number_of_comments += 1
+        toplist.title = title
+        toplist.ordered = ordered
+        toplist.quality = 1 if number_of_comments == len(items) else 0
+        toplist.number_of_items = len(items)
+        toplist.save()
+        models.UserToplistItem.objects.filter(usertoplist=toplist).delete()
+        for idx, (item_object, comment) in enumerate(items):
+            if toplist.toplist_type == 'F':
+                film, director, actor = item_object, None, None
+            elif toplist.toplist_type == 'D':
+                film, director, actor = None, item_object, None
+            else:
+                film, director, actor = None, None, item_object
+            models.UserToplistItem.objects.create(
+                usertoplist=toplist,
+                serial_number=idx + 1,
+                film=film,
+                director=director,
+                actor=actor,
+                comment=comment,
+            )
+        return HttpResponseRedirect(reverse('usertoplist', args=(toplist.id, toplist.slug_cache)))
+
     if toplist.toplist_type == models.UserToplist.TOPLIST_TYPE_FILM:
         items, _ = filmlist.filmlist(
             user_id=request.user.id,
@@ -732,6 +812,9 @@ def usertoplist(request, id, title_slug):
         'toplist': toplist,
         'toplist_list': toplist_list,
         'with_comments': with_comments,
+        'rows': [(r+1, toplist_list[r] if r < len(toplist_list) else None) for r in xrange(20)],
+        'permission_edit_usertoplist': kt_utils.check_permission('edit_usertoplist', request.user),
+        'permission_delete_usertoplist': kt_utils.check_permission('delete_usertoplist', request.user),
     })
 
 

@@ -103,6 +103,15 @@ def oneliner_film_url_html_w_year(film, subpage='film_main'):
 
 
 @register.filter
+def oneliner_film_html_w_year(film):
+    return mark_safe(u'{orig_title}{year}{second_row}'.format(
+        orig_title=film.orig_title,
+        year=' (%s)' % film.year if film.year else '',
+        second_row=' / %s' % film.second_title if film.second_title else '',
+    ))
+
+
+@register.filter
 def review_url_html_w_year(review):
     film = review.film
     if film.second_title:

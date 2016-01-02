@@ -12,6 +12,54 @@
 
     {% include 'ktapp/tables/usertoplist.html' %}
 
-    <p><a href="{% url 'new_usertoplist' %}">Új lista létrehozása</a></p>
+    {% if permission_edit_usertoplist and request.user.id == toplist.created_by_id %}
+        <div class="form_outer_block">
+            <p><span class="action_text button toggle_form_button">Toplista szerkesztése</span></p>
+            <div class="form_block" style="display: none">
+                <ul>
+                    <li>Legalább 3, legfeljebb 20 elemű lehet a lista.</li>
+                    <li>A "sorszámozott" jelzi, hogy a legelső a legjobb/rosszabb/valamilyenebb az összes közül (vagyis van értelme sorszámozni őket) vagy a listán belül nincs lényeges/egyértelmű különbség.</li>
+                    <li>Megjegyzéseket nem kötelező írni, de általában izgalmasabb egy lista, ha van hozzá magyarázat vagy részletezés.</li>
+                </ul>
+                <form action="{% url 'usertoplist' toplist.id toplist.slug_cache %}" method="post">
+                    {% csrf_token %}
+                    <p><label for="id_title">Cím: </label><input type="text" name="title" id="id_title" value="{{ toplist.title }}" class="wide_input focus_this" /></p>
+                    <p><label for="id_ordered">Sorszámozott: </label><select name="ordered" id="id_ordered">
+                        <option value="1"{% if toplist.ordered == 1 %} selected="selected"{% endif %}>Igen</option>
+                        <option value="0"{% if toplist.ordered == 0 %} selected="selected"{% endif %}>Nem</option>
+                    </select></p>
+                    {% for row, row_object in rows %}
+                        <p>
+                            <span class="toplist_serial_number"{% if toplist.ordered == 0 %} style="display: none"{% endif %}>{{ row }}.</span>
+                            {% if toplist.toplist_type == 'F' %}
+                                <input type="text" name="film_{{ row }}" value="{% if row_object %}{{ row_object|oneliner_film_html_w_year }}{% endif %}" class="wide_input input_for_film" />
+                            {% elif toplist.toplist_type == 'D' %}
+                                <input type="text" name="artist_{{ row }}" value="{{ row_object.director.name }}" class="wide_input input_for_artist"/>
+                            {% else %}
+                                <input type="text" name="artist_{{ row }}" value="{{ row_object.actor.name }}" class="wide_input input_for_artist"/>
+                            {% endif %}
+                        </p>
+                        <p>
+                            Opcionális megjegyzés:<br /><textarea name="comment_{{ row }}" rows="5">{{ row_object.comment }}</textarea>
+                        </p>
+                    {% endfor %}
+                    <p class="center"><input type="submit" value="Toplista mentése" /></p>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if permission_delete_usertoplist and request.user.id == toplist.created_by_id %}
+        <div class="form_outer_block">
+            <p><span class="action_text button toggle_form_button">Toplista törlése</span></p>
+            <div class="form_block" style="display: none">
+                <form action="{% url 'delete_usertoplist' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" value="{{ toplist.id }}" />
+                    <p>Biztosan törölni akarod? <input type="submit" value="Igen" /> <span class="action_text button toggle_form_button">Nem</span></p>
+                </form>
+            </div>
+        </div>
+    {% endif %}
 
 {% endblock %}

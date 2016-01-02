@@ -126,6 +126,7 @@ urlpatterns += [
     url(r'^felhasznaloi_toplista/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.usertoplist, name='usertoplist'),
     url(r'^felhasznaloi_toplistak/$', web_views.usertoplists, name='usertoplists'),
     url(r'^uj_felhasznaloi_toplista$', web_views.new_usertoplist, name='new_usertoplist'),
+    url(r'^torol_felhasznaloi_toplista$', post_views.delete_usertoplist, name='delete_usertoplist'),
 
     url(r'^kozkerdes/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.poll, name='poll'),
     url(r'^kozkerdesek/$', web_views.polls, name='polls'),

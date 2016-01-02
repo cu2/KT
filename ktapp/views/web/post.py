@@ -1392,3 +1392,13 @@ def vote_vapiti(request):
         elif vapiti_type in {'M', 'F'}:
             pass
     return HttpResponseForbidden()
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('delete_usertoplist')
+def delete_usertoplist(request):
+    toplist = get_object_or_404(models.UserToplist, pk=request.POST['id'])
+    if toplist.created_by_id == request.user.id:
+        toplist.delete()
+    return HttpResponseRedirect(reverse('usertoplists'))

@@ -9,7 +9,9 @@
 {% block main %}
     <div class="centered_content">
 
-        <p><a href="{% url 'new_usertoplist' %}">Új lista létrehozása</a></p>
+        {% if permission_new_usertoplist %}
+            <p><a href="{% url 'new_usertoplist' %}">Új lista létrehozása</a></p>
+        {% endif %}
 
         <table class="fullsize sortable">
             <thead>
