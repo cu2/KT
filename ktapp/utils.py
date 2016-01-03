@@ -115,15 +115,17 @@ def check_permission(perm, user, silent=True):
             'edit_link': 'reliable',
             'delete_link': 'reliable',
             'vote_vapiti': 'core',
-            'new_usertoplist': 'core',
-            'edit_usertoplist': 'core',
-            'delete_usertoplist': 'core',
+            'new_usertoplist': 'all',
+            'edit_usertoplist': 'all',
+            'delete_usertoplist': 'all',
         }.get(perm, perm)
         if grp == 'admin' and user.is_staff:
             return True
         if grp == 'reliable' and (user.is_reliable or user.is_staff):
             return True
         if grp == 'core' and (user.core_member or user.is_reliable or user.is_staff):
+            return True
+        if grp == 'all':
             return True
     if silent:
         return False
