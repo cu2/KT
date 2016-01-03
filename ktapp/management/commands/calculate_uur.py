@@ -4,18 +4,29 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 
 
-DELETE_SQL_TEMPLATE = '''
-DELETE FROM ktapp_useruserrating WHERE user_1_id = %s
-'''
-
-
-INSERT_SQL_TEMPLATE = '''
+INSERT_SQL_TEMPLATE_1 = '''
 INSERT INTO ktapp_useruserrating (
   user_1_id, user_2_id, keyword_id,
   number_of_ratings,
   similarity,
   last_calculated_at
 )
+VALUES(%s, %s, %s, %s, %s, %s)
+'''
+
+
+INSERT_SQL_TEMPLATE_2 = '''
+INSERT INTO ktapp_useruserrating (
+  user_2_id, user_1_id, keyword_id,
+  number_of_ratings,
+  similarity,
+  last_calculated_at
+)
+VALUES(%s, %s, %s, %s, %s, %s)
+'''
+
+
+GENERIC_SIMILARITY_TEMPLATE = '''
 SELECT
   user_1_id, user_2_id, keyword_id,
   number_of_ratings,
@@ -85,13 +96,7 @@ HAVING COUNT(1) >= 50
 '''
 
 
-INSERT_SQL_TEMPLATE_W_KEYWORD = '''
-INSERT INTO ktapp_useruserrating (
-  user_1_id, user_2_id, keyword_id,
-  number_of_ratings,
-  similarity,
-  last_calculated_at
-)
+KEYWORD_SIMILARITY_TEMPLATE = '''
 SELECT
   user_1_id, user_2_id, keyword_id,
   number_of_ratings,
@@ -166,18 +171,37 @@ HAVING COUNT(1) >= 30
 class Command(BaseCommand):
     help = 'Calculate user-user recommendation'
 
+    def add_arguments(self, parser):
+        parser.add_argument('user_id', nargs='+', type=int)
+
     def handle(self, *args, **options):
-        if len(args) < 1:
-            return
-        user_id = int(args[0])
-        self.stdout.write('Refreshing user-user recommendation for user %s...' % user_id)
         cursor = connection.cursor()
-        now = datetime.datetime.now()
-        cursor.execute(DELETE_SQL_TEMPLATE, (user_id,))
-        print 'Generic...'
-        cursor.execute(INSERT_SQL_TEMPLATE, (now, user_id))
-        print 'Keyword...'
-        cursor.execute(INSERT_SQL_TEMPLATE_W_KEYWORD, (now, user_id))
-        connection.commit()
-        print 'Done in %s sec.' % (datetime.datetime.now() - now).total_seconds()
-        self.stdout.write('Refreshed user-user recommendation.')
+        for user_id in options['user_id']:
+            self.stdout.write('Refreshing user-user recommendation for user %d...' % user_id)
+            now = datetime.datetime.now()
+
+            self.stdout.write('Calculating generic...')
+            cursor.execute(GENERIC_SIMILARITY_TEMPLATE, (now, user_id))
+            general_similarity = [row for row in cursor.fetchall()]
+            self.stdout.write('Updating generic...')
+            cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_1_id = %d AND keyword_id IS NULL''' % user_id)
+            cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_2_id = %d AND keyword_id IS NULL''' % user_id)
+            for row in general_similarity:
+                cursor.execute(INSERT_SQL_TEMPLATE_1, row)
+                cursor.execute(INSERT_SQL_TEMPLATE_2, row)
+
+            self.stdout.write('Calculating keyword...')
+            cursor.execute(KEYWORD_SIMILARITY_TEMPLATE, (now, user_id))
+            general_similarity = [row for row in cursor.fetchall()]
+            self.stdout.write('Updating keyword...')
+            cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_1_id = %d AND keyword_id IS NOT NULL''' % user_id)
+            cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_2_id = %d AND keyword_id IS NOT NULL''' % user_id)
+            for row in general_similarity:
+                cursor.execute(INSERT_SQL_TEMPLATE_1, row)
+                cursor.execute(INSERT_SQL_TEMPLATE_2, row)
+
+            connection.commit()
+            self.stdout.write('Refreshed user-user recommendation for user %d in %f sec.' % (
+                user_id,
+                (datetime.datetime.now() - now).total_seconds(),
+            ))
