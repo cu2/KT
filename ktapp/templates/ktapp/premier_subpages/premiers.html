@@ -12,8 +12,7 @@
                         <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} ({{ film.year }})"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
                     {% endif %}
                     <p class="film_block_content">
-                        <b><a href="{% url 'film_main' film.id film.slug_cache %}">{{ film.orig_title }}</a></b><br />
-                        {% if film.second_title %}{{ film.second_title }}<br />{% endif %}
+                        {{ film|film_url_html_big }}
                         ({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
                         <br />
                         {% for country in film.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}

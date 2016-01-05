@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django import forms
 
+from kt import settings
 from ktapp import models
 from ktapp import forms as kt_forms
 from ktapp import utils as kt_utils
@@ -28,6 +29,7 @@ def _generic_film_view(view_function):
             'film_directors': list(film.directors()),
             'countries': list(film.countries()),
             'genres': film.genres_cache,
+            'vapiti_year': settings.VAPITI_YEAR,
         }
         return view_function(request, id, film_slug, film, base_context, *args, **kwargs)
 

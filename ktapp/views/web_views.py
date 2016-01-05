@@ -1121,7 +1121,7 @@ def articles(request):
               CONCAT('L', l.id) AS id, l.name,
               l.url,
               l.link_domain, l.lead,
-              f.id AS film_id, f.orig_title AS film_orig_title, f.slug_cache AS film_slug_cache, f.year AS film_year,
+              f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year,
               u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
             FROM ktapp_link l
             INNER JOIN ktapp_film f ON f.id = l.film_id
@@ -1134,7 +1134,7 @@ def articles(request):
               CONCAT('R', r.id) AS id, CONCAT(f.orig_title, ' (', f.year, ')') AS name,
               CONCAT('/film/', f.id, '/', f.slug_cache, '/elemzesek/', r.id) AS url,
               'Kritikus Tömeg' AS link_domain, CONCAT(r.snippet, '...') AS lead,
-              f.id AS film_id, f.orig_title AS film_orig_title, f.slug_cache AS film_slug_cache, f.year AS film_year,
+              f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year,
               u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
             FROM ktapp_review r
             INNER JOIN ktapp_film f ON f.id = r.film_id

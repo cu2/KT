@@ -129,7 +129,7 @@
                 <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
                     <td><a href="{% url 'role' item.id item.slug_cache %}">{{ item.role_name }}</a></td>
                     <td><a href="{% url 'artist' item.artist.id item.artist.slug_cache %}">{{ item.artist.name }}</a></td>
-                    <td><a href="{% url 'film_main' item.film.id item.film.slug_cache %}">{{ item.film|film_url_html_w_year }}</a></td>
+                    <td>{{ item.film|film_url_html_w_year }}</td>
                 </tr>
             {% endfor %}
             </tbody>

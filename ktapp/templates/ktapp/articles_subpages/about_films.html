@@ -12,7 +12,7 @@
         </tr>
         {% for article in articles %}
             <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
-                <td><a href="{% url 'film_main' article.film_id article.film_slug_cache %}">{{ article.film_orig_title }} ({{ article.film_year }})</a></td>
+                <td>{{ article|film_url_html_from_article }}</td>
                 <td>{{ article.link_domain }}</td>
                 <td>
                     <b><a href="{{ article.url }}" target="_blank">{{ article.name }}</a></b><br />

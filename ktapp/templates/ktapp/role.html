@@ -1,4 +1,5 @@
 {% extends "ktapp/layout.html" %}
+{% load kt_extras %}
 
 {% block title %}{{ role.role_name }} - Kritikus Tömeg{% endblock %}
 
@@ -9,7 +10,7 @@
 {% block main %}
 
     <p>Színész: <a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}</p>
-    <p>Film: <a href="{% url 'film_main' role.film.id role.film.slug_cache %}">{{ role.film.orig_title }} ({{ role.film.year }})</a> {{ role.film.second_title }}</p>
+    <p>Film: {{ role.film|oneliner_film_url_html_w_year }}</p>
 
     <div class="centered_content">
         {% if picture %}
@@ -17,7 +18,7 @@
                 <a href="{% url 'role' role.id role.slug_cache %}?p={{ next_picture.id }}#pix"><img src="{{ picture.get_display_urls.max }}" style="width: {{ picture.get_widths.max }}px; height: {{ picture.get_heights.max }}px" class="picture" /></a>
                 <a name="pix" class="jumptarget"></a>
                 <br />
-                {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} <a href="{% url 'film_pictures' film.id film.slug_cache %}">{{ film.orig_title }}</a>{% if film.year %} ({{ film.year }}){% endif %} című filmben
+                {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film|oneliner_film_url_html_w_year:"film_pictures" }} című filmben
                 {% if picture.source_url %}
                     <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
                 {% endif %}

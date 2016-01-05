@@ -1,3 +1,4 @@
+{% load kt_extras %}
 <table class="fullsize">
     <tr class="header_tr">
         <th>Díj</th>
@@ -16,7 +17,7 @@
         <td>{{ a.year }}</td>
         <td>{{ a.category }}</td>
         {% if show_film %}
-        <td><a href="{% url 'film_main' a.film.id a.film.slug_cache %}">{{ a.film.orig_title }}</a></td>
+        <td>{{ a.film|oneliner_film_url_html_simple }}</td>
         <td>{{ a.note }}</td>
         {% else %}
         <td>{% if a.artist %}<a href="{% url 'artist' a.artist.id a.artist.slug_cache %}">{{ a.artist.name }}</a>{% endif %}
