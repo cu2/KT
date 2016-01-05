@@ -1,4 +1,5 @@
 {% extends "ktapp/layout.html" %}
+{% load kt_extras %}
 
 {% block title %}{{ artist.name }} - Kritikus Tömeg{% endblock %}
 
@@ -16,7 +17,7 @@
                 <a href="{% url 'artist_picture' artist.id artist.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_urls.max }}" style="width: {{ picture.get_widths.max }}px; height: {{ picture.get_heights.max }}px" class="picture" /></a>
                 <a name="pix" class="jumptarget"></a>
                 <br />
-                {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} <a href="{% url 'film_pictures' film.id film.slug_cache %}">{{ film.orig_title }}</a>{% if film.year %} ({{ film.year }}){% endif %} című filmben
+                {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film|oneliner_film_url_html_w_year:"film_pictures" }} című filmben
                 {% if picture.source_url %}
                     <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
                 {% endif %}

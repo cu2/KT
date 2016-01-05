@@ -1,9 +1,10 @@
+{% load kt_extras %}
 <div class="comment_block">
     <div class="comment_block_author">
         {% if show_comment_source %}
             {{ comment.created_at|date:"Y-m-d H:i:s" }}
             <span class="comment_source">{% if comment.domain == 'F' %}
-                <a href="{% url 'film_comments' comment.film.id comment.film.slug_cache %}">{{ comment.film.orig_title }} ({{ comment.film.year }}){% if comment.film.second_title %} / {{ comment.film.second_title }}{% endif %}</a>
+                {{ comment.film|oneliner_film_url_html_w_year:"film_comments" }}
             {% elif comment.domain == 'T' %}
                 [<a href="{% url 'forum' comment.topic.id comment.topic.slug_cache %}">{{ comment.topic }}</a>]
             {% elif comment.domain == 'P' %}

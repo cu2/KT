@@ -1390,6 +1390,7 @@ def vapiti_silver(request, gender):
       f.slug_cache AS film_slug_cache,
       f.orig_title AS film_orig_title,
       f.second_title AS film_second_title,
+      f.main_premier_year AS film_main_premier_year,
       f.number_of_ratings,
       f.average_rating,
       {my_rating_select}

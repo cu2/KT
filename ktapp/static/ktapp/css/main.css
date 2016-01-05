@@ -334,6 +334,10 @@ a {
     text-decoration: none;
     color: rgb(146,23,23);
 }
+a.vapiti {
+    text-decoration: none;
+    color: rgb(0,147,24);
+}
 .inactive_action {
     color: rgb(201,156,138) !important;
 }
