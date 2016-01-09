@@ -1129,6 +1129,7 @@ class Picture(models.Model):
         img.save(outfilename)
 
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
         super(Picture, self).save(*args, **kwargs)
         self.film.number_of_pictures = self.film.picture_set.count()
         if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
@@ -1137,8 +1138,9 @@ class Picture(models.Model):
             except IndexError:
                 self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
         self.film.save(update_fields=['number_of_pictures', 'main_poster'])
-        for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
-            self.generate_thumbnail(w, h)
+        if is_new:
+            for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
+                self.generate_thumbnail(w, h)
 
     def __unicode__(self):
         return unicode(self.img)
