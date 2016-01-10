@@ -3,27 +3,6 @@
 
 {% block premier_main %}
 
-    <table class="fullsize">
-        <tr class="header_tr">
-            <th style="width: 15%">Oldal</th>
-            <th style="width: 70%">Cikk</th>
-            <th style="width: 15%">Szerző</th>
-        </tr>
-        {% for article in articles %}
-            <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
-                <td>{{ article.link_domain }}</td>
-                <td>
-                    <b><a href="{{ article.url }}" target="_blank">{{ article.name }}</a></b><br />
-                    {% autoescape off %}
-                    {{ article.lead }}
-                    {% endautoescape %}
-                </td>
-                <td>{% if article.author_user_id %}<a href="{% url 'user_profile' article.author_user_id article.author_slug_cache %}">{{ article.author_name }}</a>{% endif %}</td>
-            </tr>
-        {% endfor %}
-    </table>
-
-
     {% if permission_new_link %}
         <h3>Új cikk felvétele</h3>
         <p class="error">Ha egy konkrét filmről akarsz írást felvenni, azt ott tedd (a film lapján a linkek fül alatt). Ha egyéb filmes témáról, azt itt.</p>
@@ -88,5 +67,24 @@
         </form>
     {% endif %}
 
+    <table class="fullsize">
+        <tr class="header_tr">
+            <th style="width: 15%">Oldal</th>
+            <th style="width: 70%">Cikk</th>
+            <th style="width: 15%">Szerző</th>
+        </tr>
+        {% for article in articles %}
+            <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                <td>{{ article.link_domain }}</td>
+                <td>
+                    <b><a href="{{ article.url }}" target="_blank">{{ article.name }}</a></b><br />
+                    {% autoescape off %}
+                        {{ article.lead }}
+                    {% endautoescape %}
+                </td>
+                <td>{% if article.author_user_id %}<a href="{% url 'user_profile' article.author_user_id article.author_slug_cache %}">{{ article.author_name }}</a>{% endif %}</td>
+            </tr>
+        {% endfor %}
+    </table>
 
 {% endblock %}
