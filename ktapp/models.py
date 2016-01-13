@@ -1117,11 +1117,12 @@ class Picture(models.Model):
         filedir = settings.MEDIA_ROOT + 'pix/' + thumbnail_type + '/' + hashdir
         filename = filedir + '/' + file_root + '.jpg'
         url = settings.MEDIA_URL + 'pix/' + thumbnail_type + '/' + hashdir + '/' + file_root + '.jpg'
-        return filedir, filename, url
+        s3_key = 'pix/' + thumbnail_type + '/' + hashdir + '/' + file_root + '.jpg'
+        return filedir, filename, url, s3_key
 
     def generate_thumbnail(self, maxwidth, maxheight):
         infilename = settings.MEDIA_ROOT + unicode(self.img)
-        outfiledir, outfilename, _ = self.get_thumbnail_filename(maxwidth, maxheight)
+        outfiledir, outfilename, _, _ = self.get_thumbnail_filename(maxwidth, maxheight)
         if not os.path.exists(outfiledir):
             os.makedirs(outfiledir)
         img = Image.open(infilename)
@@ -1131,16 +1132,35 @@ class Picture(models.Model):
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         super(Picture, self).save(*args, **kwargs)
-        self.film.number_of_pictures = self.film.picture_set.count()
-        if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
-            try:
-                self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
-            except IndexError:
-                self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
-        self.film.save(update_fields=['number_of_pictures', 'main_poster'])
         if is_new:
+            # upload to s3:
+            if not kt_utils.upload_file_to_s3(settings.MEDIA_ROOT + unicode(self.img), unicode(self.img)):
+                self.delete()
+                raise IOError
+            # generate thumbnails and upload to s3:
             for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
                 self.generate_thumbnail(w, h)
+                _, outfilename, _, s3_key = self.get_thumbnail_filename(w, h)
+                if not kt_utils.upload_file_to_s3(outfilename, s3_key):
+                    self.delete()
+                    raise IOError
+            # delete orig locally:
+            try:
+                os.remove(settings.MEDIA_ROOT + unicode(self.img))
+            except OSError:
+                pass
+            # update number_of_pictures and main_poster for film:
+            self.film.number_of_pictures = self.film.picture_set.count()
+            if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
+                try:
+                    self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
+                except IndexError:
+                    self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
+            self.film.save(update_fields=['number_of_pictures', 'main_poster'])
+        # TODO: migrate all to s3
+        # TODO: serve all from s3
+        # TODO: move os.remove() from delete_picture() to save()
+        # TODO: delete all locally
 
     def __unicode__(self):
         return unicode(self.img)
@@ -1148,7 +1168,7 @@ class Picture(models.Model):
     def get_display_url(self, thumbnail_type):
         if thumbnail_type == 'orig':
             return settings.MEDIA_URL + unicode(self.img)
-        _, _, url = self.get_thumbnail_filename(*self.THUMBNAIL_SIZES[thumbnail_type])
+        _, _, url, _ = self.get_thumbnail_filename(*self.THUMBNAIL_SIZES[thumbnail_type])
         return url
 
     def get_width(self, thumbnail_type):
@@ -1206,12 +1226,14 @@ def delete_picture(sender, instance, **kwargs):
         os.remove(settings.MEDIA_ROOT + unicode(instance.img))
     except OSError:
         pass
+    kt_utils.delete_file_from_s3(unicode(instance.img))
     for _, (w, h) in instance.THUMBNAIL_SIZES.iteritems():
-        _, filename, _ = instance.get_thumbnail_filename(w, h)
+        _, filename, _, s3_key = instance.get_thumbnail_filename(w, h)
         try:
             os.remove(filename)
         except OSError:
             pass
+        kt_utils.delete_file_from_s3(s3_key)
 
 
 class Message(models.Model):

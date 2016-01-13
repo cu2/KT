@@ -4,3 +4,4 @@ Pillow==2.9.0
 django-ipware==1.1.0
 djangorestframework==3.3.2
 wsgiref==0.1.2
+boto3==1.2.3

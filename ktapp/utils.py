@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import boto3
 import datetime
+import hashlib
+import imghdr
 import json
 import re
 
@@ -259,3 +262,64 @@ def get_vapiti_round():
         round_2_dates,
         result_day,
     )
+
+
+def upload_file_to_s3(local_name, remote_name):
+
+    def md5(fname):
+        hash = hashlib.md5()
+        with open(fname, 'rb') as f:
+            for chunk in iter(lambda: f.read(4096), b''):
+                hash.update(chunk)
+        return hash.hexdigest()
+
+    mime_type = imghdr.what(local_name)
+    if mime_type:
+        mime_type = 'image/%s' % mime_type
+    else:
+        mime_type = 'binary/octet-stream'
+    key = None
+    try:
+        boto3_session = boto3.session.Session(
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_DEFAULT_REGION,
+        )
+        s3 = boto3_session.resource('s3')
+        local_md5 = md5(local_name)
+        key = s3.Object('kt.static', remote_name)
+        key.put(
+            Body=open(local_name, 'rb'),
+            ContentType=mime_type,
+            ContentDisposition='inline',
+        )
+        remote_md5 = key.e_tag[1:-1]
+    except:
+        if key:
+            try:
+                key.delete()
+            except:
+                pass
+        return False
+    if key and local_md5 == remote_md5:
+        return True
+    if key:
+        try:
+            key.delete()
+        except:
+            pass
+    return False
+
+
+def delete_file_from_s3(remote_name):
+    try:
+        boto3_session = boto3.session.Session(
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_DEFAULT_REGION,
+        )
+        s3 = boto3_session.resource('s3')
+        key = s3.Object('kt.static', remote_name)
+        key.delete()
+    except:
+        pass
