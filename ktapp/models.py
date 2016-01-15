@@ -1149,15 +1149,15 @@ class Picture(models.Model):
                 os.remove(settings.MEDIA_ROOT + unicode(self.img))
             except OSError:
                 pass
-            # update number_of_pictures and main_poster for film:
-            self.film.number_of_pictures = self.film.picture_set.count()
-            if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
-                try:
-                    self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
-                except IndexError:
-                    self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
-            self.film.save(update_fields=['number_of_pictures', 'main_poster'])
-        # TODO: migrate all to s3
+        # update number_of_pictures and main_poster for film:
+        self.film.number_of_pictures = self.film.picture_set.count()
+        if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
+            try:
+                self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
+            except IndexError:
+                self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
+        self.film.save(update_fields=['number_of_pictures', 'main_poster'])
+        # DOING: migrate all to s3
         # TODO: serve all from s3
         # TODO: move os.remove() from delete_picture() to save()
         # TODO: delete all locally
