@@ -1341,13 +1341,38 @@ def vapiti_gold(request):
     })
 
 
-# def vapiti_gold_2(request):
-#     return render(request, 'ktapp/vapiti_subpages/vapiti_gold_2.html', {
-#         'vapiti_year': settings.VAPITI_YEAR,
-#         'active_tab': '2',
-#     })
-#
-#
+def vapiti_gold_2(request):
+    vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
+    nominee_ids = kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_GOLD)
+    if request.user.is_authenticated():
+        my_votes = {v.film_id: v.rating for v in models.Vote.objects.filter(user_id=request.user.id, film_id__in=nominee_ids)}
+    else:
+        my_votes = {}
+    nominees = []
+    for nominee in models.Film.objects.filter(id__in=nominee_ids).order_by('orig_title', 'second_title', 'id'):
+        nominee.my_rating = my_votes.get(nominee.id)
+        nominees.append(nominee)
+    my_vapiti_vote = None
+    if request.user.is_authenticated():
+        for vv in models.VapitiVote.objects.filter(
+                user=request.user,
+                year=settings.VAPITI_YEAR,
+                vapiti_round=vapiti_round,
+                vapiti_type=models.VapitiVote.VAPITI_TYPE_GOLD,
+        ):
+            my_vapiti_vote = vv.film_id
+    return render(request, 'ktapp/vapiti_subpages/vapiti_gold_2.html', {
+        'vapiti_year': settings.VAPITI_YEAR,
+        'active_tab': '2',
+        'vapiti_round': vapiti_round,
+        'round_1_dates': round_1_dates,
+        'round_2_dates': round_2_dates,
+        'result_day': result_day,
+        'nominees': nominees,
+        'my_vapiti_vote': my_vapiti_vote,
+    })
+
+
 # def vapiti_gold_winners(request):
 #     return render(request, 'ktapp/vapiti_subpages/vapiti_gold_winners.html', {
 #         'vapiti_year': settings.VAPITI_YEAR,
@@ -1428,6 +1453,47 @@ def vapiti_silver(request, gender):
         'round_2_dates': round_2_dates,
         'result_day': result_day,
         'my_vapiti_votes': my_vapiti_votes,
+    })
+
+
+def vapiti_silver_2(request, gender):
+    vapiti_type = models.VapitiVote.VAPITI_TYPE_SILVER_MALE if gender == 'ferfi' else models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE
+    vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
+    nominee_ids = kt_utils.get_vapiti_nominees(models.Award, vapiti_type)
+    if request.user.is_authenticated():
+        my_votes = {v.film_id: v.rating for v in models.Vote.objects.filter(user_id=request.user.id, film_id__in=[film_id for film_id, artist_id in nominee_ids])}
+    else:
+        my_votes = {}
+    nominees = []
+    for film_id, artist_id in nominee_ids:
+        try:
+            role = models.FilmArtistRelationship.objects.select_related('film', 'artist').get(film_id=film_id, artist_id=artist_id)
+        except models.FilmArtistRelationship.DoesNotExist:
+            continue
+        nominee = role
+        nominee.my_rating = my_votes.get(film_id)
+        nominees.append(nominee)
+    my_vapiti_vote_film_id, my_vapiti_vote_artist_id = None, None
+    if request.user.is_authenticated():
+        for vv in models.VapitiVote.objects.filter(
+                user=request.user,
+                year=settings.VAPITI_YEAR,
+                vapiti_round=vapiti_round,
+                vapiti_type=vapiti_type,
+        ):
+            my_vapiti_vote_film_id = vv.film_id
+            my_vapiti_vote_artist_id = vv.artist_id
+    return render(request, 'ktapp/vapiti_subpages/vapiti_silver_2.html', {
+        'vapiti_year': settings.VAPITI_YEAR,
+        'gender': gender,
+        'active_tab': '2',
+        'vapiti_round': vapiti_round,
+        'round_1_dates': round_1_dates,
+        'round_2_dates': round_2_dates,
+        'result_day': result_day,
+        'nominees': nominees,
+        'my_vapiti_vote_film_id': my_vapiti_vote_film_id,
+        'my_vapiti_vote_artist_id': my_vapiti_vote_artist_id,
     })
 
 

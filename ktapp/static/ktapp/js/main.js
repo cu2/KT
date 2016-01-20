@@ -144,6 +144,18 @@ $(function() {
             dataType: 'json'
         });
     });
+    $('.vapiti_vote_action').click(function() {
+        $.post('/jelol_vapiti', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            vapiti_id: $(this).closest('.vapiti_nominee_block').data('vapiti-id'),
+            vapiti_type: $(this).closest('.vapiti_nominee_block').data('vapiti-type'),
+            vapiti_yes: $(this).closest('.vapiti_nominee_block').find('.vapiti_button').length?'0':'1'
+        }, function(data) {
+            if (data.success) {
+                document.location.reload();
+            }
+        }, 'json');
+    });
     $('.show_comment_edit_form').click(function() {
         $(this).closest('.comment_block').find('.comment_content').hide();
         $(this).closest('.comment_block').find('.comment_edit_form').show();

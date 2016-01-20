@@ -1387,10 +1387,74 @@ def vote_vapiti(request):
             )
             return HttpResponseRedirect(reverse('vapiti_silver', args=('ferfi' if vapiti_type == 'M' else 'noi',)))
     if vapiti_round == 2:
-        if vapiti_type == 'G':
-            pass
-        elif vapiti_type in {'M', 'F'}:
-            pass
+        try:
+            vapiti_id = int(request.POST.get('vapiti_id', 0))
+        except:
+            vapiti_id = 0
+        if vapiti_id:
+            vapiti_yes = request.POST.get('vapiti_yes', '') == '1'
+            if vapiti_type == 'G':
+                nominee_ids = kt_utils.get_vapiti_nominees(models.Award, vapiti_type)
+                if vapiti_id in set(nominee_ids):
+                    try:
+                        film = models.Film.objects.get(id=vapiti_id)
+                    except models.Film.DoesNotExist:
+                        film = None
+                    if film:
+                        if models.Vote.objects.filter(film=film, user=request.user):
+                            models.VapitiVote.objects.filter(
+                                user=request.user,
+                                year=settings.VAPITI_YEAR,
+                                vapiti_round=vapiti_round,
+                                vapiti_type=vapiti_type,
+                            ).delete()
+                            if vapiti_yes:
+                                models.VapitiVote.objects.create(
+                                    user=request.user,
+                                    year=settings.VAPITI_YEAR,
+                                    vapiti_round=vapiti_round,
+                                    vapiti_type=vapiti_type,
+                                    serial_number=1,
+                                    film=film,
+                                )
+                            models.Event.objects.create(
+                                user=request.user,
+                                event_type=models.Event.EVENT_TYPE_VAPITI_VOTE,
+                            )
+                            return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+            elif vapiti_type in {'M', 'F'}:
+                nominee_ids = kt_utils.get_vapiti_nominees(models.Award, vapiti_type)
+                selected_nominee = None
+                for film_id, artist_id in nominee_ids:
+                    try:
+                        role = models.FilmArtistRelationship.objects.select_related('film', 'artist').get(film_id=film_id, artist_id=artist_id)
+                    except models.FilmArtistRelationship.DoesNotExist:
+                        continue
+                    if role.id == vapiti_id:
+                        selected_nominee = role
+                if selected_nominee:
+                    if models.Vote.objects.filter(film=selected_nominee.film, user=request.user):
+                        models.VapitiVote.objects.filter(
+                            user=request.user,
+                            year=settings.VAPITI_YEAR,
+                            vapiti_round=vapiti_round,
+                            vapiti_type=vapiti_type,
+                        ).delete()
+                        if vapiti_yes:
+                            models.VapitiVote.objects.create(
+                                user=request.user,
+                                year=settings.VAPITI_YEAR,
+                                vapiti_round=vapiti_round,
+                                vapiti_type=vapiti_type,
+                                serial_number=1,
+                                film=selected_nominee.film,
+                                artist=selected_nominee.artist,
+                            )
+                        models.Event.objects.create(
+                            user=request.user,
+                            event_type=models.Event.EVENT_TYPE_VAPITI_VOTE,
+                        )
+                        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
     return HttpResponseForbidden()
 
 

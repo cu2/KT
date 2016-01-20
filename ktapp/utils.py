@@ -264,6 +264,31 @@ def get_vapiti_round():
     )
 
 
+def get_vapiti_nominees(award_model, vapiti_type):
+    vapiti_year = settings.VAPITI_YEAR
+    if vapiti_type == 'G':
+        nominee_awards = award_model.objects.filter(
+            name=u'Vapiti',
+            year=vapiti_year,
+            category=u'Arany Vapiti a legjobb filmnek jelölés',
+        )
+        return [nominee_award.film_id for nominee_award in nominee_awards]
+    if vapiti_type == 'F':
+        nominee_awards = award_model.objects.filter(
+            name=u'Vapiti',
+            year=vapiti_year,
+            category=u'Ezüst Vapiti a legjobb színésznőnek jelölés',
+        )
+        return [(nominee_award.film_id, nominee_award.artist_id) for nominee_award in nominee_awards]
+    if vapiti_type == 'M':
+        nominee_awards = award_model.objects.filter(
+            name=u'Vapiti',
+            year=vapiti_year,
+            category=u'Ezüst Vapiti a legjobb színésznek jelölés',
+        )
+        return [(nominee_award.film_id, nominee_award.artist_id) for nominee_award in nominee_awards]
+
+
 def upload_file_to_s3(local_name, remote_name):
 
     def md5(fname):

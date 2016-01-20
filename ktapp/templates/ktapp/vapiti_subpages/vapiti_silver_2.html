@@ -1,0 +1,42 @@
+{% extends "ktapp/vapiti_subpages/vapiti_silver_base.html" %}
+{% load kt_extras %}
+
+{% block premier_main %}
+
+    {% if vapiti_round == 1 %}
+        <p>A második forduló {{ round_2_dates.0|str2date|date:"Y. F j" }}-én kezdődik, most még tart az első.</p>
+    {% elif vapiti_round == 2 %}
+        {% if nominees %}
+            {% if request.user.is_authenticated and request.user.core_member %}
+                <p>Az alábbiak közül melyik színészt jelölöd az Ezüst Vapiti díjra? (csak olyat választhatsz, akit láttál és osztályoztál)</p>
+            {% endif %}
+            {% for nominee in nominees %}
+                <div class="vapiti_nominee_block{% if nominee.my_rating %} active_vapiti_nominee_block{% else %} passive_vapiti_nominee_block{% endif %}" data-vapiti-id="{{ nominee.id }}" data-vapiti-type="{% if gender == 'ferfi' %}M{% else %}F{% endif %}">
+                    <p>
+                        <img src="{% if nominee.main_picture %}{{ nominee.main_picture.get_display_urls.mid }}{% else %}{{ nominee.artist.main_picture.get_display_urls.mid }}{% endif %}" class="picture{% if nominee.my_rating %} vapiti_vote_action{% endif %}" alt="{{ nominee.orig_title }} ({{ nominee.year }})" />
+                        <br />
+                        <a href="{% url 'artist' nominee.artist.id nominee.artist.slug_cache %}"><b>{{ nominee.artist.name }}</b></a>
+                        <br />
+                        <a href="{% url 'film_main' nominee.film.id nominee.film.slug_cache %}"><b>{{ nominee.film.orig_title }}</b></a>
+                        {% if nominee.film.second_title %}
+                            <br />
+                            {{ nominee.film.second_title }}
+                        {% endif %}
+                    </p>
+                    {% if nominee.my_rating %}
+                        {% if nominee.film.id == my_vapiti_vote_film_id and nominee.artist.id == my_vapiti_vote_artist_id %}
+                            <div class="vapiti_vote_action vapiti_button">Vapiti</div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Még nincs meg a jelöltek listája.</p>
+        {% endif %}
+    {% elif vapiti_round == 3 %}
+        <p>Mindkét forduló véget ért.</p>
+    {% else %}
+        <p>Az első forduló {{ round_1_dates.0|str2date|date:"Y. F j" }}-jén kezdődik, a második {{ round_2_dates.0|str2date|date:"F j" }}-én.</p>
+    {% endif %}
+
+{% endblock %}
