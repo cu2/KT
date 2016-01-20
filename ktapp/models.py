@@ -871,6 +871,7 @@ class Artist(models.Model):
     number_of_films_as_director = models.PositiveIntegerField(default=0)
     number_of_ratings_as_director = models.PositiveIntegerField(default=0)
     average_rating_as_director = models.DecimalField(default=0, max_digits=2, decimal_places=1, blank=True, null=True)
+    main_picture = models.ForeignKey('Picture', blank=True, null=True, related_name='main_artist_picture', on_delete=models.SET_NULL)
 
     def __unicode__(self):
         return self.name
@@ -914,6 +915,7 @@ class FilmArtistRelationship(models.Model):
     slug_cache = models.CharField(max_length=250, blank=True)
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
+    main_picture = models.ForeignKey('Picture', blank=True, null=True, related_name='main_role_picture', on_delete=models.SET_NULL)
 
     def __unicode__(self):
         return self.role_type + '[' + self.role_name + ']:' + unicode(self.film) + '/' + unicode(self.artist)
@@ -1157,8 +1159,6 @@ class Picture(models.Model):
             except IndexError:
                 self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
         self.film.save(update_fields=['number_of_pictures', 'main_poster'])
-        # DOING: migrate all to s3
-        # TODO: serve all from s3
         # TODO: move os.remove() from delete_picture() to save()
         # TODO: delete all locally
 
