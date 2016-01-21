@@ -96,3 +96,10 @@ LONG_YEARS = {
     2000: u"2000-es évek",
     2010: u"2010-es évek",
 }
+
+
+VAPITI_NOMINEE_CATEGORIES = {
+    'G': u'Arany Vapiti a legjobb filmnek jelölés',
+    'F': u'Ezüst Vapiti a legjobb színésznőnek jelölés',
+    'M': u'Ezüst Vapiti a legjobb színésznek jelölés',
+}

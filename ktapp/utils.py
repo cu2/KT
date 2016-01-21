@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
 
 from kt import settings
+from ktapp import texts
 
 
 def bbcode_to_html(value):
@@ -270,21 +271,14 @@ def get_vapiti_nominees(award_model, vapiti_type):
         nominee_awards = award_model.objects.filter(
             name=u'Vapiti',
             year=vapiti_year,
-            category=u'Arany Vapiti a legjobb filmnek jelölés',
+            category=texts.VAPITI_NOMINEE_CATEGORIES[vapiti_type],
         )
         return [nominee_award.film_id for nominee_award in nominee_awards]
-    if vapiti_type == 'F':
+    if vapiti_type in {'F', 'M'}:
         nominee_awards = award_model.objects.filter(
             name=u'Vapiti',
             year=vapiti_year,
-            category=u'Ezüst Vapiti a legjobb színésznőnek jelölés',
-        )
-        return [(nominee_award.film_id, nominee_award.artist_id) for nominee_award in nominee_awards]
-    if vapiti_type == 'M':
-        nominee_awards = award_model.objects.filter(
-            name=u'Vapiti',
-            year=vapiti_year,
-            category=u'Ezüst Vapiti a legjobb színésznek jelölés',
+            category=texts.VAPITI_NOMINEE_CATEGORIES[vapiti_type],
         )
         return [(nominee_award.film_id, nominee_award.artist_id) for nominee_award in nominee_awards]
 

@@ -1473,6 +1473,7 @@ def vapiti_silver_2(request, gender):
         nominee = role
         nominee.my_rating = my_votes.get(film_id)
         nominees.append(nominee)
+    nominees.sort(key=lambda nominee: (nominee.artist.name, nominee.artist.id, nominee.film.orig_title, nominee.film.second_title, nominee.film.id))
     my_vapiti_vote_film_id, my_vapiti_vote_artist_id = None, None
     if request.user.is_authenticated():
         for vv in models.VapitiVote.objects.filter(
