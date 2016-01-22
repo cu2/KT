@@ -8,7 +8,7 @@
     {% elif vapiti_round == 2 %}
         {% if nominees %}
             {% if request.user.is_authenticated and request.user.core_member %}
-                <p>Az alábbiak közül melyik színészt jelölöd az Ezüst Vapiti díjra? (csak olyat választhatsz, akit láttál és osztályoztál)</p>
+                <p>Az alábbiak közül melyik színészt jelölöd az Ezüst Vapiti díjra? Kattints arra a képre, amelyik színészt jelölni szeretnéd. (csak olyat választhatsz, akit láttál és osztályoztál)</p>
             {% endif %}
             {% for nominee in nominees %}
                 <div class="vapiti_nominee_block{% if nominee.my_rating %} active_vapiti_nominee_block{% else %} passive_vapiti_nominee_block{% endif %}" data-vapiti-id="{{ nominee.id }}" data-vapiti-type="{% if gender == 'ferfi' %}M{% else %}F{% endif %}">
