@@ -13,7 +13,7 @@
             {% for nominee in nominees %}
                 <div class="vapiti_nominee_block{% if nominee.my_rating %} active_vapiti_nominee_block{% else %} passive_vapiti_nominee_block{% endif %}" data-vapiti-id="{{ nominee.id }}" data-vapiti-type="{% if gender == 'ferfi' %}M{% else %}F{% endif %}">
                     <p>
-                        <img src="{% if nominee.main_picture %}{{ nominee.main_picture.get_display_urls.mid }}{% else %}{{ nominee.artist.main_picture.get_display_urls.mid }}{% endif %}" class="picture{% if nominee.my_rating %} vapiti_vote_action{% endif %}" alt="{{ nominee.orig_title }} ({{ nominee.year }})" />
+                        <img src="{% if nominee.main_picture %}{{ nominee.main_picture.get_display_urls.mid }}{% else %}{{ nominee.artist.main_picture.get_display_urls.mid }}{% endif %}" class="picture{% if nominee.my_rating %} vapiti_vote_action{% endif %}" alt="{{ nominee.artist.name }}" />
                         <br />
                         <a href="{% url 'artist' nominee.artist.id nominee.artist.slug_cache %}"><b>{{ nominee.artist.name }}</b></a>
                         <br />
