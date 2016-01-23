@@ -1151,6 +1151,13 @@ class Picture(models.Model):
                 os.remove(settings.MEDIA_ROOT + unicode(self.img))
             except OSError:
                 pass
+            # delete thumbnails locally:
+            for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
+                _, filename, _, _ = self.get_thumbnail_filename(w, h)
+                try:
+                    os.remove(filename)
+                except OSError:
+                    pass
         # update number_of_pictures and main_poster for film:
         self.film.number_of_pictures = self.film.picture_set.count()
         if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
@@ -1159,8 +1166,6 @@ class Picture(models.Model):
             except IndexError:
                 self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
         self.film.save(update_fields=['number_of_pictures', 'main_poster'])
-        # TODO: move os.remove() from delete_picture() to save()
-        # TODO: delete all locally
 
     def __unicode__(self):
         return unicode(self.img)
@@ -1211,7 +1216,7 @@ class Picture(models.Model):
 
 @receiver(post_delete, sender=Picture)
 def delete_picture(sender, instance, **kwargs):
-    '''Update number_of_pictures and delete files'''
+    '''Update number_of_pictures and delete files from s3'''
     instance.film.number_of_pictures = instance.film.picture_set.count()
     if instance.picture_type in {instance.PICTURE_TYPE_POSTER, instance.PICTURE_TYPE_DVD}:
         try:
@@ -1222,17 +1227,9 @@ def delete_picture(sender, instance, **kwargs):
             except IndexError:
                 instance.film.main_poster = None
     instance.film.save(update_fields=['number_of_pictures', 'main_poster'])
-    try:
-        os.remove(settings.MEDIA_ROOT + unicode(instance.img))
-    except OSError:
-        pass
     kt_utils.delete_file_from_s3(unicode(instance.img))
     for _, (w, h) in instance.THUMBNAIL_SIZES.iteritems():
-        _, filename, _, s3_key = instance.get_thumbnail_filename(w, h)
-        try:
-            os.remove(filename)
-        except OSError:
-            pass
+        _, _, _, s3_key = instance.get_thumbnail_filename(w, h)
         kt_utils.delete_file_from_s3(s3_key)
 
 
