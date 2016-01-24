@@ -31,7 +31,12 @@
                         <td>{{ award.category }}</td>
                         <td>{{ award.film|film_url_html_w_year }}</td>
                         <td>
-                            {% if award.artist %}<a href="{% url 'artist' award.artist.id award.artist.slug_cache %}">{{ award.artist.name }}</a>{% endif %}
+                            {% if award.artist %}
+                                <a href="{% url 'artist' award.artist.id award.artist.slug_cache %}">{{ award.artist.name }}</a>
+                                {% if award.note %}
+                                    -
+                                {% endif %}
+                            {% endif %}
                             {{ award.note }}
                         </td>
                     </tr>

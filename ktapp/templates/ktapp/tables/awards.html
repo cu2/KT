@@ -20,8 +20,15 @@
         <td>{{ a.film|oneliner_film_url_html_simple }}</td>
         <td>{{ a.note }}</td>
         {% else %}
-        <td>{% if a.artist %}<a href="{% url 'artist' a.artist.id a.artist.slug_cache %}">{{ a.artist.name }}</a>{% endif %}
-        {{ a.note }}</td>
+        <td>
+            {% if a.artist %}
+                <a href="{% url 'artist' a.artist.id a.artist.slug_cache %}">{{ a.artist.name }}</a>
+                {% if a.note %}
+                    -
+                {% endif %}
+            {% endif %}
+            {{ a.note }}
+        </td>
         {% endif %}
     </tr>
 {% endfor %}
