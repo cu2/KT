@@ -17,7 +17,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'ktdb',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': 'ktadmin',
@@ -86,8 +86,15 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    'compressor.finders.CompressorFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
+
+
+COMPRESS_PRECOMPILERS = (
+    ('text/jsx', 'browserify -t reactify mobileapp/src/app/index.jsx > {outfile}'),
+)
+
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = kt.settings_local.SECRET_KEY
@@ -142,8 +149,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'compressor',
     'rest_framework',
     'ktapp',
+    'mobileapp',
 )
 
 REST_FRAMEWORK = {
@@ -223,5 +232,6 @@ except:
 
 
 # override w settings_prod if KT_ENV=prod
+ENV = 'local'
 if os.getenv('KT_ENV', '') == 'prod':
     from kt.settings_prod import *

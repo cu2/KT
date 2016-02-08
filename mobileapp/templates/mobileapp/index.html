@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html class="no-js">
+<head>
+    <meta charset="utf-8" />
+    <title>KT</title>
+    {% load staticfiles %}
+    {% load compress %}
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="{% static 'mobileapp/css/main.css' %}" />
+</head>
+<body>
+    <div id="container"></div>
+    <script type="application/javascript" src="{% static 'mobileapp/js/jquery-1.12.0.min.js' %}"></script>
+    {% compress js %}
+        <script type="text/jsx" src="{% static 'mobileapp/js/bundle.js' %}"></script>
+    {% endcompress %}
+</body>
+</html>
