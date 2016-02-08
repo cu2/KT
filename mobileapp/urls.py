@@ -6,8 +6,8 @@ from mobileapp import views
 
 
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
-    url(r'^api/$', views.api, name='api'),
+    url(r'^$', views.index, name='mobile_index'),
+    url(r'^api/$', views.api, name='mobile_api'),
 ]
 
 
