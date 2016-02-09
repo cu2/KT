@@ -1,3 +1,23 @@
+body {
+    font-family: verdana;
+}
 .clickable {
     cursor: pointer;
+}
+.logo {
+    display: inline-block;
+    margin-right: 10px;
+    padding: 2px;
+}
+.title {
+    font-weight: bold;
+}
+.poster {
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    border: solid black 1px;
+}
+.clear {
+    clear: both;
 }

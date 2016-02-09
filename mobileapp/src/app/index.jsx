@@ -2,13 +2,30 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 
+var blankData = {
+    filmData: {
+        filmId: 0,
+        filmData: {
+            id: 0,
+            origTitle: '',
+            secondTitle: '',
+            year: null,
+            plot: '',
+            poster: ''
+        }
+    }
+};
+
 var FilmPage = React.createClass({
     render: function() {
         if (this.props.data.filmId) {
             return <div>
-                <h1>{this.props.data.filmData.origTitle} ({this.props.data.filmData.year})</h1>
+                <p><img className="poster" src={this.props.data.filmData.poster} /></p>
+                <p className="title">{this.props.data.filmData.origTitle} ({this.props.data.filmData.year})</p>
+                <p className="title">{this.props.data.filmData.secondTitle}</p>
                 <p>{this.props.data.filmData.plot}</p>
-                <p><span className="clickable" onClick={ (e) => { e.preventDefault(); this.props.navTo({page: 'index'}); } }>Back to Index</span></p>
+                <br className="clear" />
+                <p><span className="clickable" onClick={ (e) => { e.preventDefault(); this.props.navTo({page: 'search'}); } }>Back</span></p>
             </div>;
         }
         return <div>
@@ -20,21 +37,23 @@ var FilmPage = React.createClass({
 var FilmItem = React.createClass({
     render: function() {
         return <div>
-            <h2>
+            <p><img className="poster" src={this.props.data.poster} /></p>
+            <p className="title">
                 <span className="clickable" onClick={ (e) => { e.preventDefault(); this.props.navTo({page: 'film', filmId: this.props.data.id}); } }>
                     {this.props.data.origTitle} ({this.props.data.year})
                 </span>
-            </h2>
+            </p>
             <p>{this.props.data.plot}</p>
+            <br className="clear" />
         </div>;
     }
 });
 
-var IndexPage = React.createClass({
+var FilmList = React.createClass({
     render: function() {
-        if (this.props.data.listOfFilms.length) {
+        if (this.props.searchResults.length) {
             return <div>
-                {this.props.data.listOfFilms.map(function(film) {
+                {this.props.searchResults.map(function(film) {
                     return <FilmItem key={film.id} data={film} navTo={this.props.navTo} />;
                 }.bind(this))}
             </div>;
@@ -45,47 +64,50 @@ var IndexPage = React.createClass({
     }
 });
 
+var SearchPage = React.createClass({
+    render: function() {
+        return <div>
+            <p>Cím: <input type="text" value={this.props.searchQuery.title} onChange={this.props.handleSearchChange} /></p>
+            <FilmList searchResults={this.props.searchResults} navTo={this.props.navTo} />
+        </div>;
+    }
+});
+
 var KTApp = React.createClass({
     getInitialState: function() {
         return {
             location: {
                 page: ''
             },
-            indexData: {
-                listOfFilms: []
+            pageTitle: '',
+            searchQuery: {
+                domain: '',
+                title: '',
             },
-            filmData: {
-                filmId: 0,
-                filmData: {
-                    id: 0,
-                    origTitle: '',
-                    year: null,
-                    plot: ''
-                }
-            }
+            searchResults: [],
+            filmData: blankData.filmData
         };
     },
     componentWillMount: function() {
         this.navTo({
-            page: 'index'
+            page: 'search'
         });
     },
-    navTo: function(newLocation) {
+    navTo: function(newLocation, newSearchQuery) {
         this.setState({
             location: newLocation
         });
+        if (newSearchQuery) {
+            this.setState({
+                searchQuery: newSearchQuery
+            });
+        } else {
+            newSearchQuery = this.state.searchQuery;
+        }
         switch(newLocation.page) {
             case 'film':
                 this.setState({
-                    filmData: {
-                        filmId: 0,
-                        filmData: {
-                            id: 0,
-                            origTitle: '',
-                            year: null,
-                            plot: ''
-                        }
-                    }
+                    filmData: blankData.filmData
                 });
                 $.ajax('/m/api/?page=film&film_id=' + newLocation.filmId)
                     .done(function(data) {
@@ -95,32 +117,87 @@ var KTApp = React.createClass({
                                 filmData: data.filmData
                             }
                         });
-                    }.bind(this))
-                    .fail(function() {
-                        console.log('AJAX fail')
-                    });
-                break;
-            default:
-                $.ajax('/m/api/?page=index')
-                    .done(function(data) {
                         this.setState({
-                            indexData: {
-                                listOfFilms: data.listOfFilms
-                            }
+                            pageTitle: data.filmData.origTitle + ' (' + data.filmData.year + ')'
                         });
                     }.bind(this))
                     .fail(function() {
-                        console.log('AJAX fail')
+                        console.log('AJAX fail');
                     });
+                break;
+            case 'search':
+                this.setState({
+                    pageTitle: ''
+                });
+                $.ajax('/m/api/?page=search&domain=' + newSearchQuery.domain +
+                    '&title=' + newSearchQuery.title)
+                    .done(function(data) {
+                        this.setState({
+                            searchResults: data
+                        });
+                    }.bind(this))
+                    .fail(function() {
+                        console.log('AJAX fail');
+                    });
+                break;
         };
     },
+    handleSearchChange: function(event) {
+        var title = event.target.value
+        if (title) {
+            this.navTo(
+                {
+                    page: 'search'
+                }, {
+                    domain: 'film',
+                    title: title
+                }
+            );
+            // this.setState({
+            //     searchQuery: {
+            //         domain: 'film',
+            //         title: title
+            //     }
+            // });
+        } else {
+            this.setState({
+                searchQuery: {
+                    domain: '',
+                    title: ''
+                }
+            });
+        }
+    },
     render: function() {
+        var content;
         switch(this.state.location.page) {
             case 'film':
-                return <FilmPage data={this.state.filmData} navTo={this.navTo} />;
+                content = <FilmPage data={this.state.filmData} navTo={this.navTo} />;
+                break;
             default:
-                return <IndexPage data={this.state.indexData} navTo={this.navTo} />;
+                content = <SearchPage
+                    searchResults={this.state.searchResults}
+                    searchQuery={this.state.searchQuery}
+                    handleSearchChange={this.handleSearchChange}
+                    navTo={this.navTo}
+                />;
         };
+        return <div>
+            <div>
+                <span className="logo clickable" onClick={ () => {
+                    this.navTo(
+                        {
+                            page: 'search'
+                        }, {
+                            domain: '',
+                            title: ''
+                        }
+                    );
+                } }>KT</span>
+                <span>{this.state.pageTitle}</span>
+            </div>
+            <div>{content}</div>
+        </div>;
     }
 });
 
