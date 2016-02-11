@@ -34,18 +34,6 @@ class Command(BaseCommand):
             END
         WHERE f.id = t.id
         ''')
-        self.stdout.write('Films/actor count...')
-        cursor.execute('''
-        UPDATE ktapp_film f, (
-            SELECT f.id,
-            COUNT(DISTINCT fa.artist_id) AS actor_count
-            FROM ktapp_film f
-            INNER JOIN ktapp_filmartistrelationship fa ON fa.film_id = f.id AND fa.role_type = 'A'
-            GROUP BY f.id
-        ) t
-        SET f.number_of_actors = t.actor_count
-        WHERE f.id = t.id
-        ''')
         self.stdout.write('Artists...')
         cursor.execute('''
         UPDATE ktapp_artist a, (

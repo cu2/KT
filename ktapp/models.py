@@ -957,7 +957,14 @@ class FilmArtistRelationship(models.Model):
         else:
             self.film.directors_cache = ''
             self.film.director_names_cache = ''
-        self.film.save(update_fields=['directors_cache', 'director_names_cache'])
+        self.film.number_of_actors = FilmArtistRelationship.objects.filter(film_id=self.film, role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR).count()
+        self.film.save(update_fields=['directors_cache', 'director_names_cache', 'number_of_actors'])
+
+
+@receiver(post_delete, sender=FilmArtistRelationship)
+def delete_role(sender, instance, **kwargs):
+    instance.film.number_of_actors = FilmArtistRelationship.objects.filter(film_id=instance.film, role_type=FilmArtistRelationship.ROLE_TYPE_ACTOR).count()
+    instance.film.save(update_fields=['number_of_actors'])
 
 
 class Biography(models.Model):
