@@ -1,0 +1,54 @@
+{% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
+{% load kt_extras %}
+
+{% block user_profile_main %}
+
+    {% if articles %}
+        <table class="fullsize">
+            <thead>
+            <tr class="header_tr">
+                <th style="width: 20%">Miről/Kiről</th>
+                <th style="width: 15%">Oldal</th>
+                <th style="width: 55%">Írás</th>
+                <th style="width: 10%">Mikor</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for article in articles %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td>
+                        {% if article.1 == 'R' %}
+                            {{ article.2|film_url_html }}
+                        {% elif article.1 == 'B' %}
+                            <a href="{% url 'artist' article.3.id article.3.slug_cache %}">{{ article.3 }}</a>
+                        {% elif article.1 == 'A' %}
+                            {% if article.3 %}
+                                {{ article.3 }}
+                            {% elif article.2 %}
+                                {{ article.2|film_url_html }}
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if article.1 == 'A' %}
+                            {{ article.7 }}
+                        {% else %}
+                            Kritikus Tömeg
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if article.1 == 'A' %}
+                            <b><a href="{{ article.5 }}" target="_blank">{{ article.6 }}</a></b><br />
+                        {% endif %}
+                        {% autoescape off %}
+                        {{ article.4 }}
+                        {% endautoescape %}
+                    </td>
+                    <td class="center">{{ article.0|date:"Y-m-d" }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+{% endblock %}

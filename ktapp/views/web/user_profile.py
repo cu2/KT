@@ -25,10 +25,8 @@ FILMS_PER_PAGE = 100
 MINIMUM_YEAR = 1920
 
 USER_PROFILE_TAB_WIDTH = {
-    # True: '11',  # 1/9
-    # False: '12.3',  # 1/8
-    True: '12.3',  # 1/8
-    False: '14.2',  # 1/7
+    True: '11',  # 1/9
+    False: '12.3',  # 1/8
 }
 
 
@@ -37,17 +35,13 @@ def _get_user_profile_numbers(request, selected_user):
         number_of_messages = models.MessageCountCache.get_count(owned_by=request.user, partner=selected_user)
     else:
         number_of_messages = 0
-    number_of_articles = 0
-    # number_of_articles += models.Review.objects.filter(created_by=selected_user).count()
-    # number_of_articles += models.Biography.objects.filter(created_by=selected_user).count()
-    # number_of_articles += models.Link.objects.filter(author=selected_user).count()
     return (
         selected_user.number_of_ratings,
         selected_user.number_of_comments,
         selected_user.number_of_wishes_yes + selected_user.number_of_wishes_no + selected_user.number_of_wishes_get,
         selected_user.number_of_toplists,
         number_of_messages,
-        number_of_articles,
+        selected_user.number_of_reviews + selected_user.number_of_bios + selected_user.number_of_links,
     )
 
 
@@ -513,6 +507,35 @@ def user_toplists(request, id, name_slug):
 def user_articles(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
     number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+    articles = []
+    for review in models.Review.objects.filter(created_by=selected_user).select_related('film'):
+        articles.append((
+            review.created_at,
+            'R',
+            review.film,
+            None,
+            review.snippet + '...',
+        ))
+    for bio in models.Biography.objects.filter(created_by=selected_user).select_related('artist'):
+        articles.append((
+            bio.created_at,
+            'B',
+            None,
+            bio.artist,
+            bio.snippet + '...',
+        ))
+    for article in models.Link.objects.filter(author=selected_user).select_related('film', 'artist'):
+        articles.append((
+            article.created_at,
+            'A',
+            article.film,
+            article.artist,
+            article.lead,
+            article.url,
+            article.name,
+            article.link_domain,
+        ))
+    articles.sort(key=lambda item: item[0], reverse=True)
     return render(request, 'ktapp/user_profile_subpages/user_articles.html', {
         'active_tab': 'articles',
         'selected_user': selected_user,
@@ -523,6 +546,7 @@ def user_articles(request, id, name_slug):
         'number_of_articles': number_of_articles,
         'number_of_messages': number_of_messages,
         'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
+        'articles': articles,
     })
 
 

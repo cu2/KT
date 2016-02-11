@@ -79,6 +79,9 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_wishes_no = models.PositiveIntegerField(default=0)
     number_of_wishes_get = models.PositiveIntegerField(default=0)
     number_of_toplists = models.PositiveIntegerField(default=0)
+    number_of_reviews = models.PositiveIntegerField(default=0)
+    number_of_bios = models.PositiveIntegerField(default=0)
+    number_of_links = models.PositiveIntegerField(default=0)
     is_reliable = models.BooleanField(default=False)
     bio = models.TextField(blank=True)
     bio_html = models.TextField(blank=True)
@@ -775,6 +778,8 @@ class Review(FilmUserContent):
         super(Review, self).save(*args, **kwargs)
         self.film.number_of_reviews = self.film.review_set.filter(approved=True).count()
         self.film.save(update_fields=['number_of_reviews'])
+        self.created_by.number_of_reviews = Review.objects.filter(created_by=self.created_by, approved=True).count()
+        self.created_by.save(update_fields=['number_of_reviews'])
 
     def __unicode__(self):
         return self.content[:50]
@@ -784,6 +789,8 @@ class Review(FilmUserContent):
 def delete_review(sender, instance, **kwargs):
     instance.film.number_of_reviews = instance.film.review_set.filter(approved=True).count()
     instance.film.save(update_fields=['number_of_reviews'])
+    instance.created_by.number_of_reviews = Review.objects.filter(created_by=instance.created_by, approved=True).count()
+    instance.created_by.save(update_fields=['number_of_reviews'])
 
 
 class Award(models.Model):
@@ -840,6 +847,9 @@ class Link(models.Model):
         if self.film:
             self.film.number_of_links = self.film.link_set.count()
             self.film.save(update_fields=['number_of_links'])
+            if self.author:
+                self.author.number_of_links = Link.objects.filter(author=self.author).count()
+                self.author.save(update_fields=['number_of_links'])
 
     def __unicode__(self):
         return self.name
@@ -850,6 +860,9 @@ def delete_link(sender, instance, **kwargs):
     if instance.film:
         instance.film.number_of_links = instance.film.link_set.count()
         instance.film.save(update_fields=['number_of_links'])
+        if instance.author:
+            instance.author.number_of_links = Link.objects.filter(author=instance.author).count()
+            instance.author.save(update_fields=['number_of_links'])
 
 
 class Artist(models.Model):
@@ -962,6 +975,8 @@ class Biography(models.Model):
         self.content_html = kt_utils.bbcode_to_html(self.content)
         self.snippet = strip_tags(self.content_html)[:500]
         super(Biography, self).save(*args, **kwargs)
+        self.created_by.number_of_bios = Biography.objects.filter(created_by=self.created_by, approved=True).count()
+        self.created_by.save(update_fields=['number_of_bios'])
 
     def __unicode__(self):
         return self.content[:50]
@@ -969,6 +984,12 @@ class Biography(models.Model):
     class Meta:
         ordering = ['-created_at']
         get_latest_by = 'created_at'
+
+
+@receiver(post_delete, sender=Biography)
+def delete_biography(sender, instance, **kwargs):
+    instance.created_by.number_of_bios = Biography.objects.filter(created_by=instance.created_by, approved=True).count()
+    instance.created_by.save(update_fields=['number_of_bios'])
 
 
 class Keyword(models.Model):
