@@ -144,6 +144,7 @@
                                 <li><a href="{% url 'suggested_bios' %}">Beküldött portrék</a></li>
                             {% endif %}
                             {% if user.is_staff or user.is_reliable %}
+                                <li><a href="{% url 'films_with_missing_data' %}">Hiányos filmek</a></li>
                                 <li><a href="{% url 'changes' %}">Változások</a></li>
                             {% endif %}
                             {% if user.is_superuser %}

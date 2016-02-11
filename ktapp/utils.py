@@ -112,6 +112,7 @@ def check_permission(perm, user, silent=True):
             'delete_role': 'core',
             'new_topic': 'core',
             'check_changes': 'reliable',
+            'check_missing_data': 'reliable',
             'poll_admin': 'admin',
             'new_poll': 'core',
             'suggest_link': 'core',

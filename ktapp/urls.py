@@ -105,6 +105,7 @@ urlpatterns += [
     url(r'^elemzes_elutasitasa$', post_views.disapprove_review, name='disapprove_review'),
 
     url(r'^valtozasok/$', web_views.changes, name='changes'),
+    url(r'^hianyos_filmek/$', film_views.films_with_missing_data, name='films_with_missing_data'),
 
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)/kepek/$', web_views.artist_pictures, name='artist_pictures'),
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)/kepek/(?P<picture_id>\d+)$', web_views.artist_picture, name='artist_picture'),

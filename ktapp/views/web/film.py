@@ -483,3 +483,23 @@ def suggested_films(request):
             for f in models.SuggestedContent.objects.select_related('created_by').filter(domain=models.SuggestedContent.DOMAIN_FILM).order_by('-created_at')
         ],
     })
+
+
+@login_required
+@kt_utils.kt_permission_required('check_missing_data')
+def films_with_missing_data(request):
+    miss_type = request.GET.get('tipus', '')
+    if miss_type not in {'tortenet', 'plakat', 'szereplok'}:
+        miss_type = 'tortenet'
+    if miss_type == 'tortenet':
+        films = models.Film.objects.filter(plot_summary='').order_by('-number_of_ratings')[:100]
+    elif miss_type == 'plakat':
+        films = models.Film.objects.filter(main_poster=None).order_by('-number_of_ratings')[:100]
+    elif miss_type == 'szereplok':
+        films = models.Film.objects.filter(genre_cache_is_animation=False, number_of_actors=0).order_by('-number_of_ratings')[:100]
+    else:
+        raise Http404
+    return render(request, 'ktapp/films_with_missing_data.html', {
+        'active_tab': miss_type,
+        'films': films,
+    })

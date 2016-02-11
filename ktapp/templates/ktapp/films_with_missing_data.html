@@ -1,0 +1,41 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Hiányos filmek - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Hiányos filmek</h1>
+{% endblock %}
+
+{% block main %}
+
+    <nav id="tabs" class="clearfix">
+        <ul>
+            <li style="width: 33%"{% if active_tab == 'tortenet' %} class="active_tab"{% endif %}><a href="{% url 'films_with_missing_data' %}?tipus=tortenet">történet</a></li>
+            <li style="width: 33%"{% if active_tab == 'plakat' %} class="active_tab"{% endif %}><a href="{% url 'films_with_missing_data' %}?tipus=plakat">plakát</a></li>
+            <li style="width: 33%"{% if active_tab == 'szereplok' %} class="active_tab"{% endif %}><a href="{% url 'films_with_missing_data' %}?tipus=szereplok">szereplők</a></li>
+        </ul>
+    </nav>
+
+    <table class="fullsize">
+        <thead>
+        <tr class="header_tr">
+            <th>Film</th>
+            <th>Év</th>
+            <th>Rendező</th>
+            <th>Műfaj</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for film in films %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td>{{ film|film_url_html }}</td>
+                <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
+                <td>{{ film|film_directors }}</td>
+                <td>{{ film|film_genres }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

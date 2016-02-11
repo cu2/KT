@@ -228,6 +228,8 @@ class Film(models.Model):
     genre_cache_is_short = models.BooleanField(default=False)
     genre_cache_is_mini = models.BooleanField(default=False)
     genre_cache_is_music_video = models.BooleanField(default=False)
+    genre_cache_is_animation = models.BooleanField(default=False)
+    number_of_actors = models.PositiveIntegerField(default=0)
 
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'
@@ -274,6 +276,7 @@ class Film(models.Model):
         self.genre_cache_is_music_video = False
         self.genre_cache_is_mini = False
         self.genre_cache_is_short = False
+        self.genre_cache_is_animation = False
         for g in self.genres():
             if g.id == 314:
                 self.genre_cache_is_music_video = True
@@ -281,6 +284,8 @@ class Film(models.Model):
                 self.genre_cache_is_mini = True
             if g.id == 120:
                 self.genre_cache_is_short = True
+            if g.id in {368, 27}:  # animation, anime
+                self.genre_cache_is_animation = True
             ids.append(unicode(g.id))
             slugs.append(g.slug_cache)
             names.append(g.name)
