@@ -1221,7 +1221,7 @@ def email_header(request):
     )
     email_header_jpg = open('/home/publisher/kt/current/static/ktapp/images/email_header.jpg', 'rb')
     response = HttpResponse(content=email_header_jpg.read())
-    response['Content-Type']= 'image/jpg'
+    response['Content-Type'] = 'image/jpg'
     return response
 
 
@@ -1378,7 +1378,7 @@ def vapiti_gold_winners(request):
     raw_awards = [(a.year, a.film_id) for a in models.Award.objects.filter(
         name=u'Vapiti',
         category=texts.VAPITI_WINNER_CATEGORIES['G'],
-    ).order_by('-year')]
+    ).order_by('-year', '-id')]
     films, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('film_id_list', ','.join([str(film_id) for _, film_id in raw_awards]))],
@@ -1407,7 +1407,7 @@ def vapiti_silver(request, gender):
                 year=settings.VAPITI_YEAR,
                 vapiti_round=vapiti_round,
                 vapiti_type=vapiti_type,
-            ).select_related('film', 'artist'):
+        ).select_related('film', 'artist'):
             my_vapiti_votes[vv.serial_number] = '%s [%s]' % (
                 vv.artist.name,
                 ('%s / %s' % (vv.film.orig_title, vv.film.second_title)) if vv.film.second_title else vv.film.orig_title,
@@ -1512,6 +1512,40 @@ def vapiti_silver_2(request, gender):
         'nominees': nominees,
         'my_vapiti_vote_film_id': my_vapiti_vote_film_id,
         'my_vapiti_vote_artist_id': my_vapiti_vote_artist_id,
+    })
+
+
+def vapiti_silver_winners(request, gender):
+    vapiti_type = models.VapitiVote.VAPITI_TYPE_SILVER_MALE if gender == 'ferfi' else models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE
+    raw_awards = [(a.year, a.film_id, a.artist) for a in models.Award.objects.filter(
+        name=u'Vapiti',
+        category=texts.VAPITI_WINNER_CATEGORIES[vapiti_type],
+    ).select_related('artist').order_by('-year', '-id')]
+    raw_roles = {
+        (role.film_id, role.artist_id): role
+        for role in models.FilmArtistRelationship.objects.filter(
+            film_id__in=[film_id for _, film_id, _ in raw_awards],
+            artist_id__in=[artist.id for _, _, artist in raw_awards],
+        )
+    }
+    films, _ = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[('film_id_list', ','.join([str(film_id) for _, film_id, _ in raw_awards]))],
+        films_per_page=None,
+    )
+    raw_films = {film.id: film for film in films}
+    awards = []
+    for year, film_id, artist in raw_awards:
+        film = raw_films[film_id]
+        film.award_year = year
+        film.artist = artist
+        film.role = raw_roles[(film_id, artist.id)]
+        awards.append(film)
+    return render(request, 'ktapp/vapiti_subpages/vapiti_silver_winners.html', {
+        'vapiti_year': settings.VAPITI_YEAR,
+        'gender': gender,
+        'active_tab': 'winners',
+        'awards': awards,
     })
 
 

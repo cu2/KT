@@ -182,6 +182,7 @@ urlpatterns += [
     url(r'^arany_vapiti/gyoztesek/$', web_views.vapiti_gold_winners, name='vapiti_gold_winners'),
     url(r'^ezust_vapiti/(?P<gender>ferfi|noi)/$', web_views.vapiti_silver, name='vapiti_silver'),
     url(r'^ezust_vapiti/masodik_fordulo/(?P<gender>ferfi|noi)/$', web_views.vapiti_silver_2, name='vapiti_silver_2'),
+    url(r'^ezust_vapiti/gyoztesek/(?P<gender>ferfi|noi)/$', web_views.vapiti_silver_winners, name='vapiti_silver_winners'),
     url(r'^jelol_vapiti$', post_views.vote_vapiti, name='vote_vapiti'),
 
     # legacy redirects:
