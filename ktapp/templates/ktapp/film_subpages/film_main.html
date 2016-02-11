@@ -60,7 +60,7 @@
                                 <input type="text" id="new_role_name" class="full_input" /><br />
                                 <select id="new_role_type">
                                     <option value="F">teljes valójában</option>
-                                    <option value="V">csak a hangja</option>
+                                    <option value="V"{% if film.genre_cache_is_animation %} selected="selected"{% endif %}>csak a hangja</option>
                                 </select>
                             </td>
                             <td>
