@@ -103,3 +103,8 @@ VAPITI_NOMINEE_CATEGORIES = {
     'F': u'Ezüst Vapiti a legjobb színésznőnek jelölés',
     'M': u'Ezüst Vapiti a legjobb színésznek jelölés',
 }
+VAPITI_WINNER_CATEGORIES = {
+    'G': u'Arany Vapiti a legjobb filmnek',
+    'F': u'Ezüst Vapiti a legjobb színésznőnek',
+    'M': u'Ezüst Vapiti a legjobb színésznek',
+}

@@ -12,7 +12,7 @@
         <ul>
             <li style="width: 34%"{% if active_tab == '' %} class="active_tab"{% endif %}><a href="{% url 'vapiti_gold' %}">első forduló</a></li>
             <li style="width: 33%"{% if active_tab == '2' %} class="active_tab"{% endif %}><a href="{% url 'vapiti_gold_2' %}">második forduló</a></li>
-            <li style="width: 33%"{% if active_tab == 'winners' %} class="active_tab"{% endif %}>győztesek</li>
+            <li style="width: 33%"{% if active_tab == 'winners' %} class="active_tab"{% endif %}><a href="{% url 'vapiti_gold_winners' %}">győztesek</a></li>
         </ul>
     </nav>
 

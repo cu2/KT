@@ -1,0 +1,39 @@
+{% extends "ktapp/vapiti_subpages/vapiti_gold_base.html" %}
+{% load kt_extras %}
+
+{% block premier_main %}
+
+{% if awards %}
+    <table class="fullsize">
+        <tr class="header_tr">
+            <th>Év</th>
+            <th>Film</th>
+            <th>Rendező</th>
+            <th>Műfaj</th>
+            <th>Nézettség</th>
+            <th>Átlag</th>
+            {% if request.user.is_authenticated %}
+                <th>Kedvenceid</th>
+                <th>Szerinted</th>
+                <th>&#9733;</th>
+            {% endif %}
+        </tr>
+    {% for film in awards %}
+        <tr class="{% cycle '' 'odd' %}">
+            <td>{{ film.award_year }}</td>
+            <td>{{ film|film_url_html_w_year }}</td>
+            <td>{{ film|film_directors }}</td>
+            <td>{{ film|film_genres }}</td>
+            <td class="center">{{ film|film_num_rating_html }}</td>
+            <td class="center">{{ film|film_avg_rating_html }}</td>
+            {% if request.user.is_authenticated %}
+                <td class="center">{{ film|film_fav_rating_html }}</td>
+                <td class="center">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
+                <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </table>
+{% endif %}
+
+{% endblock %}

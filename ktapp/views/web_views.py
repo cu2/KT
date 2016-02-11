@@ -18,6 +18,7 @@ from ktapp import forms as kt_forms
 from ktapp import utils as kt_utils
 from ktapp.helpers import filmlist
 from ktapp import sqls as kt_sqls
+from ktapp import texts
 
 
 COMMENTS_PER_PAGE = 100
@@ -1373,11 +1374,27 @@ def vapiti_gold_2(request):
     })
 
 
-# def vapiti_gold_winners(request):
-#     return render(request, 'ktapp/vapiti_subpages/vapiti_gold_winners.html', {
-#         'vapiti_year': settings.VAPITI_YEAR,
-#         'active_tab': 'winners',
-#     })
+def vapiti_gold_winners(request):
+    raw_awards = [(a.year, a.film_id) for a in models.Award.objects.filter(
+        name=u'Vapiti',
+        category=texts.VAPITI_WINNER_CATEGORIES['G'],
+    ).order_by('-year')]
+    films, _ = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[('film_id_list', ','.join([str(film_id) for _, film_id in raw_awards]))],
+        films_per_page=None,
+    )
+    raw_films = {film.id: film for film in films}
+    awards = []
+    for year, film_id in raw_awards:
+        film = raw_films[film_id]
+        film.award_year = year
+        awards.append(film)
+    return render(request, 'ktapp/vapiti_subpages/vapiti_gold_winners.html', {
+        'vapiti_year': settings.VAPITI_YEAR,
+        'active_tab': 'winners',
+        'awards': awards,
+    })
 
 
 def vapiti_silver(request, gender):

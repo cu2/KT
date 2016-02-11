@@ -433,6 +433,9 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     additional_param['seen_by_other_rating_min'] = other_rating_interval[0]
                     additional_param['seen_by_other_rating_max'] = other_rating_interval[1]
                     nice_filters.append((filter_type, filter_value))
+            if filter_type == 'film_id_list':
+                additional_where.append('''f.id IN (%s)''' % filter_value)
+                nice_filters.append((filter_type, filter_value))
     order_by = None
     if ordering:
         try:
