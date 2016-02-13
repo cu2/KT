@@ -236,6 +236,29 @@ def search(request):
     topics = models.Topic.objects.filter(title__icontains=q).order_by('-number_of_comments')[:settings.MAX_SEARCH_RESULTS + 1]
     polls = models.Poll.objects.filter(title__icontains=q).order_by('-number_of_comments')[:settings.MAX_SEARCH_RESULTS + 1]
     users = models.KTUser.objects.filter(username__icontains=q).order_by('username')[:settings.MAX_SEARCH_RESULTS + 1]
+    # redirect to single hit:
+    if len(films) + len(artists) + len(roles) + len(sequels) + len(topics) + len(polls) + len(users) == 1:
+        if films:
+            item = films[0]
+            return HttpResponseRedirect(reverse('film_main', args=(item.id, item.slug_cache)))
+        if artists:
+            item = artists[0]
+            return HttpResponseRedirect(reverse('artist', args=(item.id, item.slug_cache)))
+        if roles:
+            item = roles[0]
+            return HttpResponseRedirect(reverse('role', args=(item.id, item.slug_cache)))
+        if sequels:
+            item = sequels[0]
+            return HttpResponseRedirect(reverse('sequel', args=(item.id, item.slug_cache)))
+        if topics:
+            item = topics[0]
+            return HttpResponseRedirect(reverse('forum', args=(item.id, item.slug_cache)))
+        if polls:
+            item = polls[0]
+            return HttpResponseRedirect(reverse('poll', args=(item.id, item.slug_cache)))
+        if users:
+            item = users[0]
+            return HttpResponseRedirect(reverse('user_profile', args=(item.id, item.slug_cache)))
     return render(request, 'ktapp/search.html', {
         'q': q,
         'films': films[:settings.MAX_SEARCH_RESULTS],
