@@ -223,6 +223,49 @@ def search(request):
     q = request.GET.get('q', '')
     if len(q) < 2:
         return HttpResponseRedirect(reverse('index'))
+    # search by IMDB link:
+    if 'imdb.com/title' in q:
+        try:
+            imdb_link = q[q.index('imdb.com/title')+15:].split('/')[0]
+        except Exception:
+            imdb_link = None
+        if imdb_link:
+            try:
+                film = models.Film.objects.get(imdb_link=imdb_link)
+            except models.Film.DoesNotExist:
+                film = None
+            if film:
+                return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+    # search by port.hu link:
+    if 'port.hu' in q:
+        try:
+            porthu_link = q[q.index('i_film_id=')+10:].split('&')[0]
+        except Exception:
+            porthu_link = None
+        if porthu_link:
+            try:
+                film = models.Film.objects.get(porthu_link=porthu_link)
+            except models.Film.DoesNotExist:
+                film = None
+            if film:
+                return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+    # search by wikipedia link:
+    if 'wikipedia.org' in q:
+        try:
+            wikipedia_link = q[q.index('://')+3:]
+        except Exception:
+            wikipedia_link = None
+        if wikipedia_link:
+            try:
+                film = models.Film.objects.get(wikipedia_link_en__contains=wikipedia_link)
+            except models.Film.DoesNotExist:
+                try:
+                    film = models.Film.objects.get(wikipedia_link_hu__contains=wikipedia_link)
+                except models.Film.DoesNotExist:
+                    film = None
+            if film:
+                return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+    # normal search:
     films, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('title', q)],
