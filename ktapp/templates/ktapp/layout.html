@@ -80,7 +80,7 @@
             <ul>
                 <li>Filmek<br />
                     <ul class="submenu">
-                        <li><a href="{% url 'browse' %}">Böngészés</a></li>
+                        <li><a href="{% url 'browse' %}">Összetett kereső</a></li>
                         <li><a href="{% url 'premiers' %}">Bemutatók</a></li>
                         {% if user.is_authenticated %}
                             <li><a href="{% url 'user_wishlist' user.id user.slug_cache %}">Kívánságaid</a></li>

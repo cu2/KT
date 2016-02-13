@@ -44,7 +44,7 @@ urlpatterns += [
     url(r'^$', web_views.index, name='index'),
 
     url(r'^keres/$', web_views.search, name='search'),
-    url(r'^bongeszes/$', web_views.browse, name='browse'),
+    url(r'^osszetett_kereso/$', web_views.browse, name='browse'),
     url(r'^bemutatok/(?P<year>\d+)/$', web_views.premiers_in_a_year, name='premiers_in_a_year'),
     url(r'^bemutatok/$', web_views.premiers, name='premiers'),
     url(r'^top_filmek/$', web_views.top_films, name='top_films'),
@@ -193,6 +193,7 @@ urlpatterns += [
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/kivansagok/$', RedirectView.as_view(pattern_name='user_wishlist')),
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', RedirectView.as_view(pattern_name='user_messages')),
     url(r'^tag/(?P<id>\d+)/(?P<name_slug>[^/]*)$', RedirectView.as_view(pattern_name='user_profile')),
+    url(r'^bongeszes/$', RedirectView.as_view(pattern_name='browse')),
 ]
 
 
