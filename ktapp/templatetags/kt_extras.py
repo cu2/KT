@@ -54,6 +54,20 @@ def film_genres(film, all=None):
 
 
 @register.filter
+def film_genres_jsonld(film):
+    if not film.genres_cache:
+        return ''
+    ids, slugs, names = film.genres_cache.split(';')
+    ids = ids.split(',')
+    slugs = slugs.split(',')
+    names = names.split(',')
+    genre_links = []
+    for id, slug_cache, name in zip(ids, slugs, names):
+        genre_links.append('"%s"' % name)
+    return mark_safe('"genre": [%s],' % (', '.join(genre_links)))
+
+
+@register.filter
 def film_url_html(film, subpage='film_main'):
     if film.second_title:
         second_row = film.second_title
@@ -197,6 +211,14 @@ def film_avg_rating_html(film):
     else:
         avg_rating = round(film.average_rating, 1)
     return unicode(avg_rating).replace('.', ',')
+
+
+@register.filter
+def film_avg_rating_english(film):
+    if film.average_rating:
+        avg_rating = round(film.average_rating, 1)
+        return unicode(avg_rating)
+    return ''
 
 
 @register.filter

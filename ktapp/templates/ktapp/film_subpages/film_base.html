@@ -15,6 +15,76 @@
     <meta property="fb:description" content="{{ film.plot_summary|strip_whitespace }}" />
 {% endblock %}
 
+{% block jsonld %}
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Movie",
+  "image": "{{ film.main_poster.get_display_urls.max }}",
+  "thumbnailUrl": "{{ film.main_poster.get_display_urls.mid }}",
+  "name": "{{ film.orig_title }}{% if film.year %} ({{ film.year }}){% endif %}",
+  {% if film.second_title %}
+  "alternativeHeadline": "{{ film.second_title }}",
+  {% endif %}
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    {% if film.average_rating %}
+    "ratingValue": "{{ film|film_avg_rating_english }}",
+    {% endif %}
+    "ratingCount": "{{ film.number_of_ratings }}"
+  },
+  "description": "{{ film.plot_summary|strip_whitespace }}",
+  {% if film_directors %}
+  "director": [
+    {% for director in film_directors %}
+    {
+      "@type": "Person",
+      "name": "{{ director.name }}",
+      "url": "http://kritikustomeg.org{% url 'artist' director.id director.slug_cache %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ],
+  {% endif %}
+  {% if countries %}
+  "countryOfOrigin": [
+    {% for country in countries %}
+    {
+      "@type": "Country",
+      "name": "{{ country.name }}"
+    }{% if not forloop.last %}-{% endif %}
+    {% endfor %}
+  ],
+  {% endif %}
+  {{ film|film_genres_jsonld }}
+  {% if major_keywords or other_keywords %}
+  "keywords": [
+    {% for keyword, spoiler in major_keywords %}
+    "{{ keyword.name }}"{% if not forloop.last or other_keywords %}, {% endif %}
+    {% endfor %}
+    {% for keyword, spoiler in other_keywords %}
+    "{{ keyword.name }}"{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  ],
+  {% endif %}
+  {% if roles %}
+  "actor": [
+    {% for role in roles %}
+    {
+      "@type": "Person",
+      "name": "{{ role.artist.name }}",
+      "url": "http://kritikustomeg.org{% url 'artist' role.artist.id role.artist.slug_cache %}"
+    }{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ],
+  {% endif %}
+  {% if film.main_premier %}
+    "datePublished": "{{ film.main_premier|date:"Y-m-d" }}",
+  {% endif %}
+  "url": "{{ film.absolute_url }}"
+}
+</script>
+{% endblock %}
+
 {% block header %}
     <div id="film_header" class="hover_show_button_context">
         <div id="film_title">
