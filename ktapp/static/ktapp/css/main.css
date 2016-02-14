@@ -1009,6 +1009,11 @@ ul.poll li {
 #search_input {
     width: 60px;
 }
+#search_input.loading {
+    background-image: url(/static/ktapp/images/ajax-loader.gif);
+    background-position: 100% 0;
+    background-repeat: no-repeat;
+}
 @media (min-width: 360px) {
     #search_input {
         width: 100px;
