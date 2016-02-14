@@ -11,7 +11,7 @@
 {% load staticfiles %}
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=39" />
+        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=40" />
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <base href="/" />
         <script>
@@ -62,14 +62,14 @@
                             <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
                             <span class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></span>
                             <input type="submit" value="Bejelentkezés" class="small_button" tabindex="4" />
+                            <span><a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">Regisztráció</a></span>
                         </form></li>
-                        <li id="reg_menu"><a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">Regisztráció</a></li>
                     {% endif %}
                 </ul>
             </div>
             <div class="toptopmenu_right">
                 <form class="inline" action="{% url 'search' %}" method="get">
-                    <input type="text" placeholder="Keresés..." tabindex="1" name="q" class="search_input" />
+                    <input type="text" placeholder="Keresés..." tabindex="1" name="q" autocomplete="off" id="search_input" />
                     <input type="submit" value="Keresés" class="small_button" id="search_submit_button" />
                     <input type="submit" value="?" class="small_button" id="mobile_search_submit_button" />
                 </form>
@@ -166,6 +166,8 @@
             </ul>
         </footer>
 
+        <div id="search_autocomplete_results" style="display: none"></div>
+
         {% block jsonld %}{% endblock %}
 
         <script src="{% static 'ktapp/js/jquery-1.11.2.min.js' %}"></script>
@@ -173,6 +175,6 @@
         <script src="{% static 'ktapp/js/jquery.cookie.js' %}"></script>
         <script src="{% static 'ktapp/js/rangyinputs-jquery.js' %}"></script>
         <script src="{% static 'ktapp/js/stupidtable.min.js' %}"></script>
-        <script src="{% static 'ktapp/js/main.js' %}?v=26"></script>
+        <script src="{% static 'ktapp/js/main.js' %}?v=27"></script>
     </body>
 </html>

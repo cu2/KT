@@ -1,4 +1,5 @@
 from django.db import connection
+from django.template.defaultfilters import slugify
 
 from ktapp import models
 from ktapp import utils as kt_utils
@@ -36,25 +37,36 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                 nice_filters.append((filter_type, filter_value))
             if filter_type == 'title':
                 title_pieces = []
+                title_where = []
                 for idx, title_piece in enumerate(filter_value.split(' ')):
                     title_piece = title_piece.strip()
                     if title_piece:
                         title_piece_num = idx + 1
                         title_pieces.append(title_piece)
-                        additional_where.append('''(f.orig_title LIKE %(title_piece_like_{title_piece_num})s OR f.second_title LIKE %(title_piece_like_{title_piece_num})s OR f.third_title LIKE %(title_piece_like_{title_piece_num})s)'''.format(title_piece_num=title_piece_num))
+                        title_where.append('''(f.slug_cache LIKE %(title_piece_slug_like_{title_piece_num})s OR f.orig_title LIKE %(title_piece_like_{title_piece_num})s OR f.second_title LIKE %(title_piece_like_{title_piece_num})s OR f.third_title LIKE %(title_piece_like_{title_piece_num})s)'''.format(title_piece_num=title_piece_num))
                         additional_param['title_piece_%s' % title_piece_num] = u'{term}'.format(term=title_piece)
                         additional_param['title_piece_like_%s' % title_piece_num] = u'%{term}%'.format(term=title_piece)
-                        additional_select.append('''
-                            LEAST(
-                                CASE WHEN LOCATE(%(title_piece_{title_piece_num})s, orig_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(orig_title) - {lenq}) + LOCATE(%(title_piece_{title_piece_num})s, orig_title) END,
-                                CASE WHEN LOCATE(%(title_piece_{title_piece_num})s, second_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(second_title) - {lenq}) + LOCATE(%(title_piece_{title_piece_num})s, second_title) END,
-                                CASE WHEN LOCATE(%(title_piece_{title_piece_num})s, third_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(third_title) - {lenq}) + LOCATE(%(title_piece_{title_piece_num})s, third_title) END
-                            ) AS title_match_{title_piece_num},
-                        '''.format(
-                            title_piece_num=title_piece_num,
-                            lenq=len(title_piece)
-                        ))
-                        title_matches.append('title_match_%s' % title_piece_num)
+                        additional_param['title_piece_slug_%s' % title_piece_num] = u'{term}'.format(term=slugify(title_piece))
+                        additional_param['title_piece_slug_like_%s' % title_piece_num] = u'%{term}%'.format(term=slugify(title_piece))
+                        # additional_select.append('''
+                        #     LEAST(
+                        #         CASE WHEN LOCATE(%(title_piece_slug_{title_piece_num})s, slug_cache) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(slug_cache) - {lenq}) + LOCATE(%(title_piece_slug_{title_piece_num})s, slug_cache) END,
+                        #         CASE WHEN LOCATE(%(title_piece_{title_piece_num})s, orig_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(orig_title) - {lenq}) + LOCATE(%(title_piece_{title_piece_num})s, orig_title) END,
+                        #         CASE WHEN LOCATE(%(title_piece_{title_piece_num})s, second_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(second_title) - {lenq}) + LOCATE(%(title_piece_{title_piece_num})s, second_title) END,
+                        #         CASE WHEN LOCATE(%(title_piece_{title_piece_num})s, third_title) = 0 THEN 99 ELSE ABS(CHAR_LENGTH(third_title) - {lenq}) + LOCATE(%(title_piece_{title_piece_num})s, third_title) END
+                        #     ) AS title_match_{title_piece_num},
+                        # '''.format(
+                        #     title_piece_num=title_piece_num,
+                        #     lenq=len(title_piece)
+                        # ))
+                        # title_matches.append('title_match_%s' % title_piece_num)
+                if title_where:
+                    additional_where.append('''(f.slug_cache = %(full_title_slug)s OR f.orig_title = %(full_title)s OR f.second_title = %(full_title)s OR f.third_title = %(full_title)s) OR ({pieces})'''.format(pieces=' AND '.join(title_where)))
+                else:
+                    additional_where.append('''(f.slug_cache = %(full_title_slug)s OR f.orig_title = %(full_title)s OR f.second_title = %(full_title)s OR f.third_title = %(full_title)s)''')
+                additional_select.append('''CASE WHEN f.slug_cache = %(full_title_slug)s OR f.orig_title = %(full_title)s OR f.second_title = %(full_title)s OR f.third_title = %(full_title)s THEN 1 ELSE 0 END full_title_match,''')
+                additional_param['full_title'] = filter_value
+                additional_param['full_title_slug'] = slugify(filter_value)
                 if title_pieces:
                     nice_filters.append((filter_type, ' '.join(title_pieces)))
             if filter_type == 'year':
@@ -449,9 +461,11 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
         if order_field == 'title':
             order_fields = ['f.orig_title', 'f.year', 'f.id']
         if order_field == 'title_match':
-            order_fields = ['''
-                1000 * ({title_matches}) - 1 * CAST(number_of_ratings AS SIGNED)
-            '''.format(title_matches='+'.join(title_matches))]
+            order_fields = ['10000 * full_title_match + number_of_ratings']
+            order_order = 'DESC'
+            # order_fields = ['''
+            #     1000 * ({title_matches}) - 1 * CAST(number_of_ratings AS SIGNED)
+            # '''.format(title_matches='+'.join(title_matches))]
         if order_field == 'year':
             order_fields = ['f.year', 'f.orig_title', 'f.id']
         if order_field == 'main_premier':

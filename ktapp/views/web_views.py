@@ -16,7 +16,7 @@ from kt import settings
 from ktapp import models
 from ktapp import forms as kt_forms
 from ktapp import utils as kt_utils
-from ktapp.helpers import filmlist
+from ktapp.helpers import filmlist, search as kt_search
 from ktapp import sqls as kt_sqls
 from ktapp import texts
 
@@ -223,49 +223,10 @@ def search(request):
     q = request.GET.get('q', '')
     if len(q) < 2:
         return HttpResponseRedirect(reverse('index'))
-    # search by IMDB link:
-    if 'imdb.com/title' in q:
-        try:
-            imdb_link = q[q.index('imdb.com/title')+15:].split('/')[0]
-        except Exception:
-            imdb_link = None
-        if imdb_link:
-            try:
-                film = models.Film.objects.get(imdb_link=imdb_link)
-            except models.Film.DoesNotExist:
-                film = None
-            if film:
-                return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
-    # search by port.hu link:
-    if 'port.hu' in q:
-        try:
-            porthu_link = q[q.index('i_film_id=')+10:].split('&')[0]
-        except Exception:
-            porthu_link = None
-        if porthu_link:
-            try:
-                film = models.Film.objects.get(porthu_link=porthu_link)
-            except models.Film.DoesNotExist:
-                film = None
-            if film:
-                return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
-    # search by wikipedia link:
-    if 'wikipedia.org' in q:
-        try:
-            wikipedia_link = q[q.index('://')+3:]
-        except Exception:
-            wikipedia_link = None
-        if wikipedia_link:
-            try:
-                film = models.Film.objects.get(wikipedia_link_en__contains=wikipedia_link)
-            except models.Film.DoesNotExist:
-                try:
-                    film = models.Film.objects.get(wikipedia_link_hu__contains=wikipedia_link)
-                except models.Film.DoesNotExist:
-                    film = None
-            if film:
-                return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
-    # normal search:
+    q_pieces = [q_piece.strip() for q_piece in q.split(' ')]
+    film = kt_search.find_film_by_link(q)
+    if film:
+        return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
     films, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('title', q)],
@@ -273,12 +234,12 @@ def search(request):
         films_per_page=settings.MAX_SEARCH_RESULTS + 1,
     )
     films = list(films)
-    artists = models.Artist.objects.filter(name__icontains=q).order_by('-number_of_ratings')[:settings.MAX_SEARCH_RESULTS + 1]
-    roles = models.FilmArtistRelationship.objects.select_related('artist', 'film').filter(role_name__icontains=q, role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).order_by('-artist__number_of_ratings')[:settings.MAX_SEARCH_RESULTS + 1]
-    sequels = models.Sequel.objects.filter(name__icontains=q).order_by('name')[:settings.MAX_SEARCH_RESULTS + 1]
-    topics = models.Topic.objects.filter(title__icontains=q).order_by('-number_of_comments')[:settings.MAX_SEARCH_RESULTS + 1]
-    polls = models.Poll.objects.filter(title__icontains=q).order_by('-number_of_comments')[:settings.MAX_SEARCH_RESULTS + 1]
-    users = models.KTUser.objects.filter(username__icontains=q).order_by('username')[:settings.MAX_SEARCH_RESULTS + 1]
+    artists = kt_search.find_artists(q_pieces, settings.MAX_SEARCH_RESULTS + 1)
+    roles = kt_search.find_roles(q_pieces, settings.MAX_SEARCH_RESULTS + 1)
+    sequels = kt_search.find_sequels(q_pieces, settings.MAX_SEARCH_RESULTS + 1)
+    users = kt_search.find_users(q_pieces, settings.MAX_SEARCH_RESULTS + 1)
+    topics = kt_search.find_topics(q_pieces, settings.MAX_SEARCH_RESULTS + 1)
+    polls = kt_search.find_polls(q_pieces, settings.MAX_SEARCH_RESULTS + 1)
     # redirect to single hit:
     if len(films) + len(artists) + len(roles) + len(sequels) + len(topics) + len(polls) + len(users) == 1:
         if films:

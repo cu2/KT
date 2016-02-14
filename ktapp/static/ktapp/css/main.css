@@ -407,6 +407,9 @@ input.inactive_action {
 #login_menu {
     display: none;
 }
+#login_menu span {
+    font-size: 8pt;
+}
 #login_menu #login_username {
     width: 120px;
     font-size: 11pt;
@@ -417,9 +420,6 @@ input.inactive_action {
 }
 .toptopmenu_right input {
     font-size: 11pt;
-}
-#reg_menu {
-    display: none;
 }
 #user_profile_menu, #messages_menu, #logout_menu {
     display: none;
@@ -432,9 +432,6 @@ input.inactive_action {
         display: none;
     }
     #login_menu {
-        display: block;
-    }
-    #reg_menu {
         display: block;
     }
     #user_profile_menu, #messages_menu, #logout_menu {
@@ -1009,27 +1006,77 @@ ul.poll li {
     width: 300px;
 }
 
-.search_input {
-    width: 70px;
+#search_input {
+    width: 60px;
 }
-@media (min-width: 800px) {
-    .search_input {
+@media (min-width: 360px) {
+    #search_input {
         width: 100px;
     }
 }
-@media (min-width: 950px) {
-    .search_input {
+@media (min-width: 410px) {
+    #search_input {
         width: 150px;
     }
 }
-@media (min-width: 1050px) {
-    .search_input {
+@media (min-width: 460px) {
+    #search_input {
         width: 200px;
     }
 }
-@media (min-width: 1200px) {
-    .search_input {
+@media (min-width: 600px) {
+    #search_input {
         width: 300px;
+    }
+}
+@media (min-width: 700px) {
+    #search_input {
+        width: 400px;
+    }
+}
+@media (min-width: 800px) {
+    #search_input {
+        width: 100px;
+    }
+}
+@media (min-width: 850px) {
+    #search_input {
+        width: 150px;
+    }
+}
+@media (min-width: 900px) {
+    #search_input {
+        width: 200px;
+    }
+}
+@media (min-width: 950px) {
+    #search_input {
+        width: 250px;
+    }
+}
+@media (min-width: 1050px) {
+    #search_input {
+        width: 300px;
+    }
+}
+@media (min-width: 1100px) {
+    #search_input {
+        width: 350px;
+    }
+}
+@media (min-width: 1150px) {
+    #search_input {
+        width: 400px;
+    }
+}
+@media (min-width: 1200px) {
+    #search_input {
+        width: 450px;
+    }
+}
+@media (min-width: 1250px) {
+    #search_input {
+        width: 500px;
     }
 }
 #search_submit_button {
@@ -1042,6 +1089,86 @@ ul.poll li {
     #mobile_search_submit_button {
         display: none;
     }
+}
+#search_autocomplete_results {
+    position: fixed;
+    z-index: 100;
+    background: rgb(249,244,218);
+    border: solid 1px rgb(128,128,128);
+    font-size: 8pt;
+    line-height: 1.1;
+    max-height: 430px;
+    overflow-y: scroll;
+}
+#search_autocomplete_results h2 {
+    font-size: 8pt;
+    font-weight: bold;
+    margin: 5px 5px 0 5px;
+}
+#search_autocomplete_results ul {
+    list-style: none;
+    margin: 0 0 5px 0;
+    padding: 0;
+}
+#search_autocomplete_results ul li {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    height: 50px;
+}
+#search_autocomplete_results ul li a {
+    display: block;
+    margin: 0;
+    padding: 5px;
+    overflow: hidden;
+    white-space: nowrap;
+    box-sizing: border-box;
+    height: 50px;
+    font-weight: bold;
+    color: rgb(146,23,23);
+}
+#search_autocomplete_results ul li:hover {
+    background: rgb(218,211,184);
+}
+.search_autocomplete_results_thumbnail_container {
+    display: inline-block;
+    width: 0;
+    height: 40px;
+    float: left;
+}
+.search_autocomplete_results_thumbnail_container img {
+    width: 0;
+    height: 40px;
+}
+@media (min-width: 600px) {
+    .search_autocomplete_results_thumbnail_container {
+        width: 35px;
+    }
+    .search_autocomplete_results_thumbnail_container img {
+        width: auto;
+        max-width: 35px;
+    }
+}
+@media (min-width: 800px) {
+    .search_autocomplete_results_thumbnail_container {
+        width: 0;
+    }
+    .search_autocomplete_results_thumbnail_container img {
+        width: 0;
+    }
+}
+@media (min-width: 950px) {
+    .search_autocomplete_results_thumbnail_container {
+        width: 35px;
+    }
+    .search_autocomplete_results_thumbnail_container img {
+        width: auto;
+        max-width: 35px;
+    }
+}
+.search_autocomplete_results_subtitle {
+    font-weight: normal;
+    color: rgb(0,0,0);
 }
 
 #search_results {

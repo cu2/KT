@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     # custom api endpoints:
+    url(r'^api/autocomplete/search/$', api_views.search, name='api_search'),
     url(r'^api/autocomplete/users/$', api_views.get_users, name='get_users'),
     url(r'^api/autocomplete/artists/$', api_views.get_artists, name='get_artists'),
     url(r'^api/autocomplete/keywords/$', api_views.get_keywords, name='get_keywords'),

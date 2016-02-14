@@ -1,9 +1,13 @@
+# -*- coding: utf-8 -*-
+
+import datetime
 import json
 from collections import OrderedDict
 
 from django.http import HttpResponse
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets
 from rest_framework.decorators import detail_route
@@ -12,7 +16,15 @@ from rest_framework.response import Response
 from kt import settings
 from ktapp import models
 from ktapp import serializers
-from ktapp.helpers import filmlist
+from ktapp.helpers import filmlist, search as kt_search
+
+
+HUNGARIAN_MONTHS = [
+    u'jan', u'feb', u'márc',
+    u'ápr', u'máj', u'jún',
+    u'júl', u'aug', u'szept',
+    u'okt', u'nov', u'dec',
+]
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -47,6 +59,220 @@ class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
 class SequelViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = models.Sequel.objects.all()
     serializer_class = serializers.SequelSerializer
+
+
+def search(request):
+
+    def film_title(film):
+        if film.year:
+            return u'%s (%d)' % (film.orig_title, film.year)
+        return film.orig_title
+
+    def nice_date(d):
+        return '%d %s %d' % (
+            d.year,
+            HUNGARIAN_MONTHS[int(d.month) - 1],
+            d.day,
+        )
+
+    def nice_date_interval(d1, d2):
+        if d1.year != d2.year:
+            return '%s - %s' % (nice_date(d1), nice_date(d2))
+        if d1.month != d2.month:
+            return '%d %s %d - %s %d' % (
+                d1.year,
+                HUNGARIAN_MONTHS[int(d1.month) - 1],
+                d1.day,
+                HUNGARIAN_MONTHS[int(d2.month) - 1],
+                d2.day,
+            )
+        return '%d %s %d-%d' % (
+            d1.year,
+            HUNGARIAN_MONTHS[int(d1.month) - 1],
+            d1.day,
+            d2.day,
+        )
+
+    q = request.GET.get('q', '')
+    if len(q) < 2:
+        return HttpResponse(json.dumps({
+            'q': q,
+            'results': [],
+        }), content_type='application/json')
+    q_pieces = [q_piece.strip() for q_piece in q.split(' ')]
+
+    film = kt_search.find_film_by_link(q)
+    if film:
+        films = [film]
+    else:
+        films, _ = filmlist.filmlist(
+            user_id=request.user.id,
+            filters=[('title', q)],
+            ordering='title_match',
+            films_per_page=5,
+        )
+        films = list(films)
+    artists = list(kt_search.find_artists(q_pieces, 5))
+    # roles = list(kt_search.find_roles(q_pieces, 5))
+    roles = []
+    sequels = list(kt_search.find_sequels(q_pieces, 5))
+    users = list(kt_search.find_users(q_pieces, 5))
+    topics = list(kt_search.find_topics(q_pieces, 5))
+    polls = list(kt_search.find_polls(q_pieces, 5))
+
+    number_of_items = len(films) + len(artists) + len(roles) + len(sequels) + len(users) + len(topics) + len(polls)
+    if number_of_items > 10:
+        films = films[:5 * 10 / number_of_items]
+        artists = artists[:5 * 10 / number_of_items]
+        # roles = roles[:5 * 10 / number_of_items]
+        sequels = sequels[:5 * 10 / number_of_items]
+        users = users[:5 * 10 / number_of_items]
+        topics = topics[:5 * 10 / number_of_items]
+        polls = polls[:5 * 10 / number_of_items]
+
+    results = []
+    if films:
+        film_results = []
+        for film in films:
+            actors = [r.artist.name for r in models.FilmArtistRelationship.objects.filter(film=film, role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).select_related('artist').order_by('-artist__number_of_ratings_as_actor')[:3]]
+            film_results.append({
+                'url': reverse('film_main', args=(film.id, film.slug_cache)),
+                'title': film_title(film),
+                'subtitle': film.second_title,
+                'subsubtitle': 'R: %s%s' % (
+                    film.director_names_cache.split(',')[0] if film.director_names_cache else '?',
+                    '; Sz: %s' % ', '.join(actors) if actors else '',
+                ),
+                'thumbnail': film.main_poster.get_display_urls()['min'] if film.main_poster else '',
+            })
+        results.append({
+            'domain': 'films',
+            'results': film_results,
+        })
+    if artists:
+        artist_results = []
+        for artist in artists:
+            films_as_actor = [film_title(r.film) for r in models.FilmArtistRelationship.objects.filter(artist=artist, role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).select_related('film').order_by('-film__number_of_ratings')[:3]]
+            films_as_director = [film_title(r.film) for r in models.FilmArtistRelationship.objects.filter(artist=artist, role_type=models.FilmArtistRelationship.ROLE_TYPE_DIRECTOR).select_related('film').order_by('-film__number_of_ratings')[:3]]
+            subtitle = ''
+            subsubtitle = ''
+            if len(films_as_actor) + len(films_as_director):
+                if artist.number_of_ratings_as_actor > artist.number_of_ratings_as_director:
+                    if films_as_actor: subtitle = u'Színész: %s' % (', '.join(films_as_actor))
+                    if films_as_director: subsubtitle = u'Rendező: %s' % (', '.join(films_as_director))
+                else:
+                    if films_as_director: subtitle = u'Rendező: %s' % (', '.join(films_as_director))
+                    if films_as_actor: subsubtitle = u'Színész: %s' % (', '.join(films_as_actor))
+            artist_results.append({
+                'url': reverse('artist', args=(artist.id, artist.slug_cache)),
+                'title': artist.name,
+                'subtitle': subtitle,
+                'subsubtitle': subsubtitle,
+                'thumbnail': artist.main_picture.get_display_urls()['min'] if artist.main_picture else '',
+            })
+        results.append({
+            'domain': 'artists',
+            'results': artist_results,
+        })
+    if roles:
+        results.append({
+            'domain': 'roles',
+            'results': [
+                {
+                    'url': reverse('role', args=(role.id, role.slug_cache)),
+                    'title': role.role_name,
+                    'subtitle': u'Sz: %s' % role.artist.name,
+                    'subsubtitle': u'F: %s' % film_title(role.film),
+                    'thumbnail': role.main_picture.get_display_urls()['min'] if role.main_picture else '',
+                } for role in roles
+            ],
+        })
+    if sequels:
+        sequel_results = []
+        for sequel in sequels:
+            films = list(sequel.all_films()[:3])
+            thumbnail = ''
+            if films:
+                if films[0].main_poster:
+                    thumbnail = films[0].main_poster.get_display_urls()['min']
+            sequel_results.append({
+                'url': reverse('sequel', args=(sequel.id, sequel.slug_cache)),
+                'title': sequel.name,
+                'subtitle': {
+                    models.Sequel.SEQUEL_TYPE_SEQUEL: u'Folytatás',
+                    models.Sequel.SEQUEL_TYPE_ADAPTATION: u'Adaptáció',
+                    models.Sequel.SEQUEL_TYPE_REMAKE: u'Remake',
+                }[sequel.sequel_type],
+                'subsubtitle': ', '.join([film_title(f) for f in films]),
+                'thumbnail': thumbnail,
+            })
+        results.append({
+            'domain': 'sequels',
+            'results': sequel_results,
+        })
+    if users:
+        now = datetime.datetime.now()
+        user_results = []
+        for user in users:
+            reg_days_ago = (now - user.date_joined).days
+            if reg_days_ago >= 365:
+                reg = u'%d éve' % (reg_days_ago / 365)
+            elif reg_days_ago >= 30:
+                reg = u'%d hónapja' % (reg_days_ago / 30)
+            elif reg_days_ago >= 7:
+                reg = u'%d hete' % (reg_days_ago / 7)
+            else:
+                reg = u'nemrég'
+            user_results.append({
+                'url': reverse('user_profile', args=(user.id, user.slug_cache)),
+                'title': user.username,
+                'subtitle': u'Tapasztalat: %d film; Reg: %s' % (user.number_of_ratings, reg),
+                'subsubtitle': user.bio_snippet[:200],
+                'thumbnail': '',
+            })
+        results.append({
+            'domain': 'users',
+            'results': user_results,
+        })
+    if topics:
+        results.append({
+            'domain': 'topics',
+            'results': [
+                {
+                    'url': reverse('forum', args=(topic.id, topic.slug_cache)),
+                    'title': topic.title,
+                    'subtitle': '%s vélemény' % topic.number_of_comments,
+                    'subsubtitle': u'Utolsó: %s %s' % (topic.last_comment.created_at.strftime('%Y-%m-%d'), topic.last_comment.created_by.username),
+                    'thumbnail': '',
+                } for topic in topics
+            ],
+        })
+    if polls:
+        poll_results = []
+        for poll in polls:
+            subtitle = ''
+            if poll.open_from:
+                if poll.open_until:
+                    subtitle = u'Régi: %s' % nice_date_interval(poll.open_from, poll.open_until)
+                else:
+                    subtitle = u'Aktuális: %s-' % nice_date(poll.open_from)
+            else:
+                subtitle = u'Leendő'
+            poll_results.append({
+                'url': reverse('poll', args=(poll.id, poll.slug_cache)),
+                'title': poll.title,
+                'subtitle': subtitle,
+                'subsubtitle': u'%d válasz, %d komment' % (poll.number_of_votes, poll.number_of_comments) if poll.number_of_votes or poll.number_of_comments else '',
+                'thumbnail': '',
+            })
+        results.append({
+            'domain': 'polls',
+            'results': poll_results,
+        })
+    return HttpResponse(json.dumps({
+        'q': q,
+        'results': results,
+    }), content_type='application/json')
 
 
 def get_users(request):
