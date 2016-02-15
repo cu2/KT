@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import copy
 import datetime
 import hashlib
 import math
 import json
+from collections import defaultdict
 
 from django.db import connection
 from django.shortcuts import render, get_object_or_404
@@ -1323,8 +1325,49 @@ def finance(request):
 
 
 def vapiti_general(request):
+    raw_awards = [(a, a.film_id, a.artist) for a in models.Award.objects.filter(
+        name=u'Vapiti',
+        category__in=texts.VAPITI_WINNER_CATEGORIES.values(),
+    ).select_related('artist').order_by('-year', '-id')]
+    raw_roles = {
+        (role.film_id, role.artist_id): role
+        for role in models.FilmArtistRelationship.objects.filter(
+            film_id__in=[film_id for _, film_id, _ in raw_awards],
+            artist_id__in=[artist.id for _, _, artist in raw_awards if artist],
+        )
+    }
+    films, _ = filmlist.filmlist(
+        user_id=request.user.id,
+        filters=[('film_id_list', ','.join([str(film_id) for _, film_id, _ in raw_awards]))],
+        films_per_page=None,
+    )
+    raw_films = {film.id: film for film in films}
+    awards = defaultdict(list)
+    for award, film_id, artist in raw_awards:
+        film = copy.deepcopy(raw_films[film_id])
+        film.award = award
+        film.award_type = {
+            texts.VAPITI_WINNER_CATEGORIES['G']: 0,
+            texts.VAPITI_WINNER_CATEGORIES['F']: 1,
+            texts.VAPITI_WINNER_CATEGORIES['M']: 2
+        }[award.category]
+        film.artist = artist
+        if artist:
+            film.role = raw_roles[(film_id, artist.id)]
+        else:
+            film.role = None
+        awards[(award.year, film.award_type)].append(film)
+    final_awards = []
+    current_year = 0
+    for (year, category), film_list in sorted(awards.iteritems(), key=lambda item: item[0][0], reverse=True):
+        if year != current_year:
+            final_awards.append([[], [], []])
+            current_year = year
+        for film in sorted(film_list, key=lambda film: film.award.id):
+            final_awards[-1][category].append(film)
     return render(request, 'ktapp/vapiti_subpages/vapiti_general.html', {
         'vapiti_year': settings.VAPITI_YEAR,
+        'awards': final_awards,
     })
 
 

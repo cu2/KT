@@ -27,4 +27,37 @@
 
     <p>Az Ezüst Vapiti szintén egy díj, csak ezt nem a legjobb film, hanem a legjobb női illetve férfi alakítást nyújtó színész kapja. Hogy fő- vagy mellékszerep, az mindegy, a lényeg, hogy az adott évi filmek közül valamelyikben játsszon. A szavazási rendszer és minden más megegyezik az Arany Vapitiéval.</p>
 
+    <h2>Az eddigi győztesek</h2>
+
+    <table class="fullsize">
+        <tr class="header_tr">
+            <th>Év</th>
+            <th>Arany</th>
+            <th>Női Ezüst</th>
+            <th>Férfi Ezüst</th>
+        </tr>
+        {% for year in awards %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td class="center" style="width: 4%">{{ year.0.0.award.year }}</td>
+                {% for award_list in year %}
+                    <td style="width: 32%">
+                        {% for award in award_list %}
+                            {% if award.award_type == 0 %}
+                                {{ award|film_url_html_w_year }}
+                            {% else %}
+                                {% if forloop.first %}
+                                    <a href="{% url 'artist' award.artist.id award.artist.slug_cache %}">{{ award.artist.name }}</a><br />
+                                {% endif %}
+                                <span class="td_sub"><a href="{% url 'film_main' award.id award.slug_cache %}">{{ award.orig_title }}</a> ({{ award.year }})</span>
+                            {% endif %}
+                            {% if not forloop.last %}<br />{% endif %}
+                        {% empty %}
+                            -
+                        {% endfor %}
+                    </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+
 {% endblock %}
