@@ -10,6 +10,7 @@ EMAIL_TEMPLATE_HTML = u'''<html>
 a KT szerkesztősége<br />
 <a href="http://kritikustomeg.org/click/?u={user_id}&t={type}&c={campaign_id}&url=http://kritikustomeg.org/" style="text-decoration: none; color: rgb(146,23,23)">kritikustomeg.org</a><br />
 <a href="http://kritikustomeg.org/click/?u={user_id}&t={type}&c={campaign_id}&url=https://www.facebook.com/kritikustomeg/" style="text-decoration: none; color: rgb(146,23,23)">www.facebook.com/kritikustomeg</a></p>
+{ps}
 </body>
 </html>
 '''
@@ -24,6 +25,7 @@ EMAIL_TEMPLATE_TEXT = u'''Kedves {username}!
 a KT szerkesztősége
 http://kritikustomeg.org/
 https://www.facebook.com/kritikustomeg/
+{ps}
 '''
 
 

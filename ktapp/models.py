@@ -110,7 +110,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.username
 
-    def email_user(self, subject, html_message, text_message=None, email_type='', campaign_id=0, from_email=settings.DEFAULT_FROM_EMAIL, **kwargs):
+    def email_user(self, subject, html_message, text_message=None, email_type='', campaign_id=0, html_ps='', text_ps='', from_email=settings.DEFAULT_FROM_EMAIL, **kwargs):
         if text_message is None:
             text_message = strip_tags(html_message.replace('</p>\n<p>', '\n\n'))
         html_content = texts.EMAIL_TEMPLATE_HTML.format(
@@ -119,10 +119,12 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
             user_id=self.id,
             type=email_type,
             campaign_id=campaign_id,
+            ps=html_ps,
         )
         text_content = texts.EMAIL_TEMPLATE_TEXT.format(
             username=self.username,
             text_message=text_message,
+            ps=text_ps,
         )
         email = EmailMultiAlternatives(
             subject,
