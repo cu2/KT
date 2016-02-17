@@ -149,6 +149,7 @@
                             {% endif %}
                             {% if user.is_superuser %}
                                 <li><a href="{% url 'admin:index' %}">Admin</a></li>
+                                <li><a href="{% url 'analytics' %}">Analytics</a></li>
                             {% endif %}
                         </ul>
                     </li>

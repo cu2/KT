@@ -1665,6 +1665,40 @@ def everybody(request):
     })
 
 
+@login_required
+@kt_utils.kt_permission_required('analytics')
+def analytics(request):
+    cursor = connection.cursor()
+    # DAU
+    cursor.execute('''
+    SELECT day, COUNT(DISTINCT user_id) AS dau FROM ktapp_dailyactiveuser WHERE day >= '2015-09-14' GROUP BY day
+    ''')
+    dau_data = []
+    ma7_window = []
+    for row in cursor.fetchall():
+        ma7_window.append(row[1])
+        ma7_window = ma7_window[-7:]
+        dau_data.append((
+            row[0].strftime('new Date(%Y, %m, %d)'),
+            row[1],
+            1.0 * sum(ma7_window) / len(ma7_window),
+        ))
+    # WAU
+    cursor.execute('''
+    SELECT DATE_SUB(day, INTERVAL WEEKDAY(day) DAY) AS week, COUNT(DISTINCT user_id) AS wau FROM ktapp_dailyactiveuser WHERE day >= '2015-09-14' GROUP BY week
+    ''')
+    wau_data = []
+    for row in cursor.fetchall():
+        wau_data.append((
+            row[0].strftime('new Date(%Y, %m, %d)'),
+            row[1],
+        ))
+    return render(request, 'ktapp/analytics.html', {
+        'dau': dau_data,
+        'wau': wau_data,
+    })
+
+
 def old_url(request):
     print request.path
     if request.path == '/film.php':

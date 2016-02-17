@@ -123,7 +123,10 @@ def check_permission(perm, user, silent=True):
             'new_usertoplist': 'all',
             'edit_usertoplist': 'all',
             'delete_usertoplist': 'all',
+            'analytics': 'superuser',
         }.get(perm, perm)
+        if grp == 'superuser' and user.is_superuser:
+            return True
         if grp == 'admin' and user.is_staff:
             return True
         if grp == 'reliable' and (user.is_reliable or user.is_staff):

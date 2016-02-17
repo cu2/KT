@@ -1,0 +1,65 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+
+{% block title %}Analytics - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Analytics</h1>
+{% endblock %}
+
+{% block main %}
+
+    <h2>Daily active users (active=any kind)</h2>
+    <div id="chart_div_dau"></div>
+    <h2>Weekly active users (active=any kind)</h2>
+    <div id="chart_div_wau"></div>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {packages: ['corechart', 'line']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data_dau = new google.visualization.DataTable();
+            data_dau.addColumn('date', 'day');
+            data_dau.addColumn('number', 'DAU');
+            data_dau.addColumn('number', 'MA7(DAU)');
+            data_dau.addRows([
+                {% for row in dau %}
+                    [{{ row.0 }}, {{ row.1 }}, {{ row.2|escapejs }}]{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]);
+            var data_wau = new google.visualization.DataTable();
+            data_wau.addColumn('date', 'day');
+            data_wau.addColumn('number', 'WAU');
+            data_wau.addRows([
+                {% for row in wau %}
+                    [{{ row.0 }}, {{ row.1 }}]{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]);
+
+            var options = {
+                height: 400,
+                chartArea: {
+                    width: '90%',
+                    height: '90%'
+                },
+                fontName: 'verdana',
+                vAxis: {
+                    minValue: 0
+                },
+                legend: {
+                    position: 'in'
+                },
+                axisTitlesPosition: 'none'
+            };
+
+            var chart_dau = new google.visualization.LineChart(document.getElementById('chart_div_dau'));
+            chart_dau.draw(data_dau, options);
+            var chart_wau = new google.visualization.LineChart(document.getElementById('chart_div_wau'));
+            chart_wau.draw(data_wau, options);
+        }
+    </script>
+
+{% endblock %}
