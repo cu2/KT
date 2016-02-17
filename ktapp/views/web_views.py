@@ -1668,6 +1668,14 @@ def everybody(request):
 @login_required
 @kt_utils.kt_permission_required('analytics')
 def analytics(request):
+
+    def date2js(d):
+        return 'new Date(%d, %d, %d)' % (
+            int(d.strftime('%Y')),
+            int(d.strftime('%m')) - 1,
+            int(d.strftime('%d')),
+        )
+
     cursor = connection.cursor()
     # DAU
     cursor.execute('''
@@ -1679,7 +1687,7 @@ def analytics(request):
         ma7_window.append(row[1])
         ma7_window = ma7_window[-7:]
         dau_data.append((
-            row[0].strftime('new Date(%Y, %m, %d)'),
+            date2js(row[0]),
             row[1],
             1.0 * sum(ma7_window) / len(ma7_window),
         ))
@@ -1690,7 +1698,7 @@ def analytics(request):
     wau_data = []
     for row in cursor.fetchall():
         wau_data.append((
-            row[0].strftime('new Date(%Y, %m, %d)'),
+            date2js(row[0]),
             row[1],
         ))
     return render(request, 'ktapp/analytics.html', {
