@@ -1677,10 +1677,16 @@ def analytics(request):
         )
 
     cursor = connection.cursor()
+    today = datetime.datetime.today()
+    yesterday = (today - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
+    last_sunday = (today - datetime.timedelta(days=today.weekday()+1)).strftime('%Y-%m-%d')
     # DAU
     cursor.execute('''
-    SELECT day, COUNT(DISTINCT user_id) AS dau FROM ktapp_dailyactiveuser WHERE day >= '2015-09-14' GROUP BY day
-    ''')
+    SELECT day, COUNT(DISTINCT user_id) AS dau
+    FROM ktapp_dailyactiveuser
+    WHERE day BETWEEN '2015-09-14' AND %s
+    GROUP BY day
+    ''', [yesterday])
     dau_data = []
     ma7_window = []
     for row in cursor.fetchall():
@@ -1693,8 +1699,11 @@ def analytics(request):
         ))
     # WAU
     cursor.execute('''
-    SELECT DATE_SUB(day, INTERVAL WEEKDAY(day) DAY) AS week, COUNT(DISTINCT user_id) AS wau FROM ktapp_dailyactiveuser WHERE day >= '2015-09-14' GROUP BY week
-    ''')
+    SELECT DATE_SUB(day, INTERVAL WEEKDAY(day) DAY) AS week, COUNT(DISTINCT user_id) AS wau
+    FROM ktapp_dailyactiveuser
+    WHERE day BETWEEN '2015-09-14' AND %s
+    GROUP BY week
+    ''', [last_sunday])
     wau_data = []
     for row in cursor.fetchall():
         wau_data.append((
