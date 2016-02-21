@@ -24,6 +24,7 @@
             <th>Év</th>
             <th>Rendező</th>
             <th>Műfaj</th>
+            <th>Nézettség</th>
         </tr>
         </thead>
         <tbody>
@@ -33,9 +34,12 @@
                 <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
                 <td>{{ film|film_directors }}</td>
                 <td>{{ film|film_genres }}</td>
+                <td class="center">{{ film.number_of_ratings }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+
+    <p class="center"><a href="{% url 'films_with_missing_data' %}?tipus={{ active_tab }}&p={{ p|add:"1" }}">Következő oldal &gt;&gt;</a></p>
 
 {% endblock %}

@@ -488,18 +488,23 @@ def suggested_films(request):
 @login_required
 @kt_utils.kt_permission_required('check_missing_data')
 def films_with_missing_data(request):
+    p = int(request.GET.get('p', 0))
+    if p < 1:
+        p = 1
+    offset_min, offset_max = (p - 1) * 100, p * 100
     miss_type = request.GET.get('tipus', '')
     if miss_type not in {'tortenet', 'plakat', 'szereplok'}:
         miss_type = 'tortenet'
     if miss_type == 'tortenet':
-        films = models.Film.objects.filter(plot_summary='').order_by('-number_of_ratings')[:100]
+        films = models.Film.objects.filter(plot_summary='').filter(genre_cache_is_short=False).order_by('-number_of_ratings')[offset_min:offset_max]
     elif miss_type == 'plakat':
-        films = models.Film.objects.filter(main_poster=None).order_by('-number_of_ratings')[:100]
+        films = models.Film.objects.filter(main_poster=None).filter(genre_cache_is_short=False).order_by('-number_of_ratings')[offset_min:offset_max]
     elif miss_type == 'szereplok':
-        films = models.Film.objects.filter(genre_cache_is_animation=False, number_of_actors=0).order_by('-number_of_ratings')[:100]
+        films = models.Film.objects.filter(genre_cache_is_animation=False, genre_cache_is_short=False, genre_cache_is_docu=False, number_of_actors=0).order_by('-number_of_ratings')[offset_min:offset_max]
     else:
         raise Http404
     return render(request, 'ktapp/films_with_missing_data.html', {
         'active_tab': miss_type,
         'films': films,
+        'p': p,
     })
