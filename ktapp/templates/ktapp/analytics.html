@@ -10,10 +10,15 @@
 
 {% block main %}
 
+    <h2>Activity </h2>
+    <div id="activity_chart_div"></div>
+
     <h2>Daily active users (active=any kind)</h2>
-    <div id="chart_div_dau"></div>
+    <div id="dau_chart_div"></div>
+
     <h2>Weekly active users (active=any kind)</h2>
-    <div id="chart_div_wau"></div>
+    <div id="wau_chart_div"></div>
+
     <h2>Email campaigns</h2>
     <table>
         <thead>
@@ -32,7 +37,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for row in email %}
+        {% for row in email_data %}
             <tr>
                 {% for item in row %}
                     <td>{{ item }}</td>
@@ -48,25 +53,53 @@
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
-            var data_dau = new google.visualization.DataTable();
-            data_dau.addColumn('date', 'day');
-            data_dau.addColumn('number', 'DAU');
-            data_dau.addColumn('number', 'MA7(DAU)');
-            data_dau.addRows([
-                {% for row in dau %}
+            var activity_data = new google.visualization.DataTable();
+            activity_data.addColumn('date', 'day');
+            activity_data.addColumn('number', 'DAU');
+            activity_data.addColumn('number', 'WAU');
+            activity_data.addColumn('number', 'MAU');
+            activity_data.addColumn('number', 'new');
+            activity_data.addRows([
+                {% for row in activity_data %}
+                    [{{ row.0 }}, {{ row.1 }}, {{ row.2 }}, {{ row.3 }}, {{ row.4 }}]{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]);
+            var activity_options = {
+                height: 400,
+                isStacked: true,
+                colors: ['red', 'orange', 'yellow', 'green'],
+                chartArea: {
+                    width: '90%',
+                    height: '90%'
+                },
+                fontName: 'verdana',
+                vAxis: {
+                    minValue: 0
+                },
+                legend: {
+                    position: 'in'
+                },
+                axisTitlesPosition: 'none'
+            };
+
+            var dau_data = new google.visualization.DataTable();
+            dau_data.addColumn('date', 'day');
+            dau_data.addColumn('number', 'DAU');
+            dau_data.addColumn('number', 'MA7(DAU)');
+            dau_data.addRows([
+                {% for row in dau_data %}
                     [{{ row.0 }}, {{ row.1 }}, {{ row.2|escapejs }}]{% if not forloop.last %},{% endif %}
                 {% endfor %}
             ]);
-            var data_wau = new google.visualization.DataTable();
-            data_wau.addColumn('date', 'day');
-            data_wau.addColumn('number', 'WAU');
-            data_wau.addRows([
-                {% for row in wau %}
+            var wau_data = new google.visualization.DataTable();
+            wau_data.addColumn('date', 'day');
+            wau_data.addColumn('number', 'WAU');
+            wau_data.addRows([
+                {% for row in wau_data %}
                     [{{ row.0 }}, {{ row.1 }}]{% if not forloop.last %},{% endif %}
                 {% endfor %}
             ]);
-
-            var options = {
+            var line_options = {
                 height: 400,
                 chartArea: {
                     width: '90%',
@@ -82,10 +115,12 @@
                 axisTitlesPosition: 'none'
             };
 
-            var chart_dau = new google.visualization.LineChart(document.getElementById('chart_div_dau'));
-            chart_dau.draw(data_dau, options);
-            var chart_wau = new google.visualization.LineChart(document.getElementById('chart_div_wau'));
-            chart_wau.draw(data_wau, options);
+            var activity_chart = new google.visualization.AreaChart(document.getElementById('activity_chart_div'));
+            activity_chart.draw(activity_data, activity_options);
+            var dau_chart = new google.visualization.LineChart(document.getElementById('dau_chart_div'));
+            dau_chart.draw(dau_data, line_options);
+            var wau_chart = new google.visualization.LineChart(document.getElementById('wau_chart_div'));
+            wau_chart.draw(wau_data, line_options);
         }
     </script>
 
