@@ -1710,9 +1710,38 @@ def analytics(request):
             date2js(row[0]),
             row[1],
         ))
+    # email
+    cursor.execute('''
+    SELECT
+      s.camp, LEFT(s.sent_at, 10) AS sent_at, COALESCE(cmp.subject, '') AS subject,
+      s.user_count AS sent_to, s.email_count,
+      o.user_count AS opened_by,
+      c.user_count AS clicked_by,
+      ROUND(100.0 * o.user_count / s.user_count) AS open_rate, ROUND(100.0 * o.user_count / s.email_count) AS open_email_rate,
+      ROUND(100.0 * c.user_count / s.user_count) AS click_rate, ROUND(100.0 * c.user_count / s.email_count) AS click_email_rate
+    FROM (
+        SELECT CASE WHEN email_type = 'c' THEN CONCAT('c #', campaign_id) ELSE email_type END AS camp, COUNT(DISTINCT user_id) AS user_count, MIN(sent_at) AS sent_at, SUM(is_email) AS email_count
+        FROM ktapp_emailsend WHERE email_type != '' GROUP BY camp
+    ) s
+    LEFT JOIN (
+        SELECT CONCAT('c #', id) AS camp, title, recipients, subject, sent_at
+        FROM ktapp_emailcampaign
+    ) cmp ON cmp.camp = s.camp
+    LEFT JOIN (
+        SELECT CASE WHEN email_type = 'c' THEN CONCAT('c #', campaign_id) ELSE email_type END AS camp, COUNT(DISTINCT user_id) AS user_count
+        FROM ktapp_emailopen WHERE email_type != '' GROUP BY camp
+    ) o ON o.camp = s.camp
+    LEFT JOIN (
+        SELECT CASE WHEN email_type = 'c' THEN CONCAT('c #', campaign_id) ELSE email_type END AS camp, COUNT(DISTINCT user_id) AS user_count
+        FROM ktapp_emailclick WHERE email_type != '' GROUP BY camp
+    ) c ON c.camp = s.camp
+    ORDER BY s.sent_at, s.camp
+    ''')
+    email_data = [row for row in cursor.fetchall()]
     return render(request, 'ktapp/analytics.html', {
         'dau': dau_data,
         'wau': wau_data,
+        'email': email_data,
     })
 
 
