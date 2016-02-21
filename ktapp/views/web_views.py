@@ -1715,10 +1715,12 @@ def analytics(request):
     SELECT
       s.camp, LEFT(s.sent_at, 10) AS sent_at, COALESCE(cmp.subject, '') AS subject,
       s.user_count AS sent_to, s.email_count,
-      o.user_count AS opened_by,
-      c.user_count AS clicked_by,
-      ROUND(100.0 * o.user_count / s.user_count) AS open_rate, ROUND(100.0 * o.user_count / s.email_count) AS open_email_rate,
-      ROUND(100.0 * c.user_count / s.user_count) AS click_rate, ROUND(100.0 * c.user_count / s.email_count) AS click_email_rate
+      COALESCE(o.user_count, 0) AS opened_by,
+      COALESCE(c.user_count, 0) AS clicked_by,
+      COALESCE(ROUND(100.0 * o.user_count / s.user_count), 0) AS open_rate,
+      COALESCE(ROUND(100.0 * o.user_count / s.email_count), 0) AS open_email_rate,
+      COALESCE(ROUND(100.0 * c.user_count / s.user_count), 0) AS click_rate,
+      COALESCE(ROUND(100.0 * c.user_count / s.email_count), 0) AS click_email_rate
     FROM (
         SELECT CASE WHEN email_type = 'c' THEN CONCAT('c #', campaign_id) ELSE email_type END AS camp, COUNT(DISTINCT user_id) AS user_count, MIN(sent_at) AS sent_at, SUM(is_email) AS email_count
         FROM ktapp_emailsend WHERE email_type != '' GROUP BY camp
