@@ -107,6 +107,9 @@ def premiers(request):
         'active_tab': 'nowadays',
         'this_premier_year': this_year,
         'before_this_premier_year': this_year - 1,
+        'this_year': today.strftime('%Y'),
+        'this_month': today.strftime('%m'),
+        'this_day': today.strftime('%d'),
         'premier_list': premier_list,
     })
 
@@ -130,8 +133,62 @@ def premiers_in_a_year(request, year):
         'this_premier_year': this_year,
         'before_this_premier_year': this_year - 1,
         'premier_list_full': films,
-        'this_year': year,
+        'this_year': today.strftime('%Y'),
+        'this_month': today.strftime('%m'),
+        'this_day': today.strftime('%d'),
         'premier_years': range(settings.FIRST_PREMIER_YEAR, settings.LAST_PREMIER_YEAR + 1),
+    })
+
+
+def premier_anniversaries(request, year, month, day):
+    today = datetime.date.today()
+    this_year = today.year
+    year, month, day = int(year), int(month), int(day)
+    try:
+        selected_day = datetime.date(year, month, day)
+    except ValueError:
+        raise Http404
+    prev_day = selected_day - datetime.timedelta(days=1)
+    next_day = selected_day + datetime.timedelta(days=1)
+    premier_days = []
+    for year_offset in xrange(10, 101):
+        try:
+            premier_days.append(datetime.date(
+                year - year_offset,
+                month,
+                day,
+            ))
+        except ValueError:
+            pass
+    film_id_list = [film.id for film in models.Film.objects.filter(main_premier__in=premier_days)]
+    if film_id_list:
+        raw_films, _ = filmlist.filmlist(
+            user_id=request.user.id,
+            filters=[('film_id_list', ','.join([str(film_id) for film_id in film_id_list]))],
+            ordering=('main_premier', 'DESC'),
+            films_per_page=None,
+        )
+        films = []
+        for film in raw_films:
+            film.premier_anniversary = year - film.main_premier_year
+            films.append(film)
+    else:
+        films = []
+    return render(request, 'ktapp/premier_subpages/premier_anniversaries.html', {
+        'active_tab': 'anniversaries',
+        'this_premier_year': this_year,
+        'before_this_premier_year': this_year - 1,
+        'this_year': today.strftime('%Y'),
+        'this_month': today.strftime('%m'),
+        'this_day': today.strftime('%d'),
+        'selected_day': selected_day,
+        'prev_day_year': prev_day.strftime('%Y'),
+        'prev_day_month': prev_day.strftime('%m'),
+        'prev_day_day': prev_day.strftime('%d'),
+        'next_day_year': next_day.strftime('%Y'),
+        'next_day_month': next_day.strftime('%m'),
+        'next_day_day': next_day.strftime('%d'),
+        'films': films,
     })
 
 

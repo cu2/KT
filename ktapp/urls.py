@@ -46,6 +46,7 @@ urlpatterns += [
 
     url(r'^keres/$', web_views.search, name='search'),
     url(r'^osszetett_kereso/$', web_views.browse, name='browse'),
+    url(r'^bemutatok/evfordulok/(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})/$', web_views.premier_anniversaries, name='premier_anniversaries'),
     url(r'^bemutatok/(?P<year>\d+)/$', web_views.premiers_in_a_year, name='premiers_in_a_year'),
     url(r'^bemutatok/$', web_views.premiers, name='premiers'),
     url(r'^top_filmek/$', web_views.top_films, name='top_films'),
