@@ -6,7 +6,7 @@
     {% if active_tab == 'last_year' %}
         <p>
             {% for year in premier_years %}
-                {% if year == this_year %}
+                {% if year == selected_year %}
                     <b>{{ year }}</b>
                 {% else %}
                     <a href="{% url 'premiers_in_a_year' year %}">{{ year }}</a>

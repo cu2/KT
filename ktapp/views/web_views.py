@@ -133,6 +133,7 @@ def premiers_in_a_year(request, year):
         'this_premier_year': this_year,
         'before_this_premier_year': this_year - 1,
         'premier_list_full': films,
+        'selected_year': year,
         'this_year': today.strftime('%Y'),
         'this_month': today.strftime('%m'),
         'this_day': today.strftime('%d'),
