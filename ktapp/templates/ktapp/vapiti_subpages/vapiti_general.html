@@ -60,4 +60,87 @@
         {% endfor %}
     </table>
 
+    <h2>Részvételi statisztikák</h2>
+    <div class="left_content">
+        <h3>Szavazók száma</h3>
+        <div id="ch1"></div>
+    </div>
+    <div class="right_content">
+        <h3>Szavazók súlyozott aránya</h3>
+        <div id="ch2"></div>
+    </div>
+    <br class="clear" />
+    <p style="font-size: 8pt"><br />* 2007 előtt és 2012-13-ban hiányos</p>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {packages: ['corechart', 'line']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data1 = new google.visualization.DataTable();
+            data1.addColumn('string', 'Év');
+            data1.addColumn('number', 'Arany');
+            data1.addColumn('number', 'Női Ezüst');
+            data1.addColumn('number', 'Férfi Ezüst');
+            data1.addRows([
+                ['2007', 189, 137, 141],
+                ['2008', 356, 221, 267],
+                ['2009', 598, 314, 342],
+                ['2010', 524, 344, 352],
+                ['2011', 531, 372, 391],
+                ['2014/1', 400, 281, 288],
+                ['2014/2', 508, 431, 441],
+                ['2015/1', 386, 273, 292],
+                ['2015/2', 400, 342, 371]
+            ]);
+
+            var data2 = new google.visualization.DataTable();
+            data2.addColumn('string', 'Év');
+            data2.addColumn('number', 'Arany');
+            data2.addColumn('number', 'Női Ezüst');
+            data2.addColumn('number', 'Férfi Ezüst');
+            data2.addRows([
+                ['2007', 53, 43, 44],
+                ['2008', 57, 43, 48],
+                ['2009', 64, 42, 44],
+                ['2010', 51, 36, 36],
+                ['2011', 51, 40, 41],
+                ['2014/1', 35, 27, 27],
+                ['2014/2', 41, 37, 37],
+                ['2015/1', 33, 25, 27],
+                ['2015/2', 33, 30, 31]
+            ]);
+
+            var options = {
+                height: 400,
+                chartArea: {
+                    width: '90%',
+                    left: '8%',
+                    height: '80%',
+                    top: '6%'
+                },
+                fontName: 'verdana',
+                colors: ['FF9900', 'DD4477', '0099C6'],
+                hAxis: {
+                    slantedText: true
+                },
+                vAxis: {
+                    minValue: 0
+                },
+                legend: {
+                    position: 'in'
+                },
+                axisTitlesPosition: 'none'
+            };
+
+            var chart1 = new google.visualization.LineChart(document.getElementById('ch1'));
+            chart1.draw(data1, options);
+
+            var chart2 = new google.visualization.LineChart(document.getElementById('ch2'));
+            chart2.draw(data2, options);
+        }
+    </script>
+
+
 {% endblock %}
