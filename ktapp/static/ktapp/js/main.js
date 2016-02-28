@@ -682,6 +682,14 @@ $(function() {
             }
         });
 
+    $('.banner_closer').click(function() {
+        $.post('/bezar_banner', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            banner_id: $(this).attr('id').substring(7)
+        });
+        $(this).closest('.banner').slideUp();
+    });
+
     $('.focus_this').focus();
 
     $(window).resize(function() {

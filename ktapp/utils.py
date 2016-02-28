@@ -10,6 +10,7 @@ import re
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
+from django.db.models import Sum
 
 from kt import settings
 from ktapp import texts
@@ -346,3 +347,15 @@ def delete_file_from_s3(remote_name):
         key.delete()
     except:
         pass
+
+
+def get_finance(model):
+    collected_so_far = model.objects.aggregate(Sum('money'))['money__sum']
+    required_so_far = (datetime.date.today() - datetime.date(2009, 10, 22)).days / 365.0 * 100000.0
+    missing = int(round(collected_so_far - required_so_far))
+    percent = 100.0 * (missing + 100000) / 100000
+    if percent > 100:
+        percent = 100
+    if percent < 0:
+        percent = 0
+    return int(round(percent)), missing

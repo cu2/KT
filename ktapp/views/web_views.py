@@ -69,6 +69,21 @@ def index(request):
     # during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
     before_game = False
     during_game = False
+    # banners
+    banners = []
+    if request.user.is_authenticated():
+        banners = models.Banner.objects.filter(
+            where='index',
+            user=request.user,
+            status__in=[models.Banner.BANNER_STATUS_PUBLISHED, models.Banner.BANNER_STATUS_VIEWED],
+        )
+    for banner in banners:
+        if banner.status == models.Banner.BANNER_STATUS_PUBLISHED:
+            banner.status = models.Banner.BANNER_STATUS_VIEWED
+            banner.first_viewed_at = datetime.datetime.now()
+        banner.viewed += 1
+        banner.save()
+    finance_status, finance_missing = kt_utils.get_finance(models.Donation)
     #
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
@@ -79,6 +94,9 @@ def index(request):
         'random_poll': random_poll,
         'before_game': before_game,
         'during_game': during_game,
+        'banners': banners,
+        'finance_status': finance_status,
+        'finance_amount': finance_missing,
     })
 
 
@@ -1357,22 +1375,10 @@ def rulez(request):
 
 
 def finance(request):
-    cursor = connection.cursor()
-    cursor.execute('''
-    SELECT
-      SUM(money),
-      ROUND(TIMESTAMPDIFF(day, MIN(given_at), NOW())/365*100000),
-      ROUND(SUM(money) - TIMESTAMPDIFF(day, MIN(given_at), NOW())/365*100000)
-    FROM ktapp_donation
-    ''')
-    sum_amount, sum_cost, missing = cursor.fetchone()
-    missing = int(missing)
-    percent = 100.0 * (missing + 100000) / 100000
-    if percent > 100:
-        percent = 100
+    finance_status, finance_missing = kt_utils.get_finance(models.Donation)
     return render(request, 'ktapp/finance.html', {
-        'status': int(round(4.0 * percent)),
-        'amount': missing,
+        'finance_status': finance_status,
+        'finance_amount': finance_missing,
         'donators': models.KTUser.objects.raw('''
         SELECT DISTINCT u.*
         FROM ktapp_ktuser u

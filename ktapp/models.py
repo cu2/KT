@@ -1739,3 +1739,25 @@ class VapitiVote(models.Model):
 
     class Meta:
         unique_together = ['user', 'year', 'vapiti_round', 'vapiti_type', 'serial_number']
+
+
+class Banner(models.Model):
+    published_at = models.DateTimeField(auto_now_add=True)
+    where = models.CharField(max_length=32)
+    what = models.CharField(max_length=32)
+    user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
+    BANNER_STATUS_PUBLISHED = 'P'
+    BANNER_STATUS_VIEWED = 'V'
+    BANNER_STATUS_CLOSED = 'C'
+    BANNER_STATUS_WITHDRAWN = 'W'
+    BANNER_STATUSES = [
+        (BANNER_STATUS_PUBLISHED, 'Published'),
+        (BANNER_STATUS_VIEWED, 'Viewed'),
+        (BANNER_STATUS_CLOSED, 'Closed'),
+        (BANNER_STATUS_WITHDRAWN, 'Withdrawn'),
+    ]
+    status = models.CharField(max_length=1, choices=BANNER_STATUSES, default=BANNER_STATUS_PUBLISHED)
+    first_viewed_at = models.DateTimeField(blank=True, null=True)
+    viewed = models.PositiveSmallIntegerField(default=0)
+    closed_at = models.DateTimeField(blank=True, null=True)
+    withdrawn_at = models.DateTimeField(blank=True, null=True)

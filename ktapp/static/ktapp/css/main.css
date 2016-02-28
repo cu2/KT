@@ -330,6 +330,9 @@ p {
     line-height: 1.6;
     margin-top: 0;
 }
+p.last {
+    margin-bottom: 0;
+}
 a {
     text-decoration: none;
     color: rgb(146,23,23);
@@ -1279,4 +1282,78 @@ ul.poll li {
     background: rgba(0,147,24,0.5);
     border: rgb(0,147,24) solid 2px;
     color: rgb(146,23,23);
+}
+
+
+.banner {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    border: solid 10px rgb(146,23,23);
+    padding: 20px;
+}
+.banner_closer {
+    position: absolute; right: 3px; top: 0px;
+    font-size: 16pt;
+    cursor: pointer;
+}
+.small_text {
+    font-size: 8pt;
+}
+
+.finance_container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.finance_outer {
+    position: relative;
+    margin: 0 auto;
+    width: 204px;
+    height: 30px;
+    background: black;
+}
+.finance_inner {
+    position: absolute;
+    left: 1px; top: 1px;
+    width: 202px;
+    height: 28px;
+    background: #DAD3B8;
+}
+.finance_innermost {
+    position: absolute;
+    left: 1px; top: 1px;
+    width: 200px;
+    height: 26px;
+}
+.finance_marker {
+    position: relative;
+    height: 100%;
+    background: #931818;
+}
+.finance_label {
+    position: absolute; left: 55px; top: 3px;
+    color: #F9F4DA;
+    font-size: 12pt;
+}
+.finance_target {
+    padding-left: 10px;
+    border-left: solid 10px rgb(128,128,128);
+}
+@media (min-width: 500px) {
+    .finance_outer {
+        width: 404px;
+        height: 40px;
+    }
+    .finance_inner {
+        width: 402px;
+        height: 38px;
+    }
+    .finance_innermost {
+        width: 400px;
+        height: 36px;
+    }
+    .finance_label {
+        left: 140px; top: 5px;
+        font-size: 16pt;
+    }
 }

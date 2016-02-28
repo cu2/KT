@@ -1472,3 +1472,20 @@ def delete_usertoplist(request):
             some_id=some_id,
         )
     return HttpResponseRedirect(reverse('usertoplists'))
+
+
+@require_POST
+@login_required
+def close_banner(request):
+    try:
+        banner = models.Banner.objects.get(
+            id=request.POST.get('banner_id', 0),
+            user=request.user,
+            status__in=[models.Banner.BANNER_STATUS_PUBLISHED, models.Banner.BANNER_STATUS_VIEWED],
+        )
+    except models.Banner.DoesNotExist:
+        return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+    banner.status = models.Banner.BANNER_STATUS_CLOSED
+    banner.closed_at = datetime.datetime.now()
+    banner.save()
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
