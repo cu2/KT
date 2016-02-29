@@ -52,7 +52,11 @@ def find_film_by_link(q):
 
 def find_artists(q_pieces, limit):
     artists = models.Artist.objects
-    artists = artists.filter(slug_cache__search=' '.join(['+%s' % slugify(q_piece) for q_piece in q_pieces]))
+    for q_piece in q_pieces:
+        artists = artists.filter(
+            Q(name__icontains=q_piece)
+            | Q(slug_cache__icontains=slugify(q_piece))
+        )
     return artists.order_by('-number_of_ratings')[:limit]
 
 
