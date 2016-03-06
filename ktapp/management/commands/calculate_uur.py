@@ -188,7 +188,8 @@ class Command(BaseCommand):
             cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_2_id = %d AND keyword_id IS NULL''' % user_id)
             for row in general_similarity:
                 cursor.execute(INSERT_SQL_TEMPLATE_1, row)
-                cursor.execute(INSERT_SQL_TEMPLATE_2, row)
+                if row[0] != row[1]:
+                    cursor.execute(INSERT_SQL_TEMPLATE_2, row)
 
             self.stdout.write('Calculating keyword...')
             cursor.execute(KEYWORD_SIMILARITY_TEMPLATE, (now, user_id))
@@ -198,7 +199,8 @@ class Command(BaseCommand):
             cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_2_id = %d AND keyword_id IS NOT NULL''' % user_id)
             for row in general_similarity:
                 cursor.execute(INSERT_SQL_TEMPLATE_1, row)
-                cursor.execute(INSERT_SQL_TEMPLATE_2, row)
+                if row[0] != row[1]:
+                    cursor.execute(INSERT_SQL_TEMPLATE_2, row)
 
             connection.commit()
             self.stdout.write('Refreshed user-user recommendation for user %d in %f sec.' % (

@@ -1594,6 +1594,7 @@ class UserUserRating(models.Model):
     last_calculated_at = models.DateTimeField()
     number_of_ratings = models.IntegerField(default=0)
     similarity = models.PositiveSmallIntegerField(blank=True, null=True)
+    # TODO: unique index on user_1, user_2, keyword
 
 
 class FilmFilmRecommendation(models.Model):
