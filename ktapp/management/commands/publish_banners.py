@@ -33,7 +33,7 @@ class Command(BaseCommand):
         target_population = user_ids - banner_user_ids - donation_user_ids
 
         finance_status, finance_missing = kt_utils.get_finance(models.Donation)
-        how_many_users = 34 - finance_status/30  # 1..34
+        how_many_users = 34 - finance_status/3  # 1..34
         if how_many_users > len(target_population):
             how_many_users = len(target_population)
         self.stdout.write('Publishing fundraiser banner for %d users... (out of %d)' % (how_many_users, len(target_population)))
