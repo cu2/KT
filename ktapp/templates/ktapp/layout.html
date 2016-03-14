@@ -1,170 +1,251 @@
 <!DOCTYPE html>
-<html class="no-js">
+<html lang="hu">
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}{% endblock %}</title>
         <meta name="description" content="{% block meta_description %}{% endblock %}" />
-        <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta property="fb:app_id" content="259204284100889" />
         <meta property="og:site_name" content="Kritikus Tömeg" />
         {% block other_meta %}{% endblock %}
-{% load staticfiles %}
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/normalize.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/main.css' %}?v=42" />
-        <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
+
         <base href="/" />
-        <script>
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-            ga('create', 'UA-1291633-1', 'auto');
-            ga('send', 'pageview');
-        </script>
+
+        {% load staticfiles %}
+        <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
+        <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" />
+        <style type="text/css">
+            html {
+                position: relative;
+                min-height: 100%;
+            }
+            body {
+                margin-bottom: 0;
+            }
+            header {
+                margin-top: 120px;
+            }
+            footer {
+                display: none;
+            }
+            @media (min-width: 768px) {
+                body {
+                    margin-bottom: 180px;
+                }
+                footer {
+                    display: block;
+                    position: absolute;
+                    left: 0; right: 0;
+                    bottom: 0; height: 150px;
+                    background: rgb(218,211,184);
+                    text-align: center;
+                }
+                .footer-nav-row {
+                    height: 50px;
+                }
+                .footer-nav {
+                    display: inline-block;
+                    list-style: none;
+                    padding: 0;
+                    margin: 0 auto;
+                }
+                .footer-nav li {
+                    float: left;
+                }
+                .footer-nav li a {
+                    display: block;
+                    margin: 15px 12px;
+                    height: 15px;
+                    line-height: 15px;
+                    font-size: 15px;
+                }
+                .footer-icons-row {
+                    height: 60px;
+                }
+                .footer-icons {
+                    display: inline-block;
+                    list-style: none;
+                    padding: 0;
+                    margin: 0 auto;
+                }
+                .footer-icons li {
+                    float: left;
+                }
+                .footer-icons li a {
+                    display: block;
+                    width: 44px;
+                    height: 44px;
+                    border-radius: 22px;
+                    padding: 11px 0;
+                    margin: 0 8px;
+                    line-height: 22px;
+                    font-size: 22px;
+                    background: rgb(146,23,23);
+                    color: rgb(218,211,184);
+                }
+                .youtube-outer {
+                    position: relative;
+                    display: inline-block;
+                    width: 26px;
+                    height: 18px;
+                    border-radius: 4px;
+                    margin-top: 2px;
+                    background: rgb(218,211,184);
+                }
+                .youtube-inner {
+                    position: absolute;
+                    top: 3px;
+                    left: 8px;
+                    display: block;
+                    width: 0;
+                    height: 0;
+                    border-color: transparent transparent transparent rgb(146,23,23);
+                    border-width: 6px 6px 6px 10px;
+                    border-style: solid;
+                }
+                .footer-text {
+                    line-height: 15px;
+                    font-size: 15px;
+                }
+            }
+{#            #top-navbar * {#}
+{#                transition: all 0.5s;#}
+{#            }#}
+{#            .nav-mini * {#}
+{#                font-size: 8pt;#}
+{#                height: 10px !important;#}
+{#                line-height: 10px !important;#}
+{#            }#}
+        </style>
+
+        <!--[if lt IE 9]>
+            <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+            <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+{#        <script>#}
+{#            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){#}
+{#                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),#}
+{#                    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)#}
+{#            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');#}
+{#            ga('create', 'UA-1291633-1', 'auto');#}
+{#            ga('send', 'pageview');#}
+{#        </script>#}
     </head>
     <body>
 
-        <header>
-            {% block header %}{% endblock %}
-        </header>
+        <!-- Fixed navbar -->
+        <nav class="navbar navbar-default navbar-fixed-top" id="top-navbar">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="{% url 'index' %}"><span class="glyphicon glyphicon-film" aria-hidden="true"></span> Kritikus Tömeg</a>
+                </div>
+                <div id="navbar" class="collapse navbar-collapse">
+                    <form class="navbar-form navbar-left" action="{% url 'search' %}" method="get">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="q" tabindex="1" autocomplete="off" placeholder="Keresés..." />
+                        </div>
+                        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                    </form>
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span> Filmek <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'top_films' %}">Toplisták</a></li>
+                                <li><a href="{% url 'usertoplists' %}">Egyéni listák</a></li>
 
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{% url 'premiers' %}">Bemutatók</a></li>
+                                <li><a href="{% url 'sequels' %}">Folytatások</a></li>
+                                <li><a href="{% url 'films_of_past_days' %}">Napok filmjei</a></li>
+
+                                {% if user.is_authenticated %}
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="{% url 'user_wishlist' user.id user.slug_cache %}">Kívánságaid</a></li>
+                                    <li><a href="{% url 'user_films' user.id user.slug_cache %}">Filmjeid</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Közösség <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
+                                <li><a href="{% url 'latest_comments' %}">Kommentek</a></li>
+                                <li><a href="{% url 'polls' %}?tipus=aktualis">Közkérdések</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
+                                <li><a href="{% url 'similar_users' %}">Hasonlók</a></li>
+                                <li><a href="{% url 'everybody' %}">Mindenki</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'messages' %}"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Üzenetek</a></li>
+                            <li><a href="{% url 'user_profile' user.id user.slug_cache %}"><img class="img-circle" height="20" src="{{ user.gravatar_url }}"> {{ user.username }}</a></li>
+                        {% else %}
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Login <span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <li class="dropdown-header">Bejelentkezés</li>
+                                    <li>
+                                        <form class="navbar-form">
+                                            <div class="form-group">
+                                                <input type="text" placeholder="Email" class="form-control">
+                                            </div>
+                                            <div class="form-group">
+                                                <input type="password" placeholder="Password" class="form-control">
+                                            </div>
+                                            <button type="submit" class="btn btn-success">Sign in</button>
+                                        </form>
+                                    </li>
+                                    <li role="separator" class="divider"></li>
+                                    <li class="dropdown-header">Regisztráció</li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div><!--/.nav-collapse -->
+            </div>
+        </nav>
+
+        <!-- Begin page content -->
+        <header>
+            <div class="container">
+                {% block header %}{% endblock %}
+            </div>
+        </header>
         <section id="main">
-            {% block main %}{% endblock %}
+            <div class="container">
+                {% block main %}{% endblock %}
+            </div>
         </section>
 
-        <nav id="toptopmenu" class="clearfix">
-            <div class="toptopmenu_left">
-                <ul>
-                    <li id="hamburger_menu" class="action_text">&equiv;</li>
-                    <li id="logo"><a href="{% url 'index' %}">Kritikus Tömeg</a></li>
-                    {% if user.is_authenticated %}
-                        <li id="user_profile_menu"><b><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></b></li>
-                        <li id="messages_menu"><a href="{% url 'messages' %}">Üzenetek{% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %} <span class="new_message_warning">új</span>{% endif %}</a></li>
-                        <li id="logout_menu"><form action="{% url 'logout' %}" method="post" class="inline">
-                            {% csrf_token %}
-                            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
-                            <input type="submit" value="Kijelentkezés" class="small_button" />
-                        </form></li>
-                        <li id="mobile_user_profile_menu"><b><a href="{% url 'user_profile' user.id user.slug_cache %}"><img src="{% static 'ktapp/images/kt-user-32x32.png' %}" /></a></b></li>
-                        <li id="mobile_messages_menu"><a href="{% url 'messages' %}"><img src="{% static 'ktapp/images/kt-envelope-32x32.png' %}" />{% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %} <span class="new_message_warning">új</span>{% endif %}</a></li>
-                        <li id="mobile_logout_menu"><form action="{% url 'logout' %}" method="post" class="inline">
-                            {% csrf_token %}
-                            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
-                            <input type="image" src="{% static 'ktapp/images/kt-logout-32x32.png' %}" style="border: none" />
-                        </form></li>
-                    {% else %}
-                        <li id="mobile_login_menu"><a href="{% url 'login' %}"><img src="{% static 'ktapp/images/kt-user-32x32.png' %}" /></a></li>
-                        <li id="login_menu"><form action="{% url 'login' %}" method="post" class="inline">
-                            {% csrf_token %}
-                            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
-                            <input type="text" name="username" value="" id="login_username" placeholder="név vagy email" tabindex="2" />
-                            <input type="password" name="password" value="" id="login_password" placeholder="jelszó" tabindex="3" />
-                            <span class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></span>
-                            <input type="submit" value="Bejelentkezés" class="small_button" tabindex="4" />
-                            <span><a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">Regisztráció</a></span>
-                        </form></li>
-                    {% endif %}
+        <footer>
+            <div class="footer-nav-row">
+                <ul class="footer-nav clearfix">
+                    <li><a href="{% url 'about_page' %}">Rólunk</a></li>
+                    <li><a href="{% url 'impressum' %}">Impresszum</a></li>
+                    <li><a href="{% url 'rulez' %}">Szabályzat</a></li>
+                    <li><a href="{% url 'finance' %}">Kassza</a></li>
                 </ul>
             </div>
-            <div class="toptopmenu_right">
-                <form class="inline" action="{% url 'search' %}" method="get">
-                    <input type="text" placeholder="Keresés..." tabindex="1" name="q" autocomplete="off" id="search_input" />
-                    <input type="submit" value="Keresés" class="small_button" id="search_submit_button" />
-                    <input type="submit" value="?" class="small_button" id="mobile_search_submit_button" />
-                </form>
+            <div class="footer-icons-row">
+                <ul class="footer-icons clearfix">
+                    <li><a href="https://www.facebook.com/kritikustomeg/" target="_blank" title="Facebook">f</a></li>
+                    <li><a href="https://www.youtube.com/channel/UCwODbFUp14aWqbbexI-Wmug" target="_blank" title="YouTube">
+                        <span class="youtube-outer"><span class="youtube-inner"></span></span>
+                    </a></li>
+                </ul>
             </div>
-        </nav>
-
-        <nav id="leftmenu">
-            <ul>
-                <li>Filmek<br />
-                    <ul class="submenu">
-                        <li><a href="{% url 'browse' %}">Összetett kereső</a></li>
-                        <li><a href="{% url 'premiers' %}">Bemutatók</a></li>
-                        {% if user.is_authenticated %}
-                            <li><a href="{% url 'user_wishlist' user.id user.slug_cache %}">Kívánságaid</a></li>
-                            <li><a href="{% url 'user_films' user.id user.slug_cache %}">Filmjeid</a></li>
-                        {% endif %}
-                        <li><a href="{% url 'sequels' %}">Folytatások</a></li>
-                    </ul>
-                </li>
-                <li>Toplisták<br />
-                    <ul class="submenu">
-                        <li><a href="{% url 'top_films' %}">Filmek</a></li>
-                        <li><a href="{% url 'usertoplists' %}">Egyéni listák</a></li>
-                    </ul>
-                </li>
-                <li>Közösség<br />
-                    <ul class="submenu">
-                        <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
-                        <li><a href="{% url 'latest_comments' %}">Kommentek</a></li>
-                        <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
-                        <li><a href="{% url 'similar_users' %}">Hasonlók</a></li>
-                        <li><a href="{% url 'everybody' %}">Mindenki</a></li>
-{#                        <li><a href="{% url 'forum' 38 'jatek' %}">Játék</a></li>#}
-                    </ul>
-                </li>
-                <li>Vapiti díj<br />
-                    <ul class="submenu">
-                        <li><a href="{% url 'vapiti_general' %}">Leírás</a></li>
-                        <li><a href="{% url 'vapiti_gold_winners' %}">Arany</a></li>
-                        <li><a href="{% url 'vapiti_silver_winners' 'noi' %}">Női Ezüst</a></li>
-                        <li><a href="{% url 'vapiti_silver_winners' 'ferfi' %}">Férfi Ezüst</a></li>
-                    </ul>
-                </li>
-                <li>Közkérdések<br />
-                    <ul class="submenu">
-                        <li><a href="{% url 'polls' %}?tipus=aktualis">Aktuális</a></li>
-                        <li><a href="{% url 'polls' %}?tipus=regi">Régi</a></li>
-                        <li><a href="{% url 'polls' %}?tipus=leendo">Leendő</a></li>
-                    </ul>
-                </li>
-                <li>Tartalmak<br />
-                    <ul class="submenu">
-                        <li><a href="{% url 'latest_quotes' %}">Idézetek</a></li>
-                        <li><a href="{% url 'latest_trivias' %}">Érdekességek</a></li>
-                        <li><a href="{% url 'latest_pictures' %}">Képek</a></li>
-                        <li><a href="{% url 'articles' %}">Cikkek</a></li>
-                        <li><a href="{% url 'awards' %}">Díjak</a></li>
-                    </ul>
-                </li>
-                {% if user.is_staff or user.is_reliable or user.core_member %}
-                    <li>Szerk<br />
-                        <ul class="submenu">
-                            {% if user.is_staff or user.is_reliable %}
-                                <li><a href="{% url 'new_film' %}">Filmfeltöltés</a></li>
-                            {% else %}
-                                <li><a href="{% url 'suggest_film' %}">Új film beküldése</a></li>
-                            {% endif %}
-                            <li><a href="{% url 'suggested_films' %}">Beküldött filmek</a></li>
-                            <li><a href="{% url 'suggested_links' %}">Beküldött linkek</a></li>
-                            {% if user.is_staff %}
-                                <li><a href="{% url 'suggested_reviews' %}">Beküldött elemzések</a></li>
-                                <li><a href="{% url 'suggested_bios' %}">Beküldött portrék</a></li>
-                            {% endif %}
-                            {% if user.is_staff or user.is_reliable %}
-                                <li><a href="{% url 'films_with_missing_data' %}">Hiányos filmek</a></li>
-                                <li><a href="{% url 'changes' %}">Változások</a></li>
-                            {% endif %}
-                            {% if user.is_superuser %}
-                                <li><a href="{% url 'admin:index' %}">Admin</a></li>
-                                <li><a href="{% url 'analytics' %}">Analytics</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
-
-        <footer>
-            <ul class="clearfix">
-                <li><a href="{% url 'about_page' %}">Rólunk</a></li>
-                <li><a href="{% url 'impressum' %}">Impresszum</a></li>
-                <li><a href="{% url 'rulez' %}">Szabályzat</a></li>
-                <li><a href="{% url 'finance' %}">Kassza</a></li>
-                <li><a href="https://www.facebook.com/kritikustomeg/" target="_blank">Facebook</a></li>
-            </ul>
+            <p class="footer-text">&copy; kritikustomeg.org</p>
         </footer>
 
         <div id="search_autocomplete_results" style="display: none"></div>
@@ -172,10 +253,45 @@
         {% block jsonld %}{% endblock %}
 
         <script src="{% static 'ktapp/js/jquery-1.11.2.min.js' %}"></script>
-        <script src="{% static 'ktapp/js/jquery-ui.min.js' %}"></script>
-        <script src="{% static 'ktapp/js/jquery.cookie.js' %}"></script>
-        <script src="{% static 'ktapp/js/rangyinputs-jquery.js' %}"></script>
-        <script src="{% static 'ktapp/js/stupidtable.min.js' %}"></script>
-        <script src="{% static 'ktapp/js/main.js' %}?v=29"></script>
+        {#<script src="{% static 'ktapp/js/jquery-ui.min.js' %}"></script>#}
+        {#<script src="{% static 'ktapp/js/jquery.cookie.js' %}"></script>#}
+        {#<script src="{% static 'ktapp/js/rangyinputs-jquery.js' %}"></script>#}
+        {#<script src="{% static 'ktapp/js/stupidtable.min.js' %}"></script>#}
+        {#<script src="{% static 'ktapp/js/main.js' %}?v=29"></script>#}
+        <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+        <script type="text/javascript">
+            $(function() {
+                var didScroll;
+                var lastScrollTop = $(this).scrollTop();
+                var delta = 5;
+                var navbarHeight = 50;
+
+                $(window).scroll(function(event){
+                    didScroll = true;
+                });
+
+                setInterval(function() {
+                    if (didScroll) {
+                        hasScrolled();
+                        didScroll = false;
+                    }
+                }, 250);
+
+                function hasScrolled() {
+                    var st = $(this).scrollTop();
+                    if (Math.abs(lastScrollTop - st) <= delta) {
+                        return;
+                    }
+                    if (st <= navbarHeight) {
+                        $('#top-navbar').removeClass('nav-mini');
+                    } else if (st > lastScrollTop) {
+                        $('#top-navbar').addClass('nav-mini');
+                    } else {
+                        $('#top-navbar').removeClass('nav-mini');
+                    }
+                    lastScrollTop = st;
+                }
+            });
+        </script>
     </body>
 </html>

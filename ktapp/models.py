@@ -185,6 +185,12 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
             return user_list[0]
         return None
 
+    def gravatar_url(self):
+        return 'http://www.gravatar.com/avatar/%s?s=%d&d=mm' % (
+            hashlib.md5(self.email.strip().lower()).hexdigest(),
+            60,
+        )
+
 
 class Film(models.Model):
     orig_title = models.CharField(max_length=250)

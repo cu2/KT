@@ -3,8 +3,8 @@
 
 {% block film_main %}
 
-    <div class="clearfix">
-        <div id="film_main_left">
+    <div class="row">
+        <div id="film_main_left" class="col-sm-7">
             <div class="film_block hover_show_button_context">
                 {% if film.main_poster %}
                     <a href="{% url 'film_picture' film.id film.slug_cache film.main_poster.id %}"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" id="film_main_poster" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
@@ -184,7 +184,8 @@
                 </div>
             {% endif %}
         </div>
-        <div id="film_main_right">
+
+        <div id="film_main_right" class="col-sm-5">
 
             {% if film.is_open_for_vote_from %}
 

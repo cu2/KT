@@ -41,7 +41,7 @@
         </div>
     {% endfor %}
 
-    <div class="left_content">
+    <div class="col-sm-6">
         <h2>A nap filmje</h2>
         <div class="film_block">
             {% if film.main_poster %}
@@ -156,7 +156,8 @@
         {% endif %}
         <p><a href="{% url 'usertoplists' %}">További toplisták...</a></p>
     </div>
-    <div class="right_content">
+
+    <div class="col-sm-6">
         {% if before_game %}
             <h2>Játék</h2>
             <p>Azt hiszed, ismered a filmeket? Teszteld magad! Vasárnap este 8-tól újra <a href="{% url 'forum' 38 'jatek' %}">képes játék</a>!</p>
@@ -171,6 +172,5 @@
         {% endfor %}
         <p><a href="{% url 'latest_comments' %}">További kommentek...</a></p>
     </div>
-    <br class="clear" />
 
 {% endblock %}

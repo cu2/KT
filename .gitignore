@@ -4,6 +4,7 @@ kt/settings_prod.py
 media/
 .idea/
 *.iml
+bootstrap/
 
 
 ### Template from https://github.com/github/gitignore/blob/master/Python.gitignore
