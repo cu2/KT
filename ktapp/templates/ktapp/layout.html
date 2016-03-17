@@ -23,6 +23,37 @@
             body {
                 margin-bottom: 0;
             }
+            .navbar-profile {
+                margin-top: 30px;
+                height: 60px;
+            }
+            .navbar-profile>li {
+                margin: -10px;
+            }
+            .navbar-profile>li>a {
+                padding: 10px;
+            }
+            .dropdown-menu-custom>li {
+                padding: 5px 10px;
+            }
+            .dropdown-menu-custom>li>a {
+                display: inline;
+                padding: 0;
+                color: rgb(146,23,23);
+            }
+            .dropdown-menu-custom>li>a:hover {
+                color: rgb(146,23,23);
+                background: none;
+            }
+            .dropdown-menu-custom .form-group {
+                margin-bottom: 10px;
+            }
+            .help-block {
+                font-size: 10px;
+            }
+            .additional_input {
+                display: none;
+            }
             header {
                 margin-top: 120px;
             }
@@ -186,28 +217,34 @@
                             </ul>
                         </li>
                     </ul>
-                    <ul class="nav navbar-nav navbar-right">
+                    <ul class="nav navbar-nav navbar-right navbar-profile">
                         {% if user.is_authenticated %}
                             <li><a href="{% url 'messages' %}"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Üzenetek</a></li>
-                            <li><a href="{% url 'user_profile' user.id user.slug_cache %}"><img class="img-circle" height="20" src="{{ user.gravatar_url }}"> {{ user.username }}</a></li>
+                            <li><a href="{% url 'user_profile' user.id user.slug_cache %}"><img class="img-circle" height="60" src="{{ user.gravatar_url }}"> {{ user.username }}</a></li>
                         {% else %}
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Login <span class="caret"></span></a>
-                                <ul class="dropdown-menu">
-                                    <li class="dropdown-header">Bejelentkezés</li>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img class="img-circle" height="60" src="{{ user.gravatar_url|default:"http://www.gravatar.com/avatar/?s=60&d=mm" }}"> Bejelentkezés <span class="caret"></span></a>
+                                <ul class="dropdown-menu dropdown-menu-custom">
                                     <li>
-                                        <form class="navbar-form">
+                                        <form action="{% url 'login' %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
                                             <div class="form-group">
-                                                <input type="text" placeholder="Email" class="form-control">
+                                                <input type="text" name="username" tabindex="2" placeholder="név vagy email" class="form-control login-username" />
                                             </div>
                                             <div class="form-group">
-                                                <input type="password" placeholder="Password" class="form-control">
+                                                <input type="password" name="password" tabindex="3" placeholder="jelszó" class="form-control" />
+                                                <div class="help-block text-right"><a href="{% url 'reset_password' '' %}">Elfelejtetted a jelszavad?</a></div>
                                             </div>
-                                            <button type="submit" class="btn btn-success">Sign in</button>
+                                            <span class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></span>
+                                            <div class="form-group">
+                                                <button type="submit" tabindex="4" class="btn btn-primary">Bejelentkezés</button>
+                                            </div>
                                         </form>
                                     </li>
-                                    <li role="separator" class="divider"></li>
-                                    <li class="dropdown-header">Regisztráció</li>
+                                    <li>
+                                        Új vagy? <a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">Regisztrálj!</a>
+                                    </li>
                                 </ul>
                             </li>
                         {% endif %}
@@ -291,6 +328,14 @@
                     }
                     lastScrollTop = st;
                 }
+
+                $('.navbar-profile .dropdown-toggle').click(function() {
+                    setTimeout(function() {
+                        if ($('.navbar-profile>li').hasClass('open')) {
+                            $('.navbar-profile .login-username').focus();
+                        }
+                    }, 100);
+                });
             });
         </script>
     </body>
