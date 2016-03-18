@@ -33,6 +33,26 @@
             .navbar-profile>li>a {
                 padding: 10px;
             }
+            .navbar-profile .profile-pic {
+                float: left;
+                margin-right: 10px;
+            }
+            .navbar-profile .profile-li span {
+                display: block;
+                margin-left: 70px;
+                white-space: nowrap;
+            }
+            .navbar-profile-name {
+                font-size: 16px;
+                margin-top: 10px;
+                overflow: hidden;
+                max-width: 120px;
+                text-overflow: ellipsis;
+            }
+            .navbar-profile-sub {
+                font-size: 12px;
+                margin-top: 2px;
+            }
             .dropdown-menu-custom>li {
                 padding: 5px 10px;
             }
@@ -219,8 +239,13 @@
                     </ul>
                     <ul class="nav navbar-nav navbar-right navbar-profile">
                         {% if user.is_authenticated %}
-                            <li><a href="{% url 'messages' %}"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Üzenetek</a></li>
-                            <li><a href="{% url 'user_profile' user.id user.slug_cache %}"><img class="img-circle" height="60" src="{{ user.gravatar_url }}"> {{ user.username }}</a></li>
+                            <li class="profile-li">
+                                <a href="{% url 'user_profile' user.id user.slug_cache %}" class="clearfix">
+                                    <img class="img-circle profile-pic" height="60" src="{{ user.gravatar_url }}">
+                                    <span class="navbar-profile-name">{{ user.username }}</span>
+                                    <span class="navbar-profile-sub">profil megtekintése</span>
+                                </a>
+                            </li>
                         {% else %}
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img class="img-circle" height="60" src="{{ user.gravatar_url|default:"http://www.gravatar.com/avatar/?s=60&d=mm" }}"> Bejelentkezés <span class="caret"></span></a>
@@ -249,6 +274,13 @@
                             </li>
                         {% endif %}
                     </ul>
+                    {% if user.is_authenticated %}
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <a href="{% url 'messages' %}"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Üzenetek</a>
+                            </li>
+                        </ul>
+                    {% endif %}
                 </div><!--/.nav-collapse -->
             </div>
         </nav>
