@@ -23,6 +23,40 @@
             body {
                 margin-bottom: 0;
             }
+            .navbar-with-icons {
+                margin-top: 35px;
+                height: 60px;
+            }
+            .navbar-with-icons>li {
+                text-align: center;
+                margin: -10px 10px;
+            }
+            .navbar-with-icons>li>a {
+                padding: 10px;
+            }
+            .navbar-with-icons .navbar-icon {
+                display: block;
+                font-size: 24px;
+                line-height: 30px;
+                height: 30px;
+            }
+            .navbar-with-icons .navbar-label {
+                display: block;
+                font-size: 12px;
+            }
+            .new_message_warning {
+                position: absolute;
+                top: 5px;
+                right: 15px;
+                background: rgb(30,36,180);
+                color: rgb(249,244,218);
+                display: block;
+                font-size: 12px;
+                line-height: 18px;
+                width: 18px;
+                height: 18px;
+                border-radius: 9px;
+            }
             .navbar-profile {
                 margin-top: 30px;
                 height: 60px;
@@ -44,9 +78,9 @@
             }
             .navbar-profile-name {
                 font-size: 16px;
-                margin-top: 10px;
+                margin-top: 13px;
+                width: 160px;
                 overflow: hidden;
-                max-width: 120px;
                 text-overflow: ellipsis;
             }
             .navbar-profile-sub {
@@ -205,9 +239,12 @@
                         </div>
                         <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                     </form>
-                    <ul class="nav navbar-nav">
+                    <ul class="nav navbar-nav navbar-with-icons">
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-facetime-video" aria-hidden="true"></span> Filmek <span class="caret"></span></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span class="navbar-icon glyphicon glyphicon-facetime-video" aria-hidden="true"></span>
+                                <span class="navbar-label">filmek</span>
+                            </a>
                             <ul class="dropdown-menu">
                                 <li><a href="{% url 'top_films' %}">Toplisták</a></li>
                                 <li><a href="{% url 'usertoplists' %}">Egyéni listák</a></li>
@@ -225,7 +262,10 @@
                             </ul>
                         </li>
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-user" aria-hidden="true"></span> Közösség <span class="caret"></span></a>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <span class="navbar-icon glyphicon glyphicon-user" aria-hidden="true"></span>
+                                <span class="navbar-label">közösség</span>
+                            </a>
                             <ul class="dropdown-menu">
                                 <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
                                 <li><a href="{% url 'latest_comments' %}">Kommentek</a></li>
@@ -275,9 +315,15 @@
                         {% endif %}
                     </ul>
                     {% if user.is_authenticated %}
-                        <ul class="nav navbar-nav navbar-right">
+                        <ul class="nav navbar-nav navbar-right navbar-with-icons">
                             <li>
-                                <a href="{% url 'messages' %}"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> Üzenetek</a>
+                                <a href="{% url 'messages' %}">
+                                    <span class="navbar-icon glyphicon glyphicon-envelope" aria-hidden="true"></span>
+                                    <span class="navbar-label">üzenetek</span>
+                                    {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
+                                        <span class="new_message_warning">új</span>
+                                    {% endif %}
+                                </a>
                             </li>
                         </ul>
                     {% endif %}
