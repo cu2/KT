@@ -23,63 +23,164 @@
             body {
                 margin-bottom: 0;
             }
+            .inline {
+                display: inline;
+            }
+            .btn-icon {
+                padding: 0;
+                border: 0;
+            }
+            .search-icon {
+                border-radius: 4px 0 0 4px;
+                width: 32px;
+                height: 32px;
+            }
+            .search-input {
+                border-radius: 0 4px 4px 0;
+                border-left: none;
+                padding: 6px;
+            }
+            .sub-search-link {
+                display: block;
+                font-size: 12px;
+                line-height: 12px;
+                height: 12px;
+                margin: 10px 0 -22px 32px;
+            }
+            #search_input {
+                width: 400px;
+            }
+            #search_input.loading {
+                background-image: url(/static/ktapp/images/ajax-loader.gif);
+                background-position: 99% 8px;
+                background-repeat: no-repeat;
+            }
+
+
+            #search_autocomplete_results {
+                position: fixed;
+                z-index: 100;
+                background: rgb(249,244,218);
+                border-style: none solid solid solid;
+                border-width: 1px;
+                border-color: rgb(128,128,128);
+                font-size: 8pt;
+                line-height: 1.1;
+                max-height: 430px;
+                overflow-y: scroll;
+            }
+            #search_autocomplete_results h2 {
+                font-size: 8pt;
+                font-weight: bold;
+                margin: 5px 5px 0 5px;
+            }
+            #search_autocomplete_results ul {
+                list-style: none;
+                margin: 0 0 5px 0;
+                padding: 0;
+            }
+            #search_autocomplete_results ul li {
+                position: relative;
+                margin: 0;
+                padding: 0;
+                height: 50px;
+            }
+            #search_autocomplete_results ul li a {
+                display: block;
+                margin: 0;
+                padding: 5px;
+                overflow: hidden;
+                white-space: nowrap;
+                box-sizing: border-box;
+                height: 50px;
+                font-weight: bold;
+                color: rgb(146,23,23);
+            }
+            #search_autocomplete_results ul li:hover {
+                background: rgb(218,211,184);
+            }
+            .search_autocomplete_results_thumbnail_container {
+                display: inline-block;
+                width: 35px;
+                height: 40px;
+                float: left;
+            }
+            .search_autocomplete_results_thumbnail_container img {
+                width: auto;
+                max-width: 35px;
+                height: 40px;
+            }
+            .search_autocomplete_results_subtitle {
+                font-weight: normal;
+                color: rgb(0,0,0);
+            }
+
+
+
+
             .navbar-with-icons {
                 margin-top: 35px;
                 height: 60px;
             }
             .navbar-with-icons>li {
-                text-align: center;
-                margin: -10px 10px;
+                margin: -5px 10px;
             }
             .navbar-with-icons>li>a {
-                padding: 10px;
+                padding: 5px;
             }
             .navbar-with-icons .navbar-icon {
                 display: block;
-                font-size: 24px;
-                line-height: 30px;
                 height: 30px;
+                margin: 3px auto -3px;
             }
             .navbar-with-icons .navbar-label {
                 display: block;
                 font-size: 12px;
             }
-            .new_message_warning {
+            .new-message-warning {
                 position: absolute;
-                top: 5px;
-                right: 15px;
+                top: 6px;
+                right: 10px;
                 background: rgb(30,36,180);
                 color: rgb(249,244,218);
                 display: block;
                 font-size: 12px;
-                line-height: 18px;
-                width: 18px;
-                height: 18px;
-                border-radius: 9px;
+                line-height: 20px;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                text-align: center;
             }
             .navbar-profile {
                 margin-top: 30px;
                 height: 60px;
+                width: 255px;
             }
             .navbar-profile>li {
-                margin: -10px;
+                margin: -5px 10px;
             }
             .navbar-profile>li>a {
-                padding: 10px;
+                padding: 5px;
             }
             .navbar-profile .profile-pic {
                 float: left;
-                margin-right: 10px;
+                margin-right: 5px;
+                width: 60px;
+                height: 60px;
+            }
+            .navbar-profile .profile-pic-placeholder {
+                width: 60px;
+                height: 60px;
             }
             .navbar-profile .profile-li span {
                 display: block;
-                margin-left: 70px;
+                margin-left: 65px;
                 white-space: nowrap;
             }
             .navbar-profile-name {
                 font-size: 16px;
                 margin-top: 13px;
-                width: 160px;
+                max-width: 160px;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
@@ -235,14 +336,17 @@
                 <div id="navbar" class="collapse navbar-collapse">
                     <form class="navbar-form navbar-left" action="{% url 'search' %}" method="get">
                         <div class="form-group">
-                            <input type="text" class="form-control" name="q" tabindex="1" autocomplete="off" placeholder="Keresés..." />
+                            <button type="submit" class="btn btn-icon">
+                                <img class="icon search-icon" src="{% static 'ktapp/images/kt-icon-28-search-button-64.png' %}" alt="" />
+                            </button><input type="text" class="form-control search-input" id="search_input" name="q" tabindex="1" autocomplete="off" placeholder="Keresés..." />
+                            <div id="search_autocomplete_results" style="display: none"></div>
                         </div>
-                        <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                        <span class="sub-search-link"><a href="{% url 'browse' %}">részletes keresés</a></span>
                     </form>
                     <ul class="nav navbar-nav navbar-with-icons">
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <span class="navbar-icon glyphicon glyphicon-facetime-video" aria-hidden="true"></span>
+                                <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-181-facetime-video-link-48.png' %}" alt="" />
                                 <span class="navbar-label">filmek</span>
                             </a>
                             <ul class="dropdown-menu">
@@ -263,13 +367,13 @@
                         </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <span class="navbar-icon glyphicon glyphicon-user" aria-hidden="true"></span>
+                                <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-44-group-link-48.png' %}" alt="" />
                                 <span class="navbar-label">közösség</span>
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
                                 <li><a href="{% url 'latest_comments' %}">Kommentek</a></li>
-                                <li><a href="{% url 'polls' %}?tipus=aktualis">Közkérdések</a></li>
+                                <li><a href="{% url 'polls' %}?tipus=aktualis">Szavazások</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
                                 <li><a href="{% url 'similar_users' %}">Hasonlók</a></li>
@@ -281,14 +385,17 @@
                         {% if user.is_authenticated %}
                             <li class="profile-li">
                                 <a href="{% url 'user_profile' user.id user.slug_cache %}" class="clearfix">
-                                    <img class="img-circle profile-pic" height="60" src="{{ user.gravatar_url }}">
+                                    <img class="img-circle profile-pic" src="{{ user.gravatar_url }}">
                                     <span class="navbar-profile-name">{{ user.username }}</span>
                                     <span class="navbar-profile-sub">profil megtekintése</span>
                                 </a>
                             </li>
                         {% else %}
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img class="img-circle" height="60" src="{{ user.gravatar_url|default:"http://www.gravatar.com/avatar/?s=60&d=mm" }}"> Bejelentkezés <span class="caret"></span></a>
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <img class="img-circle profile-pic-placeholder" src="{% static 'ktapp/images/kt-icon-4-user-link-white-120.png' %}">
+                                    <span class="navbar-profile-menu-title">Bejelentkezés</span>
+                                </a>
                                 <ul class="dropdown-menu dropdown-menu-custom">
                                     <li>
                                         <form action="{% url 'login' %}" method="post">
@@ -318,10 +425,10 @@
                         <ul class="nav navbar-nav navbar-right navbar-with-icons">
                             <li>
                                 <a href="{% url 'messages' %}">
-                                    <span class="navbar-icon glyphicon glyphicon-envelope" aria-hidden="true"></span>
+                                    <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-11-envelope-link-48.png' %}" alt="" />
                                     <span class="navbar-label">üzenetek</span>
                                     {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
-                                        <span class="new_message_warning">új</span>
+                                        <span class="new-message-warning">új</span>
                                     {% endif %}
                                 </a>
                             </li>
@@ -363,8 +470,6 @@
             <p class="footer-text">&copy; kritikustomeg.org</p>
         </footer>
 
-        <div id="search_autocomplete_results" style="display: none"></div>
-
         {% block jsonld %}{% endblock %}
 
         <script src="{% static 'ktapp/js/jquery-1.11.2.min.js' %}"></script>
@@ -372,49 +477,7 @@
         {#<script src="{% static 'ktapp/js/jquery.cookie.js' %}"></script>#}
         {#<script src="{% static 'ktapp/js/rangyinputs-jquery.js' %}"></script>#}
         {#<script src="{% static 'ktapp/js/stupidtable.min.js' %}"></script>#}
-        {#<script src="{% static 'ktapp/js/main.js' %}?v=29"></script>#}
+        <script src="{% static 'ktapp/js/kt.js' %}?v=1"></script>
         <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
-        <script type="text/javascript">
-            $(function() {
-                var didScroll;
-                var lastScrollTop = $(this).scrollTop();
-                var delta = 5;
-                var navbarHeight = 50;
-
-                $(window).scroll(function(event){
-                    didScroll = true;
-                });
-
-                setInterval(function() {
-                    if (didScroll) {
-                        hasScrolled();
-                        didScroll = false;
-                    }
-                }, 250);
-
-                function hasScrolled() {
-                    var st = $(this).scrollTop();
-                    if (Math.abs(lastScrollTop - st) <= delta) {
-                        return;
-                    }
-                    if (st <= navbarHeight) {
-                        $('#top-navbar').removeClass('nav-mini');
-                    } else if (st > lastScrollTop) {
-                        $('#top-navbar').addClass('nav-mini');
-                    } else {
-                        $('#top-navbar').removeClass('nav-mini');
-                    }
-                    lastScrollTop = st;
-                }
-
-                $('.navbar-profile .dropdown-toggle').click(function() {
-                    setTimeout(function() {
-                        if ($('.navbar-profile>li').hasClass('open')) {
-                            $('.navbar-profile .login-username').focus();
-                        }
-                    }, 100);
-                });
-            });
-        </script>
     </body>
 </html>

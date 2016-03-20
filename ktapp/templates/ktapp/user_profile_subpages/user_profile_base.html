@@ -1,9 +1,19 @@
 {% extends "ktapp/layout.html" %}
+{% load staticfiles %}
 
 {% block title %}{{ selected_user.username }} - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{{ selected_user.username }}</h1>
+    <h1>
+        {{ selected_user.username }}
+        {% if request.user.is_authenticated and request.user.id == selected_user.id %}
+            <form action="{% url 'logout' %}" method="post" class="inline">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+                <button type="submit" class="btn btn-success btn-xs">kijelentkezés</button>
+            </form>
+        {% endif %}
+    </h1>
     {% if not selected_user.is_active %}
         <p style="margin-top: -20px">({% if selected_user.reason_of_inactivity == 'B' %}kitiltva{% elif selected_user.reason_of_inactivity == 'Q' %}kilépett{% else %}inaktív{% endif %})</p>
     {% endif %}
