@@ -23,6 +23,11 @@
             body {
                 margin-bottom: 0;
             }
+            @media(max-width: 991px) {
+                .container {
+                    width: 100%;
+                }
+            }
             .inline {
                 display: inline;
             }
@@ -48,7 +53,17 @@
                 margin: 10px 0 -22px 32px;
             }
             #search_input {
-                width: 400px;
+                width: 100px;
+            }
+            @media(min-width: 940px) {
+                #search_input {
+                    width: 200px;
+                }
+            }
+            @media(min-width: 1200px) {
+                #search_input {
+                    width: 400px;
+                }
             }
             #search_input.loading {
                 background-image: url(/static/ktapp/images/ajax-loader.gif);
@@ -117,6 +132,17 @@
 
 
 
+            .navbar-header .logo {
+                display: block;
+                width: 154px;
+                height: 78px;
+                padding: 5px;
+                margin-top: 21px;
+            }
+            .navbar-header .logo>img {
+                width: 144px;
+                height: 68px;
+            }
 
             .navbar-with-icons {
                 margin-top: 35px;
@@ -331,56 +357,11 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="{% url 'index' %}"><span class="glyphicon glyphicon-film" aria-hidden="true"></span> Kritikus Tömeg</a>
+                    <a class="logo" href="{% url 'index' %}">
+                        <img class="" src="{% static 'ktapp/images/kt-logo-288x136.png' %}" alt="Kritikus Tömeg" />
+                    </a>
                 </div>
                 <div id="navbar" class="collapse navbar-collapse">
-                    <form class="navbar-form navbar-left" action="{% url 'search' %}" method="get">
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-icon">
-                                <img class="icon search-icon" src="{% static 'ktapp/images/kt-icon-28-search-button-64.png' %}" alt="" />
-                            </button><input type="text" class="form-control search-input" id="search_input" name="q" tabindex="1" autocomplete="off" placeholder="Keresés..." />
-                            <div id="search_autocomplete_results" style="display: none"></div>
-                        </div>
-                        <span class="sub-search-link"><a href="{% url 'browse' %}">részletes keresés</a></span>
-                    </form>
-                    <ul class="nav navbar-nav navbar-with-icons">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-181-facetime-video-link-48.png' %}" alt="" />
-                                <span class="navbar-label">filmek</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{% url 'top_films' %}">Toplisták</a></li>
-                                <li><a href="{% url 'usertoplists' %}">Egyéni listák</a></li>
-
-                                <li role="separator" class="divider"></li>
-                                <li><a href="{% url 'premiers' %}">Bemutatók</a></li>
-                                <li><a href="{% url 'sequels' %}">Folytatások</a></li>
-                                <li><a href="{% url 'films_of_past_days' %}">Napok filmjei</a></li>
-
-                                {% if user.is_authenticated %}
-                                    <li role="separator" class="divider"></li>
-                                    <li><a href="{% url 'user_wishlist' user.id user.slug_cache %}">Kívánságaid</a></li>
-                                    <li><a href="{% url 'user_films' user.id user.slug_cache %}">Filmjeid</a></li>
-                                {% endif %}
-                            </ul>
-                        </li>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-44-group-link-48.png' %}" alt="" />
-                                <span class="navbar-label">közösség</span>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
-                                <li><a href="{% url 'latest_comments' %}">Kommentek</a></li>
-                                <li><a href="{% url 'polls' %}?tipus=aktualis">Szavazások</a></li>
-                                <li role="separator" class="divider"></li>
-                                <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
-                                <li><a href="{% url 'similar_users' %}">Hasonlók</a></li>
-                                <li><a href="{% url 'everybody' %}">Mindenki</a></li>
-                            </ul>
-                        </li>
-                    </ul>
                     <ul class="nav navbar-nav navbar-right navbar-profile">
                         {% if user.is_authenticated %}
                             <li class="profile-li">
@@ -421,8 +402,44 @@
                             </li>
                         {% endif %}
                     </ul>
-                    {% if user.is_authenticated %}
-                        <ul class="nav navbar-nav navbar-right navbar-with-icons">
+                    <ul class="nav navbar-nav navbar-right navbar-with-icons">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-181-facetime-video-link-48.png' %}" alt="" />
+                                <span class="navbar-label">filmek</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'top_films' %}">Toplisták</a></li>
+                                <li><a href="{% url 'usertoplists' %}">Egyéni listák</a></li>
+
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{% url 'premiers' %}">Bemutatók</a></li>
+                                <li><a href="{% url 'sequels' %}">Folytatások</a></li>
+                                <li><a href="{% url 'films_of_past_days' %}">Napok filmjei</a></li>
+
+                                {% if user.is_authenticated %}
+                                    <li role="separator" class="divider"></li>
+                                    <li><a href="{% url 'user_wishlist' user.id user.slug_cache %}">Kívánságaid</a></li>
+                                    <li><a href="{% url 'user_films' user.id user.slug_cache %}">Filmjeid</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-44-group-link-48.png' %}" alt="" />
+                                <span class="navbar-label">közösség</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
+                                <li><a href="{% url 'latest_comments' %}">Kommentek</a></li>
+                                <li><a href="{% url 'polls' %}?tipus=aktualis">Szavazások</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
+                                <li><a href="{% url 'similar_users' %}">Hasonlók</a></li>
+                                <li><a href="{% url 'everybody' %}">Mindenki</a></li>
+                            </ul>
+                        </li>
+                        {% if user.is_authenticated %}
                             <li>
                                 <a href="{% url 'messages' %}">
                                     <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-11-envelope-link-48.png' %}" alt="" />
@@ -432,8 +449,17 @@
                                     {% endif %}
                                 </a>
                             </li>
-                        </ul>
-                    {% endif %}
+                        {% endif %}
+                    </ul>
+                    <form class="navbar-form navbar-right" action="{% url 'search' %}" method="get">
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-icon">
+                                <img class="icon search-icon" src="{% static 'ktapp/images/kt-icon-28-search-button-64.png' %}" alt="" />
+                            </button><input type="text" class="form-control search-input" id="search_input" name="q" tabindex="1" autocomplete="off" placeholder="Keresés..." />
+                            <div id="search_autocomplete_results" style="display: none"></div>
+                        </div>
+                        <span class="sub-search-link"><a href="{% url 'browse' %}">részletes keresés</a></span>
+                    </form>
                 </div><!--/.nav-collapse -->
             </div>
         </nav>
