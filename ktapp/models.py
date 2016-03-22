@@ -186,9 +186,10 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
         return None
 
     def gravatar_url(self):
-        return 'http://www.gravatar.com/avatar/%s?s=%d&d=mm' % (
-            hashlib.md5(self.email.strip().lower()).hexdigest(),
+        return 'http://www.gravatar.com/avatar/%s?s=%d&d=%s' % (
+            hashlib.md5(self.email.strip().lower()).hexdigest() + 'xxx',
             60,
+            'http://kritikustomeg.org/static/ktapp/images/kt-icon-4-user-link-light-120.png',
         )
 
 
