@@ -301,7 +301,7 @@ def search(request):
     q = request.GET.get('q', '')
     if len(q) < 2:
         return HttpResponseRedirect(reverse('index'))
-    q_pieces = q.split()
+    q_pieces = kt_search.get_q_pieces(q)
     film = kt_search.find_film_by_link(q)
     if film:
         return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))

@@ -4,6 +4,10 @@ from django.template.defaultfilters import slugify
 from ktapp import models
 
 
+def get_q_pieces(q):  # limit length of query string and number of query pieces
+    return q[:200].split()[:20]
+
+
 def find_film_by_link(q):
     # search by IMDB link:
     if 'imdb.com/title' in q:

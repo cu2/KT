@@ -99,7 +99,7 @@ def search(request):
             'q': q,
             'results': [],
         }), content_type='application/json')
-    q_pieces = q.split()
+    q_pieces = kt_search.get_q_pieces(q)
 
     film = kt_search.find_film_by_link(q)
     if film:
