@@ -213,28 +213,72 @@ def edit_comment(request):
 @login_required
 @kt_utils.kt_permission_required('new_quote')
 def new_quote(request):
-    film = get_object_or_404(models.Film, pk=request.POST["film"])
-    if request.POST:
-        quote_form = kt_forms.QuoteForm(data=request.POST)
-        if quote_form.is_valid():
-            quote = quote_form.save(commit=False)
-            quote.created_by = request.user
+    film = get_object_or_404(models.Film, id=request.POST['film'])
+    quote_form = kt_forms.QuoteForm(data=request.POST)
+    if quote_form.is_valid():
+        quote = quote_form.save(commit=False)
+        quote.created_by = request.user
+        quote.save()
+    return HttpResponseRedirect(reverse('film_quotes', args=(film.id, film.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('edit_quote')
+def edit_quote(request):
+    quote = get_object_or_404(models.Quote, id=request.POST.get('id', 0))
+    if request.user.is_staff or quote.created_by_id == request.user.id:
+        content = request.POST.get('content', '').strip()
+        if content != '':
+            quote.content = content
             quote.save()
-    return HttpResponseRedirect(reverse("film_quotes", args=(film.pk, film.slug_cache)))
+    return HttpResponseRedirect(reverse('film_quotes', args=(quote.film.id, quote.film.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('delete_quote')
+def delete_quote(request):
+    quote = get_object_or_404(models.Quote, id=request.POST.get('id', 0))
+    if request.user.is_staff or quote.created_by_id == request.user.id:
+        quote.delete()
+    return HttpResponseRedirect(reverse('film_quotes', args=(quote.film.id, quote.film.slug_cache)))
 
 
 @require_POST
 @login_required
 @kt_utils.kt_permission_required('new_trivia')
 def new_trivia(request):
-    film = get_object_or_404(models.Film, pk=request.POST["film"])
-    if request.POST:
-        trivia_form = kt_forms.TriviaForm(data=request.POST)
-        if trivia_form.is_valid():
-            trivia = trivia_form.save(commit=False)
-            trivia.created_by = request.user
+    film = get_object_or_404(models.Film, id=request.POST['film'])
+    trivia_form = kt_forms.TriviaForm(data=request.POST)
+    if trivia_form.is_valid():
+        trivia = trivia_form.save(commit=False)
+        trivia.created_by = request.user
+        trivia.save()
+    return HttpResponseRedirect(reverse('film_trivias', args=(film.id, film.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('edit_trivia')
+def edit_trivia(request):
+    trivia = get_object_or_404(models.Trivia, id=request.POST.get('id', 0))
+    if request.user.is_staff or trivia.created_by_id == request.user.id:
+        content = request.POST.get('content', '').strip()
+        if content != '':
+            trivia.content = content
             trivia.save()
-    return HttpResponseRedirect(reverse("film_trivias", args=(film.pk, film.slug_cache)))
+    return HttpResponseRedirect(reverse('film_trivias', args=(trivia.film.id, trivia.film.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('delete_trivia')
+def delete_trivia(request):
+    trivia = get_object_or_404(models.Trivia, id=request.POST.get('id', 0))
+    if request.user.is_staff or trivia.created_by_id == request.user.id:
+        trivia.delete()
+    return HttpResponseRedirect(reverse('film_trivias', args=(trivia.film.id, trivia.film.slug_cache)))
 
 
 @require_POST

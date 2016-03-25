@@ -166,6 +166,8 @@ def film_quotes(request, id, film_slug, film, base_context):
         'quotes': film.quote_set.all(),
         'quote_form': quote_form,
         'permission_new_quote': kt_utils.check_permission('new_quote', request.user),
+        'permission_edit_quote': kt_utils.check_permission('edit_quote', request.user),
+        'permission_delete_quote': kt_utils.check_permission('delete_quote', request.user),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     }))
 
@@ -179,6 +181,8 @@ def film_trivias(request, id, film_slug, film, base_context):
         'trivias': film.trivia_set.all(),
         'trivia_form': trivia_form,
         'permission_new_trivia': kt_utils.check_permission('new_trivia', request.user),
+        'permission_edit_trivia': kt_utils.check_permission('edit_trivia', request.user),
+        'permission_delete_trivia': kt_utils.check_permission('delete_trivia', request.user),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     }))
 

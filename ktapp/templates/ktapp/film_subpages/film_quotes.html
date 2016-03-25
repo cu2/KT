@@ -15,7 +15,7 @@
             </form>
         {% endif %}
         {% for q in quotes %}
-            {% include 'ktapp/blocks/film_addon_block.html' with addon=q %}
+            {% include 'ktapp/blocks/film_addon_block.html' with addon=q addon_type='quote' %}
         {% endfor %}
     </div>
 

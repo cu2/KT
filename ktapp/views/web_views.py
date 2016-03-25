@@ -301,7 +301,7 @@ def search(request):
     q = request.GET.get('q', '')
     if len(q) < 2:
         return HttpResponseRedirect(reverse('index'))
-    q_pieces = q.split()
+    q_pieces = kt_search.get_q_pieces(q)
     film = kt_search.find_film_by_link(q)
     if film:
         return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
@@ -832,8 +832,8 @@ def usertoplist(request, id, title_slug):
                 raw_film = request.POST.get('film_%d' % r, '').strip()
                 if raw_film == '':
                     continue
-                if '/' in raw_film:
-                    raw_orig_title, raw_second_title = raw_film.split('/')
+                if ' / ' in raw_film:
+                    raw_orig_title, raw_second_title = raw_film.split(' / ', 1)
                 else:
                     raw_orig_title, raw_second_title = raw_film, ''
                 raw_orig_title = raw_orig_title.strip()

@@ -4,6 +4,10 @@ from django.template.defaultfilters import slugify
 from ktapp import models
 
 
+def get_q_pieces(q):  # limit length of query string and number of query pieces
+    return q[:200].split()[:20]
+
+
 def find_film_by_link(q):
     # search by IMDB link:
     if 'imdb.com/title' in q:
@@ -52,13 +56,13 @@ def find_film_by_link(q):
 
 def find_artists(q_pieces, limit):
     return models.Artist.objects.filter(
-        slug_cache__search=' '.join(['+%s*' % slugify(q_piece) for q_piece in q_pieces])
+        slug_cache__search=' '.join(['+%s*' % slugify(q_piece) for q_piece in q_pieces if slugify(q_piece)])
     ).order_by('-number_of_ratings')[:limit]
 
 
 def find_users(q_pieces, limit):
     return models.KTUser.objects.filter(
-        slug_cache__search=' '.join(['+%s*' % slugify(q_piece) for q_piece in q_pieces])
+        slug_cache__search=' '.join(['+%s*' % slugify(q_piece) for q_piece in q_pieces if slugify(q_piece)])
     ).order_by('username')[:limit]
 
 
