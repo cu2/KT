@@ -16,9 +16,70 @@
             <p{% if addon.spoiler %} class="spoiler"{% endif %}>{{ addon.content_html|linebreaksbr }}</p>
         {% endautoescape %}
     </div>
+    {% if request.user.is_authenticated  %}
+        {% if permission_edit_quote and addon_type == 'quote' or permission_edit_trivia and addon_type == 'trivia' %}
+            {% if request.user.is_staff or addon.created_by.id == request.user.id %}
+                <div class="addon_edit_form addon_block_content" style="display: none">
+                    {% if addon_type == 'quote' %}
+                        <form action="{% url 'edit_quote' %}" method="post" class="inline">
+                    {% elif addon_type == 'trivia' %}
+                        <form action="{% url 'edit_trivia' %}" method="post" class="inline">
+                    {% endif %}
+                        {% csrf_token %}
+                        <input type="hidden" name="id" value="{{ addon.id }}" />
+                        <textarea name="content" rows="10">{{ addon.content }}</textarea>
+                        <p>
+                            {% if addon_type == 'quote' %}
+                                <input type="submit" value="Idézet mentése" />
+                            {% elif addon_type == 'trivia' %}
+                                <input type="submit" value="Érdekesség mentése" />
+                            {% endif %}
+                            <span class="button small_button hide_addon_edit_form" style="float: right">Mégsem</span>
+                        </p>
+                    </form>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
     <div class="film_addon_author">
         {% if addon.created_by %}
             <a href="{% url 'user_profile' addon.created_by.id addon.created_by.slug_cache %}">{{ addon.created_by }}</a>
+        {% endif %}
+        {% if request.user.is_authenticated  %}
+            {% if request.user.is_staff or addon.created_by.id == request.user.id %}
+                {% if permission_edit_quote and addon_type == 'quote' %}
+                    &nbsp;
+                    (<span class="action_text show_addon_edit_form" title="idézet szerkesztése">szerk</span>)
+                {% endif %}
+                {% if permission_edit_trivia and addon_type == 'trivia' %}
+                    &nbsp;
+                    (<span class="action_text show_addon_edit_form" title="érdekesség szerkesztése">szerk</span>)
+                {% endif %}
+                {% if permission_delete_quote and addon_type == 'quote' or permission_delete_trivia and addon_type == 'trivia' %}
+                    &nbsp;
+                    <span class="delete_area">
+                        <span class="delete_confirm" style="display: none">
+                            Biztosan?
+                            {% if addon_type == 'quote' %}
+                                <form action="{% url 'delete_quote' %}" method="post" class="inline">
+                            {% elif addon_type == 'trivia' %}
+                                <form action="{% url 'delete_trivia' %}" method="post" class="inline">
+                            {% endif %}
+                                {% csrf_token %}
+                                <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+                                <input type="hidden" name="id" value="{{ addon.id }}" />
+                                <input type="submit" value="Igen" class="very_small_button" />
+                            </form>
+                            <span class="button very_small_button toggle_delete">Nem</span>
+                        </span>
+                        {% if addon_type == 'quote' %}
+                            <span class="action_text toggle_delete" title="Idézet törlése">&empty;</span>
+                        {% elif addon_type == 'trivia' %}
+                            <span class="action_text toggle_delete" title="Érdekesség törlése">&empty;</span>
+                        {% endif %}
+                    </span>
+                {% endif %}
+            {% endif %}
         {% endif %}
     </div>
 </div>

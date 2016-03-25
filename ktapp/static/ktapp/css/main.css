@@ -734,6 +734,9 @@ ul.poll li {
 .comment_edit_form textarea {
     width: 99%;
 }
+.addon_edit_form textarea {
+    width: 99%;
+}
 
 
 .film_addon {

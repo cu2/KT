@@ -230,6 +230,15 @@ $(function() {
         $(this).closest('.comment_block').find('.comment_edit_form').hide();
         $(this).closest('.comment_block').find('.comment_content').show().focus();
     });
+    $('.show_addon_edit_form').click(function() {
+        $(this).closest('.film_addon').find('.film_addon_content').hide();
+        $(this).closest('.film_addon').find('.addon_edit_form').show();
+        $(this).closest('.film_addon').find('.addon_edit_form').find('textarea').focus();
+    });
+    $('.hide_addon_edit_form').click(function() {
+        $(this).closest('.film_addon').find('.addon_edit_form').hide();
+        $(this).closest('.film_addon').find('.film_addon_content').show().focus();
+    });
     $('form').submit(function() {
         $(this).find('input:submit').prop('disabled', true);
     });

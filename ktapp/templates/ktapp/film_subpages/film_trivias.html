@@ -15,7 +15,7 @@
             </form>
         {% endif %}
         {% for t in trivias %}
-            {% include 'ktapp/blocks/film_addon_block.html' with addon=t %}
+            {% include 'ktapp/blocks/film_addon_block.html' with addon=t addon_type='trivia' %}
         {% endfor %}
     </div>
 

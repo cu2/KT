@@ -95,7 +95,11 @@ def check_permission(perm, user, silent=True):
     if user.is_authenticated():
         grp = {
             'new_quote': 'core',
+            'edit_quote': 'core',
+            'delete_quote': 'core',
             'new_trivia': 'core',
+            'edit_trivia': 'core',
+            'delete_trivia': 'core',
             'new_review': 'core',
             'approve_review': 'admin',
             'new_picture': 'core',
