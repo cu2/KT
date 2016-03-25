@@ -1,5 +1,6 @@
 var ktApp = {
     windowResized: false,
+    windowScrolled: false,
     resizeSearchAutocomplete: function() {
         var search_autocomplete_results = $('#search_autocomplete_results');
         if (search_autocomplete_results.css('display') === 'block') {
@@ -73,6 +74,9 @@ $(function() {
     $(window).resize(function() {
         ktApp.windowResized = true;
     });
+    $(window).scroll(function(event){
+        ktApp.windowScrolled = true;
+    });
     setInterval(function() {
         if (ktApp.windowResized) {
             ktApp.resizeSearchAutocomplete();
@@ -86,21 +90,18 @@ $(function() {
         }
     }, 500);
 
-
-
-    var didScroll;
     var lastScrollTop = $(this).scrollTop();
     var delta = 5;
     var navbarHeight = 50;
 
-    $(window).scroll(function(event){
-        didScroll = true;
-    });
-
     setInterval(function() {
-        if (didScroll) {
+        if (ktApp.windowScrolled) {
             hasScrolled();
-            didScroll = false;
+            ktApp.resizeSearchAutocomplete();
+            setInterval(function() {
+                ktApp.resizeSearchAutocomplete();
+            }, 500);
+            ktApp.windowScrolled = false;
         }
     }, 250);
 

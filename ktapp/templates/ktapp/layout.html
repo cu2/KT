@@ -133,10 +133,9 @@
 
             .navbar-header .logo {
                 display: block;
-                width: 154px;
-                height: 78px;
                 padding: 5px;
                 margin-top: 1px;
+                overflow: hidden;
             }
             .navbar-header .logo>img {
                 width: 144px;
@@ -323,15 +322,55 @@
             #top-navbar {
                 padding-top: 20px;
                 padding-bottom: 20px;
+                transition: padding 0.5s, height 0.5s, min-height 0.5s;
             }
-{#            #top-navbar * {#}
-{#                transition: all 0.5s;#}
-{#            }#}
-{#            .nav-mini * {#}
-{#                font-size: 8pt;#}
-{#                height: 10px !important;#}
-{#                line-height: 10px !important;#}
-{#            }#}
+            #top-navbar.nav-mini {
+                padding-top: 0;
+                padding-bottom: 0;
+                height: 60px;
+                min-height: 60px;
+            }
+            #top-navbar .logo {
+                transition: height 0.5s;
+            }
+            #top-navbar.nav-mini .logo {
+                height: 55px;
+            }
+            #top-navbar .navbar-with-icons {
+                transition: margin 0.5s;
+            }
+            #top-navbar.nav-mini .navbar-with-icons {
+                margin-top: 5px;
+            }
+            #top-navbar .navbar-form {
+                transition: margin 0.5s;
+            }
+            #top-navbar.nav-mini .navbar-form {
+                margin-top: 13px;
+            }
+            #top-navbar .sub-search-link {
+                transition: display 0.5s;
+            }
+            #top-navbar.nav-mini .sub-search-link {
+                display: none;
+            }
+            #top-navbar .profile-pic-placeholder, #top-navbar .profile-pic {
+                transition: width 0.2s, height 0.2s, margin 0.2s;
+            }
+            #top-navbar.nav-mini .profile-pic-placeholder, #top-navbar.nav-mini .profile-pic {
+                width: 40px;
+                height: 40px;
+                margin-left: 20px;
+            }
+            #top-navbar .navbar-profile-name, #top-navbar .navbar-profile-sub {
+                transition: margin 0.2s;
+            }
+            #top-navbar.nav-mini .navbar-profile-name {
+                margin-top: 0;
+            }
+            #top-navbar.nav-mini .navbar-profile-sub {
+                margin-top: -2px;
+            }
         </style>
 
         <!--[if lt IE 9]>
