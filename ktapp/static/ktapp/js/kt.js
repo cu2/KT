@@ -1,6 +1,21 @@
 var ktApp = {
     windowResized: false,
     windowScrolled: false,
+    lastScrollTop: 0,
+    hasScrolled: function() {
+        var st = $(window).scrollTop();
+        if (Math.abs(ktApp.lastScrollTop - st) <= 5) {
+            return;
+        }
+        if (st <= 60) {
+            $('#top-navbar').removeClass('nav-mini');
+        } else if (st > ktApp.lastScrollTop) {
+            $('#top-navbar').addClass('nav-mini');
+        } else {
+            $('#top-navbar').removeClass('nav-mini');
+        }
+        ktApp.lastScrollTop = st;
+    },
     resizeSearchAutocomplete: function() {
         var search_autocomplete_results = $('#search_autocomplete_results');
         if (search_autocomplete_results.css('display') === 'block') {
@@ -71,18 +86,6 @@ $(function() {
     $('#search_input').on('input propertychange paste', function() {
         ktApp.searchInputChanged = true;
     });
-    $(window).resize(function() {
-        ktApp.windowResized = true;
-    });
-    $(window).scroll(function(event){
-        ktApp.windowScrolled = true;
-    });
-    setInterval(function() {
-        if (ktApp.windowResized) {
-            ktApp.resizeSearchAutocomplete();
-            ktApp.windowResized = false;
-        }
-    }, 100);
     setInterval(function() {
         if (ktApp.searchInputChanged) {
             ktApp.getSearchResults();
@@ -90,35 +93,30 @@ $(function() {
         }
     }, 500);
 
-    var lastScrollTop = $(this).scrollTop();
-    var delta = 5;
-    var navbarHeight = 50;
+    $(window).resize(function() {
+        ktApp.windowResized = true;
+    });
+    setInterval(function() {
+        if (ktApp.windowResized) {
+            ktApp.resizeSearchAutocomplete();
+            ktApp.windowResized = false;
+        }
+    }, 100);
 
+    ktApp.lastScrollTop = $(window).scrollTop();
+    $(window).scroll(function(){
+        ktApp.windowScrolled = true;
+    });
     setInterval(function() {
         if (ktApp.windowScrolled) {
-            hasScrolled();
+            ktApp.hasScrolled();
             ktApp.resizeSearchAutocomplete();
-            setInterval(function() {
+            setTimeout(function() {
                 ktApp.resizeSearchAutocomplete();
             }, 500);
             ktApp.windowScrolled = false;
         }
     }, 250);
-
-    function hasScrolled() {
-        var st = $(this).scrollTop();
-        if (Math.abs(lastScrollTop - st) <= delta) {
-            return;
-        }
-        if (st <= navbarHeight) {
-            $('#top-navbar').removeClass('nav-mini');
-        } else if (st > lastScrollTop) {
-            $('#top-navbar').addClass('nav-mini');
-        } else {
-            $('#top-navbar').removeClass('nav-mini');
-        }
-        lastScrollTop = st;
-    }
 
     $('.navbar-profile .dropdown-toggle').click(function() {
         setTimeout(function() {
