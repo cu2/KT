@@ -115,7 +115,9 @@
             }
 
 
-
+            .navbar-header {
+                float: left;
+            }
             .navbar-header .logo {
                 display: block;
                 padding: 5px;
@@ -308,6 +310,7 @@
 
 
             #top-navbar {
+                margin-bottom: 0;
                 padding-top: 20px;
                 padding-bottom: 20px;
                 transition: padding 0.2s, height 0.2s, min-height 0.2s;
@@ -323,12 +326,17 @@
             }
             #top-navbar.nav-mini .navbar-with-icons {
                 margin-top: 5px;
+                height: 55px;
             }
             #top-navbar.nav-mini .navbar-form {
                 margin-top: 13px;
+                margin-bottom: 13px;
             }
             #top-navbar.nav-mini .sub-search-link {
                 display: none;
+            }
+            #top-navbar.nav-mini .navbar-profile {
+                height: 50px;
             }
             #top-navbar.nav-mini .profile-pic-placeholder, #top-navbar.nav-mini .profile-pic {
                 width: 40px;
@@ -384,6 +392,7 @@
                 }
                 #top-navbar.nav-mini .logo {
                     margin-top: 8px;
+                    height: 44px;
                 }
                 #top-navbar .logo>img {
                     width: 72px;
@@ -439,21 +448,14 @@
     </head>
     <body>
 
-        <!-- Fixed navbar -->
         <nav class="navbar navbar-default navbar-fixed-top" id="top-navbar">
             <div class="container">
                 <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
                     <a class="logo" href="{% url 'index' %}">
                         <img class="" src="{% static 'ktapp/images/kt-logo-288x136.png' %}" alt="Kritikus Tömeg" />
                     </a>
                 </div>
-                <div id="navbar" class="collapse navbar-collapse">
+                <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right navbar-profile">
                         {% if user.is_authenticated %}
                             <li class="profile-li">
@@ -552,11 +554,10 @@
                         </div>
                         <span class="sub-search-link"><a href="{% url 'browse' %}">részletes keresés</a></span>
                     </form>
-                </div><!--/.nav-collapse -->
+                </div>
             </div>
         </nav>
 
-        <!-- Begin page content -->
         <header>
             <div class="container">
                 {% block header %}{% endblock %}
