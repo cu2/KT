@@ -430,6 +430,74 @@
             }
 
 
+            @media(max-width: 767px) {
+                html, body {
+                    overflow-x: hidden;
+                }
+                .container {
+                    padding-left: 0;
+                    padding-right: 0;
+                }
+                #top-navbar {
+                    display: none;
+                }
+                header {
+                    margin-top: 49px;
+                }
+            }
+            .navbar-mobile {
+                position: fixed;
+                top: 0;
+                width: 100%;
+                height: 49px;
+                overflow: hidden;
+                display: block;
+                z-index: 10;
+                background: rgb(218,211,184);
+                border-bottom: solid 1px rgb(207, 197, 162);
+            }
+            .navbar-mobile>ul {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+            .navbar-mobile>ul.navbar-mobile-right {
+                float: right;
+            }
+            .navbar-mobile>ul>li {
+                float: left;
+                margin: 0;
+                padding: 0;
+                height: 48px;
+                overflow: hidden;
+            }
+            .navbar-mobile>ul>li.menu-logo img {
+                height: 40px;
+                margin: 4px;
+            }
+            .navbar-mobile>ul>li.menu-icon {
+                width: 48px;
+            }
+            .navbar-mobile>ul>li.menu-icon img {
+                width: 36px;
+                height: 36px;
+                margin: 6px;
+            }
+            .navbar-mobile>ul>li.menu-icon img.icon {
+                width: 24px;
+                height: 24px;
+                margin: 12px;
+            }
+            .navbar-mobile>ul>li>a {
+                display: block;
+            }
+            @media(min-width: 768px) {
+                .navbar-mobile {
+                    display: none;
+                }
+            }
+
+
         </style>
 
         <!--[if lt IE 9]>
@@ -448,6 +516,40 @@
     </head>
     <body>
 
+        <nav class="navbar-mobile">
+            <ul>
+                <li class="menu-icon">
+                    <a href="#">
+                        <img class="icon" src="{% static 'ktapp/images/kt-icon-517-menu-hamburger-link-48.png' %}" alt="" />
+                    </a>
+                </li>
+                <li class="menu-logo">
+                    <a href="{% url 'index' %}">
+                        <img src="{% static 'ktapp/images/kt-logo-288x136.png' %}" alt="Kritikus Tömeg" />
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-mobile-right">
+                <li class="menu-icon">
+                    <a href="#">
+                        <img class="icon" src="{% static 'ktapp/images/kt-icon-28-search-link-48.png' %}" alt="" />
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="menu-icon">
+                        <a href="{% url 'user_profile' user.id user.slug_cache %}">
+                            <img class="img-circle" src="{{ user.gravatar_url }}" alt="" />
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="menu-icon">
+                        <a href="{% url 'login' %}">
+                            <img class="img-circle" src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}" alt="" />
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
         <nav class="navbar navbar-default navbar-fixed-top" id="top-navbar">
             <div class="container">
                 <div class="navbar-header">
@@ -460,7 +562,7 @@
                         {% if user.is_authenticated %}
                             <li class="profile-li">
                                 <a href="{% url 'user_profile' user.id user.slug_cache %}" class="clearfix">
-                                    <img class="img-circle profile-pic" src="{{ user.gravatar_url }}">
+                                    <img class="img-circle profile-pic" src="{{ user.gravatar_url }}" alt="" />
                                     <span class="navbar-profile-name">{{ user.username }}</span>
                                     <span class="navbar-profile-sub">profil megtekintése</span>
                                 </a>
@@ -468,7 +570,7 @@
                         {% else %}
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <img class="img-circle profile-pic-placeholder" src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}">
+                                    <img class="img-circle profile-pic-placeholder" src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}" alt="" />
                                     <span class="navbar-profile-menu-title">Bejelentkezés</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-custom">
