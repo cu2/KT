@@ -349,6 +349,9 @@
             #top-navbar.nav-mini .navbar-profile-sub {
                 margin-top: -2px;
             }
+            #top-navbar.nav-mini .dropdown-menu {
+                margin-top: -1px;
+            }
 
 
             @media(min-width: 1170px) {
@@ -488,6 +491,11 @@
                 height: 24px;
                 margin: 12px;
             }
+            .half-size-icon {
+                width: 24px;
+                height: 24px;
+                margin: 12px;
+            }
             .navbar-mobile>ul>li>a {
                 display: block;
             }
@@ -496,7 +504,63 @@
                     display: none;
                 }
             }
-
+            #hamburger-menu {
+                display: none;
+                position: fixed;
+                z-index: 200;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+            }
+            #hamburger-closer {
+                position: absolute;
+                top: 0;
+                right: 0;
+                width: 48px;
+                height: 100%;
+            }
+            #hamburger-menu-ul {
+                position: absolute;
+                z-index: 250;
+                top: 0;
+                left: -100%;
+                right: 100%;
+                height: 100%;
+                background: rgb(218,211,184);
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                overflow-y: auto;
+            }
+            #hamburger-menu-ul>li {
+                margin: 0;
+                padding: 0;
+            }
+            #hamburger-menu-ul>li>a {
+                display: block;
+                width: 100%;
+                height: 48px;
+                line-height: 48px;
+                padding-left: 12px;
+                overflow: hidden;
+            }
+            #hamburger-menu-ul>li>a.hamburger-closer {
+                padding-left: 0;
+            }
+            #hamburger-menu-ul>li.hamburger-header {
+                padding-left: 12px;
+                height: 24px;
+                line-height: 24px;
+                font-weight: bold;
+                font-size: 12px;
+                background: rgb(207, 197, 162);
+            }
+            .hamburger-divider {
+                height: 0;
+                border-bottom: solid rgb(207, 197, 162) 1px;
+            }
 
         </style>
 
@@ -519,7 +583,7 @@
         <nav class="navbar-mobile">
             <ul>
                 <li class="menu-icon">
-                    <a href="#">
+                    <a href="#" class="toggle-hamburger-menu">
                         <img class="icon" src="{% static 'ktapp/images/kt-icon-517-menu-hamburger-link-48.png' %}" alt="" />
                     </a>
                 </li>
@@ -618,6 +682,11 @@
                                     <li><a href="{% url 'user_wishlist' user.id user.slug_cache %}">Kívánságaid</a></li>
                                     <li><a href="{% url 'user_films' user.id user.slug_cache %}">Filmjeid</a></li>
                                 {% endif %}
+
+                                <li role="separator" class="divider"></li>
+                                <li><a href="{% url 'vapiti_general' %}">Vapiti-díj</a></li>
+                                <li><a href="{% url 'awards' %}">Egyéb díjak</a></li>
+
                             </ul>
                         </li>
                         <li class="dropdown">
@@ -678,6 +747,10 @@
                     <li><a href="{% url 'impressum' %}">Impresszum</a></li>
                     <li><a href="{% url 'rulez' %}">Szabályzat</a></li>
                     <li><a href="{% url 'finance' %}">Kassza</a></li>
+                    {% if user.is_superuser %}
+                        <li><a href="{% url 'admin:index' %}">Admin</a></li>
+                        <li><a href="{% url 'analytics' %}">Analytics</a></li>
+                    {% endif %}
                 </ul>
             </div>
             <div class="footer-icons-row">
@@ -690,6 +763,68 @@
             </div>
             <p class="footer-text">&copy; kritikustomeg.org</p>
         </footer>
+
+        <nav id="hamburger-menu">
+            <ul id="hamburger-menu-ul">
+
+                <li><a href="#" class="hamburger-closer"><img class="icon half-size-icon" src="{% static 'ktapp/images/kt-icon-517-menu-hamburger-link-48.png' %}" alt="" /></a></li>
+
+                <li class="hamburger-divider"></li>
+                <li><a href="{% url 'index' %}">Főoldal</a></li>
+                <li><a href="{% url 'browse' %}">Részletes keresés</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'user_profile' user.id user.slug_cache %}">Profil: {{ user.username }}</a></li>
+                    <li><a href="{% url 'messages' %}">Üzenetek</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Bejelentkezés</a></li>
+                {% endif %}
+
+                <li class="hamburger-header">Filmek</li>
+                <li><a href="{% url 'top_films' %}">Toplisták</a></li>
+                <li><a href="{% url 'usertoplists' %}">Egyéni listák</a></li>
+
+                <li class="hamburger-divider"></li>
+                <li><a href="{% url 'premiers' %}">Bemutatók</a></li>
+                <li><a href="{% url 'sequels' %}">Folytatások</a></li>
+                <li><a href="{% url 'films_of_past_days' %}">Napok filmjei</a></li>
+
+                {% if user.is_authenticated %}
+                    <li class="hamburger-divider"></li>
+                    <li><a href="{% url 'user_wishlist' user.id user.slug_cache %}">Kívánságaid</a></li>
+                    <li><a href="{% url 'user_films' user.id user.slug_cache %}">Filmjeid</a></li>
+                {% endif %}
+
+                <li class="hamburger-divider"></li>
+                <li><a href="{% url 'vapiti_general' %}">Vapiti-díj</a></li>
+                <li><a href="{% url 'awards' %}">Egyéb díjak</a></li>
+
+                <li class="hamburger-header">Közösség</li>
+                <li><a href="{% url 'list_of_topics' %}">Fórum</a></li>
+                <li><a href="{% url 'latest_comments' %}">Kommentek</a></li>
+                <li><a href="{% url 'polls' %}?tipus=aktualis">Szavazások</a></li>
+
+                <li class="hamburger-divider"></li>
+                <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
+                <li><a href="{% url 'similar_users' %}">Hasonlók</a></li>
+                <li><a href="{% url 'everybody' %}">Mindenki</a></li>
+
+                <li class="hamburger-header">Egyéb</li>
+                <li><a href="{% url 'about_page' %}">Rólunk</a></li>
+                <li><a href="{% url 'impressum' %}">Impresszum</a></li>
+                <li><a href="{% url 'rulez' %}">Szabályzat</a></li>
+                <li><a href="{% url 'finance' %}">Kassza</a></li>
+                {% if user.is_superuser %}
+                    <li><a href="{% url 'admin:index' %}">Admin</a></li>
+                    <li><a href="{% url 'analytics' %}">Analytics</a></li>
+                {% endif %}
+
+                <li class="hamburger-divider"></li>
+                <li><a href="https://www.facebook.com/kritikustomeg/" target="_blank" title="Facebook">Facebook</a></li>
+                <li><a href="https://www.youtube.com/channel/UCwODbFUp14aWqbbexI-Wmug" target="_blank" title="YouTube">YouTube</a></li>
+
+            </ul>
+            <div id="hamburger-closer" class="hamburger-closer"></div>
+        </nav>
 
         {% block jsonld %}{% endblock %}
 

@@ -2,6 +2,7 @@ var ktApp = {
     windowResized: false,
     windowScrolled: false,
     lastScrollTop: 0,
+    pageY: 0,
     hasScrolled: function() {
         var st = $(window).scrollTop();
         if (Math.abs(ktApp.lastScrollTop - st) <= 5) {
@@ -124,6 +125,28 @@ $(function() {
                 $('.navbar-profile .login-username').focus();
             }
         }, 100);
+    });
+
+    $('.toggle-hamburger-menu').click(function() {
+        ktApp.pageY = $(window).scrollTop();
+        $('#hamburger-menu').show();
+        $('#hamburger-menu-ul').scrollTop(0).animate({
+            left: '0',
+            right: '48px'
+        }, 'fast');
+        $('html').css('overflowY', 'hidden');
+        return false;
+    });
+    $('.hamburger-closer').click(function() {
+        $('#hamburger-menu-ul').animate({
+            left: '-100%',
+            right: '100%'
+        }, 'fast', function() {
+            $('#hamburger-menu').hide();
+        });
+        $('html').css('overflowY', 'auto');
+        $(window).scrollTop(ktApp.pageY);
+        return false;
     });
 
 });
