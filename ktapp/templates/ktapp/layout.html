@@ -46,45 +46,46 @@
                 height: 12px;
                 margin: 10px 0 -22px 32px;
             }
-            #search_input {
+            #search-input {
                 width: 400px;
             }
-            #search_input.loading {
+            #search-input.loading {
                 background-image: url(/static/ktapp/images/ajax-loader.gif);
                 background-position: 99% 8px;
                 background-repeat: no-repeat;
             }
 
 
-            #search_autocomplete_results {
+            #search-autocomplete-results {
+                display: none;
                 position: fixed;
                 z-index: 100;
                 background: rgb(249,244,218);
                 border-style: none solid solid solid;
                 border-width: 1px;
                 border-color: rgb(128,128,128);
-                font-size: 8pt;
-                line-height: 1.1;
+                font-size: 11px;
+                line-height: 13px;
                 max-height: 430px;
                 overflow-y: scroll;
             }
-            #search_autocomplete_results h2 {
-                font-size: 8pt;
+            .search-results h2 {
+                font-size: 11px;
                 font-weight: bold;
                 margin: 5px 5px 0 5px;
             }
-            #search_autocomplete_results ul {
+            .search-results ul {
                 list-style: none;
                 margin: 0 0 5px 0;
                 padding: 0;
             }
-            #search_autocomplete_results ul li {
+            .search-results ul li {
                 position: relative;
                 margin: 0;
                 padding: 0;
                 height: 50px;
             }
-            #search_autocomplete_results ul li a {
+            .search-results ul li a {
                 display: block;
                 margin: 0;
                 padding: 5px;
@@ -95,21 +96,21 @@
                 font-weight: bold;
                 color: rgb(146,23,23);
             }
-            #search_autocomplete_results ul li:hover {
+            .search-results ul li:hover {
                 background: rgb(218,211,184);
             }
-            .search_autocomplete_results_thumbnail_container {
+            .search-autocomplete-results-thumbnail-container {
                 display: inline-block;
                 width: 35px;
                 height: 40px;
                 float: left;
             }
-            .search_autocomplete_results_thumbnail_container img {
+            .search-autocomplete-results-thumbnail-container img {
                 width: auto;
                 max-width: 35px;
                 height: 40px;
             }
-            .search_autocomplete_results_subtitle {
+            .search-autocomplete-results-subtitle {
                 font-weight: normal;
                 color: rgb(0,0,0);
             }
@@ -217,7 +218,7 @@
             .help-block {
                 font-size: 10px;
             }
-            .additional_input {
+            .additional-input {
                 display: none;
             }
             header {
@@ -365,17 +366,17 @@
                 }
             }
             @media(max-width: 1130px) {
-                #search_input {
+                #search-input {
                     width: 350px;
                 }
             }
             @media(max-width: 1080px) {
-                #search_input {
+                #search-input {
                     width: 300px;
                 }
             }
             @media(max-width: 1030px) {
-                #search_input {
+                #search-input {
                     width: 250px;
                 }
             }
@@ -427,7 +428,7 @@
                 }
             }
             @media(max-width: 830px) {
-                #search_input {
+                #search-input {
                     width: 200px;
                 }
             }
@@ -546,7 +547,7 @@
                 padding-left: 12px;
                 overflow: hidden;
             }
-            #hamburger-menu-ul>li>a.hamburger-closer {
+            #hamburger-menu-ul>li>a.hamburger-menu-close {
                 padding-left: 0;
             }
             #hamburger-menu-ul>li.hamburger-header {
@@ -560,6 +561,54 @@
             .hamburger-divider {
                 height: 0;
                 border-bottom: solid rgb(207, 197, 162) 1px;
+            }
+            #mobile-search-screen {
+                display: none;
+                position: fixed;
+                z-index: 200;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgb(218,211,184);
+            }
+            #search-input-mobile-container {
+                position: absolute;
+                display: block;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 7px 7px 7px 36px;
+            }
+            #search-input-mobile {
+                width: 100%;
+                height: 34px;
+                padding: 6px;
+            }
+            .mobile-search-close {
+                position: absolute;
+                display: block;
+                top: 0;
+                left: 0;
+                width: 36px;
+                height: 48px;
+            }
+            .mobile-search-close>img {
+                width: 24px;
+                height: 24px;
+                margin: 12px 6px;
+            }
+            #mobile-search-results {
+                background: rgb(228,222,195);
+                position: absolute;
+                display: block;
+                top: 48px;
+                bottom: 0;
+                width: 100%;
+                overflow-x: hidden;
+                overflow-y: auto;
+                font-size: 11px;
+                line-height: 13px;
             }
 
         </style>
@@ -583,7 +632,7 @@
         <nav class="navbar-mobile">
             <ul>
                 <li class="menu-icon">
-                    <a href="#" class="toggle-hamburger-menu">
+                    <a href="#" class="hamburger-menu-open">
                         <img class="icon" src="{% static 'ktapp/images/kt-icon-517-menu-hamburger-link-48.png' %}" alt="" />
                     </a>
                 </li>
@@ -595,7 +644,7 @@
             </ul>
             <ul class="navbar-mobile-right">
                 <li class="menu-icon">
-                    <a href="#">
+                    <a href="#" class="mobile-search-open">
                         <img class="icon" src="{% static 'ktapp/images/kt-icon-28-search-link-48.png' %}" alt="" />
                     </a>
                 </li>
@@ -649,7 +698,7 @@
                                                 <input type="password" name="password" tabindex="3" placeholder="jelszó" class="form-control" />
                                                 <div class="help-block text-right"><a href="{% url 'reset_password' '' %}">Elfelejtetted a jelszavad?</a></div>
                                             </div>
-                                            <span class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></span>
+                                            <span class="additional-input">Hagyd üresen: <input type="text" name="nickname" value="" /></span>
                                             <div class="form-group">
                                                 <button type="submit" tabindex="4" class="btn btn-primary">Bejelentkezés</button>
                                             </div>
@@ -720,8 +769,8 @@
                         <div class="form-group">
                             <button type="submit" class="btn btn-icon">
                                 <img class="icon search-icon" src="{% static 'ktapp/images/kt-icon-28-search-button-64.png' %}" alt="" />
-                            </button><input type="text" class="form-control search-input" id="search_input" name="q" tabindex="1" autocomplete="off" placeholder="Keresés..." />
-                            <div id="search_autocomplete_results" style="display: none"></div>
+                            </button><input type="text" class="form-control search-input" id="search-input" name="q" tabindex="1" autocomplete="off" placeholder="Keresés..." />
+                            <div id="search-autocomplete-results" class="search-results"></div>
                         </div>
                         <span class="sub-search-link"><a href="{% url 'browse' %}">részletes keresés</a></span>
                     </form>
@@ -767,7 +816,7 @@
         <nav id="hamburger-menu">
             <ul id="hamburger-menu-ul">
 
-                <li><a href="#" class="hamburger-closer"><img class="icon half-size-icon" src="{% static 'ktapp/images/kt-icon-517-menu-hamburger-link-48.png' %}" alt="" /></a></li>
+                <li><a href="#" class="hamburger-menu-close"><img class="icon half-size-icon" src="{% static 'ktapp/images/kt-icon-517-menu-hamburger-link-48.png' %}" alt="" /></a></li>
 
                 <li class="hamburger-divider"></li>
                 <li><a href="{% url 'index' %}">Főoldal</a></li>
@@ -823,8 +872,18 @@
                 <li><a href="https://www.youtube.com/channel/UCwODbFUp14aWqbbexI-Wmug" target="_blank" title="YouTube">YouTube</a></li>
 
             </ul>
-            <div id="hamburger-closer" class="hamburger-closer"></div>
+            <div id="hamburger-closer" class="hamburger-menu-close"></div>
         </nav>
+
+        <div id="mobile-search-screen">
+            <form action="{% url 'search' %}" method="get">
+                <div id="search-input-mobile-container">
+                    <input type="text" class="form-control" id="search-input-mobile" name="q" tabindex="1" autocomplete="off" placeholder="Keresés..." />
+                </div>
+                <a href="#" class="mobile-search-close"><img class="icon" src="{% static 'ktapp/images/kt-icon-211-left-arrow-link-48.png' %}" alt="" /></a>
+            </form>
+            <div id="mobile-search-results" class="search-results"></div>
+        </div>
 
         {% block jsonld %}{% endblock %}
 
