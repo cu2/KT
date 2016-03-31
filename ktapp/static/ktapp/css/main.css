@@ -781,6 +781,11 @@ ul.poll li {
 }
 
 
+.move_to_off_loader {
+    display: none;
+}
+
+
 .paging {
     list-style: none;
     margin: 20px auto;

@@ -558,6 +558,17 @@ class Comment(models.Model):
             return
         cursor = connection.cursor()
         cursor.execute('''
+            UPDATE ktapp_comment
+            SET serial_number = 0
+            WHERE
+              domain = '{domain}'
+              AND {domain_id_field} = {domain_id}
+        '''.format(
+            domain=domain,
+            domain_id_field=domain_id_field,
+            domain_id=domain_object.id,
+        ))
+        cursor.execute('''
             UPDATE
               ktapp_comment c, (
                 SELECT

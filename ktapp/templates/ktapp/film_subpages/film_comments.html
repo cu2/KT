@@ -1,4 +1,5 @@
 {% extends "ktapp/film_subpages/film_base.html" %}
+{% load staticfiles %}
 
 {% block film_main %}
 
@@ -29,7 +30,10 @@
         {% endif %}
 
         {% if request.user.is_authenticated and request.user.is_staff %}
-            <p><span class="button move_to_off" title="kijelölt kommentek OFF-ba mozgatása">OFF-ba</span></p>
+            <p>
+                <span class="button move_to_off" title="kijelölt kommentek OFF-ba mozgatása">OFF-ba</span>
+                <span class="move_to_off_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>
+            </p>
         {% endif %}
 
         <p class="show_spoilers_section" style="visibility: hidden"><span class="button show_spoilers">Spoilerek megjelenítése</span></p>
