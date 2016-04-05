@@ -149,19 +149,12 @@
                 display: block;
                 font-size: 12px;
             }
-            .new-message-warning {
-                position: absolute;
-                top: 6px;
-                right: 10px;
-                background: rgb(30,36,180);
-                color: rgb(249,244,218);
-                display: block;
-                font-size: 12px;
-                line-height: 20px;
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                text-align: center;
+            .navbar-right .dropdown-menu {
+                left: 0;
+                right: auto;
+            }
+            .dropdown-menu>li button {
+                margin: 3px 20px;
             }
             .navbar-profile {
                 margin-top: 10px;
@@ -180,25 +173,22 @@
                 width: 60px;
                 height: 60px;
             }
-            .navbar-profile .profile-pic-placeholder {
-                width: 60px;
-                height: 60px;
-            }
-            .navbar-profile .profile-li span {
-                display: block;
-                margin-left: 65px;
+            .navbar-profile-menu-title {
+                display: inline-block;
                 white-space: nowrap;
-            }
-            .navbar-profile-name {
-                font-size: 16px;
-                margin-top: 10px;
+                margin-top: 20px;
                 max-width: 160px;
+                font-size: 16px;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
-            .navbar-profile-sub {
-                font-size: 12px;
-                margin-top: 2px;
+            .new-message-warning {
+                position: absolute;
+                top: 2px;
+                left: 55px;
+                display: block;
+                width: 20px;
+                height: 20px;
             }
             .dropdown-menu-custom>li {
                 padding: 5px 10px;
@@ -339,16 +329,23 @@
             #top-navbar.nav-mini .navbar-profile {
                 height: 50px;
             }
-            #top-navbar.nav-mini .profile-pic-placeholder, #top-navbar.nav-mini .profile-pic {
+            #top-navbar.nav-mini .navbar-profile>li {
+                margin-top: -10px;
+            }
+            #top-navbar.nav-mini .navbar-profile>li>a {
+                padding-top: 10px;
+                padding-bottom: 10px;
+            }
+            #top-navbar.nav-mini .profile-pic {
                 width: 40px;
                 height: 40px;
                 margin-left: 20px;
             }
-            #top-navbar.nav-mini .navbar-profile-name {
-                margin-top: 0;
+            #top-navbar.nav-mini .navbar-profile-menu-title {
+                margin-top: 10px;
             }
-            #top-navbar.nav-mini .navbar-profile-sub {
-                margin-top: -2px;
+            #top-navbar.nav-mini .new-message-warning {
+                bottom: -2px;
             }
             #top-navbar.nav-mini .dropdown-menu {
                 margin-top: -1px;
@@ -404,27 +401,30 @@
                 }
                 #top-navbar .navbar-profile {
                     width: 235px;
-                    margin-top: 20px;
+                    margin-top: 15px;
+                }
+                #top-navbar .navbar-profile>li>a {
+                    padding-top: 10px;
+                    padding-bottom: 10px;
                 }
                 #top-navbar.nav-mini .navbar-profile {
                     margin-top: 10px;
                 }
-                #top-navbar .profile-pic-placeholder, #top-navbar .profile-pic {
+                #top-navbar .profile-pic {
                     width: 40px;
                     height: 40px;
                     margin-left: 0;
                 }
-                #top-navbar.nav-mini .profile-pic-placeholder, #top-navbar.nav-mini .profile-pic {
+                #top-navbar.nav-mini .profile-pic {
                     margin-left: 0;
                 }
-                #top-navbar .navbar-profile-name {
-                    margin-left: 45px;
-                    margin-top: 0;
+                #top-navbar .navbar-profile-menu-title {
+                    margin-top: 10px;
                     max-width: 140px;
                 }
-                #top-navbar .navbar-profile-sub {
-                    margin-left: 45px;
-                    margin-top: -2px;
+                #top-navbar .new-message-warning {
+                    left: 50px;
+                    bottom: -2px;
                 }
             }
             @media(max-width: 830px) {
@@ -497,6 +497,15 @@
                 height: 24px;
                 margin: 12px;
             }
+            .menu-item-icon {
+                width: 20px;
+                height: 20px;
+                vertical-align: top;
+            }
+            .hamburger-menu-item-icon {
+                width: 20px;
+                height: 20px;
+            }
             .navbar-mobile>ul>li>a {
                 display: block;
             }
@@ -549,6 +558,9 @@
             }
             #hamburger-menu-ul>li>a.hamburger-menu-close {
                 padding-left: 0;
+            }
+            #hamburger-menu-ul>li button {
+                margin: 13px 12px;
             }
             #hamburger-menu-ul>li.hamburger-header {
                 padding-left: 12px;
@@ -648,19 +660,6 @@
                         <img class="icon" src="{% static 'ktapp/images/kt-icon-28-search-link-48.png' %}" alt="" />
                     </a>
                 </li>
-                {% if user.is_authenticated %}
-                    <li class="menu-icon">
-                        <a href="{% url 'user_profile' user.id user.slug_cache %}">
-                            <img class="img-circle" src="{{ user.gravatar_url }}" alt="" />
-                        </a>
-                    </li>
-                {% else %}
-                    <li class="menu-icon">
-                        <a href="{% url 'login' %}">
-                            <img class="img-circle" src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}" alt="" />
-                        </a>
-                    </li>
-                {% endif %}
             </ul>
         </nav>
         <nav class="navbar navbar-default navbar-fixed-top" id="top-navbar">
@@ -673,17 +672,56 @@
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right navbar-profile">
                         {% if user.is_authenticated %}
-                            <li class="profile-li">
-                                <a href="{% url 'user_profile' user.id user.slug_cache %}" class="clearfix">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle clearfix" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                     <img class="img-circle profile-pic" src="{{ user.gravatar_url }}" alt="" />
-                                    <span class="navbar-profile-name">{{ user.username }}</span>
-                                    <span class="navbar-profile-sub">profil megtekintése</span>
+                                    <span class="navbar-profile-menu-title">{{ user.username }}</span>
+                                    {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
+                                        <img class="new-message-warning" src="{% static 'ktapp/images/kt-icon-11-envelope-notification-48.png' %}" alt="" />
+                                    {% endif %}
                                 </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{% url 'user_profile' user.id user.slug_cache %}">Profil: {{ user.username }}</a></li>
+                                    <li>
+                                        <a href="{% url 'messages' %}">
+                                            Üzenetek
+                                            {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
+                                                <img class="icon menu-item-icon" src="{% static 'ktapp/images/kt-icon-11-envelope-notification-48.png' %}" alt="" />
+                                            {% endif %}
+                                        </a>
+                                    </li>
+                                    {% if user.is_staff or user.is_reliable or user.core_member %}
+                                        <li role="separator" class="divider"></li>
+                                        {% if user.is_staff or user.is_reliable %}
+                                            <li><a href="{% url 'new_film' %}">Filmfeltöltés</a></li>
+                                        {% else %}
+                                            <li><a href="{% url 'suggest_film' %}">Új film beküldése</a></li>
+                                        {% endif %}
+                                        <li><a href="{% url 'suggested_films' %}">Beküldött filmek</a></li>
+                                        <li><a href="{% url 'suggested_links' %}">Beküldött linkek</a></li>
+                                        {% if user.is_staff %}
+                                            <li><a href="{% url 'suggested_reviews' %}">Beküldött elemzések</a></li>
+                                            <li><a href="{% url 'suggested_bios' %}">Beküldött portrék</a></li>
+                                        {% endif %}
+                                        {% if user.is_staff or user.is_reliable %}
+                                            <li><a href="{% url 'films_with_missing_data' %}">Hiányos filmek</a></li>
+                                            <li><a href="{% url 'changes' %}">Változások</a></li>
+                                        {% endif %}
+                                    {% endif %}
+                                    <li role="separator" class="divider"></li>
+                                    <li>
+                                        <form action="{% url 'logout' %}" method="post" class="inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+                                            <button type="submit" class="btn btn-success btn-xs">kijelentkezés</button>
+                                        </form>
+                                    </li>
+                                </ul>
                             </li>
                         {% else %}
                             <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <img class="img-circle profile-pic-placeholder" src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}" alt="" />
+                                <a href="#" class="dropdown-toggle clearfix" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                                    <img class="img-circle profile-pic" src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}" alt="" />
                                     <span class="navbar-profile-menu-title">Bejelentkezés</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-custom">
@@ -753,17 +791,6 @@
                                 <li><a href="{% url 'everybody' %}">Mindenki</a></li>
                             </ul>
                         </li>
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a href="{% url 'messages' %}">
-                                    <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-11-envelope-link-48.png' %}" alt="" />
-                                    <span class="navbar-label">üzenetek</span>
-                                    {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
-                                        <span class="new-message-warning">új</span>
-                                    {% endif %}
-                                </a>
-                            </li>
-                        {% endif %}
                     </ul>
                     <form class="navbar-form navbar-right" action="{% url 'search' %}" method="get">
                         <div class="form-group">
@@ -820,13 +847,18 @@
 
                 <li class="hamburger-divider"></li>
                 <li><a href="{% url 'index' %}">Főoldal</a></li>
-                <li><a href="{% url 'browse' %}">Részletes keresés</a></li>
                 {% if user.is_authenticated %}
                     <li><a href="{% url 'user_profile' user.id user.slug_cache %}">Profil: {{ user.username }}</a></li>
-                    <li><a href="{% url 'messages' %}">Üzenetek</a></li>
+                    <li><a href="{% url 'messages' %}">
+                        Üzenetek
+                        {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
+                            <img class="icon hamburger-menu-item-icon" src="{% static 'ktapp/images/kt-icon-11-envelope-notification-48.png' %}" alt="" />
+                        {% endif %}
+                    </a></li>
                 {% else %}
                     <li><a href="{% url 'login' %}">Bejelentkezés</a></li>
                 {% endif %}
+                <li><a href="{% url 'browse' %}">Részletes keresés</a></li>
 
                 <li class="hamburger-header">Filmek</li>
                 <li><a href="{% url 'top_films' %}">Toplisták</a></li>
@@ -857,6 +889,25 @@
                 <li><a href="{% url 'similar_users' %}">Hasonlók</a></li>
                 <li><a href="{% url 'everybody' %}">Mindenki</a></li>
 
+                {% if user.is_staff or user.is_reliable or user.core_member %}
+                    <li class="hamburger-header">Szerk</li>
+                    {% if user.is_staff or user.is_reliable %}
+                        <li><a href="{% url 'new_film' %}">Filmfeltöltés</a></li>
+                    {% else %}
+                        <li><a href="{% url 'suggest_film' %}">Új film beküldése</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'suggested_films' %}">Beküldött filmek</a></li>
+                    <li><a href="{% url 'suggested_links' %}">Beküldött linkek</a></li>
+                    {% if user.is_staff %}
+                        <li><a href="{% url 'suggested_reviews' %}">Beküldött elemzések</a></li>
+                        <li><a href="{% url 'suggested_bios' %}">Beküldött portrék</a></li>
+                    {% endif %}
+                    {% if user.is_staff or user.is_reliable %}
+                        <li><a href="{% url 'films_with_missing_data' %}">Hiányos filmek</a></li>
+                        <li><a href="{% url 'changes' %}">Változások</a></li>
+                    {% endif %}
+                {% endif %}
+
                 <li class="hamburger-header">Egyéb</li>
                 <li><a href="{% url 'about_page' %}">Rólunk</a></li>
                 <li><a href="{% url 'impressum' %}">Impresszum</a></li>
@@ -870,6 +921,17 @@
                 <li class="hamburger-divider"></li>
                 <li><a href="https://www.facebook.com/kritikustomeg/" target="_blank" title="Facebook">Facebook</a></li>
                 <li><a href="https://www.youtube.com/channel/UCwODbFUp14aWqbbexI-Wmug" target="_blank" title="YouTube">YouTube</a></li>
+
+                {% if user.is_authenticated %}
+                    <li class="hamburger-divider"></li>
+                    <li>
+                        <form action="{% url 'logout' %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="next" value="{{ request.build_absolute_uri }}" />
+                            <button type="submit" class="btn btn-success btn-xs">kijelentkezés</button>
+                        </form>
+                    </li>
+                {% endif %}
 
             </ul>
             <div id="hamburger-closer" class="hamburger-menu-close"></div>
