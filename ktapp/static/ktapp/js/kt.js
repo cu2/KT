@@ -38,15 +38,18 @@ var ktApp = {
         var search_autocomplete_results = $('#search-autocomplete-results');
         var mobile_search_results = $('#mobile-search-results');
         var search_input = $('#search-input');
+        var search_input_mobile = $('#search-input-mobile');
         if (search_input.val().trim().length < 2) {
             search_autocomplete_results.hide();
             mobile_search_results.html('');
         } else {
             search_input.addClass('loading');
+            search_input_mobile.addClass('loading');
             $.getJSON('/api/autocomplete/search/', {
                 q: search_input.val().trim()
             }, function(data) {
                 search_input.removeClass('loading');
+                search_input_mobile.removeClass('loading');
                 if (data.q === search_input.val().trim()) {
                     if (data.results.length) {
                         var search_autocomplete_results_html = '';
