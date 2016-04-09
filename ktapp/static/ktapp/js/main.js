@@ -159,6 +159,8 @@ $(function() {
         $('#close_topic_div').toggle();
     });
     $('.move_to_off').click(function() {
+        $('.move_to_off').hide();
+        $('.move_to_off_loader').show();
         var list_of_ids = '';
         $('.comment_to_move_to_off:checked').each(function() {
             list_of_ids += $(this).data('id') + ',';
