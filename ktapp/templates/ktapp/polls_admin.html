@@ -3,11 +3,15 @@
 {% block title %}Leendő közkérdések - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>Leendő közkérdések</h1>
+    <h1>
+        <a href="{% url 'polls' %}?tipus=aktualis">Aktuális</a>/<a href="{% url 'polls' %}?tipus=regi">Régi</a>/Leendő
+        közkérdések
+    </h1>
 {% endblock %}
 
 {% block main %}
-    <div class="centered_content">
+<div class="row">
+    <div class="central-column">
 
         {% if permission_new_poll %}
             <h2>Új közkérdés</h2>
@@ -66,4 +70,5 @@
         {% endfor %}
 
     </div>
+</div>
 {% endblock %}

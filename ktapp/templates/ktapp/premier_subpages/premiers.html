@@ -2,8 +2,8 @@
 {% load kt_extras %}
 
 {% block premier_main %}
-
-    <div class="centered_content">
+<div class="row">
+    <div class="central-column">
         {% for premier_day, premier_films in premier_list %}
             <h2>{{ premier_day|date:"F j."|title }}</h2>
             {% for film in premier_films %}
@@ -26,5 +26,5 @@
             {% endfor %}
         {% endfor %}
     </div>
-
+</div>
 {% endblock %}

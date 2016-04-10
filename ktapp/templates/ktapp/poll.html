@@ -14,7 +14,8 @@
 {% endblock %}
 
 {% block main %}
-    <div class="centered_content">
+<div class="row">
+    <div class="central-column">
 
         <ul class="poll">
             {% for pollchoice, pollchoice_percent, pollchoice_px, your_vote in pollchoices %}
@@ -70,4 +71,5 @@
         {% endif %}
 
     </div>
+</div>
 {% endblock %}

@@ -11,13 +11,13 @@
 {% endblock %}
 
 {% block main %}
-<div class="centered_content">
-
+<div class="row">
+    <div class="central-column">
     {% if comments %}
         {% for c in comments %}
             {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
         {% endfor %}
     {% endif %}
-
+    </div>
 </div>
 {% endblock %}

@@ -7,11 +7,13 @@
 {% endblock %}
 
 {% block main %}
-<div class="centered_content">
+<div class="row">
+    <div class="central-column">
 
     {% for t in trivias %}
         {% include 'ktapp/blocks/film_addon_block.html' with addon=t show_addon_source=True addon_type='trivia' %}
     {% endfor %}
 
+    </div>
 </div>
 {% endblock %}

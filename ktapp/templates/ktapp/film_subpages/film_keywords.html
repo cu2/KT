@@ -1,8 +1,8 @@
 {% extends "ktapp/film_subpages/film_base.html" %}
 
 {% block film_main %}
-
-    <div id="film_centered" class="hover_show_button_context">
+<div class="row">
+    <div class="central-column hover_show_button_context">
         <h3>Meghatározó</h3>
         <p>{% for keyword, spoiler in major_keywords %}{{ keyword.name }}{% if spoiler %}*{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
         <h3>Egyéb</h3>
@@ -34,5 +34,5 @@
             </div>
         {% endif %}
     </div>
-
+</div>
 {% endblock %}

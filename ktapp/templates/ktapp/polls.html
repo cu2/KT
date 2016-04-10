@@ -3,11 +3,19 @@
 {% block title %}{% if poll_type == 'aktualis' %}Aktuális{% else %}Régi{% endif %} közkérdések - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{% if poll_type == 'aktualis' %}Aktuális{% else %}Régi{% endif %} közkérdések</h1>
+    <h1>
+        {% if poll_type == 'aktualis' %}
+            Aktuális/<a href="{% url 'polls' %}?tipus=regi">Régi</a>/<a href="{% url 'polls' %}?tipus=leendo">Leendő</a>
+        {% else %}
+            <a href="{% url 'polls' %}?tipus=aktualis">Aktuális</a>/Régi/<a href="{% url 'polls' %}?tipus=leendo">Leendő</a>
+        {% endif %}
+        közkérdések
+    </h1>
 {% endblock %}
 
 {% block main %}
-    <div class="centered_content">
+<div class="row">
+    <div class="central-column">
 
         <table class="fullsize sortable">
             <thead>
@@ -42,4 +50,5 @@
         <p style="font-size: 8pt"><sup>*</sup>Egyedi válaszok száma, zárójelben a válaszolt felhasználók száma.</p>
 
     </div>
+</div>
 {% endblock %}

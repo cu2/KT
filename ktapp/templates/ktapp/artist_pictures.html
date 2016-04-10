@@ -11,23 +11,26 @@
 {% endblock %}
 
 {% block main %}
-    <div class="centered_content">
+<div class="row">
+    <div class="central-column-max">
         {% if picture %}
-            <p class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
-                <a href="{% url 'artist_picture' artist.id artist.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_urls.max }}" style="width: {{ picture.get_widths.max }}px; height: {{ picture.get_heights.max }}px" class="picture" /></a>
+            <div class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
+                <div class="mobile-scroller">
+                    <a href="{% url 'artist_picture' artist.id artist.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_urls.max }}" style="width: {{ picture.get_widths.max }}px; height: {{ picture.get_heights.max }}px" class="picture" /></a>
+                </div>
                 <a name="pix" class="jumptarget"></a>
                 <br />
                 {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film|oneliner_film_url_html_w_year:"film_pictures" }} című filmben
                 {% if picture.source_url %}
                     <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
                 {% endif %}
-            </p>
+            </div>
         {% endif %}
         {% if pictures|length > 1 %}
             {% for picture in pictures %}
-                <a href="{% url 'artist_picture' artist.id artist.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="thumbnail" /></a>
+                <a href="{% url 'artist_picture' artist.id artist.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="kt-thumbnail" /></a>
             {% endfor %}
         {% endif %}
     </div>
-
+</div>
 {% endblock %}

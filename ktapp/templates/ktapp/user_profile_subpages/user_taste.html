@@ -2,8 +2,8 @@
 {% load kt_extras %}
 
 {% block user_profile_main %}
-
-    <div class="centered_content">
+<div class="row">
+    <div class="central-column">
 
     <p>
         {% if active_subtab == 'directors' %}<b>{% else %}<a href="{% url 'user_taste' selected_user.id selected_user.slug_cache 'rendezok' %}">{% endif %}
@@ -22,7 +22,6 @@
         korszakok
         {% if active_subtab == 'periods' %}</b>{% else %}</a>{% endif %}
     </p>
-
 
     {% if list_of_items %}
         <table class="fullsize sortable">
@@ -99,6 +98,6 @@
         </table>
     {% endif %}
 
-
-
+    </div>
+</div>
 {% endblock %}

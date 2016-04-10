@@ -1,8 +1,8 @@
 {% extends "ktapp/film_subpages/film_base.html" %}
 
 {% block film_main %}
-
-    <div id="film_centered">
+<div class="row">
+    <div class="central-column">
         {% for r in reviews %}
             <div class="film_addon">
                 <div class="review_author">
@@ -56,5 +56,5 @@
             {% endfor %}
         {% endif %}
     </div>
-
+</div>
 {% endblock %}

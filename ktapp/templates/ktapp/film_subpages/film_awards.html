@@ -1,12 +1,11 @@
 {% extends "ktapp/film_subpages/film_base.html" %}
 
 {% block film_main %}
-
-    <div id="film_centered">
+<div class="row">
+    <div class="central-column">
         {% if awards %}
         {% include 'ktapp/tables/awards.html' with awards=awards %}
         {% endif %}
-    </div>
 
     {% if permission_edit_film %}
         <h3>Új díj felvétele</h3>
@@ -22,4 +21,6 @@
         </form>
     {% endif %}
 
+    </div>
+</div>
 {% endblock %}

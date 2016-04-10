@@ -1,8 +1,8 @@
 {% extends "ktapp/film_subpages/film_base.html" %}
 
 {% block film_main %}
-
-    <div id="film_centered">
+<div class="row">
+    <div class="central-column">
         {% if permission_new_quote %}
             <form action="{% url 'new_quote' %}" method="post">
                 {% csrf_token %}
@@ -18,5 +18,5 @@
             {% include 'ktapp/blocks/film_addon_block.html' with addon=q addon_type='quote' %}
         {% endfor %}
     </div>
-
+</div>
 {% endblock %}

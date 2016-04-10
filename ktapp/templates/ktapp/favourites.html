@@ -11,11 +11,16 @@
 
     {% if request.user.is_authenticated %}
 
+    <div class="row">
+        <div class="central-column">
     {% if favourites %}
         <p>Kedvenceid: {% for fav in favourites %}<a href="{% url 'user_profile' fav.id fav.slug_cache %}">{{ fav.username }}</a>{% if not forloop.last %}, {% endif %}{% endfor %}</p>
     {% endif %}
+        </div>
+    </div>
 
-    <div class="left_content">
+    <div class="row">
+        <div class="col-sm-6">
 
         {% if latest_votes %}
             <h2>Legutóbbi szavazataik</h2>
@@ -39,8 +44,8 @@
             </table>
         {% endif %}
 
-    </div>
-    <div class="right_content">
+        </div>
+        <div class="col-sm-6">
 
         {% if latest_comments %}
             <h2>Legutóbbi kommentjeik</h2>
@@ -49,14 +54,16 @@
             {% endfor %}
         {% endif %}
 
+        </div>
     </div>
-    <br class="clear" />
 
     {% else %}
 
-        <div class="centered_content">
+    <div class="row">
+        <div class="central-column">
             <p>Ha <a href="{% url 'registration' %}?next={{ request.build_absolute_uri }}">regisztrálsz</a> az oldalon, bejelölheted azokat a usereket, akiknek hozzád hasonló az ízlése vagy számodra érdekes kommenteket írnak. Ezután ebben a menüben láthatod az ő legfrissebb szavazataikat és hozzászólásaikat.</p>
         </div>
+    </div>
 
     {% endif %}
 

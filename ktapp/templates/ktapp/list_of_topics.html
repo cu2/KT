@@ -7,7 +7,8 @@
 {% endblock %}
 
 {% block main %}
-<div class="centered_content">
+<div class="row">
+    <div class="central-column">
 
     <p>Ha egy konkrét filmről akarsz valamit mondani, azt megteheted ott. Ha egyéb témáról szeretnél beszélgetni, arra való ez a fórum. A legfrissebb hozzászólásokat <a href="{% url 'latest_comments' %}">itt találod</a>.</p>
 
@@ -45,5 +46,6 @@
         </form>
     {% endif %}
 
+    </div>
 </div>
 {% endblock %}

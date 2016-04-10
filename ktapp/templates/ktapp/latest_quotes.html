@@ -7,11 +7,13 @@
 {% endblock %}
 
 {% block main %}
-<div class="centered_content">
+<div class="row">
+    <div class="central-column">
 
     {% for q in quotes %}
         {% include 'ktapp/blocks/film_addon_block.html' with addon=q show_addon_source=True addon_type='quote' %}
     {% endfor %}
 
+    </div>
 </div>
 {% endblock %}

@@ -8,28 +8,30 @@
 {% endblock %}
 
 {% block main %}
+<div class="row">
+    <div class="central-column">
 
     <p>Színész: <a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}</p>
     <p>Film: {{ role.film|oneliner_film_url_html_w_year }}</p>
 
-    <div class="centered_content">
-        {% if picture %}
-            <p class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
+    {% if picture %}
+        <div class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
+            <div class="mobile-scroller">
                 <a href="{% url 'role' role.id role.slug_cache %}?p={{ next_picture.id }}#pix"><img src="{{ picture.get_display_urls.max }}" style="width: {{ picture.get_widths.max }}px; height: {{ picture.get_heights.max }}px" class="picture" /></a>
-                <a name="pix" class="jumptarget"></a>
-                <br />
-                {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film|oneliner_film_url_html_w_year:"film_pictures" }} című filmben
-                {% if picture.source_url %}
-                    <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
-                {% endif %}
-            </p>
-        {% endif %}
-        {% if pictures|length > 1 %}
-            {% for picture in pictures %}
-                <a href="{% url 'role' role.id role.slug_cache %}?p={{ picture.id }}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="thumbnail" /></a>
-            {% endfor %}
-        {% endif %}
-    </div>
+            </div>
+            <a name="pix" class="jumptarget"></a>
+            <br />
+            {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film|oneliner_film_url_html_w_year:"film_pictures" }} című filmben
+            {% if picture.source_url %}
+                <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
+            {% endif %}
+        </div>
+    {% endif %}
+    {% if pictures|length > 1 %}
+        {% for picture in pictures %}
+            <a href="{% url 'role' role.id role.slug_cache %}?p={{ picture.id }}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="kt-thumbnail" /></a>
+        {% endfor %}
+    {% endif %}
 
     {% if permission_edit_role %}
         <p><br /></p>
@@ -65,5 +67,6 @@
         </div>
     {% endif %}
 
-
+    </div>
+</div>
 {% endblock %}

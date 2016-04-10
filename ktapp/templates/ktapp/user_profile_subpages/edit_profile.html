@@ -7,16 +7,18 @@
     <form action="{% url 'edit_profile' %}" method="post">
         {% csrf_token %}
 
-    <div class="left_content">
+<div class="row">
+    <div class="col-sm-6">
+
         <h2>Bemutatkozás</h2>
         {% include 'ktapp/blocks/bbcode_buttons.html' %}
         <p>
             <label for="id_bio">Írj magadról bármit, amit fontosnak tartasz elmondani. Ha blogot írsz, linkeld be, hogy akit érdekel, rátaláljon.</label>
             <textarea id="id_bio" name="bio" style="height: 200px">{{ selected_user.bio }}</textarea>
         </p>
-    </div>
 
-    <div class="right_content">
+    </div>
+    <div class="col-sm-6">
 
         <h2>Kedvenceid</h2>
         <p>
@@ -61,8 +63,7 @@
             <input type="checkbox" id="id_public_location" name="public_location"{% if selected_user.public_location %} checked="checked"{% endif %} /> <label for="id_public_location">(ikszeld be, ha publikus)</label>
         </p>
     </div>
-
-    <br class="clear" />
+</div>
 
         <p class="center"><input type="submit" value="Profil mentése" /></p>
     </form>

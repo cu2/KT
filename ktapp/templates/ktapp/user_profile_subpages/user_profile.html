@@ -3,7 +3,8 @@
 
 {% block user_profile_main %}
 
-    <div class="left_content">
+<div class="row">
+    <div class="col-sm-6">
 
         <p>
             Tapasztalat{% if selected_user.id == user.id %}od{% endif %}: {{ number_of_votes }} film
@@ -175,7 +176,7 @@
         {% endif %}
 
     </div>
-    <div class="right_content">
+    <div class="col-sm-6">
 
         <h2 style="margin-top: 0">Legutóbbi szavazat{% if selected_user.id == user.id %}aid{% else %}ok{% endif %}</h2>
         <table class="fullsize">
@@ -205,6 +206,6 @@
         <p><a href="{% url 'user_comments' selected_user.id selected_user.slug_cache %}">Összes komment...</a></p>
 
     </div>
-    <br class="clear" />
+</div>
 
 {% endblock %}

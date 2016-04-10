@@ -15,7 +15,8 @@
         </p>
     </form>
 
-    <div class="left_content">
+<div class="row">
+    <div class="col-sm-6">
 
         {% if films %}
         <h2>Filmek</h2>
@@ -94,7 +95,7 @@
         {% endif %}
 
     </div>
-    <div class="right_content">
+    <div class="col-sm-6">
 
         {% if artists %}
         <h2>Színészek/Rendezők</h2>
@@ -155,6 +156,6 @@
         {% endif %}
 
     </div>
-    <br class="clear" />
+</div>
 
 {% endblock %}

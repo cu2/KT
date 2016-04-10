@@ -1,8 +1,8 @@
 {% extends "ktapp/film_subpages/film_base.html" %}
 
 {% block film_main %}
-
-    <div id="film_centered">
+<div class="row">
+    <div class="central-column">
         <div class="film_addon">
             <div class="review_author">
                 {{ review.created_at|date:"Y-m-d" }}{% if review.created_by %} <a href="{% url 'user_profile' review.created_by.id review.created_by.slug_cache %}">{{ review.created_by }}</a>{% endif %}
@@ -14,5 +14,5 @@
             </div>
         </div>
     </div>
-
+</div>
 {% endblock %}

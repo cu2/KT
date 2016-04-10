@@ -6,6 +6,8 @@
 {% block header %}<h1>Privát üzeneteid</h1>{% endblock %}
 
 {% block main %}
+<div class="row">
+    <div class="central-column">
 
     <p><a href="{% url 'new_message' %}">Új üzenet küldése</a></p>
     {% if user.is_staff %}
@@ -60,4 +62,6 @@
         </ul>
     {% endif %}
 
+    </div>
+</div>
 {% endblock %}

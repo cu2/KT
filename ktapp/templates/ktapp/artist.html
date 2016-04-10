@@ -16,7 +16,8 @@
 {% endblock %}
 
 {% block main %}
-<div class="centered_content_wide">
+<div class="row">
+    <div class="central-column-wide">
 
     {% if random_picture %}
         <p style="text-align: center"><a href="{% url 'artist_pictures' artist.id artist.slug_cache %}"><img src="{{ random_picture.get_display_urls.mid }}" style="width: {{ random_picture.get_widths.mid }}px; height: {{ random_picture.get_heights.mid }}px" class="picture" /></a></p>
@@ -107,5 +108,6 @@
         </div>
     {% endif %}
 
+    </div>
 </div>
 {% endblock %}

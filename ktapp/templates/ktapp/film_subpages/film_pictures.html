@@ -2,11 +2,13 @@
 {% load staticfiles %}
 
 {% block film_main %}
-
-    <div id="film_centered">
+<div class="row">
+    <div class="central-column">
         {% if picture %}
-            <p class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
-                <a href="{% url 'film_picture' film.id film.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_urls.max }}" style="width: {{ picture.get_widths.max }}px; height: {{ picture.get_heights.max }}px" class="picture" /></a>
+            <div class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
+                <div class="mobile-scroller">
+                    <a href="{% url 'film_picture' film.id film.slug_cache next_picture.id %}#pix"><img src="{{ picture.get_display_urls.max }}" style="width: {{ picture.get_widths.max }}px; height: {{ picture.get_heights.max }}px" class="picture" /></a>
+                </div>
                 <a name="pix" class="jumptarget"></a>
                 <br />
                 {% if artists %}
@@ -28,7 +30,7 @@
                         {% endif %}
                     </span>
                 {% endif %}
-            </p>
+            </div>
             {% if permission_edit_picture %}
                 <p style="text-align: center; font-size: 8pt">(<span class="action_text" id="show_picture_edit_button">kép szerkesztése</span>)</p>
                 <div class="picture_edit_block" style="display: none">
@@ -64,7 +66,7 @@
         {% endif %}
         {% if pictures|length > 1 %}
             {% for picture in pictures %}
-                <a href="{% url 'film_picture' film.id film.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="thumbnail" /></a>
+                <a href="{% url 'film_picture' film.id film.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="kt-thumbnail" /></a>
             {% endfor %}
         {% endif %}
         {% if permission_new_picture %}
@@ -98,5 +100,5 @@
             </form>
         {% endif %}
     </div>
-
+</div>
 {% endblock %}

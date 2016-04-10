@@ -2,8 +2,8 @@
 {% load kt_extras %}
 
 {% block user_profile_main %}
-
-    <div class="centered_content">
+<div class="row">
+    <div class="central-column">
 
         <form action="{% url 'new_message' %}" method="post">
             {% csrf_token %}
@@ -64,5 +64,5 @@
         {% endif %}
 
     </div>
-
+</div>
 {% endblock %}

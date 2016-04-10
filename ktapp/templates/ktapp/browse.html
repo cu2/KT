@@ -50,17 +50,23 @@
                     <input type="text" class="full_input input_for_keywords" name="genre" id="id_genres" value="{{ querystring.genre }}" />
                 </th>
                 <th class="nowrap">
-                    <a href="{% url 'browse' %}?o={% if ordering_str != '-number_of_ratings' %}-{% endif %}number_of_ratings{{ qs_combined }}">Nézettség{% if ordering_str == 'number_of_ratings' %}&uarr;{% elif ordering_str == '-number_of_ratings' %}&darr;{% endif %}</a><br />
-                    <input type="text" class="small_input" name="num_rating_min" value="{{ querystring.num_rating_min }}" />-<input type="text" class="small_input" name="num_rating_max" value="{{ querystring.num_rating_max }}" />
+                    <a href="{% url 'browse' %}?o={% if ordering_str != '-number_of_ratings' %}-{% endif %}number_of_ratings{{ qs_combined }}">Nézettség{% if ordering_str == 'number_of_ratings' %}&uarr;{% elif ordering_str == '-number_of_ratings' %}&darr;{% endif %}</a>
+                    <div style="white-space: nowrap">
+                        <input type="text" class="small_input" name="num_rating_min" value="{{ querystring.num_rating_min }}" />-<input type="text" class="small_input" name="num_rating_max" value="{{ querystring.num_rating_max }}" />
+                    </div>
                 </th>
                 <th class="nowrap">
-                    <a href="{% url 'browse' %}?o={% if ordering_str != '-average_rating' %}-{% endif %}average_rating{{ qs_combined }}">Átlag{% if ordering_str == 'average_rating' %}&uarr;{% elif ordering_str == '-average_rating' %}&darr;{% endif %}</a><br />
-                    <input type="text" class="small_input" name="avg_rating_min" value="{{ querystring.avg_rating_min }}" />-<input type="text" class="small_input" name="avg_rating_max" value="{{ querystring.avg_rating_max }}" />
+                    <a href="{% url 'browse' %}?o={% if ordering_str != '-average_rating' %}-{% endif %}average_rating{{ qs_combined }}">Átlag{% if ordering_str == 'average_rating' %}&uarr;{% elif ordering_str == '-average_rating' %}&darr;{% endif %}</a>
+                    <div style="white-space: nowrap">
+                        <input type="text" class="small_input" name="avg_rating_min" value="{{ querystring.avg_rating_min }}" />-<input type="text" class="small_input" name="avg_rating_max" value="{{ querystring.avg_rating_max }}" />
+                    </div>
                 </th>
                 {% if request.user.is_authenticated %}
                     <th class="nowrap">
-                        <a href="{% url 'browse' %}?o={% if ordering_str != '-fav_average_rating' %}-{% endif %}fav_average_rating{{ qs_combined }}">Kedvenceid{% if ordering_str == 'fav_average_rating' %}&uarr;{% elif ordering_str == '-fav_average_rating' %}&darr;{% endif %}</a><br />
-                        <input type="text" class="small_input" name="fav_avg_rating_min" value="{{ querystring.fav_avg_rating_min }}" />-<input type="text" class="small_input" name="fav_avg_rating_max" value="{{ querystring.fav_avg_rating_max }}" />
+                        <a href="{% url 'browse' %}?o={% if ordering_str != '-fav_average_rating' %}-{% endif %}fav_average_rating{{ qs_combined }}">Kedvenceid{% if ordering_str == 'fav_average_rating' %}&uarr;{% elif ordering_str == '-fav_average_rating' %}&darr;{% endif %}</a>
+                        <div style="white-space: nowrap">
+                            <input type="text" class="small_input" name="fav_avg_rating_min" value="{{ querystring.fav_avg_rating_min }}" />-<input type="text" class="small_input" name="fav_avg_rating_max" value="{{ querystring.fav_avg_rating_max }}" />
+                        </div>
                     </th>
                     <th>
                         <a href="{% url 'browse' %}?o={% if ordering_str != '-my_rating' %}-{% endif %}my_rating{{ qs_combined }}">Szerinted{% if ordering_str == 'my_rating' %}&uarr;{% elif ordering_str == '-my_rating' %}&darr;{% endif %}</a><br />
