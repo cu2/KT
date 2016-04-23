@@ -1266,7 +1266,7 @@ def move_to_off(request):
                     link_text = domain_object.orig_title
                 elif comment.domain == models.Comment.DOMAIN_TOPIC:
                     domain_object = comment.topic
-                    url = request.build_absolute_uri(reverse('topic', args=(domain_object.id, domain_object.slug_cache)))
+                    url = request.build_absolute_uri(reverse('forum', args=(domain_object.id, domain_object.slug_cache)))
                     link_text = domain_object.title
                 elif comment.domain == models.Comment.DOMAIN_POLL:
                     domain_object = comment.poll

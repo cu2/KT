@@ -33,8 +33,10 @@
                     {% endif %}
                 {% endif %}
                 #{{ comment.serial_number }}
-                {% if request.user.is_authenticated and request.user.is_staff and comment.domain == 'F' %}
-                    <input type="checkbox" class="comment_to_move_to_off" data-id="{{ comment.id }}" title="ikszeld be, ha OFF-ba szeretnéd mozgatni" />
+                {% if request.user.is_authenticated and request.user.is_staff %}
+                    {% if comment.domain != 'T' or comment.topic.id != 87 %}
+                        <input type="checkbox" class="comment_to_move_to_off" data-id="{{ comment.id }}" title="ikszeld be, ha OFF-ba szeretnéd mozgatni" />
+                    {% endif %}
                 {% endif %}
             </span>
         {% endif %}
