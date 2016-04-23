@@ -129,6 +129,7 @@ def check_permission(perm, user, silent=True):
             'edit_usertoplist': 'all',
             'delete_usertoplist': 'all',
             'analytics': 'superuser',
+            'ban_user': 'superuser',
         }.get(perm, perm)
         if grp == 'superuser' and user.is_superuser:
             return True
@@ -363,3 +364,12 @@ def get_finance(model):
     if percent < 0:
         percent = 0
     return int(round(percent)), missing
+
+
+def delete_sessions(user_id):
+    user_id_string = str(user_id)
+    from django.contrib.sessions.models import Session
+    for s in Session.objects.all():
+        session_user_id = s.get_decoded().get('_auth_user_id')
+        if session_user_id == user_id_string or session_user_id == user_id:
+            s.delete()

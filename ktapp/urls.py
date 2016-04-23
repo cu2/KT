@@ -177,6 +177,8 @@ urlpatterns += [
     url(r'^uj_kedvenc$', post_views.follow, name='follow'),
     url(r'^torol_kedvenc$', post_views.unfollow, name='unfollow'),
 
+    url(r'^kitilt$', post_views.ban_user, name='ban_user'),
+
     url(r'^email_header.jpg$', web_views.email_header, name='email_header'),
     url(r'^click/$', web_views.click, name='click'),
     url(r'^impresszum/$', web_views.impressum, name='impressum'),

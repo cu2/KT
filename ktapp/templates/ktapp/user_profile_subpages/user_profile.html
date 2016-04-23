@@ -163,6 +163,45 @@
                     </form>
                 {% endif %}
             {% endif %}
+
+            {% if selected_user.id != user.id and permission_ban_user %}
+                <h2>Kitiltás</h2>
+                {% if selected_user.is_active or not selected_user.is_active and selected_user.reason_of_inactivity == 'T' %}
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="ban" />
+                        <p><input type="submit" value="Végleges kitiltás" class="small_button confirm_required" /></p>
+                    </form>
+                {% endif %}
+                {% if selected_user.is_active %}
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="temp_ban_1d" />
+                        <p><input type="submit" value="Ideiglenes kitiltás 1 napig" class="small_button confirm_required" /></p>
+                    </form>
+                {% endif %}
+                {% if not selected_user.is_active and selected_user.reason_of_inactivity == 'T' %}
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="temp_ban_1d" />
+                        <p><input type="submit" value="Ideiglenes kitiltás meghosszabbítása 1 nappal" class="small_button confirm_required" /></p>
+                    </form>
+                {% endif %}
+                {% if not selected_user.is_active %}
+                    {% if selected_user.reason_of_inactivity == 'B' or selected_user.reason_of_inactivity == 'T' %}
+                        <form action="{% url 'ban_user' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                            <input type="hidden" name="action" value="unban" />
+                            <p><input type="submit" value="Kitiltás megszüntetése" class="small_button confirm_required" /></p>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+
         {% endif %}
 
         {% if user.is_authenticated %}

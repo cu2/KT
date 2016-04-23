@@ -241,6 +241,9 @@ $(function() {
         $(this).closest('.film_addon').find('.addon_edit_form').hide();
         $(this).closest('.film_addon').find('.film_addon_content').show().focus();
     });
+    $('.confirm_required').click(function() {
+        return confirm('Biztos vagy benne?');
+    });
     $('form').submit(function() {
         $(this).find('input:submit').prop('disabled', true);
     });

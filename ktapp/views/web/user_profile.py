@@ -155,6 +155,7 @@ def user_profile(request, id, name_slug):
         ''', [selected_user.id, models.UserFavourite.DOMAIN_COUNTRY, models.Keyword.KEYWORD_TYPE_COUNTRY])),
         'similarity': similarity,
         'similarity_per_genre': similarity_per_genre,
+        'permission_ban_user': kt_utils.check_permission('ban_user', request.user),
     })
 
 

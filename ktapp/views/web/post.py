@@ -1533,3 +1533,37 @@ def close_banner(request):
     banner.closed_at = datetime.datetime.now()
     banner.save()
     return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('ban_user')
+def ban_user(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    try:
+        target_user = models.KTUser.objects.get(id=request.POST.get('target_user_id', 0))
+    except models.KTUser.DoesNotExist:
+        return HttpResponseRedirect(next_url)
+    action = request.POST.get('action')
+    if action == 'unban':
+        target_user.is_active = True
+        target_user.reason_of_inactivity = models.KTUser.REASON_UNKNOWN
+        target_user.banned_until = None
+        target_user.save()
+    elif action == 'ban':
+        target_user.is_active = False
+        target_user.reason_of_inactivity = models.KTUser.REASON_BANNED
+        target_user.banned_until = None
+        target_user.save()
+        kt_utils.delete_sessions(target_user.id)
+    elif action in {'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'}:
+        days = int(action[9])
+        target_user.is_active = False
+        target_user.reason_of_inactivity = models.KTUser.REASON_TEMPORARILY_BANNED
+        if target_user.banned_until:
+            target_user.banned_until = target_user.banned_until + datetime.timedelta(days=days)
+        else:
+            target_user.banned_until = datetime.datetime.now() + datetime.timedelta(days=days)
+        target_user.save()
+        kt_utils.delete_sessions(target_user.id)
+    return HttpResponseRedirect(next_url)
