@@ -246,7 +246,7 @@
                         {% endif %}
                     </a></li>
                 {% else %}
-                    <li><a href="{% url 'login' %}">Bejelentkezés</a></li>
+                    <li><a href="{% url 'login' %}?next={{ request.build_absolute_uri }}">Bejelentkezés</a></li>
                 {% endif %}
                 <li><a href="{% url 'browse' %}">Részletes keresés</a></li>
 
