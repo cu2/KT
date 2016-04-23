@@ -8,6 +8,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django import forms
+from django.utils.http import urlquote_plus
 
 from kt import settings
 from ktapp import models
@@ -30,6 +31,12 @@ def _generic_film_view(view_function):
             'countries': list(film.countries()),
             'genres': film.genres_cache,
             'vapiti_year': settings.VAPITI_YEAR,
+            'film_link_imdb': 'http://www.imdb.com/title/%s/' % film.imdb_link if film.imdb_link else '',
+            'film_link_porthu': 'http://www.port.hu/pls/fi/films.film_page?i_where=2&i_film_id=%s&i_city_id=-1&i_county_id=1' % film.porthu_link if film.porthu_link else '',
+            'film_link_rt': 'http://www.rottentomatoes.com/search/?search=' + urlquote_plus(film.orig_title),
+            'film_link_youtube': 'http://www.youtube.com/results?search_query=%s+trailer&search=Search' % urlquote_plus(film.orig_title),
+            'film_link_wiki_en': film.wikipedia_link_en.strip() if film.wikipedia_link_en else ('http://en.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(film.orig_title)),
+            'film_link_wiki_hu': film.wikipedia_link_hu.strip(),
         }
         return view_function(request, id, film_slug, film, base_context, *args, **kwargs)
 

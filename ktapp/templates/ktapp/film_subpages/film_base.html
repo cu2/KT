@@ -121,21 +121,17 @@
         <div id="film_misc_info">
             <ul>
                 <li>
-                    <span>{% if film.imdb_link %}<a href="http://www.imdb.com/title/{{ film.imdb_link }}/" class="link_w_icon imdb_link">IMDb</a>{% if film.imdb_real_rating %} {{ film.imdb_real_rating|floatformat:1 }}{% endif %}{% endif %}</span>
-                    <span>{% if film.porthu_link %}<a href="http://www.port.hu/pls/fi/films.film_page?i_where=2&i_film_id={{ film.porthu_link }}&i_city_id=-1&i_county_id=1" class="link_w_icon porthu_link">PORT.hu</a>{% endif %}</span>
+                    <span>{% if film_link_imdb %}<a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ film_link_imdb|urlencode }}&t=im&f={{ film.id }}{% else %}{{ film_link_imdb }}{% endif %}" class="link_w_icon imdb_link" target="_blank">IMDb</a>{% if film.imdb_real_rating %} {{ film.imdb_real_rating|floatformat:1 }}{% endif %}{% endif %}</span>
+                    <span>{% if film_link_porthu %}<a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ film_link_porthu|urlencode }}&t=po&f={{ film.id }}{% else %}{{ film_link_porthu }}{% endif %}" class="link_w_icon porthu_link" target="_blank">PORT.hu</a>{% endif %}</span>
                 </li>
                 <li>
-                    <span>{% if film.imdb_link %}<a href="http://www.rottentomatoes.com/search/?search={{ film.orig_title|urlquote_plus }}" class="link_w_icon rt_link">RT</a>{% endif %}</span>
-                    <span><a href="http://www.youtube.com/results?search_query={{ film.orig_title|urlquote_plus }}+trailer&search=Search" class="link_w_icon youtube_link">YouTube</a></span>
+                    <span><a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ film_link_rt|urlencode }}&t=rt&f={{ film.id }}{% else %}{{ film_link_rt }}{% endif %}" class="link_w_icon rt_link" target="_blank">RT</a></span>
+                    <span><a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ film_link_youtube|urlencode }}&t=yt&f={{ film.id }}{% else %}{{ film_link_youtube }}{% endif %}" class="link_w_icon youtube_link" target="_blank">YouTube</a></span>
                 </li>
                 <li>
-                    {% if film.wikipedia_link_en %}
-                    <span><a href="{{ film.wikipedia_link_en }}" class="link_w_icon wikipedia_link">Wikipedia</a></span>
-                    {% else %}
-                    <span><a href="http://en.wikipedia.org/w/wiki.phtml?search={{ film.orig_title|urlquote_plus }}" class="link_w_icon wikipedia_link">Wikipedia</a></span>
-                    {% endif %}
+                    <span><a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ film_link_wiki_en|urlencode }}&t=we&f={{ film.id }}{% else %}{{ film_link_wiki_en }}{% endif %}" class="link_w_icon wikipedia_link" target="_blank">Wikipedia</a></span>
                     {% if film.wikipedia_link_hu %}
-                    <span><a href="{{ film.wikipedia_link_hu }}" class="link_w_icon wikipedia_hu_link">Wikipédia</a></span>
+                        <span><a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ film_link_wiki_hu|urlencode }}&t=wh&f={{ film.id }}{% else %}{{ film_link_wiki_hu }}{% endif %}" class="link_w_icon wikipedia_hu_link" target="_blank">Wikipédia</a></span>
                     {% endif %}
                 </li>
             </ul>

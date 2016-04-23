@@ -1777,3 +1777,43 @@ class Banner(models.Model):
     viewed = models.PositiveSmallIntegerField(default=0)
     closed_at = models.DateTimeField(blank=True, null=True)
     withdrawn_at = models.DateTimeField(blank=True, null=True)
+
+
+class LinkClick(models.Model):
+    url = models.CharField(max_length=250)
+    url_domain = models.CharField(max_length=250)
+    referer = models.CharField(max_length=250, blank=True)
+    user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
+    clicked_at = models.DateTimeField(auto_now_add=True)
+    LINK_TYPE_LINK = 'LI'
+    LINK_TYPE_FILM_IMDB = 'IM'
+    LINK_TYPE_FILM_PORTHU = 'PO'
+    LINK_TYPE_FILM_RT = 'RT'
+    LINK_TYPE_FILM_YOUTUBE = 'YT'
+    LINK_TYPE_FILM_WIKI_EN = 'WE'
+    LINK_TYPE_FILM_WIKI_HU = 'WH'
+    LINK_TYPE_ARTIST_IMDB = 'AI'
+    LINK_TYPE_ARTIST_WIKI_EN = 'AE'
+    LINK_TYPE_ARTIST_WIKI_HU = 'AH'
+    LINK_TYPE_OTHER = '-'
+    LINK_TYPES = [
+        (LINK_TYPE_LINK, 'Link'),
+        (LINK_TYPE_FILM_IMDB, 'Film / IMDb'),
+        (LINK_TYPE_FILM_PORTHU, 'Film / Port.hu'),
+        (LINK_TYPE_FILM_RT, 'Film / Rotten Tomatoes'),
+        (LINK_TYPE_FILM_YOUTUBE, 'Film / YouTube'),
+        (LINK_TYPE_FILM_WIKI_EN, 'Film / Wikipedia EN'),
+        (LINK_TYPE_FILM_WIKI_HU, 'Film / Wikipedia HU'),
+        (LINK_TYPE_ARTIST_IMDB, 'Artist / IMDb'),
+        (LINK_TYPE_ARTIST_WIKI_EN, 'Artist / Wikipedia EN'),
+        (LINK_TYPE_ARTIST_WIKI_HU, 'Artist / Wikipedia HU'),
+        (LINK_TYPE_OTHER, 'Other'),
+    ]
+    link_type = models.CharField(max_length=2, choices=LINK_TYPES, default=LINK_TYPE_OTHER)
+    link = models.ForeignKey(Link, blank=True, null=True)
+    film = models.ForeignKey(Film, blank=True, null=True)
+    artist = models.ForeignKey(Artist, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.url_domain = urlparse(self.url).netloc
+        super(LinkClick, self).save(*args, **kwargs)

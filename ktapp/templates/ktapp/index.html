@@ -102,7 +102,7 @@
                         <div class="film_addon_content">
                             <p>[{{ content.link_domain }}] <b>{{ content.name }}</b></p>
                             <p>{{ content.lead|linebreaksbr }}</p>
-                            <p style="text-align: right"><a href="{{ content.url }}" target="_blank">Tovább...</a></p>
+                            <p style="text-align: right"><a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ content.url|urlencode }}&t=l&l={{ content.id }}{% else %}{{ content.url }}{% endif %}" target="_blank">Tovább...</a></p>
                             {% if user.is_authenticated and user.is_staff %}<p>(Mióta van kint? {{ content.created_at|timesince }})</p>{% endif %}
                         </div>
                         {% if content.author %}
