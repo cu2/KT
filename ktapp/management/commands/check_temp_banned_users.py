@@ -1,5 +1,4 @@
 import datetime
-import random
 
 from django.core.management.base import BaseCommand
 

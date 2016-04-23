@@ -189,7 +189,7 @@ def new_comment(request):
 def edit_comment(request):
     next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
     comment = get_object_or_404(models.Comment, id=request.POST.get('comment_id', 0))
-    if request.user.is_staff or (comment.created_by.id == request.user.id and comment.editable()):
+    if request.user.is_inner_staff or (comment.created_by.id == request.user.id and comment.editable()):
         content = request.POST.get('content', '').strip()
         if content != '':
             comment.content = content
@@ -1244,7 +1244,7 @@ def new_poll(request):
 
 @require_POST
 @login_required
-@kt_utils.kt_permission_required('admin')
+@kt_utils.kt_permission_required('move_to_off')
 def move_to_off(request):
     off_topic = models.Topic.objects.get(id=87)
     domain_object = None
@@ -1543,6 +1543,8 @@ def ban_user(request):
     try:
         target_user = models.KTUser.objects.get(id=request.POST.get('target_user_id', 0))
     except models.KTUser.DoesNotExist:
+        return HttpResponseRedirect(next_url)
+    if target_user.is_staff:
         return HttpResponseRedirect(next_url)
     action = request.POST.get('action')
     if action == 'unban':
