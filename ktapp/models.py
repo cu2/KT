@@ -26,6 +26,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=64, unique=True)
     email = models.EmailField(blank=True, unique=True)
     is_staff = models.BooleanField(default=False)  # admin
+    is_inner_staff = models.BooleanField(default=False)  # active admin
     is_active = models.BooleanField(default=True)  # delete
     date_joined = models.DateTimeField(auto_now_add=True)
     GENDER_TYPE_MALE = 'M'

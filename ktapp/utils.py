@@ -129,9 +129,11 @@ def check_permission(perm, user, silent=True):
             'edit_usertoplist': 'all',
             'delete_usertoplist': 'all',
             'analytics': 'superuser',
-            'ban_user': 'superuser',
+            'ban_user': 'inner_staff',
         }.get(perm, perm)
         if grp == 'superuser' and user.is_superuser:
+            return True
+        if grp == 'inner_staff' and user.is_inner_staff:
             return True
         if grp == 'admin' and user.is_staff:
             return True
