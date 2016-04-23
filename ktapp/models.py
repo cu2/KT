@@ -55,14 +55,17 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     added_tvfilm = models.PositiveIntegerField(default=0)
     added_trivia = models.PositiveIntegerField(default=0)
     REASON_BANNED = 'B'
+    REASON_TEMPORARILY_BANNED = 'T'
     REASON_QUIT = 'Q'
     REASON_UNKNOWN = 'U'
     REASONS = [
         (REASON_BANNED, 'Banned'),
+        (REASON_TEMPORARILY_BANNED, 'Temporarily Banned'),
         (REASON_QUIT, 'Quit'),
         (REASON_UNKNOWN, 'Unknown'),
     ]
     reason_of_inactivity = models.CharField(max_length=1, choices=REASONS, default=REASON_UNKNOWN)
+    banned_until = models.DateTimeField(blank=True, null=True)
     old_permissions = models.CharField(max_length=250, blank=True, null=True)
     ip_at_registration = models.CharField(max_length=250, blank=True, null=True)
     ip_at_last_login = models.CharField(max_length=250, blank=True, null=True)
