@@ -17,32 +17,56 @@
                 </div>
             </div>
         {% endfor %}
-        {% if permission_approve_review and unapproved_reviews %}
-            <h2>Elfogadásra váró elemzés{% if unapproved_reviews.count > 1 %}ek{% endif %}</h2>
-            {% for r in unapproved_reviews %}
-                <div class="film_addon">
-                    <div class="review_author">
-                        {{ r.created_at|date:"Y-m-d" }} <a href="{% url 'user_profile' r.created_by.id r.created_by.slug_cache %}">{{ r.created_by }}</a>
+        {% if unapproved_reviews %}
+            {% if permission_approve_review %}
+                <h2>Elfogadásra váró elemzés{% if unapproved_reviews.count > 1 %}ek{% endif %}</h2>
+                {% for r in unapproved_reviews %}
+                    <div class="film_addon">
+                        <div class="review_author">
+                            {{ r.created_at|date:"Y-m-d" }} <a href="{% url 'user_profile' r.created_by.id r.created_by.slug_cache %}">{{ r.created_by }}</a>
+                        </div>
+                        <div class="film_addon_content">
+                            {% autoescape off %}
+                                {{ r.content_html|linebreaks }}
+                            {% endautoescape %}
+                            <form action="{% url 'approve_review' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="film_id" value="{{ film.id }}" />
+                                <input type="hidden" name="review_id" value="{{ r.id }}" />
+                                <p><input type="submit" value="Elemzés elfogadása" /></p>
+                            </form>
+                            <form action="{% url 'disapprove_review' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="film_id" value="{{ film.id }}" />
+                                <input type="hidden" name="review_id" value="{{ r.id }}" />
+                                <p><input type="submit" value="Elemzés elutasítása" /> (komment lesz belőle)</p>
+                            </form>
+                            <form action="{% url 'delete_review' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="film_id" value="{{ film.id }}" />
+                                <input type="hidden" name="review_id" value="{{ r.id }}" />
+                                <p><input type="submit" value="Elemzés törlése" class="confirm_required" /> (nyomtalanul eltűnik)</p>
+                            </form>
+                        </div>
                     </div>
-                    <div class="film_addon_content">
-                        {% autoescape off %}
-                            {{ r.content_html|linebreaks }}
-                        {% endautoescape %}
-                        <form action="{% url 'approve_review' %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="film_id" value="{{ film.id }}" />
-                            <input type="hidden" name="review_id" value="{{ r.id }}" />
-                            <p><input type="submit" value="Elemzés elfogadása" /></p>
-                        </form>
-                        <form action="{% url 'disapprove_review' %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="film_id" value="{{ film.id }}" />
-                            <input type="hidden" name="review_id" value="{{ r.id }}" />
-                            <p><input type="submit" value="Elemzés elutasítása" /> (komment lesz belőle)</p>
-                        </form>
-                    </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% elif request.user.is_authenticated %}
+                <h2>Elfogadásra váró elemzésed</h2>
+                {% for r in unapproved_reviews %}
+                    {% if r.created_by.id == request.user.id %}
+                        <div class="film_addon">
+                            <div class="review_author">
+                                {{ r.created_at|date:"Y-m-d" }} <a href="{% url 'user_profile' r.created_by.id r.created_by.slug_cache %}">{{ r.created_by }}</a>
+                            </div>
+                            <div class="film_addon_content">
+                                {% autoescape off %}
+                                    {{ r.content_html|linebreaks }}
+                                {% endautoescape %}
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         {% endif %}
         {% for link in links_reviews %}
             {% include 'ktapp/blocks/film_link_block.html' with link=link %}

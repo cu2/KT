@@ -112,6 +112,7 @@ urlpatterns += [
     url(r'^bekuldott_portrek/$', web_views.suggested_bios, name='suggested_bios'),
     url(r'^elemzes_elfogadasa$', post_views.approve_review, name='approve_review'),
     url(r'^elemzes_elutasitasa$', post_views.disapprove_review, name='disapprove_review'),
+    url(r'^elemzes_torlese$', post_views.delete_review, name='delete_review'),
 
     url(r'^valtozasok/$', web_views.changes, name='changes'),
     url(r'^hianyos_filmek/$', film_views.films_with_missing_data, name='films_with_missing_data'),

@@ -300,11 +300,10 @@ def new_review(request):
 @kt_utils.kt_permission_required('approve_review')
 def approve_review(request):
     film = get_object_or_404(models.Film, pk=request.POST.get('film_id', 0))
-    if request.POST:
-        review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
-        if review.film == film:
-            review.approved = True
-            review.save()
+    review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
+    if review.film == film:
+        review.approved = True
+        review.save()
     return HttpResponseRedirect(reverse('film_articles', args=(film.pk, film.slug_cache)))
 
 
@@ -313,19 +312,30 @@ def approve_review(request):
 @kt_utils.kt_permission_required('approve_review')
 def disapprove_review(request):
     film = get_object_or_404(models.Film, pk=request.POST.get('film_id', 0))
-    if request.POST:
-        review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
-        if review.film == film:
-            comment = models.Comment(
-                domain=models.Comment.DOMAIN_FILM,
-                film=film,
-                created_by=review.created_by,
-                content=review.content,
-            )
-            comment.save(domain=film)
-            review.film = film  # NOTE: this is needed, otherwise review.delete() will save the original values of the film (e.g. old number_of_comments)
-            review.delete()
+    review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
+    if review.film == film:
+        comment = models.Comment(
+            domain=models.Comment.DOMAIN_FILM,
+            film=film,
+            created_by=review.created_by,
+            content=review.content,
+        )
+        comment.save(domain=film)
+        review.film = film  # NOTE: this is needed, otherwise review.delete() will save the original values of the film (e.g. old number_of_comments)
+        review.delete()
     return HttpResponseRedirect(reverse('film_comments', args=(film.pk, film.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('approve_review')
+def delete_review(request):
+    film = get_object_or_404(models.Film, pk=request.POST.get('film_id', 0))
+    review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
+    if review.film == film:
+        review.film = film  # NOTE: this is needed, otherwise review.delete() will save the original values of the film (e.g. old number_of_comments)
+        review.delete()
+    return HttpResponseRedirect(reverse('film_articles', args=(film.pk, film.slug_cache)))
 
 
 @require_POST
