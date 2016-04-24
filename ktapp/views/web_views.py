@@ -1228,7 +1228,7 @@ def articles(request):
         active_tab = 'films'
         list_of_articles = list(models.Link.objects.raw(u'''
             SELECT
-              CONCAT('L', l.id) AS id, l.name,
+              CONCAT('L', l.id) AS id, l.name, 'link' AS url_type, l.id as orig_id,
               l.url,
               l.link_domain, l.lead,
               f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year,
@@ -1241,7 +1241,7 @@ def articles(request):
             UNION
 
             SELECT
-              CONCAT('R', r.id) AS id, CONCAT(f.orig_title, ' (', f.year, ')') AS name,
+              CONCAT('R', r.id) AS id, CONCAT(f.orig_title, ' (', f.year, ')') AS name, 'review' AS url_type, r.id as orig_id,
               CONCAT('/film/', f.id, '/', f.slug_cache, '/elemzesek/', r.id) AS url,
               'Kritikus Tömeg' AS link_domain, CONCAT(r.snippet, '...') AS lead,
               f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year,
@@ -1257,7 +1257,7 @@ def articles(request):
         active_tab = 'artists'
         list_of_articles = list(models.Link.objects.raw(u'''
             SELECT
-              CONCAT('L', l.id) AS id, l.name,
+              CONCAT('L', l.id) AS id, l.name, 'link' AS url_type, l.id as orig_id,
               l.url,
               l.link_domain, l.lead,
               a.id AS artist_id, a.name AS artist_name, a.slug_cache AS artist_slug_cache,
@@ -1270,7 +1270,7 @@ def articles(request):
             UNION
 
             SELECT
-              CONCAT('B', b.id) AS id, a.name AS name,
+              CONCAT('B', b.id) AS id, a.name AS name, 'bio' AS url_type, b.id as orig_id,
               CONCAT('/muvesz/', a.id, '/', a.slug_cache) AS url,
               'Kritikus Tömeg' AS link_domain, CONCAT(b.snippet, '...') AS lead,
               a.id AS artist_id, a.name AS artist_name, a.slug_cache AS artist_slug_cache,
@@ -1286,7 +1286,7 @@ def articles(request):
         active_tab = 'misc'
         list_of_articles = list(models.Link.objects.raw(u'''
             SELECT
-              CONCAT('L', l.id) AS id, l.name,
+              CONCAT('L', l.id) AS id, l.name, 'link' AS url_type, l.id as orig_id,
               l.url,
               l.link_domain, l.lead,
               u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache

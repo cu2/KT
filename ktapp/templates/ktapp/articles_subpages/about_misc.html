@@ -77,7 +77,7 @@
             <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
                 <td>{{ article.link_domain }}</td>
                 <td>
-                    <b><a href="{{ article.url }}" target="_blank">{{ article.name }}</a></b><br />
+                    <b><a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ article.url|urlencode }}&t=l&l={{ article.orig_id }}{% else %}{{ article.url }}{% endif %}" target="_blank">{{ article.name }}</a></b><br />
                     {% autoescape off %}
                         {{ article.lead }}
                     {% endautoescape %}

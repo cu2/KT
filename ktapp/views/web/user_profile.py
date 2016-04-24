@@ -535,6 +535,7 @@ def user_articles(request, id, name_slug):
             article.url,
             article.name,
             article.link_domain,
+            article.id,
         ))
     articles.sort(key=lambda item: item[0], reverse=True)
     return render(request, 'ktapp/user_profile_subpages/user_articles.html', {
