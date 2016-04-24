@@ -21,7 +21,7 @@
             <tbody>
             {% for review in unapproved_reviews %}
                 <tr class="{% cycle '' 'odd' %}">
-                    <td>{{ review.film|film_url_html_w_year:"film_reviews" }}</td>
+                    <td>{{ review.film|film_url_html_w_year:"film_articles" }}</td>
                     <td>{% if review.created_by %}<a href="{% url 'user_profile' review.created_by.id review.created_by.slug_cache %}">{{ review.created_by }}</a>{% endif %}</td>
                     <td class="nowrap">{{ review.created_at|date:"Y-m-d" }}</td>
                 </tr>

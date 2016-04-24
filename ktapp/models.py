@@ -318,6 +318,10 @@ class Film(models.Model):
             return True
         return self.open_for_vote_from <= datetime.date.today()
 
+    @property
+    def number_of_articles(self):
+        return self.number_of_reviews + self.number_of_links
+
 
 class PremierType(models.Model):
     name = models.CharField(max_length=250)

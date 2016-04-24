@@ -1947,7 +1947,7 @@ def old_url(request):
         return HttpResponseRedirect(reverse('film_awards', args=(film.id, film.slug_cache)))
     if request.path == '/filmelem.php':
         film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
-        return HttpResponseRedirect(reverse('film_reviews', args=(film.id, film.slug_cache)))
+        return HttpResponseRedirect(reverse('film_articles', args=(film.id, film.slug_cache)))
     if request.path == '/filmid.php':
         film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
         return HttpResponseRedirect(reverse('film_quotes', args=(film.id, film.slug_cache)))
@@ -1959,7 +1959,7 @@ def old_url(request):
         return HttpResponseRedirect(reverse('film_keywords', args=(film.id, film.slug_cache)))
     if request.path == '/filmlink.php':
         film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
-        return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+        return HttpResponseRedirect(reverse('film_articles', args=(film.id, film.slug_cache)))
     if request.path == '/szinesz.php':
         artist = get_object_or_404(models.Artist, pk=request.GET.get('aid', 0))
         return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))

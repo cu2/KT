@@ -195,27 +195,36 @@ def film_trivias(request, id, film_slug, film, base_context):
 
 
 @_generic_film_view
-def film_reviews(request, id, film_slug, film, base_context):
+def film_articles(request, id, film_slug, film, base_context):
     review_form = kt_forms.ReviewForm(initial={'film': film})
     review_form.fields['film'].widget = forms.HiddenInput()
-    return render(request, 'ktapp/film_subpages/film_reviews.html', dict(base_context, **{
-        'active_tab': 'reviews',
+    links = film.link_set.select_related('author')
+    return render(request, 'ktapp/film_subpages/film_articles.html', dict(base_context, **{
+        'active_tab': 'articles',
         'reviews': film.review_set.filter(approved=True).all(),
         'unapproved_reviews': film.review_set.filter(approved=False).all(),
         'review_form': review_form,
         'permission_new_review': kt_utils.check_permission('new_review', request.user),
         'permission_approve_review': kt_utils.check_permission('approve_review', request.user),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
+        'links_reviews': links.filter(link_type=models.Link.LINK_TYPE_REVIEWS),
+        'links_interviews': links.filter(link_type=models.Link.LINK_TYPE_INTERVIEWS),
+        'links_official': links.filter(link_type=models.Link.LINK_TYPE_OFFICIAL),
+        'links_other': links.filter(link_type=models.Link.LINK_TYPE_OTHER),
+        'permission_suggest_link': kt_utils.check_permission('suggest_link', request.user),
+        'permission_new_link': kt_utils.check_permission('new_link', request.user),
+        'permission_edit_link': kt_utils.check_permission('edit_link', request.user),
+        'permission_delete_link': kt_utils.check_permission('delete_link', request.user),
     }))
 
 
 @_generic_film_view
-def film_review(request, id, film_slug, film, base_context, review_id):
+def film_article(request, id, film_slug, film, base_context, review_id):
     review = get_object_or_404(models.Review, pk=review_id, approved=True)
     if review.film != film:
         raise Http404
-    return render(request, 'ktapp/film_subpages/film_review.html', dict(base_context, **{
-        'active_tab': 'reviews',
+    return render(request, 'ktapp/film_subpages/film_article.html', dict(base_context, **{
+        'active_tab': 'articles',
         'review': review,
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
     }))
@@ -227,23 +236,6 @@ def film_awards(request, id, film_slug, film, base_context):
         'active_tab': 'awards',
         'awards': film.award_set.all().order_by('name', 'year', 'category'),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-    }))
-
-
-@_generic_film_view
-def film_links(request, id, film_slug, film, base_context):
-    links = film.link_set.select_related('author')
-    return render(request, 'ktapp/film_subpages/film_links.html', dict(base_context, **{
-        'active_tab': 'links',
-        'links_reviews': links.filter(link_type=models.Link.LINK_TYPE_REVIEWS),
-        'links_interviews': links.filter(link_type=models.Link.LINK_TYPE_INTERVIEWS),
-        'links_official': links.filter(link_type=models.Link.LINK_TYPE_OFFICIAL),
-        'links_other': links.filter(link_type=models.Link.LINK_TYPE_OTHER),
-        'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
-        'permission_suggest_link': kt_utils.check_permission('suggest_link', request.user),
-        'permission_new_link': kt_utils.check_permission('new_link', request.user),
-        'permission_edit_link': kt_utils.check_permission('edit_link', request.user),
-        'permission_delete_link': kt_utils.check_permission('delete_link', request.user),
     }))
 
 

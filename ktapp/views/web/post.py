@@ -292,7 +292,7 @@ def new_review(request):
             review = review_form.save(commit=False)
             review.created_by = request.user
             review.save()
-    return HttpResponseRedirect(reverse('film_reviews', args=(film.pk, film.slug_cache)))
+    return HttpResponseRedirect(reverse('film_articles', args=(film.pk, film.slug_cache)))
 
 
 @require_POST
@@ -305,7 +305,7 @@ def approve_review(request):
         if review.film == film:
             review.approved = True
             review.save()
-    return HttpResponseRedirect(reverse('film_reviews', args=(film.pk, film.slug_cache)))
+    return HttpResponseRedirect(reverse('film_articles', args=(film.pk, film.slug_cache)))
 
 
 @require_POST
@@ -774,7 +774,7 @@ def new_link(request):
     url = kt_utils.strip_whitespace(request.POST.get('url', ''))
     if name == '' or url == '':
         if film:
-            return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+            return HttpResponseRedirect(reverse('film_articles', args=(film.id, film.slug_cache)))
         else:
             return HttpResponseRedirect(reverse('articles') + '?t=egyeb')
     link_type = kt_utils.strip_whitespace(request.POST.get('link_type', ''))
@@ -794,7 +794,7 @@ def new_link(request):
         featured=True,
     )
     if film:
-        return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+        return HttpResponseRedirect(reverse('film_articles', args=(film.id, film.slug_cache)))
     else:
         return HttpResponseRedirect(reverse('articles') + '?t=egyeb')
 
@@ -837,7 +837,7 @@ def suggest_link(request):
     url = kt_utils.strip_whitespace(request.POST.get('url', ''))
     if name == '' or url == '':
         if film:
-            return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+            return HttpResponseRedirect(reverse('film_articles', args=(film.id, film.slug_cache)))
         else:
             return HttpResponseRedirect(reverse('articles') + '?t=egyeb')
     link_type = kt_utils.strip_whitespace(request.POST.get('link_type', ''))
