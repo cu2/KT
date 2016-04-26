@@ -25,6 +25,8 @@
                 <td>
                     {% if change.object_type == 'film' %}
                         <a href="{% url 'film_main' change.object_id '' %}">{{ change.object }}</a>
+                    {% elif change.object_type == 'user' %}
+                        <a href="{% url 'user_profile' change.object_id '' %}">{{ change.object }}</a>
                     {% else %}
                         {{ change.object }}
                     {% endif %}

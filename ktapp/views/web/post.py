@@ -1557,17 +1557,44 @@ def ban_user(request):
     if target_user.is_staff:
         return HttpResponseRedirect(next_url)
     action = request.POST.get('action')
+    state_before = {
+        'is_active': target_user.is_active,
+        'reason': target_user.reason_of_inactivity,
+        'banned_until': target_user.banned_until,
+    }
     if action == 'unban':
         target_user.is_active = True
         target_user.reason_of_inactivity = models.KTUser.REASON_UNKNOWN
         target_user.banned_until = None
         target_user.save()
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            'unban',
+            'user:%s' % target_user.id,
+            state_before, {
+                'is_active': target_user.is_active,
+                'reason': target_user.reason_of_inactivity,
+                'banned_until': target_user.banned_until,
+            },
+        )
     elif action == 'ban':
         target_user.is_active = False
         target_user.reason_of_inactivity = models.KTUser.REASON_BANNED
         target_user.banned_until = None
         target_user.save()
         kt_utils.delete_sessions(target_user.id)
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            'ban',
+            'user:%s' % target_user.id,
+            state_before, {
+                'is_active': target_user.is_active,
+                'reason': target_user.reason_of_inactivity,
+                'banned_until': target_user.banned_until,
+            },
+        )
     elif action in {'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'}:
         days = int(action[9])
         target_user.is_active = False
@@ -1578,4 +1605,15 @@ def ban_user(request):
             target_user.banned_until = datetime.datetime.now() + datetime.timedelta(days=days)
         target_user.save()
         kt_utils.delete_sessions(target_user.id)
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            action,
+            'user:%s' % target_user.id,
+            state_before, {
+                'is_active': target_user.is_active,
+                'reason': target_user.reason_of_inactivity,
+                'banned_until': target_user.banned_until,
+            },
+        )
     return HttpResponseRedirect(next_url)
