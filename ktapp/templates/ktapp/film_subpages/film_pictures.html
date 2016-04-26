@@ -15,7 +15,7 @@
                     {% if picture.picture_type == "P" %}
                         {{ film_title_article|title }} {{ film.orig_title }} című film plakátja
                     {% elif picture.picture_type == "D" %}
-                        {{ film_title_article|title }} {{ film.orig_title }} című film DVD-borítója
+                        {{ film_title_article|title }} {{ film.orig_title }} című film DVD/VHS/Bluray-borítója
                     {% else %}
                         Kép {{ film_title_article }} {{ film.orig_title }} című filmből
                     {% endif %}
@@ -38,7 +38,7 @@
                         <p><label for="id_picture_type_edit">Típus:</label> <select name="picture_type" id="id_picture_type_edit">
                             <option value="O"{% if picture.picture_type == 'O' %} selected="selected"{% endif %}>Kép a filmből</option>
                             <option value="P"{% if picture.picture_type == 'P' %} selected="selected"{% endif %}>Plakát</option>
-                            <option value="D"{% if picture.picture_type == 'D' %} selected="selected"{% endif %}>DVD-borító</option>
+                            <option value="D"{% if picture.picture_type == 'D' %} selected="selected"{% endif %}>DVD/VHS/Bluray-borító</option>
                             <option value="S"{% if picture.picture_type == 'S' %} selected="selected"{% endif %}>Saját kezűleg készített screenshot</option>
                         </select></p>
                         <p><label for="id_source_url_edit">Honnan való? (a kép pontos webcíme, nem csak az oldalé)</label> <input type="text" name="source_url" id="id_source_url_edit" maxlength="250" value="{{ picture.source_url }}" /></p>
@@ -85,7 +85,7 @@
                 <p><label for="id_picture_type">Típus:</label> <select name="picture_type" id="id_picture_type">
                     <option value="O" selected="selected">Kép a filmből</option>
                     <option value="P">Plakát</option>
-                    <option value="D">DVD-borító</option>
+                    <option value="D">DVD/VHS/Bluray-borító</option>
                     <option value="S">Saját kezűleg készített screenshot</option>
                 </select></p>
                 <p><label for="id_source_url">Honnan való? (a kép pontos webcíme, nem csak az oldalé)</label> <input type="text" name="source_url" id="id_source_url" maxlength="250" /></p>
