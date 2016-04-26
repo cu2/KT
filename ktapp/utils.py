@@ -369,6 +369,21 @@ def get_finance(model):
     return int(round(percent)), missing
 
 
+def get_banner_version(user_id):
+    if user_id is None:
+        version = 0
+    else:
+        version = user_id % 4
+    if version == 0:
+        return 50, 2000
+    elif version == 1:
+        return 40, 2500
+    elif version == 2:
+        return 25, 4000
+    else:
+        return 20, 5000
+
+
 def delete_sessions(user_id):
     user_id_string = str(user_id)
     from django.contrib.sessions.models import Session

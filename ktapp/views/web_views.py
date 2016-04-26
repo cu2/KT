@@ -85,6 +85,7 @@ def index(request):
         banner.viewed += 1
         banner.save()
     finance_status, finance_missing = kt_utils.get_finance(models.Donation)
+    number_of_donators, amount_of_donation = kt_utils.get_banner_version(request.user.id)
     #
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
@@ -98,6 +99,8 @@ def index(request):
         'banners': banners,
         'finance_status': finance_status,
         'finance_amount': finance_missing,
+        'number_of_donators': number_of_donators,
+        'amount_of_donation': amount_of_donation,
     })
 
 
@@ -1441,9 +1444,12 @@ def rulez(request):
 
 def finance(request):
     finance_status, finance_missing = kt_utils.get_finance(models.Donation)
+    number_of_donators, amount_of_donation = kt_utils.get_banner_version(request.user.id)
     return render(request, 'ktapp/finance.html', {
         'finance_status': finance_status,
         'finance_amount': finance_missing,
+        'number_of_donators': number_of_donators,
+        'amount_of_donation': amount_of_donation,
         'donators': models.KTUser.objects.raw('''
         SELECT DISTINCT u.*
         FROM ktapp_ktuser u
