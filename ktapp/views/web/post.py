@@ -1224,6 +1224,17 @@ def poll_support(request):
 
 @require_POST
 @login_required
+@kt_utils.kt_permission_required('poll_admin')
+def poll_delete(request):
+    poll = get_object_or_404(models.Poll, id=request.POST.get('poll', 0))
+    if poll.state != models.Poll.STATE_WAITING_FOR_APPROVAL:
+        return HttpResponseForbidden()
+    poll.delete()
+    return HttpResponseRedirect(reverse('polls') + '?tipus=leendo')
+
+
+@require_POST
+@login_required
 @kt_utils.kt_permission_required('new_poll')
 def new_poll(request):
     title = kt_utils.strip_whitespace(request.POST.get('title', ''))

@@ -146,6 +146,7 @@ urlpatterns += [
     url(r'^kozkerdest_archival', post_views.poll_archive, name='poll_archive'),
     url(r'^kozkerdest_aktival', post_views.poll_activate, name='poll_activate'),
     url(r'^kozkerdest_tamogat', post_views.poll_support, name='poll_support'),
+    url(r'^kozkerdest_torol', post_views.poll_delete, name='poll_delete'),
     url(r'^uj_kozkerdes', post_views.new_poll, name='new_poll'),
 
     url(r'^elemzesek/$', RedirectView.as_view(pattern_name='articles')),

@@ -26,13 +26,21 @@
         {% for poll in polls_w %}
             {% if permission_poll_admin %}
                 {% if myself in poll.nominated_by %}
-                    <h3><span class="small_button_selected">Támogatod</span> {{ poll.title }}</h3></h3>
+                    <h3><span class="small_button_selected">Támogatod</span> {{ poll.title }}</h3>
                 {% else %}
-                    <form action="{% url 'poll_support' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="poll" value="{{ poll.id }}" />
-                        <h3><input type="submit" value="Támogatás" class="small_button" /> {{ poll.title }}</h3>
-                    </form>
+                    <h3>
+                        <form action="{% url 'poll_support' %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="poll" value="{{ poll.id }}" />
+                            <input type="submit" value="Támogatás" class="small_button" />
+                        </form>
+                        <form action="{% url 'poll_delete' %}" method="post" class="inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="poll" value="{{ poll.id }}" />
+                            <input type="submit" value="Törlés" class="small_button confirm_required" />
+                        </form>
+                        {{ poll.title }}
+                    </h3>
                 {% endif %}
             {% else %}
                 <h3>{{ poll.title }}</h3>
