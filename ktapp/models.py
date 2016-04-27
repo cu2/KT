@@ -103,6 +103,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_poll_comments = models.PositiveIntegerField(default=0)
     number_of_vapiti_votes = models.PositiveIntegerField(default=0)
     vapiti_weight = models.PositiveIntegerField(default=0)
+    profile_pic = models.ForeignKey('Picture', blank=True, null=True, related_name='profile_pic', on_delete=models.SET_NULL)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -1128,7 +1129,14 @@ class FilmSequelRelationship(models.Model):
 def get_picture_upload_name(instance, filename):
     file_root, file_ext = os.path.splitext(filename)
     random_chunk = ''.join((random.choice(string.ascii_lowercase) for _ in range(8)))
-    new_file_name = 'p_%s_%s%s' % (unicode(instance.film.id), random_chunk, file_ext)
+    if instance.film:
+        new_file_name = 'p_%s_%s%s' % (unicode(instance.film.id), random_chunk, file_ext)
+    elif instance.artist:
+        new_file_name = 'pa_%s_%s%s' % (unicode(instance.artist.id), random_chunk, file_ext)
+    elif instance.user:
+        new_file_name = 'pu_%s_%s%s' % (unicode(instance.user.id), random_chunk, file_ext)
+    else:
+        new_file_name = 'px_%s%s' % (random_chunk, file_ext)
     hashdir = hashlib.md5(new_file_name).hexdigest()[:3]
     return 'pix/orig/%s/%s' % (hashdir, new_file_name)
 
@@ -1145,15 +1153,21 @@ class Picture(models.Model):
     PICTURE_TYPE_DVD = 'D'
     PICTURE_TYPE_SCREENSHOT = 'S'
     PICTURE_TYPE_OTHER = 'O'
+    PICTURE_TYPE_ACTOR_PROFILE = 'A'
+    PICTURE_TYPE_USER_PROFILE = 'U'
     PICTURE_TYPES = [
         (PICTURE_TYPE_POSTER, 'Poster'),
         (PICTURE_TYPE_DVD, 'DVD'),
         (PICTURE_TYPE_SCREENSHOT, 'Screenshot'),
         (PICTURE_TYPE_OTHER, 'Other'),
+        (PICTURE_TYPE_ACTOR_PROFILE, 'Actor profile'),
+        (PICTURE_TYPE_USER_PROFILE, 'User profile'),
     ]
     picture_type = models.CharField(max_length=1, choices=PICTURE_TYPES, default=PICTURE_TYPE_OTHER)
-    film = models.ForeignKey(Film)
+    film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
     artists = models.ManyToManyField(Artist, blank=True)
+    artist = models.ForeignKey(Artist, blank=True, null=True, on_delete=models.SET_NULL, related_name='actor_profile')
+    user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL, related_name='user_profile')
 
     THUMBNAIL_SIZES = {
         'min': (120, 120),
@@ -1217,13 +1231,14 @@ class Picture(models.Model):
                 except OSError:
                     pass
         # update number_of_pictures and main_poster for film:
-        self.film.number_of_pictures = self.film.picture_set.count()
-        if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
-            try:
-                self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
-            except IndexError:
-                self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
-        self.film.save(update_fields=['number_of_pictures', 'main_poster'])
+        if self.film:
+            self.film.number_of_pictures = self.film.picture_set.count()
+            if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
+                try:
+                    self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
+                except IndexError:
+                    self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
+            self.film.save(update_fields=['number_of_pictures', 'main_poster'])
 
     def __unicode__(self):
         return unicode(self.img)
@@ -1275,16 +1290,17 @@ class Picture(models.Model):
 @receiver(post_delete, sender=Picture)
 def delete_picture(sender, instance, **kwargs):
     '''Update number_of_pictures and delete files from s3'''
-    instance.film.number_of_pictures = instance.film.picture_set.count()
-    if instance.picture_type in {instance.PICTURE_TYPE_POSTER, instance.PICTURE_TYPE_DVD}:
-        try:
-            instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_POSTER).order_by('id')[0]
-        except IndexError:
+    if instance.film:
+        instance.film.number_of_pictures = instance.film.picture_set.count()
+        if instance.picture_type in {instance.PICTURE_TYPE_POSTER, instance.PICTURE_TYPE_DVD}:
             try:
-                instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_DVD).order_by('id')[0]
+                instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_POSTER).order_by('id')[0]
             except IndexError:
-                instance.film.main_poster = None
-    instance.film.save(update_fields=['number_of_pictures', 'main_poster'])
+                try:
+                    instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_DVD).order_by('id')[0]
+                except IndexError:
+                    instance.film.main_poster = None
+        instance.film.save(update_fields=['number_of_pictures', 'main_poster'])
     kt_utils.delete_file_from_s3(unicode(instance.img))
     for _, (w, h) in instance.THUMBNAIL_SIZES.iteritems():
         _, _, _, s3_key = instance.get_thumbnail_filename(w, h)
