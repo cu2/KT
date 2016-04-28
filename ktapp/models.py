@@ -1711,6 +1711,8 @@ class Event(models.Model):
     EVENT_TYPE_EDIT_COMMENT = 'EC'
     EVENT_TYPE_SIGNUP = 'SU'
     EVENT_TYPE_EDIT_PROFILE = 'EP'
+    EVENT_TYPE_UPLOAD_PROFILE_PIC = 'UP'
+    EVENT_TYPE_DELETE_PROFILE_PIC = 'DP'
     EVENT_TYPE_FOLLOW = 'FO'
     EVENT_TYPE_UNFOLLOW = 'UF'
     EVENT_TYPE_POLL_VOTE = 'PV'
@@ -1728,6 +1730,8 @@ class Event(models.Model):
         (EVENT_TYPE_EDIT_COMMENT, 'Edit comment'),
         (EVENT_TYPE_SIGNUP, 'Signup'),
         (EVENT_TYPE_EDIT_PROFILE, 'Edit profile'),
+        (EVENT_TYPE_UPLOAD_PROFILE_PIC, 'Upload profile pic'),
+        (EVENT_TYPE_DELETE_PROFILE_PIC, 'Delete profile pic'),
         (EVENT_TYPE_FOLLOW, 'Follow'),
         (EVENT_TYPE_UNFOLLOW, 'Unfollow'),
         (EVENT_TYPE_POLL_VOTE, 'Poll vote'),

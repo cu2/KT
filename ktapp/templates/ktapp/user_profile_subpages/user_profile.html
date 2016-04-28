@@ -1,11 +1,23 @@
 {% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
 {% load kt_extras %}
+{% load staticfiles %}
 
 {% block user_profile_main %}
 
     <div class="left_content">
 
-        <p>
+        <p class="clearfix">
+            {% if user.is_authenticated and selected_user.id == user.id %}
+                <a href="{% url 'edit_profile' %}?t=pic" title="Profilkép {% if selected_user.profile_pic %}lecserélése{% else %}feltöltése{% endif %}">
+            {% endif %}
+            {% if selected_user.profile_pic %}
+                <img src="{{ selected_user.profile_pic.get_display_urls.mid }}" style="width: {{ selected_user.profile_pic.get_widths.mid }}px; height: {{ selected_user.profile_pic.get_heights.mid }}px; float: right" class="picture" />
+            {% else %}
+                <img src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}" class="picture" style="float:right" />
+            {% endif %}
+            {% if user.is_authenticated and selected_user.id == user.id %}
+                </a>
+            {% endif %}
             Tapasztalat{% if selected_user.id == user.id %}od{% endif %}: {{ number_of_votes }} film
             <br />
             Kompetenci{% if selected_user.id == user.id %}ád{% else %}a{% endif %}: {{ number_of_vapiti_votes }} film

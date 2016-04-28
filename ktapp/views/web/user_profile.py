@@ -709,6 +709,33 @@ def edit_profile(request):
 
     next_url = request.GET.get('next', request.POST.get('next', reverse('user_profile', args=(request.user.id, request.user.slug_cache))))
     if request.POST:
+
+        if request.POST.get('t', '') == 'pic':
+            if request.POST.get('a', '') == 'del':
+                if request.user.profile_pic:
+                    request.user.profile_pic.delete()
+                    request.user.profile_pic = None
+                    request.user.save()
+                    models.Event.objects.create(
+                        user=request.user,
+                        event_type=models.Event.EVENT_TYPE_DELETE_PROFILE_PIC,
+                    )
+            else:
+                if 'img' in request.FILES:
+                    picture = models.Picture.objects.create(
+                        img=request.FILES['img'],
+                        picture_type=models.Picture.PICTURE_TYPE_USER_PROFILE,
+                        created_by=request.user,
+                        user=request.user,
+                    )
+                    request.user.profile_pic = picture
+                    request.user.save()
+                    models.Event.objects.create(
+                        user=request.user,
+                        event_type=models.Event.EVENT_TYPE_UPLOAD_PROFILE_PIC,
+                    )
+            return HttpResponseRedirect(next_url)
+
         request.user.bio = request.POST.get('bio', '').strip()
         gender = request.POST.get('gender', '')
         if gender not in {'U', 'M', 'F'}:
@@ -772,4 +799,5 @@ def edit_profile(request):
             WHERE uf.user_id = %s AND uf.domain = %s AND k.keyword_type = %s
             ORDER BY k.name, k.id
         ''', [request.user.id, models.UserFavourite.DOMAIN_COUNTRY, models.Keyword.KEYWORD_TYPE_COUNTRY]),
+        'topic': request.GET.get('t', ''),
     })
