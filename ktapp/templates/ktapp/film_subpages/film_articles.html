@@ -1,7 +1,8 @@
 {% extends "ktapp/film_subpages/film_base.html" %}
 
 {% block film_main %}
-    <div id="film_centered">
+<div class="row">
+    <div class="central-column">
 
         {% if reviews or permission_approve_review and unapproved_reviews or links_reviews %}<h2>Kritikák, elemzések</h2>{% endif %}
         {% for r in reviews %}
@@ -172,6 +173,6 @@
             </form>
         {% endif %}
 
-
     </div>
+</div>
 {% endblock %}
