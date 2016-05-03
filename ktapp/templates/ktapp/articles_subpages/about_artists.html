@@ -15,9 +15,13 @@
                 <td><a href="{% url 'artist' article.artist_id article.artist_slug_cache %}">{{ article.artist_name }}</a></td>
                 <td>{{ article.link_domain }}</td>
                 <td>
-                    <b><a href="{{ article.url }}" target="_blank">{{ article.name }}</a></b><br />
+                    {% if article.url_type == 'link' %}
+                        <b><a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ article.url|urlencode }}&t=l&l={{ article.orig_id }}{% else %}{{ article.url }}{% endif %}" target="_blank">{{ article.name }}</a></b><br />
+                    {% else %}
+                        <b><a href="{{ article.url }}" target="_blank">{{ article.name }}</a></b><br />
+                    {% endif %}
                     {% autoescape off %}
-                    {{ article.lead }}
+                        {{ article.lead }}
                     {% endautoescape %}
                 </td>
                 <td>{% if article.author_user_id %}<a href="{% url 'user_profile' article.author_user_id article.author_slug_cache %}">{{ article.author_name }}</a>{% endif %}</td>

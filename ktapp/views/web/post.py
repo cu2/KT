@@ -189,7 +189,7 @@ def new_comment(request):
 def edit_comment(request):
     next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
     comment = get_object_or_404(models.Comment, id=request.POST.get('comment_id', 0))
-    if request.user.is_staff or (comment.created_by.id == request.user.id and comment.editable()):
+    if request.user.is_inner_staff or (comment.created_by.id == request.user.id and comment.editable()):
         content = request.POST.get('content', '').strip()
         if content != '':
             comment.content = content
@@ -292,7 +292,7 @@ def new_review(request):
             review = review_form.save(commit=False)
             review.created_by = request.user
             review.save()
-    return HttpResponseRedirect(reverse('film_reviews', args=(film.pk, film.slug_cache)))
+    return HttpResponseRedirect(reverse('film_articles', args=(film.pk, film.slug_cache)))
 
 
 @require_POST
@@ -300,12 +300,11 @@ def new_review(request):
 @kt_utils.kt_permission_required('approve_review')
 def approve_review(request):
     film = get_object_or_404(models.Film, pk=request.POST.get('film_id', 0))
-    if request.POST:
-        review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
-        if review.film == film:
-            review.approved = True
-            review.save()
-    return HttpResponseRedirect(reverse('film_reviews', args=(film.pk, film.slug_cache)))
+    review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
+    if review.film == film:
+        review.approved = True
+        review.save()
+    return HttpResponseRedirect(reverse('film_articles', args=(film.pk, film.slug_cache)))
 
 
 @require_POST
@@ -313,19 +312,30 @@ def approve_review(request):
 @kt_utils.kt_permission_required('approve_review')
 def disapprove_review(request):
     film = get_object_or_404(models.Film, pk=request.POST.get('film_id', 0))
-    if request.POST:
-        review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
-        if review.film == film:
-            comment = models.Comment(
-                domain=models.Comment.DOMAIN_FILM,
-                film=film,
-                created_by=review.created_by,
-                content=review.content,
-            )
-            comment.save(domain=film)
-            review.film = film  # NOTE: this is needed, otherwise review.delete() will save the original values of the film (e.g. old number_of_comments)
-            review.delete()
+    review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
+    if review.film == film:
+        comment = models.Comment(
+            domain=models.Comment.DOMAIN_FILM,
+            film=film,
+            created_by=review.created_by,
+            content=review.content,
+        )
+        comment.save(domain=film)
+        review.film = film  # NOTE: this is needed, otherwise review.delete() will save the original values of the film (e.g. old number_of_comments)
+        review.delete()
     return HttpResponseRedirect(reverse('film_comments', args=(film.pk, film.slug_cache)))
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('approve_review')
+def delete_review(request):
+    film = get_object_or_404(models.Film, pk=request.POST.get('film_id', 0))
+    review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
+    if review.film == film:
+        review.film = film  # NOTE: this is needed, otherwise review.delete() will save the original values of the film (e.g. old number_of_comments)
+        review.delete()
+    return HttpResponseRedirect(reverse('film_articles', args=(film.pk, film.slug_cache)))
 
 
 @require_POST
@@ -774,7 +784,7 @@ def new_link(request):
     url = kt_utils.strip_whitespace(request.POST.get('url', ''))
     if name == '' or url == '':
         if film:
-            return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+            return HttpResponseRedirect(reverse('film_articles', args=(film.id, film.slug_cache)))
         else:
             return HttpResponseRedirect(reverse('articles') + '?t=egyeb')
     link_type = kt_utils.strip_whitespace(request.POST.get('link_type', ''))
@@ -794,7 +804,7 @@ def new_link(request):
         featured=True,
     )
     if film:
-        return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+        return HttpResponseRedirect(reverse('film_articles', args=(film.id, film.slug_cache)))
     else:
         return HttpResponseRedirect(reverse('articles') + '?t=egyeb')
 
@@ -837,7 +847,7 @@ def suggest_link(request):
     url = kt_utils.strip_whitespace(request.POST.get('url', ''))
     if name == '' or url == '':
         if film:
-            return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+            return HttpResponseRedirect(reverse('film_articles', args=(film.id, film.slug_cache)))
         else:
             return HttpResponseRedirect(reverse('articles') + '?t=egyeb')
     link_type = kt_utils.strip_whitespace(request.POST.get('link_type', ''))
@@ -1214,6 +1224,17 @@ def poll_support(request):
 
 @require_POST
 @login_required
+@kt_utils.kt_permission_required('poll_admin')
+def poll_delete(request):
+    poll = get_object_or_404(models.Poll, id=request.POST.get('poll', 0))
+    if poll.state != models.Poll.STATE_WAITING_FOR_APPROVAL:
+        return HttpResponseForbidden()
+    poll.delete()
+    return HttpResponseRedirect(reverse('polls') + '?tipus=leendo')
+
+
+@require_POST
+@login_required
 @kt_utils.kt_permission_required('new_poll')
 def new_poll(request):
     title = kt_utils.strip_whitespace(request.POST.get('title', ''))
@@ -1244,7 +1265,7 @@ def new_poll(request):
 
 @require_POST
 @login_required
-@kt_utils.kt_permission_required('admin')
+@kt_utils.kt_permission_required('move_to_off')
 def move_to_off(request):
     off_topic = models.Topic.objects.get(id=87)
     domain_object = None
@@ -1266,7 +1287,7 @@ def move_to_off(request):
                     link_text = domain_object.orig_title
                 elif comment.domain == models.Comment.DOMAIN_TOPIC:
                     domain_object = comment.topic
-                    url = request.build_absolute_uri(reverse('topic', args=(domain_object.id, domain_object.slug_cache)))
+                    url = request.build_absolute_uri(reverse('forum', args=(domain_object.id, domain_object.slug_cache)))
                     link_text = domain_object.title
                 elif comment.domain == models.Comment.DOMAIN_POLL:
                     domain_object = comment.poll
@@ -1533,3 +1554,77 @@ def close_banner(request):
     banner.closed_at = datetime.datetime.now()
     banner.save()
     return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('ban_user')
+def ban_user(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    try:
+        target_user = models.KTUser.objects.get(id=request.POST.get('target_user_id', 0))
+    except models.KTUser.DoesNotExist:
+        return HttpResponseRedirect(next_url)
+    if target_user.is_staff:
+        return HttpResponseRedirect(next_url)
+    action = request.POST.get('action')
+    state_before = {
+        'is_active': target_user.is_active,
+        'reason': target_user.reason_of_inactivity,
+        'banned_until': target_user.banned_until,
+    }
+    if action == 'unban':
+        target_user.is_active = True
+        target_user.reason_of_inactivity = models.KTUser.REASON_UNKNOWN
+        target_user.banned_until = None
+        target_user.save()
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            'unban',
+            'user:%s' % target_user.id,
+            state_before, {
+                'is_active': target_user.is_active,
+                'reason': target_user.reason_of_inactivity,
+                'banned_until': target_user.banned_until,
+            },
+        )
+    elif action == 'ban':
+        target_user.is_active = False
+        target_user.reason_of_inactivity = models.KTUser.REASON_BANNED
+        target_user.banned_until = None
+        target_user.save()
+        kt_utils.delete_sessions(target_user.id)
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            'ban',
+            'user:%s' % target_user.id,
+            state_before, {
+                'is_active': target_user.is_active,
+                'reason': target_user.reason_of_inactivity,
+                'banned_until': target_user.banned_until,
+            },
+        )
+    elif action in {'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'}:
+        days = int(action[9])
+        target_user.is_active = False
+        target_user.reason_of_inactivity = models.KTUser.REASON_TEMPORARILY_BANNED
+        if target_user.banned_until:
+            target_user.banned_until = target_user.banned_until + datetime.timedelta(days=days)
+        else:
+            target_user.banned_until = datetime.datetime.now() + datetime.timedelta(days=days)
+        target_user.save()
+        kt_utils.delete_sessions(target_user.id)
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            action,
+            'user:%s' % target_user.id,
+            state_before, {
+                'is_active': target_user.is_active,
+                'reason': target_user.reason_of_inactivity,
+                'banned_until': target_user.banned_until,
+            },
+        )
+    return HttpResponseRedirect(next_url)

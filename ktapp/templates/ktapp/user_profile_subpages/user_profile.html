@@ -1,12 +1,24 @@
 {% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
 {% load kt_extras %}
+{% load staticfiles %}
 
 {% block user_profile_main %}
 
 <div class="row">
     <div class="col-sm-6">
 
-        <p>
+        <p class="clearfix">
+            {% if user.is_authenticated and selected_user.id == user.id %}
+                <a href="{% url 'edit_profile' %}?t=pic" title="Profilkép {% if selected_user.profile_pic %}lecserélése{% else %}feltöltése{% endif %}">
+            {% endif %}
+            {% if selected_user.profile_pic %}
+                <img src="{{ selected_user.profile_pic.get_display_urls.mid }}" style="width: {{ selected_user.profile_pic.get_widths.mid }}px; height: {{ selected_user.profile_pic.get_heights.mid }}px; float: right" class="picture" />
+            {% else %}
+                <img src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}" class="picture" style="float:right" />
+            {% endif %}
+            {% if user.is_authenticated and selected_user.id == user.id %}
+                </a>
+            {% endif %}
             Tapasztalat{% if selected_user.id == user.id %}od{% endif %}: {{ number_of_votes }} film
             <br />
             Kompetenci{% if selected_user.id == user.id %}ád{% else %}a{% endif %}: {{ number_of_vapiti_votes }} film
@@ -164,6 +176,69 @@
                     </form>
                 {% endif %}
             {% endif %}
+
+            {% if selected_user.id != user.id and permission_ban_user %}
+                <h2>Kitiltás</h2>
+                {% if selected_user.is_active %}
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="temp_ban_1d" />
+                        <p><input type="submit" value="Ideiglenes kitiltás 1 napig" class="small_button confirm_required" /></p>
+                    </form>
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="temp_ban_3d" />
+                        <p><input type="submit" value="Ideiglenes kitiltás 3 napig" class="small_button confirm_required" /></p>
+                    </form>
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="temp_ban_7d" />
+                        <p><input type="submit" value="Ideiglenes kitiltás 7 napig" class="small_button confirm_required" /></p>
+                    </form>
+                {% endif %}
+                {% if not selected_user.is_active and selected_user.reason_of_inactivity == 'T' %}
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="temp_ban_1d" />
+                        <p><input type="submit" value="Ideiglenes kitiltás meghosszabbítása 1 nappal" class="small_button confirm_required" /></p>
+                    </form>
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="temp_ban_3d" />
+                        <p><input type="submit" value="Ideiglenes kitiltás meghosszabbítása 3 nappal" class="small_button confirm_required" /></p>
+                    </form>
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="temp_ban_7d" />
+                        <p><input type="submit" value="Ideiglenes kitiltás meghosszabbítása 7 nappal" class="small_button confirm_required" /></p>
+                    </form>
+                {% endif %}
+                {% if selected_user.is_active or not selected_user.is_active and selected_user.reason_of_inactivity == 'T' %}
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="ban" />
+                        <p><input type="submit" value="Végleges kitiltás" class="small_button confirm_required" /></p>
+                    </form>
+                {% endif %}
+                {% if not selected_user.is_active %}
+                    {% if selected_user.reason_of_inactivity == 'B' or selected_user.reason_of_inactivity == 'T' %}
+                        <form action="{% url 'ban_user' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                            <input type="hidden" name="action" value="unban" />
+                            <p><input type="submit" value="Kitiltás megszüntetése" class="small_button confirm_required" /></p>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+
         {% endif %}
 
         {% if user.is_authenticated %}

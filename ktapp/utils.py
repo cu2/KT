@@ -129,8 +129,12 @@ def check_permission(perm, user, silent=True):
             'edit_usertoplist': 'all',
             'delete_usertoplist': 'all',
             'analytics': 'superuser',
+            'move_to_off': 'inner_staff',
+            'ban_user': 'inner_staff',
         }.get(perm, perm)
         if grp == 'superuser' and user.is_superuser:
+            return True
+        if grp == 'inner_staff' and user.is_inner_staff:
             return True
         if grp == 'admin' and user.is_staff:
             return True
@@ -363,3 +367,27 @@ def get_finance(model):
     if percent < 0:
         percent = 0
     return int(round(percent)), missing
+
+
+def get_banner_version(user_id):
+    if user_id is None:
+        version = 0
+    else:
+        version = user_id % 4
+    if version == 0:
+        return 50, 2000
+    elif version == 1:
+        return 40, 2500
+    elif version == 2:
+        return 25, 4000
+    else:
+        return 20, 5000
+
+
+def delete_sessions(user_id):
+    user_id_string = str(user_id)
+    from django.contrib.sessions.models import Session
+    for s in Session.objects.all():
+        session_user_id = s.get_decoded().get('_auth_user_id')
+        if session_user_id == user_id_string or session_user_id == user_id:
+            s.delete()

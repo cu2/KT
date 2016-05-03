@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django import forms
+from django.utils.http import urlquote_plus
 
 from kt import settings
 from ktapp import models
@@ -84,6 +85,7 @@ def index(request):
         banner.viewed += 1
         banner.save()
     finance_status, finance_missing = kt_utils.get_finance(models.Donation)
+    number_of_donators, amount_of_donation = kt_utils.get_banner_version(request.user.id)
     #
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
@@ -97,6 +99,8 @@ def index(request):
         'banners': banners,
         'finance_status': finance_status,
         'finance_amount': finance_missing,
+        'number_of_donators': number_of_donators,
+        'amount_of_donation': amount_of_donation,
     })
 
 
@@ -591,6 +595,9 @@ def artist_main(request, id, name_slug):
         'permission_edit_artist': kt_utils.check_permission('edit_artist', request.user),
         'permission_merge_artist': kt_utils.check_permission('merge_artist', request.user),
         'permission_approve_bio': kt_utils.check_permission('approve_bio', request.user),
+        'imdb_link': 'http://imdb.com/find?s=nm&q=' + urlquote_plus(artist.name),
+        'wiki_en_link': 'http://en.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(artist.name),
+        'wiki_hu_link': 'http://hu.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(artist.name),
     })
 
 
@@ -1224,7 +1231,7 @@ def articles(request):
         active_tab = 'films'
         list_of_articles = list(models.Link.objects.raw(u'''
             SELECT
-              CONCAT('L', l.id) AS id, l.name,
+              CONCAT('L', l.id) AS id, l.name, 'link' AS url_type, l.id as orig_id,
               l.url,
               l.link_domain, l.lead,
               f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year,
@@ -1237,7 +1244,7 @@ def articles(request):
             UNION
 
             SELECT
-              CONCAT('R', r.id) AS id, CONCAT(f.orig_title, ' (', f.year, ')') AS name,
+              CONCAT('R', r.id) AS id, CONCAT(f.orig_title, ' (', f.year, ')') AS name, 'review' AS url_type, r.id as orig_id,
               CONCAT('/film/', f.id, '/', f.slug_cache, '/elemzesek/', r.id) AS url,
               'Kritikus Tömeg' AS link_domain, CONCAT(r.snippet, '...') AS lead,
               f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year,
@@ -1253,7 +1260,7 @@ def articles(request):
         active_tab = 'artists'
         list_of_articles = list(models.Link.objects.raw(u'''
             SELECT
-              CONCAT('L', l.id) AS id, l.name,
+              CONCAT('L', l.id) AS id, l.name, 'link' AS url_type, l.id as orig_id,
               l.url,
               l.link_domain, l.lead,
               a.id AS artist_id, a.name AS artist_name, a.slug_cache AS artist_slug_cache,
@@ -1266,7 +1273,7 @@ def articles(request):
             UNION
 
             SELECT
-              CONCAT('B', b.id) AS id, a.name AS name,
+              CONCAT('B', b.id) AS id, a.name AS name, 'bio' AS url_type, b.id as orig_id,
               CONCAT('/muvesz/', a.id, '/', a.slug_cache) AS url,
               'Kritikus Tömeg' AS link_domain, CONCAT(b.snippet, '...') AS lead,
               a.id AS artist_id, a.name AS artist_name, a.slug_cache AS artist_slug_cache,
@@ -1282,7 +1289,7 @@ def articles(request):
         active_tab = 'misc'
         list_of_articles = list(models.Link.objects.raw(u'''
             SELECT
-              CONCAT('L', l.id) AS id, l.name,
+              CONCAT('L', l.id) AS id, l.name, 'link' AS url_type, l.id as orig_id,
               l.url,
               l.link_domain, l.lead,
               u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
@@ -1360,9 +1367,70 @@ def click(request):
     raise Http404
 
 
+def link_click(request):
+    url = request.GET.get('url', '')
+    raw_link_type = request.GET.get('t', '')
+    if raw_link_type == 'l':
+        link_type = models.LinkClick.LINK_TYPE_LINK
+    elif raw_link_type == 'im':
+        link_type = models.LinkClick.LINK_TYPE_FILM_IMDB
+    elif raw_link_type == 'po':
+        link_type = models.LinkClick.LINK_TYPE_FILM_PORTHU
+    elif raw_link_type == 'rt':
+        link_type = models.LinkClick.LINK_TYPE_FILM_RT
+    elif raw_link_type == 'yt':
+        link_type = models.LinkClick.LINK_TYPE_FILM_YOUTUBE
+    elif raw_link_type == 'we':
+        link_type = models.LinkClick.LINK_TYPE_FILM_WIKI_EN
+    elif raw_link_type == 'wh':
+        link_type = models.LinkClick.LINK_TYPE_FILM_WIKI_HU
+    elif raw_link_type == 'ai':
+        link_type = models.LinkClick.LINK_TYPE_ARTIST_IMDB
+    elif raw_link_type == 'ae':
+        link_type = models.LinkClick.LINK_TYPE_ARTIST_WIKI_EN
+    elif raw_link_type == 'ah':
+        link_type = models.LinkClick.LINK_TYPE_ARTIST_WIKI_HU
+    else:
+        link_type = models.LinkClick.LINK_TYPE_OTHER
+    link = None
+    raw_link_id = request.GET.get('l', '')
+    if raw_link_id:
+        try:
+            link = models.Link.objects.get(id=raw_link_id)
+        except models.Link.DoesNotExist:
+            pass
+    film = None
+    raw_film_id = request.GET.get('f', '')
+    if raw_film_id:
+        try:
+            film = models.Film.objects.get(id=raw_film_id)
+        except models.Film.DoesNotExist:
+            pass
+    artist = None
+    raw_artist_id = request.GET.get('a', '')
+    if raw_artist_id:
+        try:
+            artist = models.Artist.objects.get(id=raw_artist_id)
+        except models.Artist.DoesNotExist:
+            pass
+    models.LinkClick.objects.create(
+        url=url,
+        referer=request.META.get('HTTP_REFERER'),
+        user=request.user,
+        link_type=link_type,
+        link=link,
+        film=film,
+        artist=artist,
+    )
+    if url:
+        return HttpResponseRedirect(url)
+    raise Http404
+
+
 def impressum(request):
     return render(request, 'ktapp/impressum.html', {
-        'staff': models.KTUser.objects.filter(is_staff=True).order_by('username', 'id'),
+        'inner_staff': models.KTUser.objects.filter(is_inner_staff=True).order_by('username', 'id'),
+        'outer_staff': models.KTUser.objects.filter(is_staff=True).exclude(is_inner_staff=True).order_by('username', 'id'),
     })
 
 
@@ -1376,9 +1444,12 @@ def rulez(request):
 
 def finance(request):
     finance_status, finance_missing = kt_utils.get_finance(models.Donation)
+    number_of_donators, amount_of_donation = kt_utils.get_banner_version(request.user.id)
     return render(request, 'ktapp/finance.html', {
         'finance_status': finance_status,
         'finance_amount': finance_missing,
+        'number_of_donators': number_of_donators,
+        'amount_of_donation': amount_of_donation,
         'donators': models.KTUser.objects.raw('''
         SELECT DISTINCT u.*
         FROM ktapp_ktuser u
@@ -1882,7 +1953,7 @@ def old_url(request):
         return HttpResponseRedirect(reverse('film_awards', args=(film.id, film.slug_cache)))
     if request.path == '/filmelem.php':
         film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
-        return HttpResponseRedirect(reverse('film_reviews', args=(film.id, film.slug_cache)))
+        return HttpResponseRedirect(reverse('film_articles', args=(film.id, film.slug_cache)))
     if request.path == '/filmid.php':
         film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
         return HttpResponseRedirect(reverse('film_quotes', args=(film.id, film.slug_cache)))
@@ -1894,7 +1965,7 @@ def old_url(request):
         return HttpResponseRedirect(reverse('film_keywords', args=(film.id, film.slug_cache)))
     if request.path == '/filmlink.php':
         film = get_object_or_404(models.Film, pk=request.GET.get('fid', 0))
-        return HttpResponseRedirect(reverse('film_links', args=(film.id, film.slug_cache)))
+        return HttpResponseRedirect(reverse('film_articles', args=(film.id, film.slug_cache)))
     if request.path == '/szinesz.php':
         artist = get_object_or_404(models.Artist, pk=request.GET.get('aid', 0))
         return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))

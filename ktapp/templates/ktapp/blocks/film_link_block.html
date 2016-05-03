@@ -1,5 +1,5 @@
 <div class="link_edit_block">
-<h3>[{{ link.link_domain }}] <a href="{{ link.url }}" target="_blank">{{ link.name }}</a>{% if link.author %} (<a href="{% url 'user_profile' link.author.id link.author.slug_cache %}">{{ link.author.username }}</a>){% endif %}{% if permission_edit_link %} <span class="normal_text">(<span class="action_text toggle_link_edit_form_button">szerk</span>)</span>{% endif %}</h3>
+<h3>[{{ link.link_domain }}] <a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ link.url|urlencode }}&t=l&l={{ link.id }}&f={{ link.film_id }}{% else %}{{ link.url }}{% endif %}" target="_blank">{{ link.name }}</a>{% if link.author %} (<a href="{% url 'user_profile' link.author.id link.author.slug_cache %}">{{ link.author.username }}</a>){% endif %}{% if permission_edit_link %} <span class="normal_text">(<span class="action_text toggle_link_edit_form_button">szerk</span>)</span>{% endif %}</h3>
 <p>{{ link.lead|linebreaksbr }}</p>
 <form action="{% url 'edit_link' %}" method="post" style="display: none">
     {% csrf_token %}

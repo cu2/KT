@@ -4,6 +4,41 @@
 {% block user_profile_main %}
 
     <div class="form_container">
+
+    {% if topic == 'pic' %}
+        <h2>Profilkép</h2>
+        {% if selected_user.profile_pic %}
+            <img src="{{ selected_user.profile_pic.get_display_urls.mid }}" style="width: {{ selected_user.profile_pic.get_widths.mid }}px; height: {{ selected_user.profile_pic.get_heights.mid }}px" class="picture" />
+            <p><br /></p>
+            <form action="{% url 'edit_profile' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="t" value="pic" />
+                <p>
+                    <label for="id_img">Kép (lehetőleg négyzet alakú, vagyis azonos szélességgel és magassággal):</label><br />
+                    <input type="file" name="img" id="id_img" />
+                </p>
+                <p><input type="submit" value="Profilkép lecserélése" /></p>
+            </form>
+            <p><br /></p>
+            <form action="{% url 'edit_profile' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="t" value="pic" />
+                <input type="hidden" name="a" value="del" />
+                <p><input type="submit" value="Profilkép törlése" class="confirm_required" /></p>
+            </form>
+        {% else %}
+            <form action="{% url 'edit_profile' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="t" value="pic" />
+                <p>
+                    <label for="id_img">Kép (lehetőleg négyzet alakú, vagyis azonos szélességgel és magassággal):</label><br />
+                    <input type="file" name="img" id="id_img" />
+                </p>
+                <p><input type="submit" value="Profilkép feltöltése" /></p>
+            </form>
+        {% endif %}
+    {% else %}
+
     <form action="{% url 'edit_profile' %}" method="post">
         {% csrf_token %}
 
@@ -13,7 +48,7 @@
         <h2>Bemutatkozás</h2>
         {% include 'ktapp/blocks/bbcode_buttons.html' %}
         <p>
-            <label for="id_bio">Írj magadról bármit, amit fontosnak tartasz elmondani. Ha blogot írsz, linkeld be, hogy akit érdekel, rátaláljon.</label>
+            <label for="id_bio">Írj magadról bármit, amit fontosnak tartasz elmondani. Ha blogot írsz, linkeld be, hogy akit érdekel, rátaláljon.</label><br />
             <textarea id="id_bio" name="bio" style="height: 200px">{{ selected_user.bio }}</textarea>
         </p>
 
@@ -67,6 +102,12 @@
 
         <p class="center"><input type="submit" value="Profil mentése" /></p>
     </form>
+
+    {% endif %}
+
+    <p><br /></p>
+    <p><a href="{% url 'user_profile' selected_user.id selected_user.slug_cache %}" class="button">Vissza a profilra</a></p>
+
     </div>
 
 {% endblock %}

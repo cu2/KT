@@ -6,7 +6,17 @@
 {% block header %}
     <h1>{{ selected_user.username }}</h1>
     {% if not selected_user.is_active %}
-        <p style="margin-top: -20px">({% if selected_user.reason_of_inactivity == 'B' %}kitiltva{% elif selected_user.reason_of_inactivity == 'Q' %}kilépett{% else %}inaktív{% endif %})</p>
+        <p style="margin-top: -20px">
+            {% if selected_user.reason_of_inactivity == 'B' %}
+                (kitiltva)
+            {% elif selected_user.reason_of_inactivity == 'T' %}
+                (kitiltva {{ selected_user.banned_until }}-ig)
+            {% elif selected_user.reason_of_inactivity == 'Q' %}
+                (kilépett)
+            {% else %}
+                (inaktív)
+            {% endif %}
+        </p>
     {% endif %}
 {% endblock %}
 

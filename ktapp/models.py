@@ -26,6 +26,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=64, unique=True)
     email = models.EmailField(blank=True, unique=True)
     is_staff = models.BooleanField(default=False)  # admin
+    is_inner_staff = models.BooleanField(default=False)  # active admin
     is_active = models.BooleanField(default=True)  # delete
     date_joined = models.DateTimeField(auto_now_add=True)
     GENDER_TYPE_MALE = 'M'
@@ -55,14 +56,17 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     added_tvfilm = models.PositiveIntegerField(default=0)
     added_trivia = models.PositiveIntegerField(default=0)
     REASON_BANNED = 'B'
+    REASON_TEMPORARILY_BANNED = 'T'
     REASON_QUIT = 'Q'
     REASON_UNKNOWN = 'U'
     REASONS = [
         (REASON_BANNED, 'Banned'),
+        (REASON_TEMPORARILY_BANNED, 'Temporarily Banned'),
         (REASON_QUIT, 'Quit'),
         (REASON_UNKNOWN, 'Unknown'),
     ]
     reason_of_inactivity = models.CharField(max_length=1, choices=REASONS, default=REASON_UNKNOWN)
+    banned_until = models.DateTimeField(blank=True, null=True)
     old_permissions = models.CharField(max_length=250, blank=True, null=True)
     ip_at_registration = models.CharField(max_length=250, blank=True, null=True)
     ip_at_last_login = models.CharField(max_length=250, blank=True, null=True)
@@ -99,6 +103,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_poll_comments = models.PositiveIntegerField(default=0)
     number_of_vapiti_votes = models.PositiveIntegerField(default=0)
     vapiti_weight = models.PositiveIntegerField(default=0)
+    profile_pic = models.ForeignKey('Picture', blank=True, null=True, related_name='profile_pic', on_delete=models.SET_NULL)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -320,6 +325,10 @@ class Film(models.Model):
         if self.open_for_vote_from is None:
             return True
         return self.open_for_vote_from <= datetime.date.today()
+
+    @property
+    def number_of_articles(self):
+        return self.number_of_reviews + self.number_of_links
 
 
 class PremierType(models.Model):
@@ -1127,7 +1136,14 @@ class FilmSequelRelationship(models.Model):
 def get_picture_upload_name(instance, filename):
     file_root, file_ext = os.path.splitext(filename)
     random_chunk = ''.join((random.choice(string.ascii_lowercase) for _ in range(8)))
-    new_file_name = 'p_%s_%s%s' % (unicode(instance.film.id), random_chunk, file_ext)
+    if instance.film:
+        new_file_name = 'p_%s_%s%s' % (unicode(instance.film.id), random_chunk, file_ext)
+    elif instance.artist:
+        new_file_name = 'pa_%s_%s%s' % (unicode(instance.artist.id), random_chunk, file_ext)
+    elif instance.user:
+        new_file_name = 'pu_%s_%s%s' % (unicode(instance.user.id), random_chunk, file_ext)
+    else:
+        new_file_name = 'px_%s%s' % (random_chunk, file_ext)
     hashdir = hashlib.md5(new_file_name).hexdigest()[:3]
     return 'pix/orig/%s/%s' % (hashdir, new_file_name)
 
@@ -1144,15 +1160,21 @@ class Picture(models.Model):
     PICTURE_TYPE_DVD = 'D'
     PICTURE_TYPE_SCREENSHOT = 'S'
     PICTURE_TYPE_OTHER = 'O'
+    PICTURE_TYPE_ACTOR_PROFILE = 'A'
+    PICTURE_TYPE_USER_PROFILE = 'U'
     PICTURE_TYPES = [
         (PICTURE_TYPE_POSTER, 'Poster'),
         (PICTURE_TYPE_DVD, 'DVD'),
         (PICTURE_TYPE_SCREENSHOT, 'Screenshot'),
         (PICTURE_TYPE_OTHER, 'Other'),
+        (PICTURE_TYPE_ACTOR_PROFILE, 'Actor profile'),
+        (PICTURE_TYPE_USER_PROFILE, 'User profile'),
     ]
     picture_type = models.CharField(max_length=1, choices=PICTURE_TYPES, default=PICTURE_TYPE_OTHER)
-    film = models.ForeignKey(Film)
+    film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
     artists = models.ManyToManyField(Artist, blank=True)
+    artist = models.ForeignKey(Artist, blank=True, null=True, on_delete=models.SET_NULL, related_name='actor_profile')
+    user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL, related_name='user_profile')
 
     THUMBNAIL_SIZES = {
         'min': (120, 120),
@@ -1216,13 +1238,14 @@ class Picture(models.Model):
                 except OSError:
                     pass
         # update number_of_pictures and main_poster for film:
-        self.film.number_of_pictures = self.film.picture_set.count()
-        if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
-            try:
-                self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
-            except IndexError:
-                self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
-        self.film.save(update_fields=['number_of_pictures', 'main_poster'])
+        if self.film:
+            self.film.number_of_pictures = self.film.picture_set.count()
+            if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
+                try:
+                    self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
+                except IndexError:
+                    self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
+            self.film.save(update_fields=['number_of_pictures', 'main_poster'])
 
     def __unicode__(self):
         return unicode(self.img)
@@ -1274,16 +1297,17 @@ class Picture(models.Model):
 @receiver(post_delete, sender=Picture)
 def delete_picture(sender, instance, **kwargs):
     '''Update number_of_pictures and delete files from s3'''
-    instance.film.number_of_pictures = instance.film.picture_set.count()
-    if instance.picture_type in {instance.PICTURE_TYPE_POSTER, instance.PICTURE_TYPE_DVD}:
-        try:
-            instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_POSTER).order_by('id')[0]
-        except IndexError:
+    if instance.film:
+        instance.film.number_of_pictures = instance.film.picture_set.count()
+        if instance.picture_type in {instance.PICTURE_TYPE_POSTER, instance.PICTURE_TYPE_DVD}:
             try:
-                instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_DVD).order_by('id')[0]
+                instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_POSTER).order_by('id')[0]
             except IndexError:
-                instance.film.main_poster = None
-    instance.film.save(update_fields=['number_of_pictures', 'main_poster'])
+                try:
+                    instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_DVD).order_by('id')[0]
+                except IndexError:
+                    instance.film.main_poster = None
+        instance.film.save(update_fields=['number_of_pictures', 'main_poster'])
     kt_utils.delete_file_from_s3(unicode(instance.img))
     for _, (w, h) in instance.THUMBNAIL_SIZES.iteritems():
         _, _, _, s3_key = instance.get_thumbnail_filename(w, h)
@@ -1694,6 +1718,8 @@ class Event(models.Model):
     EVENT_TYPE_EDIT_COMMENT = 'EC'
     EVENT_TYPE_SIGNUP = 'SU'
     EVENT_TYPE_EDIT_PROFILE = 'EP'
+    EVENT_TYPE_UPLOAD_PROFILE_PIC = 'UP'
+    EVENT_TYPE_DELETE_PROFILE_PIC = 'DP'
     EVENT_TYPE_FOLLOW = 'FO'
     EVENT_TYPE_UNFOLLOW = 'UF'
     EVENT_TYPE_POLL_VOTE = 'PV'
@@ -1711,6 +1737,8 @@ class Event(models.Model):
         (EVENT_TYPE_EDIT_COMMENT, 'Edit comment'),
         (EVENT_TYPE_SIGNUP, 'Signup'),
         (EVENT_TYPE_EDIT_PROFILE, 'Edit profile'),
+        (EVENT_TYPE_UPLOAD_PROFILE_PIC, 'Upload profile pic'),
+        (EVENT_TYPE_DELETE_PROFILE_PIC, 'Delete profile pic'),
         (EVENT_TYPE_FOLLOW, 'Follow'),
         (EVENT_TYPE_UNFOLLOW, 'Unfollow'),
         (EVENT_TYPE_POLL_VOTE, 'Poll vote'),
@@ -1780,3 +1808,43 @@ class Banner(models.Model):
     viewed = models.PositiveSmallIntegerField(default=0)
     closed_at = models.DateTimeField(blank=True, null=True)
     withdrawn_at = models.DateTimeField(blank=True, null=True)
+
+
+class LinkClick(models.Model):
+    url = models.CharField(max_length=250)
+    url_domain = models.CharField(max_length=250)
+    referer = models.CharField(max_length=250, blank=True)
+    user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
+    clicked_at = models.DateTimeField(auto_now_add=True)
+    LINK_TYPE_LINK = 'LI'
+    LINK_TYPE_FILM_IMDB = 'IM'
+    LINK_TYPE_FILM_PORTHU = 'PO'
+    LINK_TYPE_FILM_RT = 'RT'
+    LINK_TYPE_FILM_YOUTUBE = 'YT'
+    LINK_TYPE_FILM_WIKI_EN = 'WE'
+    LINK_TYPE_FILM_WIKI_HU = 'WH'
+    LINK_TYPE_ARTIST_IMDB = 'AI'
+    LINK_TYPE_ARTIST_WIKI_EN = 'AE'
+    LINK_TYPE_ARTIST_WIKI_HU = 'AH'
+    LINK_TYPE_OTHER = '-'
+    LINK_TYPES = [
+        (LINK_TYPE_LINK, 'Link'),
+        (LINK_TYPE_FILM_IMDB, 'Film / IMDb'),
+        (LINK_TYPE_FILM_PORTHU, 'Film / Port.hu'),
+        (LINK_TYPE_FILM_RT, 'Film / Rotten Tomatoes'),
+        (LINK_TYPE_FILM_YOUTUBE, 'Film / YouTube'),
+        (LINK_TYPE_FILM_WIKI_EN, 'Film / Wikipedia EN'),
+        (LINK_TYPE_FILM_WIKI_HU, 'Film / Wikipedia HU'),
+        (LINK_TYPE_ARTIST_IMDB, 'Artist / IMDb'),
+        (LINK_TYPE_ARTIST_WIKI_EN, 'Artist / Wikipedia EN'),
+        (LINK_TYPE_ARTIST_WIKI_HU, 'Artist / Wikipedia HU'),
+        (LINK_TYPE_OTHER, 'Other'),
+    ]
+    link_type = models.CharField(max_length=2, choices=LINK_TYPES, default=LINK_TYPE_OTHER)
+    link = models.ForeignKey(Link, blank=True, null=True)
+    film = models.ForeignKey(Film, blank=True, null=True)
+    artist = models.ForeignKey(Artist, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.url_domain = urlparse(self.url).netloc
+        super(LinkClick, self).save(*args, **kwargs)

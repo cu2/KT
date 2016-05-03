@@ -59,10 +59,13 @@ urlpatterns += [
     url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/idezetek/$', film_views.film_quotes, name='film_quotes'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/erdekessegek/$', film_views.film_trivias, name='film_trivias'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/kulcsszavak/$', film_views.film_keywords, name='film_keywords'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/elemzesek/$', film_views.film_reviews, name='film_reviews'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/elemzesek/(?P<review_id>\d+)$', film_views.film_review, name='film_review'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/cikkek/$', film_views.film_articles, name='film_articles'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/cikkek/(?P<review_id>\d+)$', film_views.film_article, name='film_article'),
+
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/elemzesek/$', RedirectView.as_view(pattern_name='film_articles')),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/elemzesek/(?P<review_id>\d+)$', RedirectView.as_view(pattern_name='film_article')),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/dijak/$', film_views.film_awards, name='film_awards'),
-    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/linkek/$', film_views.film_links, name='film_links'),
+    url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/linkek/$', RedirectView.as_view(pattern_name='film_articles')),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/kepek/$', film_views.film_pictures, name='film_pictures'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)/kepek/(?P<picture_id>\d+)$', film_views.film_picture, name='film_picture'),
     url(r'^film/(?P<id>\d+)/(?P<film_slug>[^/]*)$', film_views.film_main, name='film_main'),
@@ -109,6 +112,7 @@ urlpatterns += [
     url(r'^bekuldott_portrek/$', web_views.suggested_bios, name='suggested_bios'),
     url(r'^elemzes_elfogadasa$', post_views.approve_review, name='approve_review'),
     url(r'^elemzes_elutasitasa$', post_views.disapprove_review, name='disapprove_review'),
+    url(r'^elemzes_torlese$', post_views.delete_review, name='delete_review'),
 
     url(r'^valtozasok/$', web_views.changes, name='changes'),
     url(r'^hianyos_filmek/$', film_views.films_with_missing_data, name='films_with_missing_data'),
@@ -142,6 +146,7 @@ urlpatterns += [
     url(r'^kozkerdest_archival', post_views.poll_archive, name='poll_archive'),
     url(r'^kozkerdest_aktival', post_views.poll_activate, name='poll_activate'),
     url(r'^kozkerdest_tamogat', post_views.poll_support, name='poll_support'),
+    url(r'^kozkerdest_torol', post_views.poll_delete, name='poll_delete'),
     url(r'^uj_kozkerdes', post_views.new_poll, name='new_poll'),
 
     url(r'^elemzesek/$', RedirectView.as_view(pattern_name='articles')),
@@ -177,6 +182,8 @@ urlpatterns += [
     url(r'^uj_kedvenc$', post_views.follow, name='follow'),
     url(r'^torol_kedvenc$', post_views.unfollow, name='unfollow'),
 
+    url(r'^kitilt$', post_views.ban_user, name='ban_user'),
+
     url(r'^email_header.jpg$', web_views.email_header, name='email_header'),
     url(r'^click/$', web_views.click, name='click'),
     url(r'^impresszum/$', web_views.impressum, name='impressum'),
@@ -184,6 +191,7 @@ urlpatterns += [
     url(r'^szabalyzat/$', web_views.rulez, name='rulez'),
     url(r'^kassza/$', web_views.finance, name='finance'),
     url(r'^bezar_banner$', post_views.close_banner, name='close_banner'),
+    url(r'^url/$', web_views.link_click, name='link_click'),
 
     url(r'^vapiti/$', web_views.vapiti_general, name='vapiti_general'),
     url(r'^arany_vapiti/$', web_views.vapiti_gold, name='vapiti_gold'),

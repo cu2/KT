@@ -38,7 +38,7 @@
                     </td>
                     <td>
                         {% if article.1 == 'A' %}
-                            <b><a href="{{ article.5 }}" target="_blank">{{ article.6 }}</a></b><br />
+                            <b><a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ article.5|urlencode }}&t=l&l={{ article.8 }}{% else %}{{ article.5 }}{% endif %}" target="_blank">{{ article.6 }}</a></b><br />
                         {% endif %}
                         {% autoescape off %}
                         {{ article.4 }}

@@ -9,9 +9,15 @@
 {% block header %}
     <h1 style="margin-bottom: 0">{{ artist.name }}</h1>
     <p>
-        <a href="http://imdb.com/find?s=nm&q={{ artist.name|urlquote_plus }}" title="{{ artist.name }} az IMDb-n"><img src="{% static 'ktapp/images/imdb.png' %}"></a>
-        <a href="http://en.wikipedia.org/w/wiki.phtml?search={{ artist.name|urlquote_plus }}" title="{{ artist.name }} az angol Wikipedián"><img src="{% static 'ktapp/images/wikipedia.png' %}"></a>
-        <a href="http://hu.wikipedia.org/w/wiki.phtml?search={{ artist.name|urlquote_plus }}" title="{{ artist.name }} a magyar Wikipédián"><img src="{% static 'ktapp/images/wikipedia_hu.png' %}"></a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'link_click' %}?url={{ imdb_link|urlencode }}&t=ai&a={{ artist.id }}" title="{{ artist.name }} az IMDb-n" target="_blank"><img src="{% static 'ktapp/images/imdb.png' %}"></a>
+            <a href="{% url 'link_click' %}?url={{ wiki_en_link|urlencode }}&t=ae&a={{ artist.id }}" title="{{ artist.name }} az angol Wikipedián" target="_blank"><img src="{% static 'ktapp/images/wikipedia.png' %}"></a>
+            <a href="{% url 'link_click' %}?url={{ wiki_hu_link|urlencode }}&t=ah&a={{ artist.id }}" title="{{ artist.name }} a magyar Wikipédián" target="_blank"><img src="{% static 'ktapp/images/wikipedia_hu.png' %}"></a>
+        {% else %}
+            <a href="{{ imdb_link }}" title="{{ artist.name }} az IMDb-n" target="_blank"><img src="{% static 'ktapp/images/imdb.png' %}"></a>
+            <a href="{{ wiki_en_link }}" title="{{ artist.name }} az angol Wikipedián" target="_blank"><img src="{% static 'ktapp/images/wikipedia.png' %}"></a>
+            <a href="{{ wiki_hu_link }}" title="{{ artist.name }} a magyar Wikipédián" target="_blank"><img src="{% static 'ktapp/images/wikipedia_hu.png' %}"></a>
+        {% endif %}
     </p>
 {% endblock %}
 
