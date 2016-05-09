@@ -1415,7 +1415,7 @@ def link_click(request):
             pass
     models.LinkClick.objects.create(
         url=url,
-        referer=request.META.get('HTTP_REFERER'),
+        referer=request.META.get('HTTP_REFERER', ''),
         user=request.user,
         link_type=link_type,
         link=link,
