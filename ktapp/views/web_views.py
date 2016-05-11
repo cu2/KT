@@ -1416,7 +1416,7 @@ def link_click(request):
     models.LinkClick.objects.create(
         url=url,
         referer=request.META.get('HTTP_REFERER', ''),
-        user=request.user,
+        user=request.user if request.user.is_authenticated() else None,
         link_type=link_type,
         link=link,
         film=film,
