@@ -37,7 +37,7 @@
                 <p>{{ selected_user.bio_html|linebreaksbr }}</p>
             {% endautoescape %}
         {% endif %}
-        {% if fav_directors or fav_actors %}
+        {% if fav_directors or fav_actors or fav_genres or fav_countries or selected_user.fav_period %}
             <h2>Kedvencek</h2>
             <p>
             {% if fav_directors %}
