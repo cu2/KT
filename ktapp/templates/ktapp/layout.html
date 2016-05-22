@@ -64,7 +64,7 @@
                         {% if user.is_authenticated %}
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle clearfix" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <img class="img-circle profile-pic" src="{{ user.gravatar_url }}" alt="" />
+                                    <img class="img-circle profile-pic" src="{{ user.profile_pic.get_display_urls.min }}" alt="" />
                                     <span class="navbar-profile-menu-title">{{ user.username }}</span>
                                     {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
                                         <img class="new-message-warning" src="{% static 'ktapp/images/kt-icon-11-envelope-notification-48.png' %}" alt="" />
