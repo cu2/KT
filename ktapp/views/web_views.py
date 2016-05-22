@@ -60,11 +60,14 @@ def index(request):
             if comment.created_at > buzz_comment_domains[key][1]:
                 buzz_comment_domains[key] = (comment.id, comment.created_at)
     buzz_comment_ids = [id for id, _ in sorted(buzz_comment_domains.values(), key=lambda x: x[1], reverse=True)[:20]]
-    # random poll
+    # random poll, quote and trivia
     try:
         random_poll = models.Poll.objects.filter(state=models.Poll.STATE_OPEN).order_by('?')[0]
     except IndexError:
         random_poll = None
+    random_quote = models.Quote.objects.all().order_by('?')[0]
+    random_trivia = models.Trivia.objects.all().order_by('?')[0]
+
     # game
     # before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
     # during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
@@ -94,6 +97,8 @@ def index(request):
         'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
         'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids),
         'random_poll': random_poll,
+        'random_quote': random_quote,
+        'random_trivia': random_trivia,
         'before_game': before_game,
         'during_game': during_game,
         'banners': banners,

@@ -41,7 +41,25 @@
         </div>
     {% endfor %}
 
-    <div class="col-sm-6">
+<div class="row">
+
+    <div class="col-sm-6 col-sm-push-6">
+        {% if before_game %}
+        <h2>Játék</h2>
+        <p>Azt hiszed, ismered a filmeket? Teszteld magad! Vasárnap este 8-tól újra <a href="{% url 'forum' 38 'jatek' %}">képes játék</a>!</p>
+        {% endif %}
+        {% if during_game %}
+        <h2>Játék</h2>
+        <p>Azt hiszed, ismered a filmeket? Teszteld magad a <a href="{% url 'forum' 38 'jatek' %}">képes játékban</a>!</p>
+        {% endif %}
+        <h2>Legfrissebb kommentek</h2>
+        {% for c in buzz_comments %}
+        {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
+        {% endfor %}
+        <p><a href="{% url 'latest_comments' %}">További kommentek...</a></p>
+    </div>
+
+    <div class="col-sm-6 col-sm-pull-6">
         <h2>A nap filmje</h2>
         <div class="film_block">
             {% if film.main_poster %}
@@ -116,9 +134,15 @@
             <p><a href="{% url 'articles' %}">További írások...</a></p>
         {% endif %}
         {% if random_poll %}
-            <h2>Aktuális közkérdés</h2>
-            <p><b><a href="{% url 'poll' random_poll.id random_poll.slug_cache %}">{{ random_poll.title }}</a></b></p>
+            <h2>Szavazz: <a href="{% url 'poll' random_poll.id random_poll.slug_cache %}">{{ random_poll.title }}</a></h2>
+            <p><a href="{% url 'polls' %}">További szavazások...</a></p>
         {% endif %}
+        <h2>Random idézet</h2>
+        {% include 'ktapp/blocks/film_addon_block.html' with addon=random_quote show_addon_source=True addon_type='quote' %}
+        <p><a href="{% url 'latest_quotes' %}">További idézetek...</a></p>
+        <h2>Random érdekesség</h2>
+        {% include 'ktapp/blocks/film_addon_block.html' with addon=random_trivia show_addon_source=True addon_type='trivia' %}
+        <p><a href="{% url 'latest_trivias' %}">További érdekességek...</a></p>
         <h2>A nap toplistája</h2>
         <p><b><a href="{% url 'usertoplist' toplist.id toplist.slug_cache %}">{{ toplist.title }}</a></b>{% if toplist.created_by %} (<a href="{% url 'user_profile' toplist.created_by.id toplist.created_by.slug_cache %}">{{ toplist.created_by.username }}</a>){% endif %}</p>
         {% if toplist.toplist_type == 'F' %}
@@ -157,20 +181,5 @@
         <p><a href="{% url 'usertoplists' %}">További toplisták...</a></p>
     </div>
 
-    <div class="col-sm-6">
-        {% if before_game %}
-            <h2>Játék</h2>
-            <p>Azt hiszed, ismered a filmeket? Teszteld magad! Vasárnap este 8-tól újra <a href="{% url 'forum' 38 'jatek' %}">képes játék</a>!</p>
-        {% endif %}
-        {% if during_game %}
-            <h2>Játék</h2>
-            <p>Azt hiszed, ismered a filmeket? Teszteld magad a <a href="{% url 'forum' 38 'jatek' %}">képes játékban</a>!</p>
-        {% endif %}
-        <h2>Legfrissebb kommentek</h2>
-        {% for c in buzz_comments %}
-            {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
-        {% endfor %}
-        <p><a href="{% url 'latest_comments' %}">További kommentek...</a></p>
-    </div>
-
+</div>
 {% endblock %}
