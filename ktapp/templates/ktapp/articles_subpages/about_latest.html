@@ -1,0 +1,53 @@
+{% extends "ktapp/articles_subpages/articles_base.html" %}
+{% load kt_extras %}
+
+{% block premier_main %}
+
+    <table class="fullsize">
+        <tr class="header_tr">
+            <th style="width: 20%">Téma</th>
+            <th style="width: 15%">Oldal</th>
+            <th style="width: 50%">Cikk</th>
+            <th style="width: 15%">Szerző</th>
+        </tr>
+        {% for _, content_type, content in articles %}
+            <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                <td>
+                    {% if content.film %}
+                        {{ content.film|film_url_html_w_year }}
+                    {% elif content.artist %}
+                        <a href="{% url 'artist' content.artist.id content.artist.slug_cache %}">{{ content.artist.name }}</a>
+                    {% else %}
+                    {% endif %}
+                </td>
+                {% if content_type == 'review' %}
+                    <td>
+                        Kritikus Tömeg
+                    </td>
+                    <td>
+                        {% if content.film %}
+                            <b><a href="{% url 'film_article' content.film.id content.film.slug_cache content.id %}" target="_blank">{{ content.film|film_url_html_w_linked_year }}</a></b><br />
+                        {% elif content.artist %}
+                            <b><a href="{% url 'artist' content.artist.id content.artist.slug_cache %}" target="_blank">{{ content.artist.name }}</a></b><br />
+                        {% endif %}
+                        {% autoescape off %}
+                            {{ content.content_html|striptags|truncatechars:400 }}
+                        {% endautoescape %}
+                    </td>
+                {% else %}
+                    <td>
+                        {{ content.link_domain }}
+                    </td>
+                    <td>
+                        <b><a href="{% if request.user.is_authenticated %}{% url 'link_click' %}?url={{ content.url|urlencode }}&t=l&l={{ content.orig_id }}{% else %}{{ content.url }}{% endif %}" target="_blank">{{ content.name }}</a></b><br />
+                        {% autoescape off %}
+                            {{ content.lead }}
+                        {% endautoescape %}
+                    </td>
+                {% endif %}
+                <td>{% if content.author %}<a href="{% url 'user_profile' content.author.id content.author.slug_cache %}">{{ content.author.username }}</a>{% endif %}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

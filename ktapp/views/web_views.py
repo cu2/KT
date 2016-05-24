@@ -1229,10 +1229,18 @@ def suggested_links(request):
 
 
 def articles(request):
-    t = request.GET.get('t', 'filmek')
+    t = request.GET.get('t', 'latest')
     if t not in {'filmek', 'muveszek', 'egyeb'}:
-        t = 'filmek'
-    if t == 'filmek':
+        t = 'latest'
+    if t == 'latest':
+        active_tab = 'latest'
+        latest_content = []
+        for item in models.Review.objects.select_related('film', 'created_by').filter(approved=True).order_by('-created_at')[:50]:
+            latest_content.append((item.created_at, 'review', item))
+        for item in models.Link.objects.filter(featured=True).exclude(lead='').select_related('author', 'created_by', 'film', 'artist').order_by('-created_at')[:50]:
+            latest_content.append((item.created_at, 'link', item))
+        list_of_articles = sorted(latest_content, key=lambda x: x[0], reverse=True)[:50]
+    elif t == 'filmek':
         active_tab = 'films'
         list_of_articles = list(models.Link.objects.raw(u'''
             SELECT

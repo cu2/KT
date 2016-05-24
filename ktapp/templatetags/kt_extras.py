@@ -115,7 +115,7 @@ def film_url_html_from_article(article, subpage='film_main'):
         second_row = article.film_second_title
     else:
         second_row = '&nbsp;'
-    return mark_safe(u'<a href="{url}"{vapiti}>{orig_title}{year}</a><br />\n<span class="td_sub">{second_row}</span>'.format(
+    return mark_safe(u'<a href="{url}"{vapiti}>{orig_title}</a>{year}<br />\n<span class="td_sub">{second_row}</span>'.format(
         url=reverse(subpage, args=(article.film_id, article.film_slug_cache)),
         vapiti=' class="vapiti"' if article.film_main_premier_year == settings.VAPITI_YEAR else '',
         orig_title=article.film_orig_title,
@@ -131,6 +131,21 @@ def film_url_html_w_year(film, subpage='film_main'):
     else:
         second_row = '&nbsp;'
     return mark_safe(u'<a href="{url}"{vapiti}>{orig_title}</a>{year}<br />\n<span class="td_sub">{second_row}</span>'.format(
+        url=reverse(subpage, args=(film.id, film.slug_cache)),
+        vapiti=' class="vapiti"' if film.main_premier_year == settings.VAPITI_YEAR else '',
+        orig_title=film.orig_title,
+        year=' (%s)' % film.year if film.year else '',
+        second_row=second_row,
+    ))
+
+
+@register.filter
+def film_url_html_w_linked_year(film, subpage='film_main'):
+    if film.second_title:
+        second_row = film.second_title
+    else:
+        second_row = '&nbsp;'
+    return mark_safe(u'<a href="{url}"{vapiti}>{orig_title}{year}</a><br />\n<span class="td_sub">{second_row}</span>'.format(
         url=reverse(subpage, args=(film.id, film.slug_cache)),
         vapiti=' class="vapiti"' if film.main_premier_year == settings.VAPITI_YEAR else '',
         orig_title=film.orig_title,

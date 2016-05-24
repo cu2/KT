@@ -10,9 +10,10 @@
 
     <nav id="tabs" class="clearfix">
         <ul>
-            <li style="width: 34%"{% if active_tab == 'films' %} class="active_tab"{% endif %}><a href="{% url 'articles' %}">filmek</a></li>
-            <li style="width: 33%"{% if active_tab == 'artists' %} class="active_tab"{% endif %}><a href="{% url 'articles' %}?t=muveszek">színészek/rendezők</a></li>
-            <li style="width: 33%"{% if active_tab == 'misc' %} class="active_tab"{% endif %}><a href="{% url 'articles' %}?t=egyeb">egyéb</a></li>
+            <li style="width: 25%"{% if active_tab == 'latest' %} class="active_tab"{% endif %}><a href="{% url 'articles' %}">legfrissebbek</a></li>
+            <li style="width: 25%"{% if active_tab == 'films' %} class="active_tab"{% endif %}><a href="{% url 'articles' %}?t=filmek">filmek</a></li>
+            <li style="width: 25%"{% if active_tab == 'artists' %} class="active_tab"{% endif %}><a href="{% url 'articles' %}?t=muveszek">színészek/rendezők</a></li>
+            <li style="width: 25%"{% if active_tab == 'misc' %} class="active_tab"{% endif %}><a href="{% url 'articles' %}?t=egyeb">egyéb</a></li>
         </ul>
     </nav>
 
