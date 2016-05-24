@@ -54,7 +54,9 @@
         {% endif %}
         <h2>Legfrissebb kommentek</h2>
         {% for c in buzz_comments %}
-        {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
+            {% if forloop.counter > 5 %}<div class="hidden-xs">{% endif %}
+            {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
+            {% if forloop.counter > 5 %}</div>{% endif %}
         {% endfor %}
         <p><a href="{% url 'latest_comments' %}">További kommentek...</a></p>
     </div>
@@ -97,7 +99,7 @@
         {% if latest_content %}
             <h2>Legfrissebb írások</h2>
             {% for _, content_type, content in latest_content %}
-                <div class="film_addon">
+                <div class="film_addon{% if forloop.counter > 3 %} hidden-xs{% endif %}">
                     {% if content.film %}
                         <div class="film_addon_source">
                             {{ content.film|oneliner_film_url_html_w_year }}
@@ -145,6 +147,7 @@
         <p><a href="{% url 'latest_trivias' %}">További érdekességek...</a></p>
         <h2>A nap toplistája</h2>
         <p><b><a href="{% url 'usertoplist' toplist.id toplist.slug_cache %}">{{ toplist.title }}</a></b>{% if toplist.created_by %} (<a href="{% url 'user_profile' toplist.created_by.id toplist.created_by.slug_cache %}">{{ toplist.created_by.username }}</a>){% endif %}</p>
+        <div class="hidden-xs">
         {% if toplist.toplist_type == 'F' %}
             <table class="fullsize">
                 <tr class="header_tr">
@@ -178,6 +181,7 @@
                 {% endfor %}
             </table>
         {% endif %}
+        </div>
         <p><a href="{% url 'usertoplists' %}">További toplisták...</a></p>
     </div>
 
