@@ -807,6 +807,12 @@ $(function() {
         $(this).closest('.banner').slideUp();
     });
 
+    $('ul.nav li.dropdown').hover(function() {
+        $(this).find('.dropdown-menu').stop(true, true).show();
+    }, function() {
+        $(this).find('.dropdown-menu').stop(true, true).hide();
+    });
+
     $('.focus_this').focus();
 
     $('.comment_block_content .spoiler').each(function() {
