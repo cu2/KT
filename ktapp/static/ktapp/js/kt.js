@@ -40,10 +40,12 @@ var ktApp = {
         if (Math.abs(ktApp.lastScrollTop - st) <= 5) {
             return;
         }
-        if (st <= 60) {
+        if (st <= 100) {
             $('#top-navbar').removeClass('nav-mini');
         } else if (st > ktApp.lastScrollTop) {
             $('#top-navbar').addClass('nav-mini');
+            $('ul.nav li.dropdown .dropdown-menu').stop(true, true).hide();
+            $('#search-autocomplete-results').hide();
         } else {
             $('#top-navbar').removeClass('nav-mini');
         }

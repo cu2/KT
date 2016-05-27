@@ -194,7 +194,7 @@ body {
   font-size: 10px;
 }
 header {
-  margin-top: 120px;
+  margin-top: 100px;
 }
 
 footer {
@@ -284,53 +284,13 @@ footer {
 
 #top-navbar {
   margin-bottom: 0;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  transition: padding 0.2s, height 0.2s, min-height 0.2s;
-}
-#top-navbar.nav-mini {
-  padding-top: 0;
-  padding-bottom: 0;
-  height: 60px;
-  min-height: 60px;
-}
-#top-navbar.nav-mini .logo {
-  height: 55px;
-}
-#top-navbar.nav-mini .navbar-with-icons {
-  margin-top: 5px;
-  height: 55px;
-}
-#top-navbar.nav-mini .navbar-form {
-  margin-top: 13px;
-  margin-bottom: 13px;
-}
-#top-navbar.nav-mini .sub-search-link {
-  display: none;
-}
-#top-navbar.nav-mini .navbar-profile {
-  height: 50px;
-}
-#top-navbar.nav-mini .navbar-profile>li {
-  margin-top: -10px;
-}
-#top-navbar.nav-mini .navbar-profile>li>a {
   padding-top: 10px;
   padding-bottom: 10px;
+  top: 0;
+  transition: top 0.5s;
 }
-#top-navbar.nav-mini .profile-pic {
-  width: 40px;
-  height: 40px;
-  margin-left: 20px;
-}
-#top-navbar.nav-mini .navbar-profile-menu-title {
-  margin-top: 10px;
-}
-#top-navbar.nav-mini .new-message-warning {
-  bottom: -2px;
-}
-#top-navbar.nav-mini .dropdown-menu {
-  margin-top: -1px;
+#top-navbar.nav-mini {
+  top: -101px;
 }
 
 
@@ -373,10 +333,6 @@ footer {
   #top-navbar .logo {
     margin-top: 18px;
   }
-  #top-navbar.nav-mini .logo {
-    margin-top: 8px;
-    height: 44px;
-  }
   #top-navbar .logo>img {
     width: 72px;
     height: 34px;
@@ -389,15 +345,9 @@ footer {
     padding-top: 10px;
     padding-bottom: 10px;
   }
-  #top-navbar.nav-mini .navbar-profile {
-    margin-top: 10px;
-  }
   #top-navbar .profile-pic {
     width: 40px;
     height: 40px;
-    margin-left: 0;
-  }
-  #top-navbar.nav-mini .profile-pic {
     margin-left: 0;
   }
   #top-navbar .navbar-profile-menu-title {
