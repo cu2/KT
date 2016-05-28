@@ -37,12 +37,16 @@ var ktApp = {
     pageY: 0,
     hasScrolled: function() {
         var st = $(window).scrollTop();
-        if (Math.abs(ktApp.lastScrollTop - st) <= 5) {
-            return;
-        }
         if (st <= 100) {
             $('#top-navbar').removeClass('nav-mini');
-        } else if (st > ktApp.lastScrollTop) {
+            ktApp.lastScrollTop = st;
+            return;
+        }
+        if (Math.abs(ktApp.lastScrollTop - st) <= 200) {
+            ktApp.lastScrollTop = st;
+            return;
+        }
+        if (st > ktApp.lastScrollTop) {
             $('#top-navbar').addClass('nav-mini');
             $('ul.nav li.dropdown .dropdown-menu').stop(true, true).hide();
             $('#search-autocomplete-results').hide();
