@@ -51,7 +51,7 @@
     {
       "@type": "Country",
       "name": "{{ country.name }}"
-    }{% if not forloop.last %}-{% endif %}
+    }{% if not forloop.last %},{% endif %}
     {% endfor %}
   ],
   {% endif %}
