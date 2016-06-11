@@ -217,6 +217,7 @@
                     <li><a href="{% url 'about_page' %}">Rólunk</a></li>
                     <li><a href="{% url 'impressum' %}">Impresszum</a></li>
                     <li><a href="{% url 'rulez' %}">Szabályzat</a></li>
+                    <li><a href="{% url 'blacklist' %}">Feketelista</a></li>
                     <li><a href="{% url 'finance' %}">Kassza</a></li>
                     {% if user.is_superuser %}
                         <li><a href="{% url 'admin:index' %}">Admin</a></li>
@@ -307,6 +308,7 @@
                 <li><a href="{% url 'about_page' %}">Rólunk</a></li>
                 <li><a href="{% url 'impressum' %}">Impresszum</a></li>
                 <li><a href="{% url 'rulez' %}">Szabályzat</a></li>
+                <li><a href="{% url 'blacklist' %}">Feketelista</a></li>
                 <li><a href="{% url 'finance' %}">Kassza</a></li>
                 {% if user.is_superuser %}
                     <li><a href="{% url 'admin:index' %}">Admin</a></li>

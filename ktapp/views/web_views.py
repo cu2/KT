@@ -1455,6 +1455,45 @@ def rulez(request):
     return render(request, 'ktapp/rulez.html')
 
 
+def blacklist(request):
+    set_of_user_ids = set()
+    list_of_bans = []
+    for ban in models.Change.objects.filter(
+        action__in=['ban', 'unban', 'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'],
+    ).order_by('-created_at'):
+        user_id = int(ban.object[5:])
+        set_of_user_ids.add(user_id)
+        list_of_bans.append((
+            ban.created_at,
+            user_id,
+            ban.action,
+        ))
+    banned_users = {}
+    for user in models.KTUser.objects.filter(id__in=set_of_user_ids):
+        banned_users[user.id] = user
+    old_banned_users = models.KTUser.objects.filter(
+        is_active=False,
+        reason_of_inactivity__in=[models.KTUser.REASON_BANNED, models.KTUser.REASON_TEMPORARILY_BANNED],
+    ).exclude(id__in=set_of_user_ids).order_by('-date_joined')
+    return render(request, 'ktapp/blacklist.html', {
+        'list_of_bans': [
+            (
+                ban[0],
+                banned_users.get(ban[1]),
+                texts.BAN_TYPES.get(ban[2]),
+            )
+            for ban in list_of_bans
+        ] + [
+            (
+                '?',
+                u,
+                texts.BAN_TYPES['ban'],
+            )
+            for u in old_banned_users
+        ],
+    })
+
+
 def finance(request):
     finance_status, finance_missing = kt_utils.get_finance(models.Donation)
     number_of_donators, amount_of_donation = kt_utils.get_banner_version(request.user.id)

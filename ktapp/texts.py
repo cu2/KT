@@ -110,3 +110,12 @@ VAPITI_WINNER_CATEGORIES = {
     'F': u'Ezüst Vapiti a legjobb színésznőnek',
     'M': u'Ezüst Vapiti a legjobb színésznek',
 }
+
+
+BAN_TYPES = {
+    'ban': u'végleges kitiltás',
+    'unban': u'kitiltás visszavonása',
+    'temp_ban_1d': u'1 napos kitiltás',
+    'temp_ban_3d': u'3 napos kitiltás',
+    'temp_ban_7d': u'7 napos kitiltás',
+}

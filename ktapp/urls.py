@@ -189,6 +189,7 @@ urlpatterns += [
     url(r'^impresszum/$', web_views.impressum, name='impressum'),
     url(r'^rolunk/$', web_views.about_page, name='about_page'),
     url(r'^szabalyzat/$', web_views.rulez, name='rulez'),
+    url(r'^feketelista/$', web_views.blacklist, name='blacklist'),
     url(r'^kassza/$', web_views.finance, name='finance'),
     url(r'^bezar_banner$', post_views.close_banner, name='close_banner'),
     url(r'^url/$', web_views.link_click, name='link_click'),

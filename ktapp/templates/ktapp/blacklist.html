@@ -1,0 +1,44 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+
+{% block title %}Feketelista - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Feketelista</h1>
+{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="central-column">
+
+    <table class="fullsize">
+        <thead>
+            <tr class="header_tr">
+                <th>Mikor</th>
+                <th>Ki</th>
+                <th>Szankció</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ban in list_of_bans %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td>
+                    {% if ban.0 == '?' %}
+                        ?
+                    {% else %}
+                        {{ ban.0|date:"Y-m-d H:i" }}
+                    {% endif %}
+                </td>
+                <td class="nowrap"><a href="{% url 'user_profile' ban.1.id ban.1.slug_cache %}">{{ ban.1.username }}</a></td>
+                <td>{{ ban.2 }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <p>A régebbi kitiltásokról az egykori <a href="{% url 'forum' 104 'feketelista' %}">Feketelista</a> topikban olvashatsz.</p>
+
+    </div>
+</div>
+{% endblock %}
