@@ -31,6 +31,26 @@ var ktApp = {
             }
         });
     },
+    followUser: function(user_id) {
+        $('.follow_loader').show();
+        $.post('/uj_kedvenc', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            ajax: '1',
+            whom: user_id
+        }, function(data) {
+            document.location.reload();
+        });
+    },
+    unfollowUser: function(user_id) {
+        $('.follow_loader').show();
+        $.post('/torol_kedvenc', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            ajax: '1',
+            whom: user_id
+        }, function(data) {
+            document.location.reload();
+        });
+    },
     windowResized: false,
     windowScrolled: false,
     lastScrollTop: 0,
@@ -264,6 +284,15 @@ $(function() {
     kt_email += 'il.c';
     kt_email += 'om';
     $('#kt_email').html(kt_email);
+
+    $('.follow_user').click(function() {
+        $('.follow_user').hide();
+        ktApp.followUser($(this).data('id'));
+    });
+    $('.unfollow_user').click(function() {
+        $('.unfollow_user').hide();
+        ktApp.unfollowUser($(this).data('id'));
+    });
 
     $('.show_spoilers').click(function() {
         $('.spoiler').removeClass('spoiler').addClass('visible_spoiler');

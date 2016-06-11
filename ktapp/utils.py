@@ -131,6 +131,7 @@ def check_permission(perm, user, silent=True):
             'analytics': 'superuser',
             'move_to_off': 'inner_staff',
             'ban_user': 'inner_staff',
+            'see_core': 'inner_staff',
         }.get(perm, perm)
         if grp == 'superuser' and user.is_superuser:
             return True

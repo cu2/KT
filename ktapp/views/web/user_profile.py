@@ -156,6 +156,11 @@ def user_profile(request, id, name_slug):
         'similarity': similarity,
         'similarity_per_genre': similarity_per_genre,
         'permission_ban_user': kt_utils.check_permission('ban_user', request.user),
+        'permission_see_core': kt_utils.check_permission('see_core', request.user),
+        'list_of_bans': models.Change.objects.filter(
+            action__in=['ban', 'unban', 'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'],
+            object='user:%d' % selected_user.id,
+        ).order_by('-created_at'),
     })
 
 

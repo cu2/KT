@@ -1123,6 +1123,10 @@ def follow(request):
             event_type=models.Event.EVENT_TYPE_FOLLOW,
             some_id=request.user.id,
         )
+    if request.POST.get('ajax', '') == '1':
+        return HttpResponse(json.dumps({
+            'success': True,
+        }), content_type='application/json')
     return HttpResponseRedirect(next_url)
 
 
@@ -1140,6 +1144,10 @@ def unfollow(request):
         event_type=models.Event.EVENT_TYPE_UNFOLLOW,
         some_id=request.user.id,
     )
+    if request.POST.get('ajax', '') == '1':
+        return HttpResponse(json.dumps({
+            'success': True,
+        }), content_type='application/json')
     return HttpResponseRedirect(next_url)
 
 

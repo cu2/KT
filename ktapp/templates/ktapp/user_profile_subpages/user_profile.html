@@ -26,11 +26,40 @@
             Súly{% if selected_user.id == user.id %}od{% endif %}: {{ vapiti_weight }}
             <br />
             Regisztráció{% if selected_user.id == user.id %}d{% endif %}: {{ selected_user.date_joined|date:"Y. F j." }} ({{ selected_user.date_joined|timesince }})
-            {% if fav_count %}
-                <br />
-                Kedvencnek jelölt{% if selected_user.id != user.id %}ék{% endif %}: {{ fav_count }} user
+
+            {% if selected_user.id == user.id %}
+                {% if selected_user.core_member %}
+                    <br />
+                    Törzstag vagy.
+                {% endif %}
+            {% elif permission_see_core %}
+                {% if selected_user.core_member %}
+                    <br />
+                    Törzstag.
+                {% else %}
+                    <br />
+                    Nem törzstag.
+                {% endif %}
             {% endif %}
+
+            {% if selected_user.id == user.id %}
+                {% if fav_count %}
+                    <br />
+                    Kedvencnek jelölt: {{ fav_count }} user
+                {% endif %}
+            {% else %}
+                <br />
+                Kedvencnek jelölték: {{ fav_count }} user{% if user.is_authenticated %}{% if myfav %}, te is
+                    <span class="button small_button unfollow_user" data-id="{{ selected_user.id }}" title="Törlés a kedvencek közül">Mégsem.</span>
+                {% else %}
+                    <span class="button small_button follow_user" data-id="{{ selected_user.id }}" title="Hozzáadás a kedvencekhez">Én is!</span>
+                {% endif %}
+                <span class="follow_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>
+                {% endif %}
+            {% endif %}
+
         </p>
+
         {% if selected_user.bio_html %}
             <h2>Bemutatkozás</h2>
             {% autoescape off %}
@@ -150,30 +179,13 @@
         {% endif %}
 
         {% if user.is_authenticated %}
-            <h2>Egyéb</h2>
-            {% if selected_user.id == user.id %}
-                {% if selected_user.core_member %}
-                    <p>Törzstag vagy.</p>
-                {% endif %}
-            {% else %}
-                {% if myfav %}
-                    <form action="{% url 'unfollow' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="whom" value="{{ selected_user.id }}" />
-                        <p>
-                            Kedvencnek jelölted.
-                            <input type="submit" value="Törlés a kedvencek közül" class="small_button" />
-                        </p>
-                    </form>
-                {% else %}
-                    <form action="{% url 'follow' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="whom" value="{{ selected_user.id }}" />
-                        <p>
-                            Érdekel {{ selected_user.username }}? Jelöld kedvencnek, hogy követni tudd a szavazatait és kommentjeit:
-                            <input type="submit" value="Hozzáadás a kedvencekhez" class="small_button" />
-                        </p>
-                    </form>
+
+            {% if list_of_bans %}
+                {% if selected_user.id == user.id or permission_ban_user %}
+                    <h2>Korábbi kitiltások</h2>
+                    {% for ban in list_of_bans %}
+                        <p>{{ ban.created_at|date:"Y-m-d H:i" }} {{ ban.action }} [{{ ban.created_by }}]</p>
+                    {% endfor %}
                 {% endif %}
             {% endif %}
 
@@ -239,15 +251,14 @@
                 {% endif %}
             {% endif %}
 
-        {% endif %}
-
-        {% if user.is_authenticated %}
             {% if selected_user.id == user.id %}
+                <h2>Egyéb</h2>
                 <p><a href="{% url 'edit_profile' %}">Profil szerkesztése</a></p>
                 {% if user.validated_email %}
                     <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
                 {% endif %}
             {% endif %}
+
         {% endif %}
 
     </div>

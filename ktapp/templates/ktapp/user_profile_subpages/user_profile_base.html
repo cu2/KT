@@ -6,7 +6,7 @@
 {% block header %}
     <h1>{{ selected_user.username }}</h1>
     {% if not selected_user.is_active %}
-        <p style="margin-top: -20px">
+        <p style="margin-top: -15px">
             {% if selected_user.reason_of_inactivity == 'B' %}
                 (kitiltva)
             {% elif selected_user.reason_of_inactivity == 'T' %}
