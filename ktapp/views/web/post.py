@@ -13,6 +13,7 @@ from kt import settings
 from ktapp import models
 from ktapp import forms as kt_forms
 from ktapp import utils as kt_utils
+from ktapp import texts
 from ktapp.helpers import filmlist
 
 
@@ -1596,6 +1597,21 @@ def ban_user(request):
                 'reason': target_user.reason_of_inactivity,
                 'banned_until': target_user.banned_until,
             },
+        )
+    elif action == 'warning':
+        models.Message.send_message(
+            sent_by=None,
+            content=texts.WARNING_PM_BODY.format(
+                username=target_user.username,
+            ),
+            recipients=[target_user],
+        )
+        kt_utils.changelog(
+            models.Change,
+            request.user,
+            'warning',
+            'user:%s' % target_user.id,
+            {}, {}, force=True,
         )
     elif action == 'ban':
         target_user.is_active = False

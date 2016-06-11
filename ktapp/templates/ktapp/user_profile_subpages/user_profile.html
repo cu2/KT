@@ -184,7 +184,7 @@
                 {% if selected_user.id == user.id or permission_ban_user %}
                     <h2>Korábbi kitiltások</h2>
                     {% for ban in list_of_bans %}
-                        <p>{{ ban.created_at|date:"Y-m-d H:i" }} {{ ban.action }} [{{ ban.created_by }}]</p>
+                        <p>{{ ban.0|date:"Y-m-d H:i" }} {{ ban.1 }} [<a href="{% url 'user_profile' ban.2.id ban.2.slug_cache %}">{{ ban.2.username }}</a>]</p>
                     {% endfor %}
                 {% endif %}
             {% endif %}
@@ -192,6 +192,12 @@
             {% if selected_user.id != user.id and permission_ban_user %}
                 <h2>Kitiltás</h2>
                 {% if selected_user.is_active %}
+                    <form action="{% url 'ban_user' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                        <input type="hidden" name="action" value="warning" />
+                        <p><input type="submit" value="Figyelmeztetés" class="small_button confirm_required" /></p>
+                    </form>
                     <form action="{% url 'ban_user' %}" method="post">
                         {% csrf_token %}
                         <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />

@@ -115,7 +115,17 @@ VAPITI_WINNER_CATEGORIES = {
 BAN_TYPES = {
     'ban': u'végleges kitiltás',
     'unban': u'kitiltás visszavonása',
+    'warning': u'hivatalos figyelmeztetés',
     'temp_ban_1d': u'1 napos kitiltás',
     'temp_ban_3d': u'3 napos kitiltás',
     'temp_ban_7d': u'7 napos kitiltás',
 }
+
+
+WARNING_PM_BODY = u'''Kedves {username}!
+
+Ez egy hivatalos figyelmeztetés a szerkesztőségtől. Ha továbbra sem tartod be a [link=http://kritikustomeg.org/szabalyzat/]szabályzatot[/link], a következő retorzió egy ideiglenes kitiltás lesz. Hadd ne kelljen idáig eljutni.
+
+
+a szerk
+'''

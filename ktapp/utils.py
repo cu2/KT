@@ -209,13 +209,13 @@ def myjsondumps(value):
     return json.dumps(ret, sort_keys=True)
 
 
-def changelog(model, created_by, action, object, state_before, state_after):
+def changelog(model, created_by, action, object, state_before, state_after, force=False):
     common_keys = set(state_before.keys()) & set(state_after.keys())
     for key in common_keys:
         if state_after[key] == state_before[key]:
             del state_before[key]
             del state_after[key]
-    if len(state_before) + len(state_after):
+    if len(state_before) + len(state_after) > 0 or force:
         model.objects.create(
             created_by=created_by,
             action=action,

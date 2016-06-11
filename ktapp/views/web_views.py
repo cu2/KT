@@ -1459,7 +1459,7 @@ def blacklist(request):
     set_of_user_ids = set()
     list_of_bans = []
     for ban in models.Change.objects.filter(
-        action__in=['ban', 'unban', 'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'],
+        action__in=['ban', 'unban', 'warning', 'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'],
     ).order_by('-created_at'):
         user_id = int(ban.object[5:])
         set_of_user_ids.add(user_id)

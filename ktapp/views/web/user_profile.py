@@ -14,7 +14,7 @@ from django.conf import settings
 from ktapp import models
 from ktapp import utils as kt_utils
 from ktapp.helpers import filmlist
-from ktapp.texts import LONG_YEARS
+from ktapp import texts
 from ktapp import sqls as kt_sqls
 
 
@@ -92,7 +92,7 @@ def user_profile(request, id, name_slug):
         WHERE ups.user_id = {user_id} AND ups.score >= 50
         ORDER BY ups.score DESC;
     '''.format(user_id=selected_user.id)):
-        year_str = LONG_YEARS[int(year.ps_segment)]
+        year_str = texts.LONG_YEARS[int(year.ps_segment)]
         if year.score >= 100:
             profile['major_years'].append(year_str)
         else:
@@ -157,10 +157,17 @@ def user_profile(request, id, name_slug):
         'similarity_per_genre': similarity_per_genre,
         'permission_ban_user': kt_utils.check_permission('ban_user', request.user),
         'permission_see_core': kt_utils.check_permission('see_core', request.user),
-        'list_of_bans': models.Change.objects.filter(
-            action__in=['ban', 'unban', 'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'],
-            object='user:%d' % selected_user.id,
-        ).order_by('-created_at'),
+        'list_of_bans': [
+            (
+                ban.created_at,
+                texts.BAN_TYPES.get(ban.action),
+                ban.created_by,
+            )
+            for ban in models.Change.objects.filter(
+                action__in=['ban', 'unban', 'warning', 'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'],
+                object='user:%d' % selected_user.id,
+            ).order_by('-created_at')
+        ],
     })
 
 
