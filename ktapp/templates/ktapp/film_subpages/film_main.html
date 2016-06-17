@@ -80,6 +80,22 @@
                     </table>
                 </div>
             {% endif %}
+
+            {% if film.iszdb_link %}
+                <p><b>Szinkron infók</b>: <a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ film.iszdb_link|urlencode }}&t=is&f={{ film.id }}{% else %}{{ film.iszdb_link }}{% endif %}" target="_blank">iszdb.hu</a></p>
+            {% endif %}
+            {% if permission_edit_iszdb %}
+                <form action="{% url 'edit_iszdb' %}" method="post" class="inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="film_id" value="{{ film.pk }}" />
+                    <p>
+                        <label for="id_iszdb_link">ISZDb-link</label>: <input type="text" id="id_iszdb_link" name="iszdb_link" class="wide_input" value="{{ film.iszdb_link }}" />
+                        <input type="submit" class="small_button" value="ISZDb-link mentése" />
+                    </p>
+                    <p><br /></p>
+                </form>
+            {% endif %}
+
             {% if sequels %}
                 {% for seq in sequels %}
                     <h3><a href="{% url 'sequel' seq.sequel.id seq.sequel.slug_cache %}">{{ seq.sequel.name }}{% if seq.sequel.sequel_type == 'A' %} adaptációk{% endif %}{% if seq.sequel.sequel_type == 'R' %} remake-ek{% endif %}</a></h3>

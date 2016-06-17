@@ -111,6 +111,7 @@ def film_main(request, id, film_slug, film, base_context):
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
         'permission_edit_premiers': kt_utils.check_permission('edit_premiers', request.user),
         'permission_new_role': kt_utils.check_permission('new_role', request.user),
+        'permission_edit_iszdb': kt_utils.check_permission('edit_iszdb', request.user),
     }))
 
 

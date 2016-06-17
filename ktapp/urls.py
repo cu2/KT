@@ -90,6 +90,7 @@ urlpatterns += [
     url(r'^szerk_bemutatok$', post_views.edit_premiers, name='edit_premiers'),
     url(r'^szerk_kulcsszavak$', post_views.edit_keywords, name='edit_keywords'),
     url(r'^szerk_folytatasok$', post_views.edit_sequels, name='edit_sequels'),
+    url(r'^szerk_iszdb$', post_views.edit_iszdb, name='edit_iszdb'),
     url(r'^uj_dij$', post_views.new_award, name='new_award'),
     url(r'^offba$', post_views.move_to_off, name='move_to_off'),
 

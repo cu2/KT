@@ -744,6 +744,26 @@ def edit_sequels(request):
 
 @require_POST
 @login_required
+@kt_utils.kt_permission_required('edit_iszdb')
+def edit_iszdb(request):
+    film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
+    iszdb_link = kt_utils.strip_whitespace(request.POST.get('iszdb_link', ''))
+    old_iszdb_link = film.iszdb_link
+    film.iszdb_link = iszdb_link
+    film.save(update_fields=['iszdb_link'])
+    kt_utils.changelog(
+        models.Change,
+        request.user,
+        'edit_iszdb',
+        'film:%s' % film.id,
+        {'iszdb_link': old_iszdb_link},
+        {'iszdb_link': iszdb_link},
+    )
+    return HttpResponseRedirect(reverse('film_main', args=(film.id, film.slug_cache)))
+
+
+@require_POST
+@login_required
 @kt_utils.kt_permission_required('edit_film')
 def new_award(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))

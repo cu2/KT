@@ -223,6 +223,7 @@ class Film(models.Model):
     porthu_link = models.PositiveIntegerField(default=0, blank=True, null=True)
     wikipedia_link_en = models.CharField(max_length=250, blank=True)
     wikipedia_link_hu = models.CharField(max_length=250, blank=True)
+    iszdb_link = models.CharField(max_length=50, blank=True)
     imdb_rating = models.PositiveSmallIntegerField(blank=True, null=True)
     imdb_rating_refreshed_at = models.DateTimeField(blank=True, null=True)
     number_of_awards = models.PositiveIntegerField(default=0)
@@ -1823,6 +1824,7 @@ class LinkClick(models.Model):
     LINK_TYPE_FILM_YOUTUBE = 'YT'
     LINK_TYPE_FILM_WIKI_EN = 'WE'
     LINK_TYPE_FILM_WIKI_HU = 'WH'
+    LINK_TYPE_FILM_ISZDB = 'IS'
     LINK_TYPE_ARTIST_IMDB = 'AI'
     LINK_TYPE_ARTIST_WIKI_EN = 'AE'
     LINK_TYPE_ARTIST_WIKI_HU = 'AH'
@@ -1835,6 +1837,7 @@ class LinkClick(models.Model):
         (LINK_TYPE_FILM_YOUTUBE, 'Film / YouTube'),
         (LINK_TYPE_FILM_WIKI_EN, 'Film / Wikipedia EN'),
         (LINK_TYPE_FILM_WIKI_HU, 'Film / Wikipedia HU'),
+        (LINK_TYPE_FILM_ISZDB, 'Film / ISZDb'),
         (LINK_TYPE_ARTIST_IMDB, 'Artist / IMDb'),
         (LINK_TYPE_ARTIST_WIKI_EN, 'Artist / Wikipedia EN'),
         (LINK_TYPE_ARTIST_WIKI_HU, 'Artist / Wikipedia HU'),
