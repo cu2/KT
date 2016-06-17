@@ -1397,6 +1397,8 @@ def link_click(request):
         link_type = models.LinkClick.LINK_TYPE_FILM_WIKI_EN
     elif raw_link_type == 'wh':
         link_type = models.LinkClick.LINK_TYPE_FILM_WIKI_HU
+    elif raw_link_type == 'is':
+        link_type = models.LinkClick.LINK_TYPE_FILM_ISZDB
     elif raw_link_type == 'ai':
         link_type = models.LinkClick.LINK_TYPE_ARTIST_IMDB
     elif raw_link_type == 'ae':
