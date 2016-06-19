@@ -7,7 +7,7 @@
 
             <div class="film_block hover_show_button_context">
                 {% if film.main_poster %}
-                    <a href="{% url 'film_picture' film.id film.slug_cache film.main_poster.id %}"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" id="film_main_poster" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
+                    <a href="{% url 'film_picture' film.id film.slug_cache film.main_poster.id %}#pix"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" id="film_main_poster" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
                 {% endif %}
                 <p{% if film.main_poster %} class="film_block_content"{% endif %} id="plot_text">
                     {{ film.plot_summary|linebreaksbr }}{% if permission_edit_film %} <span class="hover_show_button button small_button" id="show_plot_edit_form">történet szerkesztése</span>{% endif %}
