@@ -104,6 +104,8 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_vapiti_votes = models.PositiveIntegerField(default=0)
     vapiti_weight = models.PositiveIntegerField(default=0)
     profile_pic = models.ForeignKey('Picture', blank=True, null=True, related_name='profile_pic', on_delete=models.SET_NULL)
+    number_of_followers = models.PositiveIntegerField(default=0)
+    opinion_leader = models.BooleanField(default=False)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'

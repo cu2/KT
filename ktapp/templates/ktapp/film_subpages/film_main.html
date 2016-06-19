@@ -237,7 +237,7 @@
                             <li>{{ num_vote }} {{ named_rating }}{% if vote.0 %}:{% endif %}
                                 <span id="fav_users_voted_{{ numbered_rating }}">
                                 {% for voteuser in vote.0 %}
-                                    <a href="{% url 'user_profile' voteuser.user.id voteuser.user.slug_cache %}">{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
+                                    <a href="{% url 'user_profile' voteuser.user.id voteuser.user.slug_cache %}"{% if voteuser.user.id in special_users %} style="font-weight: bold"{% endif %}>{{ voteuser.user.username }}</a>{% if not forloop.last %}, {% endif %}
                                 {% endfor %}
                                 </span>
                                 <span id="all_users_voted_{{ numbered_rating }}" class="rating_details" style="display: none">

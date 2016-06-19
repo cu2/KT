@@ -56,11 +56,14 @@ def film_main(request, id, film_slug, film, base_context):
             rating = vote.rating
         except models.Vote.DoesNotExist:
             pass
+    leader_users = set()
+    for u in models.KTUser.objects.filter(opinion_leader=True):
+        leader_users.add(u.id)
     votes = []
     for idx, r in enumerate(range(5, 0, -1)):
         votes.append(([], []))
         for u in film.vote_set.filter(rating=r).select_related('user').order_by('user__username'):
-            if u.user.id in special_users:
+            if u.user.id in special_users or u.user.id in leader_users:
                 votes[idx][0].append(u)
             else:
                 votes[idx][1].append(u)
