@@ -204,31 +204,8 @@
         <div id="film_main_right" class="col-sm-5">
 
             {% if film.is_open_for_vote_from %}
-
-            <div id="film_main_voting_block">
-                <h3>Szerinted?</h3>
-                {% if user.is_authenticated %}
-                    <div class="change_vote">
-                        {% for r in ratings reversed %}
-                            {% cycle 'zseniális' 'jó' 'oké/elmegy' 'rossz' 'nézhetetlen' as named_rating silent %}
-                            <div>
-                                <span id="vote_button_{{ r }}_selected" class="my_rating"{% if r != rating %} style="display: none"{% endif %}>{{ named_rating }}</span>
-                                <button id="vote_button_{{ r }}" class="button vote_button" data-rating="{{ r }}" data-film="{{ film.id }}"{% if r == rating %} style="display: none"{% endif %}>{{ named_rating }}</button>
-                            </div>
-                        {% endfor %}
-                        <div>
-                            <button id="vote_button_0" class="button small_button vote_button" data-rating="0" data-film="{{ film.id }}"{% if 0 == rating %} style="display: none"{% endif %}>???</button>
-                        </div>
-                        <div>
-                            <p><label for="share_on_facebook">Meg szeretnéd osztani Facebook-on?</label> <input type="checkbox" id="share_on_facebook"{% if user.facebook_rating_share %} checked="checked"{% endif %} /></p>
-                        </div>
-                    </div>
-                {% else %}
-                    <p>Ahhoz, hogy szavazhass, be kell <a href="{% url 'login' %}">jelentkezned</a>.</p>
-                {% endif %}
-            </div>
             <div id="film_main_ratings_block">
-                <h3>Szavazatok{% if film.number_of_ratings %} <span class="button very_small_button" id="show_rating_details_button">összes &gt;</span> <span class="button very_small_button" id="hide_rating_details_button">összes v</span>{% endif %}</h3>
+                <h3 style="margin-top: 0">Szavazatok{% if film.number_of_ratings %} <span class="button very_small_button" id="show_rating_details_button">összes &gt;</span> <span class="button very_small_button" id="hide_rating_details_button">összes v</span>{% endif %}</h3>
                 <ul class="mini_list">
                     {% for num_vote, vote in votes %}
                         {% cycle 5 4 3 2 1 as numbered_rating silent %}
@@ -251,12 +228,9 @@
                     {% endfor %}
                 </ul>
             </div>
-
-            {% else %}
-                <p>Erre a filmre még nem lehet szavazni.</p>
             {% endif %}
 
-            <h3>Kívánságok</h3>
+            <h3{% if not film.is_open_for_vote_from %} style="margin-top: 0"{% endif %}>Kívánságok</h3>
             <ul class="mini_list">
                 {% if wish_count.0 > 0 %}<li>{{ wish_count.0 }} ember meg akarja nézni</li>{% endif %}
                 {% if wish_count.1 > 0 %}<li>{{ wish_count.1 }} ember kifejezetten nem akarja megnézni</li>{% endif %}

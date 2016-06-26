@@ -378,7 +378,7 @@ footer {
     display: none;
   }
   header {
-    margin-top: 49px;
+    margin-top: 39px;
   }
 }
 .navbar-mobile {
@@ -626,7 +626,7 @@ input.inactive_action {
   background: @input-bg;
   border: solid 1px rgb(128,128,128);
 }
-@media (min-width: 800px) {
+@media (min-width: 768px) {
   .small_button {
     font-size: 8pt;
   }
@@ -661,6 +661,14 @@ input.inactive_action {
   .mobile-scroller {
     overflow-x: auto;
   }
+}
+
+
+input.vote_box_input {
+  width: 70px;
+  font-size: 9px;
+  border-radius: 0;
+  vertical-align: middle;
 }
 
 
@@ -837,7 +845,7 @@ table.sortable tr.header_tr {
 
 /***************************************** OLD STUFF TO REFACTOR ***************************************************/
 
-@media (min-width: 800px) {
+@media (min-width: 768px) {
   #film_title {
     margin-left: 150px;
     margin-right: 200px;
@@ -851,7 +859,7 @@ table.sortable tr.header_tr {
 .film_block_picture {
   display: none;
 }
-@media (min-width: 800px) {
+@media (min-width: 768px) {
   .film_block_content {
     margin-left: 210px;
   }
@@ -894,7 +902,7 @@ header {
   margin-top: -10px;
   font-size: 8pt;
 }
-@media (min-width: 800px) {
+@media (min-width: 768px) {
   .title_comment {
     margin-top: -15px;
     font-size: 9pt;
@@ -989,7 +997,7 @@ ul.poll li {
   font-size: 6pt;
   font-weight: normal;
 }
-@media (min-width: 800px) {
+@media (min-width: 768px) {
   #tabs ul li {
     font-size: 10pt;
   }
@@ -1091,7 +1099,18 @@ ul.poll li {
 .follow_loader {
   display: none;
 }
-
+.vote_star_menu {
+  display: none;
+}
+.vote_star_menu>div {
+  margin-top: 10px;
+}
+.vote_star_loader {
+  display: none;
+}
+.vote_star_loader img {
+  vertical-align: top;
+}
 
 
 
@@ -1124,7 +1143,7 @@ ul.poll li {
 
 #film_header {
   position: relative;
-  min-height: 90px;
+  min-height: 110px;
   margin-top: 20px;
 }
 #film_header h1,
@@ -1143,41 +1162,91 @@ ul.poll li {
   font-size: 10pt;
 }
 
+
+
 #film_rating {
   float: left;
-  padding: 4px 8px;
   background: rgb(249,244,218);
   border-radius: 12px;
+  text-align: left;
+  padding: 8px 8px;
   margin-right: 20px;
 }
-#film_rating_num {
-  font-size: 7pt;
-}
-#film_rating_avg {
-  margin-top: 5px;
-  font-size: 13pt;
-  font-weight: bold;
-}
-@media (min-width: 800px) {
+@media (min-width: 768px) {
   #film_rating {
     float: none;
     position: absolute;
-    left: 50px; top: 10px;
-    padding: 8px 16px;
+    left: 0; top: 0;
     margin-right: 0;
-  }
-  #film_rating_num {
-    font-size: 8pt;
-  }
-  #film_rating_avg {
-    font-size: 14pt;
   }
 }
 
-@media (min-width: 800px) {
+#film_rating_average {
+  font-size: 32px;
+  line-height: 32px;
+  font-weight: normal;
+  float: left;
+  padding-right: 4px;
+  width: 60px;
+  text-align: right;
+}
+#film_rating_stars {
+  font-size: 14px;
+  line-height: 16px;
+  float: right;
+  width: 110px;
+}
+#film_rating_stars .icon {
+  height: 16px;
+  vertical-align: top;
+}
+#film_rating_yours_label {
+  padding: 12px 0 0 60px;
+  font-size: 12px;
+  line-height: 16px;
+}
+#film_rating_yours_rating {
+  font-size: 32px;
+  line-height: 32px;
+  font-weight: normal;
+  float: left;
+  padding-right: 4px;
+  width: 60px;
+  text-align: right;
+}
+#film_rating_yours_stars {
+  font-size: 14px;
+  line-height: 16px;
+  float: right;
+  width: 110px;
+}
+#film_rating_yours_stars .icon {
+  height: 16px;
+  vertical-align: top;
+}
+#share_on_facebook_button {
+  margin-top: 3px;
+}
+#film_rating_your_date {
+  padding-top: 0;
+  font-size: 12px;
+  line-height: 14px;
+}
+#film_rating_not_yet {
+  padding-top: 12px;
+  font-size: 12px;
+  line-height: 16px;
+  width: 170px;
+}
+
+
+
+
+
+@media (min-width: 768px) {
   #film_misc_info {
     position: absolute;
-    right: 0; top: 0px;
+    right: 0; top: 0;
   }
 }
 #film_misc_info ul {
@@ -1243,7 +1312,7 @@ ul.poll li {
   font-size: 8pt;
   font-weight: normal;
   border-radius: 10px;
-  padding: 0px 10px;
+  padding: 0 10px;
 }
 .minimini_list li {
   padding: 2px 0;
@@ -1283,9 +1352,27 @@ ul.poll li {
   display: none;
 }
 .action_text {
-  color: rgb(146,23,23);
+  color: @brand-primary;
   cursor: pointer;
 }
+.inaction_text {
+  color: @inactive-link-color;
+  cursor: pointer;
+}
+.facebook_button {
+  display: inline-block;
+  width: 12px; height: 12px;
+  background-position: top left;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+.facebook_button_yes {
+  background-image: url(/static/ktapp/images/facebook-icon-12x12.png);
+}
+.facebook_button_no {
+  background-image: url(/static/ktapp/images/facebook-icon-12x12-gray.png);
+}
+
 .picture_source {
   font-size: 8pt;
 }
@@ -1390,7 +1477,7 @@ ul.poll li {
   padding: 20px;
 }
 .banner_closer {
-  position: absolute; right: 3px; top: 0px;
+  position: absolute; right: 3px; top: 0;
   font-size: 16pt;
   cursor: pointer;
 }

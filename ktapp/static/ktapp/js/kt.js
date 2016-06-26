@@ -1,33 +1,15 @@
 var ktApp = {
-    vote: function(film_id, rating, fb) {
+    vote: function(film_id, rating, fb, vote_redate_to) {
         $.post('/szavaz', {
             csrfmiddlewaretoken: $.cookie('csrftoken'),
             ajax: '1',
             film_id: film_id,
             rating: rating,
-            fb: fb
+            fb: fb,
+            vote_redate_to: vote_redate_to
         }, function(data) {
             if (data.success) {
-                var r, i, v;
-                for(r = 1; r <= 5; r++) {
-                    v = [];
-                    for(i = 0; i < data.votes[r].length; i++) {
-                        v.push('<a href="' + data.votes[r][i].url + '">' + data.votes[r][i].username + '</a>')
-                    }
-                    $('#fav_users_voted_' + r).html(v.join(', '));
-                    if (r === data.rating) {
-                        $('#vote_button_' + r).hide();
-                        $('#vote_button_' + r + '_selected').show();
-                    } else {
-                        $('#vote_button_' + r).show();
-                        $('#vote_button_' + r + '_selected').hide();
-                    }
-                }
-                if (0 === data.rating) {
-                    $('#vote_button_0').hide();
-                } else {
-                    $('#vote_button_0').show();
-                }
+                document.location.reload();
             }
         });
     },
@@ -149,42 +131,60 @@ var ktApp = {
 };
 
 $(function() {
-    $('.vote_button').click(function() {
+    $('.vote_star').click(function() {
         var film_id = $(this).data('film');
         var rating = $(this).data('rating');
-        if ($('#share_on_facebook').is(':checked')) {
-            if (rating == 0) {
-                ktApp.vote(film_id, rating, 0);
-            } else {
-                var rating_string = '';
-                if (rating == 1) rating_string = 'Szerintem nézhetetlen. Szerinted?';
-                else if (rating == 2) rating_string = 'Szerintem rossz. Szerinted?';
-                else if (rating == 3) rating_string = 'Szerintem oké/elmegy. Szerinted?';
-                else if (rating == 4) rating_string = 'Szerintem jó. Szerinted?';
-                else rating_string = 'Szerintem zseniális. Szerinted?';
-                FB.ui({
-                    method: 'feed',
-                    link: window.location.href,
-                    picture: $('#film_main_poster').attr('src'),
-                    name: $('meta[property="og:title"]').attr('content') + ': ' + rating_string,
-                    caption: $('meta[property="fb:caption"]').attr('content'),
-                    description: $('meta[property="fb:description"]').attr('content')
-                }, function(response) {
-                    if (response && response.post_id) {
-                        ktApp.vote(film_id, rating, 1);
-                    } else {
-                        ktApp.vote(film_id, rating, 0);
-                    }
-                });
+        if (rating == 0) {
+            if (! confirm('Biztos vagy benne?')) {
+                return;
             }
+        }
+        var vote_redate_to = $('#vote_redate_to').val();
+        $('.vote_star_loader').show();
+        var share_on_facebook = $('#share_on_facebook_button').hasClass('facebook_button_yes');
+        if (rating <= 0) {  // don't share if delete or redate
+            share_on_facebook = false;
+        }
+        if (share_on_facebook) {
+            var rating_string = '';
+            if (rating == 1) rating_string = 'Szerintem nézhetetlen. Szerinted?';
+            else if (rating == 2) rating_string = 'Szerintem rossz. Szerinted?';
+            else if (rating == 3) rating_string = 'Szerintem oké/elmegy. Szerinted?';
+            else if (rating == 4) rating_string = 'Szerintem jó. Szerinted?';
+            else rating_string = 'Szerintem zseniális. Szerinted?';
+            FB.ui({
+                method: 'feed',
+                link: window.location.href,
+                picture: $('#film_main_poster').attr('src'),
+                name: $('meta[property="og:title"]').attr('content') + ': ' + rating_string,
+                caption: $('meta[property="fb:caption"]').attr('content'),
+                description: $('meta[property="fb:description"]').attr('content')
+            }, function(response) {
+                if (response && response.post_id) {
+                    ktApp.vote(film_id, rating, 1, vote_redate_to);
+                } else {
+                    ktApp.vote(film_id, rating, 0, vote_redate_to);
+                }
+            });
         } else {
-            ktApp.vote(film_id, rating, 0);
+            ktApp.vote(film_id, rating, 0, vote_redate_to);
         }
     });
-    $('#share_on_facebook').click(function() {
+    $('.vote_star_menu_toggle').click(function() {
+        $('.vote_star_menu').toggle();
+    });
+    $('#share_on_facebook_button').click(function() {
         $.post('/szerk_facebook', {
             csrfmiddlewaretoken: $.cookie('csrftoken'),
-            share_on_facebook: ($(this).is(':checked'))?'1':'0'
+            share_on_facebook: ($(this).hasClass('facebook_button_no'))?'1':'0'
+        }, function(data) {
+            if (data.success) {
+                if (data.share_on_facebook) {
+                    $('#share_on_facebook_button').removeClass('facebook_button_no').addClass('facebook_button_yes');
+                } else {
+                    $('#share_on_facebook_button').removeClass('facebook_button_yes').addClass('facebook_button_no');
+                }
+            }
         });
     });
 

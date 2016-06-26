@@ -1,5 +1,6 @@
 {% extends "ktapp/layout.html" %}
 {% load kt_extras %}
+{% load staticfiles %}
 
 {% block title %}{{ film.orig_title }}{% if film.second_title %} / {{ film.second_title }}{% endif %} ({{ film.year }}) - Kritikus Tömeg{% endblock %}
 
@@ -112,12 +113,108 @@
                 </p>
             {% endif %}
         </div>
-        {% if film.number_of_ratings and film.average_rating %}
+
         <div id="film_rating">
-            <div id="film_rating_num">{{ film.number_of_ratings }} szavazat<br />átlaga:</div>
-            <div id="film_rating_avg">{{ film.average_rating|floatformat:1 }}</div>
+            <div id="film_rating_average">
+                {% if film.average_rating %}
+                    {{ film.average_rating|floatformat:1 }}
+                {% else %}
+                    ?,?
+                {% endif %}
+            </div>
+            <div id="film_rating_stars">
+                <div>
+                    {% spaceless %}
+                    {% if film.average_rating %}
+                        {% for r in ratings %}
+                            {% if r <= film_avg_rating_int %}
+                                <img class="icon" src="{% static 'ktapp/images/kt-icon-50-star-text-48.png' %}" alt="&#x2605;" />
+                            {% elif r == film_avg_rating_int|add:1 %}
+                                {% if film_avg_rating_frac <= 2 %}
+                                    <img class="icon" src="{% static 'ktapp/images/kt-icon-49-star-empty-text-48.png' %}" alt="&#x2606;" />
+                                {% elif film_avg_rating_frac >= 3 and film_avg_rating_frac <= 7 %}
+                                    <img class="icon" src="{% static 'ktapp/images/kt-icon-x-star-0.5-text-48.png' %}" alt="&#x2606;" />
+                                {% elif film_avg_rating_frac >= 8 %}
+                                    <img class="icon" src="{% static 'ktapp/images/kt-icon-50-star-text-48.png' %}" alt="&#x2605;" />
+                                {% endif %}
+                            {% else %}
+                                <img class="icon" src="{% static 'ktapp/images/kt-icon-49-star-empty-text-48.png' %}" alt="&#x2606;" />
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        &nbsp;
+                    {% endif %}
+                    {% endspaceless %}
+                </div>
+                <div>
+                    {{ film.number_of_ratings }}&nbsp;szavazat
+                </div>
+            </div>
+            <div class="clearfix"></div>
+
+            {% if film.is_open_for_vote_from %}
+
+            <div id="film_rating_yours_label">
+                Szerinted:
+            </div>
+            <div id="film_rating_yours_rating">
+                {% if your_rating %}
+                    <span class="action_text vote_star_menu_toggle">{{ your_rating }}</span>
+                {% else %}
+                    ?
+                {% endif %}
+            </div>
+            <div id="film_rating_yours_stars">
+                <div>
+                    {% spaceless %}
+                    {% for r in ratings %}
+                        {% cycle 'nézhetetlen' 'rossz' 'oké/elmegy' 'jó' 'zseniális' as named_rating silent %}
+                        {% if request.user.is_authenticated %}
+                            {% if r <= your_rating %}
+                                <img class="icon action_text vote_star" src="{% static 'ktapp/images/kt-icon-50-star-link-48.png' %}" alt="&#x2605;" title="{{ named_rating }}" data-rating="{{ r }}" data-film="{{ film.id }}" />
+                            {% else %}
+                                <img class="icon action_text vote_star" src="{% static 'ktapp/images/kt-icon-49-star-empty-link-48.png' %}" alt="&#x2606;" title="{{ named_rating }}" data-rating="{{ r }}" data-film="{{ film.id }}" />
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}?next={{ request.build_absolute_uri }}"><img class="icon action_text" src="{% static 'ktapp/images/kt-icon-49-star-empty-link-48.png' %}" alt="&#x2606;" title="{{ named_rating }}" /></a>
+                        {% endif %}
+                    {% endfor %}
+                    {% endspaceless %}
+                    {% if request.user.is_authenticated %}
+                        {% if not your_rating %}
+                            <span id="share_on_facebook_button" class="facebook_button facebook_button_{% if user.facebook_rating_share %}yes{% else %}no{% endif %}" title="Meg szeretnéd osztani Facebook-on?"></span>
+                        {% endif %}
+                    {% endif %}
+                    <span class="vote_star_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>
+                </div>
+                {% if request.user.is_authenticated %}
+                    <div id="film_rating_your_date">
+                        {% if your_rating_date %}
+                            {{ your_rating_date|date:"Y-m-d" }}
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="clearfix"></div>
+            {% if your_rating %}
+            <div class="vote_star_menu">
+                <div>
+                    <span class="button small_button vote_star" data-rating="0" data-film="{{ film.id }}">szavazat törlése</span>
+                </div>
+                <div>
+                    <span class="button small_button vote_star" data-rating="-1" data-film="{{ film.id }}">más dátum:</span>
+                    <input type="text" class="vote_box_input" id="vote_redate_to" value="{% if your_rating_date %}{{ your_rating_date|date:"Y-m-d" }}{% else %}{% now 'Y-m-d' %}{% endif %}" />
+                </div>
+            </div>
+            {% endif %}
+
+            {% else %}
+                <div id="film_rating_not_yet">
+                    Erre a filmre még nem lehet szavazni.
+                </div>
+            {% endif %}
+
         </div>
-        {% endif %}
         <div id="film_misc_info">
             <ul>
                 <li>

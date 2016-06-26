@@ -29,12 +29,12 @@ def vote(request):
     if not film.is_open_for_vote_from():
         if request.POST.get('ajax', '') == '1':
             return HttpResponse(json.dumps({'success': False}), content_type='application/json')
-        raise
+        return HttpResponseForbidden
     try:
         rating = int(request.POST['rating'])
     except ValueError:
         rating = 0
-    if rating < 0 or rating > 5:
+    if rating < -1 or rating > 5:
         rating = 0
     fb = request.POST.get('fb', '0')
     if rating == 0:
@@ -50,6 +50,34 @@ def vote(request):
                 film=film,
                 details=json.dumps({
                     'old_rating': old_vote.rating,
+                }),
+            )
+    elif rating == -1:  # redate
+        try:
+            new_date = datetime.datetime.strptime(request.POST.get('vote_redate_to', '')[:10], '%Y-%m-%d')
+        except ValueError:
+            new_date = datetime.datetime.now()
+        try:
+            old_vote = models.Vote.objects.get(film=film, user=request.user)
+        except models.Vote.DoesNotExist:
+            old_vote = None
+        if old_vote:
+            if old_vote.when:
+                old_vote_when = old_vote.when.strftime('%Y-%m-%d %H:%M:%S')
+            else:
+                old_vote_when = ''
+            old_vote.when = new_date
+            new_vote_when = old_vote.when.strftime('%Y-%m-%d %H:%M:%S')
+            old_vote.save()
+            models.Event.objects.create(
+                user=request.user,
+                event_type=models.Event.EVENT_TYPE_CHANGE_VOTE,
+                film=film,
+                details=json.dumps({
+                    'old_rating': old_vote.rating,
+                    'new_rating': old_vote.rating,
+                    'old_vote_when': old_vote_when,
+                    'new_vote_when': new_vote_when,
                 }),
             )
     elif 1 <= rating <= 5:
@@ -111,7 +139,10 @@ def edit_share_on_facebook(request):
     share_on_facebook = request.POST.get('share_on_facebook', '0')
     request.user.facebook_rating_share = (share_on_facebook == '1')
     request.user.save(update_fields=['facebook_rating_share'])
-    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+    return HttpResponse(json.dumps({
+        'success': True,
+        'share_on_facebook': bool(share_on_facebook == '1'),
+    }), content_type='application/json')
 
 
 @require_POST

@@ -25,6 +25,15 @@ def _generic_film_view(view_function):
 
     def extended_view_function(request, id, film_slug, *args, **kwargs):
         film = get_object_or_404(models.Film, pk=id)
+        rating = 0
+        rating_date = None
+        if request.user.is_authenticated():
+            try:
+                vote = models.Vote.objects.get(film=film, user=request.user)
+                rating = vote.rating
+                rating_date = vote.when
+            except models.Vote.DoesNotExist:
+                pass
         base_context = {
             'film': film,
             'film_directors': list(film.directors()),
@@ -37,6 +46,11 @@ def _generic_film_view(view_function):
             'film_link_youtube': 'http://www.youtube.com/results?search_query=%s+trailer&search=Search' % urlquote_plus(film.orig_title),
             'film_link_wiki_en': film.wikipedia_link_en.strip() if film.wikipedia_link_en else ('http://en.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(film.orig_title)),
             'film_link_wiki_hu': film.wikipedia_link_hu.strip(),
+            'your_rating': rating,
+            'your_rating_date': rating_date,
+            'ratings': range(1, 6),
+            'film_avg_rating_int': int(film.average_rating) if film.average_rating else 0,
+            'film_avg_rating_frac': int(10 * (film.average_rating - int(film.average_rating))) if film.average_rating else 0,
         }
         return view_function(request, id, film_slug, film, base_context, *args, **kwargs)
 
