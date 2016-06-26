@@ -71,8 +71,11 @@ def film_main(request, id, film_slug, film, base_context):
         except models.Vote.DoesNotExist:
             pass
     leader_users = set()
-    for u in models.KTUser.objects.filter(opinion_leader=True):
-        leader_users.add(u.id)
+    for u in film.vote_set.select_related('user').filter(user__opinion_leader=True).order_by('-user__number_of_followers'):
+        if u.user.id not in special_users:
+            leader_users.add(u.user.id)
+            if len(leader_users) >= 12:
+                break
     votes = []
     for idx, r in enumerate(range(5, 0, -1)):
         votes.append(([], []))
