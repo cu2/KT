@@ -486,6 +486,16 @@ $(function() {
         $('#show_rating_details_button').show();
         $('.rating_details').hide();
     });
+    $('#show_wish_details_button').click(function () {
+        $('#show_wish_details_button').hide();
+        $('#hide_wish_details_button').show();
+        $('.wish_details').show();
+    });
+    $('#hide_wish_details_button').click(function () {
+        $('#hide_wish_details_button').hide();
+        $('#show_wish_details_button').show();
+        $('.wish_details').hide();
+    });
     $('#show_picture_edit_button').click(function () {
         $('.picture_edit_block').toggle();
     });

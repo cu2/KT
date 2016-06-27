@@ -230,10 +230,40 @@
             </div>
             {% endif %}
 
-            <h3{% if not film.is_open_for_vote_from %} style="margin-top: 0"{% endif %}>Kívánságok</h3>
+            <h3{% if not film.is_open_for_vote_from %} style="margin-top: 0"{% endif %}>Ki akarja megnézni?{% if wish_count_sum %} <span class="button very_small_button" id="show_wish_details_button">összes &gt;</span> <span class="button very_small_button" id="hide_wish_details_button">összes v</span>{% endif %}</h3>
             <ul class="mini_list">
-                {% if wish_count.0 > 0 %}<li>{{ wish_count.0 }} ember meg akarja nézni</li>{% endif %}
-                {% if wish_count.1 > 0 %}<li>{{ wish_count.1 }} ember kifejezetten nem akarja megnézni</li>{% endif %}
+                {% if wish_count.0 > 0 %}
+                    <li>
+                        {{ wish_count.0 }} igen:
+                        <span id="fav_users_wished_y">
+                        {% for wish_user in all_wishes.Y.0 %}
+                            <a href="{% url 'user_profile' wish_user.id wish_user.slug_cache %}"{% if wish_user.id in special_users %} style="font-weight: bold"{% endif %}>{{ wish_user.username }}</a>{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                        </span>
+                        <span id="all_users_wished_y" class="wish_details" style="display: none">
+                            <br />
+                            {% for wish_user in all_wishes.Y.1 %}
+                                <a href="{% url 'user_profile' wish_user.id wish_user.slug_cache %}"{% if wish_user.id in special_users %} style="font-weight: bold"{% endif %}>{{ wish_user.username }}</a>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </span>
+                    </li>
+                {% endif %}
+                {% if wish_count.1 > 0 %}
+                    <li>
+                        {{ wish_count.1 }} kifejezetten nem:
+                        <span id="fav_users_wished_n">
+                        {% for wish_user in all_wishes.N.0 %}
+                            <a href="{% url 'user_profile' wish_user.id wish_user.slug_cache %}"{% if wish_user.id in special_users %} style="font-weight: bold"{% endif %}>{{ wish_user.username }}</a>{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                        </span>
+                        <span id="all_users_wished_y" class="wish_details" style="display: none">
+                            <br />
+                            {% for wish_user in all_wishes.N.1 %}
+                                <a href="{% url 'user_profile' wish_user.id wish_user.slug_cache %}"{% if wish_user.id in special_users %} style="font-weight: bold"{% endif %}>{{ wish_user.username }}</a>{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </span>
+                    </li>
+                {% endif %}
             </ul>
             {% if user.is_authenticated %}
                 <ul class="minimini_list">

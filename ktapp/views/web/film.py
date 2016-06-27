@@ -91,16 +91,29 @@ def film_main(request, id, film_slug, film, base_context):
                 votes[idx][0].append(u)
             else:
                 votes[idx][1].append(u)
-    utls = models.UserToplistItem.objects.filter(film=film).select_related('usertoplist', 'usertoplist__created_by').order_by('-usertoplist__ordered', 'serial_number', 'usertoplist__title', 'usertoplist__id')
+
+    wish_leader_users = set()
+    for wish in models.Wishlist.objects.filter(film=film).select_related('wished_by').filter(wished_by__opinion_leader=True).order_by('-wished_by__number_of_followers'):
+        if wish.wished_by_id not in special_users:
+            wish_leader_users.add(wish.wished_by_id)
+            if len(wish_leader_users) >= 12:
+                break
     my_wishes = dict((wish_type[0], False) for wish_type in models.Wishlist.WISH_TYPES)
+    all_wishes = dict((wish_type[0], [[], []]) for wish_type in models.Wishlist.WISH_TYPES)
     wish_count = [0, 0]
-    for wish in models.Wishlist.objects.filter(film=film):
+    for wish in models.Wishlist.objects.filter(film=film).select_related('wished_by').order_by('wished_by__username'):
+        if wish.wished_by_id in special_users or wish.wished_by_id in wish_leader_users:
+            all_wishes[wish.wish_type][0].append(wish.wished_by)
+        else:
+            all_wishes[wish.wish_type][1].append(wish.wished_by)
         if wish.wish_type == models.Wishlist.WISH_TYPE_YES:
             wish_count[0] += 1
         if wish.wish_type == models.Wishlist.WISH_TYPE_NO:
             wish_count[1] += 1
         if wish.wished_by_id == request.user.id:
             my_wishes[wish.wish_type] = True
+
+    utls = models.UserToplistItem.objects.filter(film=film).select_related('usertoplist', 'usertoplist__created_by').order_by('-usertoplist__ordered', 'serial_number', 'usertoplist__title', 'usertoplist__id')
     # if request.user.is_authenticated():
     #     recommended_films = list(models.Film.objects.raw(kt_sqls.RECOMMENDED_FILMS_LOGGED_IN.format(film_id=film.id, user_id=request.user.id)))
     # else:
@@ -130,6 +143,8 @@ def film_main(request, id, film_slug, film, base_context):
         'special_users': special_users,
         'my_wishes': my_wishes,
         'wish_count': wish_count,
+        'wish_count_sum': wish_count[0] + wish_count[1],
+        'all_wishes': all_wishes,
         'recommended_films': recommended_films,
         'utls': utls,
         'premier_types': models.PremierType.objects.all().order_by('name'),
