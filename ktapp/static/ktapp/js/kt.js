@@ -188,6 +188,29 @@ $(function() {
         });
     });
 
+    $('.wish_star').click(function() {
+        $('.wish_star_loader').show();
+        var film_id = $(this).data('film');
+        var action = $(this).data('action');
+        $.ajax({
+            type: 'POST',
+            url: '/kivan',
+            data: {
+                csrfmiddlewaretoken: $.cookie('csrftoken'),
+                film_id: film_id,
+                wish_type: 'Y',
+                action: action,
+                ajax: '1'
+            },
+            success: function(data) {
+                if (data.success) {
+                    document.location.reload();
+                }
+            },
+            dataType: 'json'
+        });
+    });
+
     $('#search-input-mobile').on('input propertychange paste', function() {
         $('#search-input').val($('#search-input-mobile').val());
         ktApp.searchInputChanged = true;

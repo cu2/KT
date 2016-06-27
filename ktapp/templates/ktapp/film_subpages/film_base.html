@@ -89,7 +89,25 @@
 {% block header %}
     <div id="film_header" class="hover_show_button_context">
         <div id="film_title">
-            <h1>{{ film.orig_title }}{% if film.year %} <span class="film_year">({% if film.main_premier_year == vapiti_year %}<a href="{% url 'vapiti_gold' %}" class="vapiti">{{ film.year }}</a>{% else %}{{ film.year }}{% endif %})</span>{% endif %}</h1>
+            <h1>
+                {{ film.orig_title }}{% if film.year %} <span class="film_year">({% if film.main_premier_year == vapiti_year %}<a href="{% url 'vapiti_gold' %}" class="vapiti">{{ film.year }}</a>{% else %}{{ film.year }}{% endif %})</span>{% endif %}
+
+                <span id="film_wish_star">
+                    {% spaceless %}
+                    {% if request.user.is_authenticated %}
+                        {% if your_wish_status %}
+                            <img class="icon action_text wish_star" src="{% static 'ktapp/images/kt-icon-50-star-link-48.png' %}" alt="&#x2605;" title="Meg akarod nézni?" data-action="-" data-film="{{ film.id }}" />
+                        {% else %}
+                            <img class="icon action_text wish_star" src="{% static 'ktapp/images/kt-icon-49-star-empty-link-48.png' %}" alt="&#x2606;" title="Meg akarod nézni?" data-action="+" data-film="{{ film.id }}" />
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.build_absolute_uri }}"><img class="icon action_text" src="{% static 'ktapp/images/kt-icon-49-star-empty-link-48.png' %}" alt="&#x2606;" title="Meg akarod nézni?" /></a>
+                    {% endif %}
+                    <span class="wish_star_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>
+                    {% endspaceless %}
+                </span>
+
+            </h1>
             {% if film.second_title %}
                 <h2>
                     {{ film.second_title }}

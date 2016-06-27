@@ -27,6 +27,7 @@ def _generic_film_view(view_function):
         film = get_object_or_404(models.Film, pk=id)
         rating = 0
         rating_date = None
+        your_wish_status = 0
         if request.user.is_authenticated():
             try:
                 vote = models.Vote.objects.get(film=film, user=request.user)
@@ -34,6 +35,11 @@ def _generic_film_view(view_function):
                 rating_date = vote.when
             except models.Vote.DoesNotExist:
                 pass
+            your_wish_status = models.Wishlist.objects.filter(
+                film=film,
+                wished_by=request.user,
+                wish_type=models.Wishlist.WISH_TYPE_YES,
+            ).count()
         base_context = {
             'film': film,
             'film_directors': list(film.directors()),
@@ -51,6 +57,7 @@ def _generic_film_view(view_function):
             'ratings': range(1, 6),
             'film_avg_rating_int': int(film.average_rating) if film.average_rating else 0,
             'film_avg_rating_frac': int(10 * (film.average_rating - int(film.average_rating))) if film.average_rating else 0,
+            'your_wish_status': your_wish_status,
         }
         return view_function(request, id, film_slug, film, base_context, *args, **kwargs)
 
