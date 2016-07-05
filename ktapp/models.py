@@ -192,13 +192,6 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
             return user_list[0]
         return None
 
-    def gravatar_url(self):
-        return 'http://www.gravatar.com/avatar/%s?s=%d&d=%s' % (
-            hashlib.md5(self.email.strip().lower()).hexdigest(),
-            60,
-            'http://kritikustomeg.org/static/ktapp/images/kt-icon-4-user-link-light-120.png',
-        )
-
 
 class Film(models.Model):
     orig_title = models.CharField(max_length=250)
