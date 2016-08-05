@@ -82,6 +82,7 @@ urlpatterns += [
     url(r'^torol_erdekesseg$', post_views.delete_trivia, name='delete_trivia'),
     url(r'^uj_kep$', post_views.new_picture, name='new_picture'),
     url(r'^szerk_kep$', post_views.edit_picture, name='edit_picture'),
+    url(r'^foplakat$', post_views.set_main_poster, name='set_main_poster'),
     url(r'^torol_kep$', post_views.delete_picture, name='delete_picture'),
 
     url(r'^uj_film$', film_views.new_film, name='new_film'),

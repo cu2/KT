@@ -228,6 +228,13 @@ def changelog(model, created_by, action, object, state_before, state_after, forc
         )
 
 
+def picture_index(picture, film):
+    if film.main_poster and picture.id == film.main_poster.id:
+        return 0, picture.order_key, picture.id
+    else:
+        return 1, picture.order_key, picture.id
+
+
 def get_next_picture(pictures, picture):
     found_this = False
     next_picture = None

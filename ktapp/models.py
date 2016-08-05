@@ -1236,7 +1236,7 @@ class Picture(models.Model):
         # update number_of_pictures and main_poster for film:
         if self.film:
             self.film.number_of_pictures = self.film.picture_set.count()
-            if self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
+            if self.film.main_poster is None and self.picture_type in {self.PICTURE_TYPE_POSTER, self.PICTURE_TYPE_DVD}:
                 try:
                     self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_POSTER).order_by('id')[0]
                 except IndexError:
@@ -1295,7 +1295,7 @@ def delete_picture(sender, instance, **kwargs):
     '''Update number_of_pictures and delete files from s3'''
     if instance.film:
         instance.film.number_of_pictures = instance.film.picture_set.count()
-        if instance.picture_type in {instance.PICTURE_TYPE_POSTER, instance.PICTURE_TYPE_DVD}:
+        if instance.film.main_poster is not None and instance.film.main_poster.id == instance.id:
             try:
                 instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_POSTER).order_by('id')[0]
             except IndexError:

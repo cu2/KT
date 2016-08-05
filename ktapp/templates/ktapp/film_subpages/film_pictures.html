@@ -15,7 +15,7 @@
                 {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film.orig_title }} című filmben
                 {% else %}
                     {% if picture.picture_type == "P" %}
-                        {{ film_title_article|title }} {{ film.orig_title }} című film plakátja
+                        {{ film_title_article|title }} {{ film.orig_title }} című film {% if permission_edit_picture and picture.id == film.main_poster.id %}fő{% endif %}plakátja
                     {% elif picture.picture_type == "D" %}
                         {{ film_title_article|title }} {{ film.orig_title }} című film DVD/VHS/Bluray-borítója
                     {% else %}
@@ -32,6 +32,19 @@
                 {% endif %}
             </div>
             {% if permission_edit_picture %}
+
+                {% if picture.picture_type == 'P' or picture.picture_type == 'D' %}
+                    {% if picture.id != film.main_poster.id %}
+                        <div class="main_poster_edit_block" style="margin: 20px">
+                            <form action="{% url 'set_main_poster' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="picture" value="{{ picture.id }}" />
+                                <p class="center"><input type="submit" class="small_button" value="Kép beállítása főplakátnak" /></p>
+                            </form>
+                        </div>
+                    {% endif %}
+                {% endif %}
+
                 <p style="text-align: center; font-size: 8pt">(<span class="action_text" id="show_picture_edit_button">kép szerkesztése</span>)</p>
                 <div class="picture_edit_block" style="display: none">
                     <form action="{% url 'edit_picture' %}" method="post">

@@ -395,17 +395,27 @@ def new_picture(request):
 @kt_utils.kt_permission_required('edit_picture')
 def edit_picture(request):
     picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
-    if request.POST:
-        picture.picture_type = request.POST.get('picture_type', 'O')
-        picture.source_url = request.POST.get('source_url', '')
-        picture.save()
-        picture.artists.clear()
-        possible_artists = {
-            unicode(artist.id): artist for artist in picture.film.artists.all()
-        }
-        for artist_id in request.POST.getlist('picture_artist_cb_edit'):
-            if artist_id in possible_artists:
-                picture.artists.add(possible_artists[artist_id])
+    picture.picture_type = request.POST.get('picture_type', 'O')
+    picture.source_url = request.POST.get('source_url', '')
+    picture.save()
+    picture.artists.clear()
+    possible_artists = {
+        unicode(artist.id): artist for artist in picture.film.artists.all()
+    }
+    for artist_id in request.POST.getlist('picture_artist_cb_edit'):
+        if artist_id in possible_artists:
+            picture.artists.add(possible_artists[artist_id])
+    return HttpResponseRedirect(reverse('film_picture', args=(picture.film.pk, picture.film.slug_cache, picture.id)) + '#pix')
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('edit_picture')
+def set_main_poster(request):
+    picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
+    film = get_object_or_404(models.Film, pk=picture.film.id)
+    film.main_poster = picture
+    film.save(update_fields=['main_poster'])
     return HttpResponseRedirect(reverse('film_picture', args=(picture.film.pk, picture.film.slug_cache, picture.id)) + '#pix')
 
 
@@ -414,8 +424,7 @@ def edit_picture(request):
 @kt_utils.kt_permission_required('delete_picture')
 def delete_picture(request):
     picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
-    if request.POST:
-        picture.delete()
+    picture.delete()
     return HttpResponseRedirect(reverse('film_pictures', args=(picture.film.pk, picture.film.slug_cache)))
 
 
