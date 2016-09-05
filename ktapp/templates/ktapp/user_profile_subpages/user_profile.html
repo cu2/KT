@@ -1,6 +1,8 @@
 {% extends "ktapp/user_profile_subpages/user_profile_base.html" %}
 {% load kt_extras %}
 {% load staticfiles %}
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
 
 {% block user_profile_main %}
 
@@ -14,7 +16,7 @@
             {% if selected_user.profile_pic %}
                 <img src="{{ selected_user.profile_pic.get_display_urls.mid }}" style="width: {{ selected_user.profile_pic.get_widths.mid }}px; height: {{ selected_user.profile_pic.get_heights.mid }}px; float: right" class="picture" />
             {% else %}
-                <img src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}" class="picture" style="float:right" />
+                <img src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-4-user-link-light-main{{ design_version_postfix }}-120.png" class="picture" style="float:right" />
             {% endif %}
             {% if user.is_authenticated and selected_user.id == user.id %}
                 </a>

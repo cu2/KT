@@ -209,7 +209,8 @@ footer {
     position: absolute;
     left: 0; right: 0;
     bottom: 0; height: 150px;
-    background: @navbar-default-bg;
+    background: @footer-bg;
+    color: @footer-text-color;
     text-align: center;
   }
   .footer-nav-row {
@@ -230,6 +231,7 @@ footer {
     height: 15px;
     line-height: 15px;
     font-size: 15px;
+    color: @footer-link-color;
   }
   .footer-icons-row {
     height: 60px;
@@ -252,8 +254,8 @@ footer {
     margin: 0 8px;
     line-height: 22px;
     font-size: 22px;
-    background: @link-color;
-    color: @navbar-default-bg;
+    background: @footer-link-color;
+    color: @footer-bg;
   }
   .youtube-outer {
     position: relative;
@@ -262,7 +264,7 @@ footer {
     height: 18px;
     border-radius: 4px;
     margin-top: 2px;
-    background: @navbar-default-bg;
+    background: @footer-bg;
   }
   .youtube-inner {
     position: absolute;
@@ -271,7 +273,7 @@ footer {
     display: block;
     width: 0;
     height: 0;
-    border-color: transparent transparent transparent @link-color;
+    border-color: transparent transparent transparent @footer-link-color;
     border-width: 6px 6px 6px 10px;
     border-style: solid;
   }
@@ -681,17 +683,17 @@ input.vote_box_input {
 }
 .spoiler {
   display: inline-block;
-  background: rgb(249,244,218);
-  color: rgb(249,244,218);
+  background: @block-content-bg;
+  color: @block-content-bg;
   border: solid 1px rgb(0, 0, 0);
   padding: 2px;
 }
 .spoiler * {
-  color: rgb(249,244,218);
+  color: @block-content-bg;
 }
 .visible_spoiler {
   display: inline-block;
-  background: rgb(249,244,218);
+  background: @block-content-bg;
   border: solid 1px rgb(0, 0, 0);
   padding: 2px;
 }
@@ -752,7 +754,7 @@ input.vote_box_input {
 table {
   border-collapse: separate;
   border-spacing: 1px;
-  background: @kt-bg-light;
+  background: @table-bg;
   font-size: @font-size-table;
   text-align: left;
   margin-bottom: 20px;
@@ -764,14 +766,14 @@ table {
   }
 }
 tr {
-  background: @kt-bg-normal;
+  background: @tr-bg-even;
   vertical-align: top;
 }
 tr.odd {
-  background: @kt-bg-light;
+  background: @tr-bg-odd;
 }
 tr.header_tr {
-  background: @kt-bg-dark;
+  background: @tr-bg-header;
 }
 th {
   padding: 3px;
@@ -856,7 +858,7 @@ table.sortable tr.header_tr {
   }
 }
 .film_block {
-  background: rgb(249,244,218);
+  background: @block-content-bg;
   margin-bottom: 20px;
   padding: 10px;
 }
@@ -1017,7 +1019,7 @@ ul.poll li {
 }
 .comment_block_content {
   position: relative;
-  background: rgb(249,244,218);
+  background: @block-content-bg;
 }
 .comment_block_content p {
   margin: 0;
@@ -1027,7 +1029,7 @@ ul.poll li {
   font-weight: bold;
 }
 .comment_block_author {
-  background: rgb(218,211,184);
+  background: @block-header-bg;
   margin: 0;
   padding: 2px 5px;
   font-size: 8pt;
@@ -1060,21 +1062,21 @@ ul.poll li {
   overflow: hidden;
 }
 .film_addon_content {
-  background: rgb(249,244,218);
+  background: @block-content-bg;
 }
 .film_addon_content p {
   margin: 0;
   padding: 5px;
 }
 .film_addon_source {
-  background: rgb(218,211,184);
+  background: @block-header-bg;
   margin: 0;
   padding: 2px 5px;
   font-size: 8pt;
   overflow: auto;
 }
 .film_addon_author {
-  background: rgb(218,211,184);
+  background: @block-footer-bg;
   margin: 0;
   padding: 2px 5px;
   font-size: 8pt;
@@ -1082,14 +1084,14 @@ ul.poll li {
   overflow: auto;
 }
 .review_author {
-  background: rgb(218,211,184);
+  background: @block-footer-bg;
   margin: 0;
   padding: 2px 5px;
   font-size: 8pt;
   overflow: auto;
 }
 .portrait_author {
-  background: rgb(218,211,184);
+  background: @block-footer-bg;
   margin: 0;
   padding: 2px 5px;
   font-size: 8pt;
@@ -1170,7 +1172,7 @@ ul.poll li {
 
 #film_rating {
   float: left;
-  background: rgb(249,244,218);
+  background: @film-rating-block-bg;
   border-radius: 12px;
   text-align: left;
   padding: 8px 8px;
@@ -1351,16 +1353,6 @@ ul.poll li {
 #film_main_voting_block form,
 #film_main_voting_block form input {
   margin: 0;
-}
-.change_vote div {
-  padding-top: 5px;
-}
-.my_rating {
-  background: rgb(249,244,218);
-  border: solid 1px rgb(128,128,128);
-  border-radius: 12px;
-  padding: 1px 12px;
-  font-weight: bold;
 }
 .rating_details {
   font-size: 8pt;

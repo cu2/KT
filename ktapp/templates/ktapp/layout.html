@@ -12,9 +12,15 @@
         <base href="/" />
 
         {% load staticfiles %}
+        {% load static %}
+        {% get_static_prefix as STATIC_PREFIX %}
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
-        <link href="{% static 'ktapp/css/kt-bootstrap.min.css' %}?csshash=d7e3234fccb2eb3874ae773d4d6f6551" rel="stylesheet" />
+        {% if design_version == 'v1' %}
+            <link href="{% static 'ktapp/css/kt-bootstrap-v1.min.css' %}?csshash-v1=c4f2a071b486af3265b6e47a2a7f9d28" rel="stylesheet" />
+        {% elif design_version == 'v2' %}
+            <link href="{% static 'ktapp/css/kt-bootstrap-v2.min.css' %}?csshash-v2=1ab5830ebe92d2cf29307fd7d9f5101d" rel="stylesheet" />
+        {% endif %}
 
         <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -36,19 +42,19 @@
             <ul>
                 <li class="menu-icon">
                     <a href="#" class="hamburger-menu-open">
-                        <img class="icon" src="{% static 'ktapp/images/kt-icon-517-menu-hamburger-link-48.png' %}" alt="" />
+                        <img class="icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-517-menu-hamburger-link{{ design_version_postfix }}-48.png" alt="" />
                     </a>
                 </li>
                 <li class="menu-logo">
                     <a href="{% url 'index' %}">
-                        <img src="{% static 'ktapp/images/kt-logo-288x136.png' %}" alt="Kritikus Tömeg" />
+                        <img src="{{ STATIC_PREFIX }}ktapp/images/kt-logo{{ design_version_postfix }}-288x136.png" alt="Kritikus Tömeg" />
                     </a>
                 </li>
             </ul>
             <ul class="navbar-mobile-right">
                 <li class="menu-icon">
                     <a href="#" class="mobile-search-open">
-                        <img class="icon" src="{% static 'ktapp/images/kt-icon-28-search-link-48.png' %}" alt="" />
+                        <img class="icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-28-search-link{{ design_version_postfix }}-48.png" alt="" />
                     </a>
                 </li>
             </ul>
@@ -57,7 +63,7 @@
             <div class="container">
                 <div class="navbar-header">
                     <a class="logo" href="{% url 'index' %}">
-                        <img class="" src="{% static 'ktapp/images/kt-logo-288x136.png' %}" alt="Kritikus Tömeg" />
+                        <img class="" src="{{ STATIC_PREFIX }}ktapp/images/kt-logo{{ design_version_postfix }}-288x136.png" alt="Kritikus Tömeg" />
                     </a>
                 </div>
                 <div class="collapse navbar-collapse">
@@ -68,11 +74,11 @@
                                     {% if user.profile_pic %}
                                         <img class="img-circle profile-pic" src="{{ user.profile_pic.get_display_urls.min }}" alt="" />
                                     {% else %}
-                                        <img class="img-circle profile-pic" src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}" alt="" />
+                                        <img class="img-circle profile-pic" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-4-user-link-light{{ design_version_postfix }}-120.png" alt="" />
                                     {% endif %}
                                     <span class="navbar-profile-menu-title">{{ user.username }}</span>
                                     {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
-                                        <img class="new-message-warning" src="{% static 'ktapp/images/kt-icon-11-envelope-notification-48.png' %}" alt="" />
+                                        <img class="new-message-warning" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-11-envelope-notification{{ design_version_postfix }}-48.png" alt="" />
                                     {% endif %}
                                 </a>
                                 <ul class="dropdown-menu">
@@ -81,7 +87,7 @@
                                         <a href="{% url 'messages' %}">
                                             Üzenetek
                                             {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
-                                                <img class="icon menu-item-icon" src="{% static 'ktapp/images/kt-icon-11-envelope-notification-48.png' %}" alt="" />
+                                                <img class="icon menu-item-icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-11-envelope-notification-menu{{ design_version_postfix }}-48.png" alt="" />
                                             {% endif %}
                                         </a>
                                     </li>
@@ -116,7 +122,7 @@
                         {% else %}
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle clearfix" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                    <img class="img-circle profile-pic" src="{% static 'ktapp/images/kt-icon-4-user-link-light-120.png' %}" alt="" />
+                                    <img class="img-circle profile-pic" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-4-user-link-light{{ design_version_postfix }}-120.png" alt="" />
                                     <span class="navbar-profile-menu-title">Bejelentkezés</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-custom">
@@ -147,7 +153,7 @@
                     <ul class="nav navbar-nav navbar-right navbar-with-icons">
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-181-facetime-video-link-48.png' %}" alt="" />
+                                <img class="navbar-icon icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-181-facetime-video-link{{ design_version_postfix }}-48.png" alt="" />
                                 <span class="navbar-label">filmek</span>
                             </a>
                             <ul class="dropdown-menu">
@@ -173,7 +179,7 @@
                         </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
-                                <img class="navbar-icon icon" src="{% static 'ktapp/images/kt-icon-44-group-link-48.png' %}" alt="" />
+                                <img class="navbar-icon icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-44-group-link{{ design_version_postfix }}-48.png" alt="" />
                                 <span class="navbar-label">közösség</span>
                             </a>
                             <ul class="dropdown-menu">
@@ -190,7 +196,7 @@
                     <form class="navbar-form navbar-right" action="{% url 'search' %}" method="get">
                         <div class="form-group">
                             <button type="submit" class="btn btn-icon">
-                                <img class="icon search-icon" src="{% static 'ktapp/images/kt-icon-28-search-button-64.png' %}" alt="" />
+                                <img class="icon search-icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-28-search-button{{ design_version_postfix }}-64.png" alt="" />
                             </button><input type="text" class="form-control search-input" id="search-input" name="q" tabindex="1" autocomplete="off" placeholder="Keresés..." />
                             <div id="search-autocomplete-results" class="search-results"></div>
                         </div>
@@ -239,7 +245,7 @@
         <nav id="hamburger-menu">
             <ul id="hamburger-menu-ul">
 
-                <li><a href="#" class="hamburger-menu-close"><img class="icon half-size-icon" src="{% static 'ktapp/images/kt-icon-517-menu-hamburger-link-48.png' %}" alt="" /></a></li>
+                <li><a href="#" class="hamburger-menu-close"><img class="icon half-size-icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-517-menu-hamburger-link{{ design_version_postfix }}-48.png" alt="" /></a></li>
 
                 <li class="hamburger-divider"></li>
                 <li><a href="{% url 'index' %}">Főoldal</a></li>
@@ -248,7 +254,7 @@
                     <li><a href="{% url 'messages' %}">
                         Üzenetek
                         {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
-                            <img class="icon hamburger-menu-item-icon" src="{% static 'ktapp/images/kt-icon-11-envelope-notification-48.png' %}" alt="" />
+                            <img class="icon hamburger-menu-item-icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-11-envelope-notification-hamburger{{ design_version_postfix }}-48.png" alt="" />
                         {% endif %}
                     </a></li>
                 {% else %}
@@ -339,7 +345,7 @@
                 <div id="search-input-mobile-container">
                     <input type="text" class="form-control" id="search-input-mobile" name="q" tabindex="1" autocomplete="off" placeholder="Keresés..." />
                 </div>
-                <a href="#" class="mobile-search-close"><img class="icon" src="{% static 'ktapp/images/kt-icon-211-left-arrow-link-48.png' %}" alt="" /></a>
+                <a href="#" class="mobile-search-close"><img class="icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-211-left-arrow-link{{ design_version_postfix }}-48.png" alt="" /></a>
             </form>
             <div id="mobile-search-results" class="search-results"></div>
         </div>

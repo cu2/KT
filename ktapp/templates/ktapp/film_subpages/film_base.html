@@ -1,6 +1,8 @@
 {% extends "ktapp/layout.html" %}
 {% load kt_extras %}
 {% load staticfiles %}
+{% load static %}
+{% get_static_prefix as STATIC_PREFIX %}
 
 {% block title %}{{ film.orig_title }}{% if film.second_title %} / {{ film.second_title }}{% endif %} ({{ film.year }}) - Kritikus Tömeg{% endblock %}
 
@@ -96,12 +98,12 @@
                     {% spaceless %}
                     {% if request.user.is_authenticated %}
                         {% if your_wish_status %}
-                            <img class="icon action_text wish_star" src="{% static 'ktapp/images/kt-icon-50-star-link-48.png' %}" alt="&#x2605;" title="Meg akarod nézni?" data-action="-" data-film="{{ film.id }}" />
+                            <img class="icon action_text wish_star" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-50-star-link{{ design_version_postfix }}-48.png" alt="&#x2605;" title="Meg akarod nézni?" data-action="-" data-film="{{ film.id }}" />
                         {% else %}
-                            <img class="icon action_text wish_star" src="{% static 'ktapp/images/kt-icon-49-star-empty-link-48.png' %}" alt="&#x2606;" title="Meg akarod nézni?" data-action="+" data-film="{{ film.id }}" />
+                            <img class="icon action_text wish_star" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-49-star-empty-link{{ design_version_postfix }}-48.png" alt="&#x2606;" title="Meg akarod nézni?" data-action="+" data-film="{{ film.id }}" />
                         {% endif %}
                     {% else %}
-                        <a href="{% url 'login' %}?next={{ request.build_absolute_uri }}"><img class="icon action_text" src="{% static 'ktapp/images/kt-icon-49-star-empty-link-48.png' %}" alt="&#x2606;" title="Meg akarod nézni?" /></a>
+                        <a href="{% url 'login' %}?next={{ request.build_absolute_uri }}"><img class="icon action_text" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-49-star-empty-link{{ design_version_postfix }}-48.png" alt="&#x2606;" title="Meg akarod nézni?" /></a>
                     {% endif %}
                     <span class="wish_star_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>
                     {% endspaceless %}
@@ -189,12 +191,12 @@
                         {% cycle 'nézhetetlen' 'rossz' 'oké/elmegy' 'jó' 'zseniális' as named_rating silent %}
                         {% if request.user.is_authenticated %}
                             {% if r <= your_rating %}
-                                <img class="icon action_text vote_star" src="{% static 'ktapp/images/kt-icon-50-star-link-48.png' %}" alt="&#x2605;" title="{{ named_rating }}" data-rating="{{ r }}" data-film="{{ film.id }}" />
+                                <img class="icon action_text vote_star" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-50-star-link{{ design_version_postfix }}-48.png" alt="&#x2605;" title="{{ named_rating }}" data-rating="{{ r }}" data-film="{{ film.id }}" />
                             {% else %}
-                                <img class="icon action_text vote_star" src="{% static 'ktapp/images/kt-icon-49-star-empty-link-48.png' %}" alt="&#x2606;" title="{{ named_rating }}" data-rating="{{ r }}" data-film="{{ film.id }}" />
+                                <img class="icon action_text vote_star" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-49-star-empty-link{{ design_version_postfix }}-48.png" alt="&#x2606;" title="{{ named_rating }}" data-rating="{{ r }}" data-film="{{ film.id }}" />
                             {% endif %}
                         {% else %}
-                            <a href="{% url 'login' %}?next={{ request.build_absolute_uri }}"><img class="icon action_text" src="{% static 'ktapp/images/kt-icon-49-star-empty-link-48.png' %}" alt="&#x2606;" title="{{ named_rating }}" /></a>
+                            <a href="{% url 'login' %}?next={{ request.build_absolute_uri }}"><img class="icon action_text" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-49-star-empty-link{{ design_version_postfix }}-48.png" alt="&#x2606;" title="{{ named_rating }}" /></a>
                         {% endif %}
                     {% endfor %}
                     {% endspaceless %}

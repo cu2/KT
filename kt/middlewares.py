@@ -142,7 +142,7 @@ class LoggingMiddleware(object):
         except AttributeError:
             pass
         kt_exception_logger.exception(u'-----\nDATETIME={dt}\nURL={url}\nUSER_ID={user_id}\nUSER_NAME={user_name}'.format(
-            dt=datetime.datetime.strftime(datetime.datetime.utcnow(), '%Y-%m-%d %H:%M:%S.%f'),
+            dt=datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
             url=request.get_full_path(),
             user_id=user_id,
             user_name=username,
