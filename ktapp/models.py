@@ -106,6 +106,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     profile_pic = models.ForeignKey('Picture', blank=True, null=True, related_name='profile_pic', on_delete=models.SET_NULL)
     number_of_followers = models.PositiveIntegerField(default=0)
     opinion_leader = models.BooleanField(default=False)
+    design_version = models.PositiveSmallIntegerField(default=1)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
