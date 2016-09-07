@@ -1,6 +1,6 @@
 def get_design_version(request):
     design_version = 'v1'
-    if request.user.is_authenticated:
+    if request.user.is_authenticated():
         design_version = 'v%d' % request.user.design_version
     if design_version == 'v1':
         design_version_postfix = ''
