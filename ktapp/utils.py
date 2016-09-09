@@ -402,3 +402,15 @@ def delete_sessions(user_id):
         session_user_id = s.get_decoded().get('_auth_user_id')
         if session_user_id == user_id_string or session_user_id == user_id:
             s.delete()
+
+
+def get_design_version(request):
+    if request.user.is_authenticated():
+        return request.user.design_version
+    # A/B test
+    cohort = request.META.get('KT_COHORT', 0)
+    if cohort < 50:
+        design_version = 1
+    else:
+        design_version = 2
+    return design_version

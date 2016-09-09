@@ -7,6 +7,7 @@ import string
 import time
 from ipware.ip import get_ip
 
+from django.conf import settings
 from django.db import connection
 
 
@@ -129,7 +130,11 @@ class LoggingMiddleware(object):
             'response_status_code': response.status_code,
         })
         if kutma:
-            response.set_cookie('kutma', kutma, max_age=SECONDS_IN_A_YEAR, domain='.kritikustomeg.org')
+            if settings.ENV == 'prod':
+                cookie_domain = '.kritikustomeg.org'
+            else:
+                cookie_domain = 'localhost'
+            response.set_cookie('kutma', kutma, max_age=SECONDS_IN_A_YEAR, domain=cookie_domain)
         return response
 
     def process_exception(self, request, exc):

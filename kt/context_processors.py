@@ -1,7 +1,8 @@
-def get_design_version(request):
-    design_version = 'v1'
-    if request.user.is_authenticated():
-        design_version = 'v%d' % request.user.design_version
+from ktapp.utils import get_design_version
+
+
+def get_design_version_context(request):
+    design_version = 'v%d' % get_design_version(request)
     if design_version == 'v1':
         design_version_postfix = ''
     else:

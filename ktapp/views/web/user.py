@@ -59,6 +59,7 @@ def registration(request):
             user.ip_at_registration = ip
             user.ip_at_last_login = ip
             user.last_activity_at = datetime.datetime.now()
+            user.design_version = kt_utils.get_design_version(request)
             user.save()
             token = get_random_string(64)
             models.PasswordToken.objects.create(

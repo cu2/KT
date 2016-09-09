@@ -118,7 +118,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                'kt.context_processors.get_design_version',
+                'kt.context_processors.get_design_version_context',
             ],
         },
     },
