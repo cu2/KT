@@ -1847,3 +1847,11 @@ class LinkClick(models.Model):
     def save(self, *args, **kwargs):
         self.url_domain = urlparse(self.url).netloc
         super(LinkClick, self).save(*args, **kwargs)
+
+
+class ActiveUserCount(models.Model):
+    day = models.DateField(primary_key=True)
+    dau_count = models.PositiveIntegerField(default=0)
+    wau_count = models.PositiveIntegerField(default=0)
+    mau_count = models.PositiveIntegerField(default=0)
+    new_count = models.PositiveIntegerField(default=0)
