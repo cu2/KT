@@ -12,7 +12,7 @@
 <div class="row">
     <div class="central-column">
 
-    {% if topic.id == 38 %}
+    {% if topic.id == 38 and False %}
         <ul>
             <li>Vasárnaponként, 20:00-kor megjelenik 10 kép (az időpont és a képek száma változhat, de a játékvezető erről előre szólni fog). A feladat egyszerű: ki kell találni, melyik kép melyik filmből való.</li>
             <li>Megfejtésként csak magyar címet fogad el a játékvezető.</li>
@@ -24,8 +24,13 @@
         <p>A kitiltottak listája <a href="{% url 'blacklist' %}">itt</a> található.</p>
     {% endif %}
 
-    {% if closed %}
-        <p class="error">A topik {{ topic.closed_until|date:"Y-m-d H:i" }}-ig le van zárva. A megnyitásig hátravan {% if closed_seconds > 300 %}{{ topic.closed_until|timeuntil }}{% else %}{{ closed_seconds }} másodperc{% endif %}.</p>
+    {% if request.user.is_authenticated %}
+        {% if closed %}
+            <p class="error">A topik {{ topic.closed_until|date:"Y-m-d H:i" }}-ig le van zárva. A megnyitásig hátravan {% if closed_seconds > 300 %}{{ topic.closed_until|timeuntil }}{% else %}{{ closed_seconds }} másodperc{% endif %}.</p>
+        {% endif %}
+        {% if topic.game_mode %}
+            <p class="error">Rejtett mód: ha most írsz kommentet, azt csak te és a játékvezetők látják, a többiek nem. Amikor véget ér a játek, az összes komment publikus lesz mindenki számára.</p>
+        {% endif %}
     {% endif %}
 
     {% if not closed or request.user.is_authenticated and request.user.is_game_master and topic.id == 38 %}
@@ -62,6 +67,20 @@
                 <input type="hidden" name="topic_id" value="{{ topic.id }}" />
                 <p>Meddig (ÉÉÉÉ-HH-NN ÓÓ:PP): <input type="text" name="closed_until" value="{% if topic.closed_until %}{{ topic.closed_until|date:"Y-m-d H:i" }}{% endif %}" /></p>
                 <p><input type="submit" value="Topik lezárása" /></p>
+            </form>
+        </div>
+        <p><span id="set_topic_game_mode_opener" class="action_text">Rejtett mód ki/bekapcsolása</span></p>
+        <div id="set_topic_game_mode_div" style="display: none">
+            <form action="{% url 'set_topic_game_mode' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="topic_id" value="{{ topic.id }}" />
+                {% if topic.game_mode %}
+                    <input type="hidden" name="game_mode" value="0" />
+                    <p><input type="submit" value="Rejtett mód kikapcsolása, kommentek megjelenítése" /></p>
+                {% else %}
+                    <input type="hidden" name="game_mode" value="1" />
+                    <p><input type="submit" value="Rejtett mód bekapcsolása" /></p>
+                {% endif %}
             </form>
         </div>
     {% endif %}

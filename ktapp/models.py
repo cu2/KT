@@ -502,6 +502,7 @@ class Comment(models.Model):
     rating = models.PositiveSmallIntegerField(blank=True, null=True)  # cache for film comments
     serial_number = models.PositiveIntegerField(default=0)
     serial_number_by_user = models.PositiveIntegerField(default=0)
+    hidden = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.content[:100]
@@ -654,6 +655,7 @@ class Topic(models.Model):
     last_comment = models.ForeignKey(Comment, blank=True, null=True, related_name='last_topic_comment', on_delete=models.SET_NULL)
     slug_cache = models.CharField(max_length=250, blank=True)
     closed_until = models.DateTimeField(blank=True, null=True)
+    game_mode = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.title

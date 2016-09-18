@@ -698,7 +698,9 @@ input.vote_box_input {
 .comment_img {
   max-width: 99%;
 }
-
+.hidden_comment {
+  border: dashed 1px rgb(0, 0, 0);
+}
 
 
 
@@ -1444,8 +1446,8 @@ ul.poll li {
 
 
 .error {
-  border: solid rgba(109,106,92,0.5) 1px;
-  background: rgb(218,211,184);
+  border: solid @error-border 1px;
+  background: @error-bg;
   padding: 10px;
 }
 

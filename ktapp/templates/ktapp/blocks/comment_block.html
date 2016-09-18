@@ -1,8 +1,8 @@
 {% load kt_extras %}
 <div class="comment_block">
     <div class="comment_block_author">
+        {{ comment.created_at|date:"Y-m-d H:i:s" }}
         {% if show_comment_source %}
-            {{ comment.created_at|date:"Y-m-d H:i:s" }}
             <span class="comment_source">{% if comment.domain == 'F' %}
                 {{ comment.film|oneliner_film_url_html_w_year:"film_comments" }}
             {% elif comment.domain == 'T' %}
@@ -10,48 +10,54 @@
             {% elif comment.domain == 'P' %}
                 [<a href="{% url 'poll' comment.poll.id comment.poll.slug_cache %}">{{ comment.poll }}</a>]
             {% endif %}</span>
-            <span class="comment_block_author_right">
-                {% if request.user.is_authenticated %}
-                    <a href="{% if comment.domain == 'F' %}{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'T' %}{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'P' %}{% url 'poll' comment.poll.id comment.poll.slug_cache %}?valasz={{ comment.id }}{% endif %}" title="válasz erre a kommentre">&larr;</a>&nbsp;
-                    {% if request.user.is_inner_staff or comment.editable and comment.created_by.id == request.user.id %}
-                        (<span class="action_text show_comment_edit_form" title="komment szerkesztése">szerk</span>)&nbsp;
-                    {% endif %}
-                {% endif %}
-                {% if comment.created_by %}<a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% endif %}
-                {% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}
-                #{{ comment.serial_number }}
-            </span>
         {% else %}
-            {{ comment.created_at|date:"Y-m-d H:i:s" }}
             {% if comment.created_by %}<a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% endif %}
             {% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}
-            <span class="comment_block_author_right">
-                {% if request.user.is_authenticated %}
-                    <a href="{% if comment.domain == 'F' %}{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'T' %}{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'P' %}{% url 'poll' comment.poll.id comment.poll.slug_cache %}?valasz={{ comment.id }}{% endif %}" title="válasz erre a kommentre">&larr;</a>&nbsp;
-                    {% if request.user.is_inner_staff or comment.editable and comment.created_by.id == request.user.id %}
+        {% endif %}
+        <span class="comment_block_author_right">
+            {% if request.user.is_authenticated %}
+                <a href="{% if comment.domain == 'F' %}{% url 'film_comments' comment.film.id comment.film.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'T' %}{% url 'forum' comment.topic.id comment.topic.slug_cache %}?valasz={{ comment.id }}{% elif comment.domain == 'P' %}{% url 'poll' comment.poll.id comment.poll.slug_cache %}?valasz={{ comment.id }}{% endif %}" title="válasz erre a kommentre">&larr;</a>&nbsp;
+                {% if request.user.is_inner_staff or comment.editable and comment.created_by.id == request.user.id %}
+                    {% if comment.domain != 'T' or comment.topic.id != 38 or request.user.is_game_master %}
                         (<span class="action_text show_comment_edit_form" title="komment szerkesztése">szerk</span>)&nbsp;
                     {% endif %}
                 {% endif %}
-                #{{ comment.serial_number }}
-                {% if request.user.is_authenticated and request.user.is_inner_staff %}
-                    {% if comment.domain != 'T' or comment.topic.id != 87 %}
-                        <input type="checkbox" class="comment_to_move_to_off" data-id="{{ comment.id }}" title="ikszeld be, ha OFF-ba szeretnéd mozgatni" />
-                    {% endif %}
+            {% endif %}
+            {% if show_comment_source %}
+                {% if comment.created_by %}<a href="{% url 'user_profile' comment.created_by.id comment.created_by.slug_cache %}">{{ comment.created_by }}</a>{% endif %}
+                {% if comment.domain == 'F' %} ({% if comment.rating %}{{ comment.rating }}{% else %}?{% endif %}){% endif %}
+            {% endif %}
+            #{{ comment.serial_number }}
+            {% if not show_comment_source and request.user.is_authenticated and request.user.is_inner_staff %}
+                {% if comment.domain != 'T' or comment.topic.id != 87 %}
+                    <input type="checkbox" class="comment_to_move_to_off" data-id="{{ comment.id }}" title="ikszeld be, ha OFF-ba szeretnéd mozgatni" />
                 {% endif %}
-            </span>
-        {% endif %}
+            {% endif %}
+        </span>
     </div>
     <div class="comment_content comment_block_content">
-        {% autoescape off %}
-            <p>{{ comment.content_html|linebreaksbr }}</p>
-        {% endautoescape %}
+        {% if comment.hidden %}
+            <p class="hidden_comment">
+            {% if not request.user.is_game_master and comment.created_by.id != request.user.id %}
+                [rejtett komment]
+            {% else %}
+                {% autoescape off %}
+                {{ comment.content_html|linebreaksbr }}
+                {% endautoescape %}
+            {% endif %}
+            </p>
+        {% else %}
+            {% autoescape off %}
+                <p>{{ comment.content_html|linebreaksbr }}</p>
+            {% endautoescape %}
+        {% endif %}
         {% if comment.reply_to %}
             <div class="comment_block_reply_to">
                 <p><span>előzmény: {{ comment.reply_to.created_by }} (#{{ comment.reply_to.serial_number }})</span></p>
             </div>
         {% endif %}
     </div>
-{% if request.user.is_authenticated  %}
+{% if request.user.is_authenticated %}
     {% if request.user.is_inner_staff or comment.editable and comment.created_by.id == request.user.id %}
         <div class="comment_edit_form comment_block_content" style="display: none">
             <form action="{% url 'edit_comment' %}" method="post" class="inline">

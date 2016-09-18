@@ -324,6 +324,9 @@ $(function() {
     $('#close_topic_opener').click(function() {
         $('#close_topic_div').toggle();
     });
+    $('#set_topic_game_mode_opener').click(function() {
+        $('#set_topic_game_mode_div').toggle();
+    });
     $('.move_to_off').click(function() {
         $('.move_to_off').hide();
         $('.move_to_off_loader').show();

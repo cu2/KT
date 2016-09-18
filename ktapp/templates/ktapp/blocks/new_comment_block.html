@@ -11,7 +11,13 @@
                 {% endif %}
                 {{ comment_form.content.errors }}
                 {{ comment_form.content }}
-                <p class="center"><input type="submit" value="Komment elküldése" /></p>
+                <p class="center">
+                {% if topic and topic.game_mode and not user.is_game_master %}
+                    <input type="submit" value="Rejtett komment elküldése" />
+                {% else %}
+                    <input type="submit" value="Komment elküldése" />
+                {% endif %}
+                </p>
             </form>
         </div>
     {% else %}

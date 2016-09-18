@@ -194,6 +194,9 @@ def new_comment(request):
     if comment_form.is_valid():
         comment = comment_form.save(commit=False)
         comment.created_by = request.user
+        if domain_type == models.Comment.DOMAIN_TOPIC:
+            if domain.game_mode and not request.user.is_game_master:
+                comment.hidden = True
         comment.save(domain=domain)  # Comment model updates domain object
         models.Event.objects.create(
             user=request.user,
@@ -222,6 +225,8 @@ def edit_comment(request):
     next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
     comment = get_object_or_404(models.Comment, id=request.POST.get('comment_id', 0))
     if request.user.is_inner_staff or (comment.created_by.id == request.user.id and comment.editable()):
+        if comment.domain == models.Comment.DOMAIN_TOPIC and comment.topic_id == 38 and not request.user.is_game_master:
+            return HttpResponseForbidden()
         content = request.POST.get('content', '').strip()
         if content != '':
             comment.content = content
@@ -1393,6 +1398,23 @@ def close_topic(request):
     else:
         topic.closed_until = None
     topic.save(update_fields=['closed_until'])
+    return HttpResponseRedirect(reverse('forum', args=(topic.id, topic.slug_cache)))
+
+
+@require_POST
+@login_required
+def set_topic_game_mode(request):
+    if not request.user.is_game_master:
+        return HttpResponseForbidden()
+    topic = get_object_or_404(models.Topic, id=request.POST.get('topic_id', 0))
+    game_mode = False
+    if request.POST.get('game_mode', '0') == '1':
+        game_mode = True
+    if topic.game_mode and not game_mode:  # show comments if game mode is over
+        print 'SHOW!!!'
+        models.Comment.objects.filter(domain=models.Comment.DOMAIN_TOPIC, topic=topic).update(hidden=False)
+    topic.game_mode = game_mode
+    topic.save(update_fields=['game_mode'])
     return HttpResponseRedirect(reverse('forum', args=(topic.id, topic.slug_cache)))
 
 

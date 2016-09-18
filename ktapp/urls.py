@@ -132,6 +132,7 @@ urlpatterns += [
     url(r'^forum/$', web_views.list_of_topics, name='list_of_topics'),
     url(r'^uj_topik$', post_views.new_topic, name='new_topic'),
     url(r'^lezar$', post_views.close_topic, name='close_topic'),
+    url(r'^rejtett_mod$', post_views.set_topic_game_mode, name='set_topic_game_mode'),
     url(r'^legfrissebb_kommentek/$', web_views.latest_comments, name='latest_comments'),
     url(r'^kedvencek/$', web_views.favourites, name='favourites'),
     url(r'^hasonlok/$', web_views.similar_users, name='similar_users'),
