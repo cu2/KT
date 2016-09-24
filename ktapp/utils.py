@@ -407,10 +407,11 @@ def delete_sessions(user_id):
 def get_design_version(request):
     if request.user.is_authenticated():
         return request.user.design_version
-    # A/B test
-    cohort = request.META.get('KT_COHORT', 0)
-    if cohort < 50:
-        design_version = 1
-    else:
-        design_version = 2
-    return design_version
+    return 2
+    # # A/B test
+    # cohort = request.META.get('KT_COHORT', 0)
+    # if cohort < 50:
+    #     design_version = 1
+    # else:
+    #     design_version = 2
+    # return design_version
