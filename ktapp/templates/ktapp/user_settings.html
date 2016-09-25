@@ -1,0 +1,27 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}<h1>Egyéni beállítások</h1>{% endblock %}
+
+{% block main %}
+
+    <form action="" method="post">
+        {% csrf_token %}
+        {% if user.id <= 17442 %}
+        <p>
+            <label for="id_design_version">Színvilág</label>
+            <select id="id_design_version" name="design_version">
+                <option value="2"{% if user.design_version == 2 %} selected="selected"{% endif %}>új (kék)</option>
+                <option value="1"{% if user.design_version == 1 %} selected="selected"{% endif %}>régi (barna)</option>
+            </select>
+        </p>
+        {% endif %}
+        <p>
+            <input type="submit" value="Beállítasok mentése" />
+            <a href="{% url 'user_profile' user.id user.slug_cache %}" class="button small_button" style="float: right">Mégsem</a>
+        </p>
+    </form>
+
+{% endblock %}

@@ -169,6 +169,7 @@ urlpatterns += [
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', user_profile_views.user_messages, name='user_messages'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)$', user_profile_views.user_profile, name='user_profile'),
     url(r'^szerk_profil/$', user_profile_views.edit_profile, name='edit_profile'),
+    url(r'^egyeni_beallitasok/$', user_views.user_settings, name='user_settings'),
     url(r'^szerk_facebook$', post_views.edit_share_on_facebook, name='edit_share_on_facebook'),
 
     url(r'^jelszo_modositasa$', user_views.change_password, name='change_password'),

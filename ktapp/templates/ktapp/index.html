@@ -9,6 +9,8 @@
 {% block main %}
 
     {% for banner in banners %}
+<div class="row">
+    <div class="col-sm-12">
         <div class="banner">
 
             {% if banner.what == 'fundraiser' %}
@@ -35,10 +37,22 @@
                     IBAN: HU64-12010154-00562473-00100006<br />
                     SWIFT: UBRT HU HB
                 </p>
+            {% elif banner.what == 'new_design' %}
+                <p>Hé! Hol vagyok? Mi ez a kék izé itt? Hát, ez a Kritikus Tömeg új dizájnja. Nem tetszik? <a href="{% url 'user_settings' %}">Kattints ide</a>, állítsd be a régit, és minden újra a megszokott barna. De ha netalántán, esetleg merésznek érzed magad, akkor próbáld ki mondjuk egy hétre. Hátha csak a megszokás köt az eddigihez.</p>
+                <hr />
+                <p>És hogy miért a változás? Kezdjük ott, hogy a KT eredetileg tömény sötétkék alapon világító sárga betűkkel indult. A logója pedig egy csapat tüntető emberke volt, akik egy-egy betűt tartottak a magasba: ők voltak a "Kritikus Tömeg".</p>
+                <p>Nem sokkal később jött a már jól ismert bézs-barna-bordó színvilág, ami egy az egyben egy könyvkiadó honlapjáról lett "kölcsönözve". Logó nuku. Aztán lett a Vapiti-díj, logó nélkül. Évekkel utána a Vapiti-figura csak a díjhoz. És további évek múlva a Vapiti-logó az egész oldalhoz.</p>
+                <p>Ez volt mostanáig a status quo: egy színvilág, ami egy könyvkiadóhoz tökéletesen passzol, hiszen a patinás, "értékes" könyvek bordó borítóját, megsárgult lapjait, barnás tintáját idézi. De mi köze a filmhez, ami egy folyamatosan megújuló, világító és vizuális médium? Nem beszélve a logóról, ami legyen bár aranyos és egyedi, szintén teljesen ad hoc egy filmes oldalon.</p>
+                <p>A régi felhasználóknak ez persze nem annyira számít. De mi van az új látogatókkal? Nem lehet, hogy nekik segítene, ha az oldal első ránézésre is közvetítené, hogy miről szól? Például egy logóval, ami kifejezi a látást, ami a filmek befogadásához kell, az okosságot/okoskodást, ami a jó kritika előfeltétele, és a sokféle nézőpontot és a közösséget, ami az oldal lényege. Vagy egy színvilággal, ami nem a régi, megsárgult könyvek lapjait idézi, hanem csak egy fokkal fiatalosabb, ahogy maga a film is a kultúrán belül a legfiatalabb ág. És, ami még a jövő zenéje: a mostaninál jóval több képpel, hiszen a film vizuális műfaj.</p>
+                <p>Az előzetes teszt azt mutatja, hogy ezek valóban fontos szempontok: az elmúlt két hétben a látogatók fele a régi, fele az új verziót látta, és az utóbbiak jóval nagyobb eséllyel regisztráltak. Hogy újakra szükség van, az pedig nem kérdés: minden közösség kihal előbb-utóbb, ha nem tud új tagokat toborozni.</p>
+                <p>Az új dizájn nem végleges, sok-sok csiszolni való van még rajta. Ez most az első lépés.</p>
+                <p>Ha bármi kérdésed, megjegyzésed, javaslatod van, szokás szerint <a href="{% url 'forum' 187 'kritikus-kod' %}">a fórumon</a> oszthatod meg velünk.</p>
             {% endif %}
 
             <div class="banner_closer" id="banner_{{ banner.id }}">&times;</div>
         </div>
+    </div>
+</div>
     {% endfor %}
 
 <div class="row">

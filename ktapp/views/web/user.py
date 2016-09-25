@@ -387,3 +387,24 @@ def new_message(request):
         'list_of_recipients': sorted(list(users), key=lambda u: u.username.upper()),
         'message_to_reply_to': message_to_reply_to,
     })
+
+
+@login_required()
+def user_settings(request):
+    next_url = request.GET.get('next', request.POST.get('next', reverse('user_profile', args=(request.user.id, request.user.slug_cache))))
+    if request.POST:
+        try:
+            design_version = int(request.POST.get('design_version'))
+        except (ValueError, TypeError):
+            design_version = 2
+        if design_version not in {1, 2}:
+            design_version = 2
+        request.user.design_version = design_version
+        request.user.save(update_fields=['design_version'])
+        models.Event.objects.create(
+            user=request.user,
+            event_type=models.Event.EVENT_TYPE_EDIT_USER_SETTINGS,
+        )
+        return HttpResponseRedirect(next_url)
+
+    return render(request, 'ktapp/user_settings.html')
