@@ -1174,6 +1174,7 @@ class Picture(models.Model):
     artists = models.ManyToManyField(Artist, blank=True)
     artist = models.ForeignKey(Artist, blank=True, null=True, on_delete=models.SET_NULL, related_name='actor_profile')
     user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL, related_name='user_profile')
+    number_of_artists = models.PositiveIntegerField(default=0)
 
     THUMBNAIL_SIZES = {
         'min': (120, 120),
@@ -1291,6 +1292,9 @@ class Picture(models.Model):
             return urlparse(self.source_url).netloc
         except:
             return ''
+
+    def get_margin_left(self):
+        return int(round((50.0 - 50.0 / self.height * self.width) / 2))
 
 
 @receiver(post_delete, sender=Picture)
