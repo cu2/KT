@@ -1672,7 +1672,7 @@ class EmailSend(models.Model):
 
 class EmailBounce(models.Model):
     email = models.CharField(max_length=250)
-    bounced_at = models.DateTimeField()
+    bounced_at = models.DateField()
 
 
 class EmailOpen(models.Model):
