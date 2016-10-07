@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 EMAIL_TEMPLATE_HTML = u'''<html>
-<body style="font-family: verdana, sans-serif; font-size: 10pt; padding: 20px; line-height: 1.6">
+<body style="font-family: verdana, sans-serif; font-size: 10pt; padding: 20px; line-height: 1.6; color: rgb(0,0,0)">
 <p><a href="https://kritikustomeg.org/click/?u={user_id}&t={type}&c={campaign_id}&url=https://kritikustomeg.org/"><img src="https://kritikustomeg.org/email_header.jpg?v=2&u={user_id}&t={type}&c={campaign_id}" alt="Kritikus Tömeg" style="width: 100%" /></a></p>
 <p>Kedves {username}!</p>
 {html_message}
