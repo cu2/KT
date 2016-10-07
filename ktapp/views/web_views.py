@@ -1344,7 +1344,7 @@ def email_header(request):
         email_type=email_type,
         campaign=campaign,
     )
-    email_header_jpg = open('/home/publisher/kt/current/static/ktapp/images/email_header.jpg', 'rb')
+    email_header_jpg = open('/home/publisher/kt/current/static/ktapp/images/email_header_v2.jpg', 'rb')
     response = HttpResponse(content=email_header_jpg.read())
     response['Content-Type'] = 'image/jpg'
     return response

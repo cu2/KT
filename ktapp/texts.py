@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 EMAIL_TEMPLATE_HTML = u'''<html>
-<body style="background: rgb(228,222,195); font-family: verdana, sans-serif; font-size: 10pt; padding: 20px; line-height: 1.6">
+<body style="font-family: verdana, sans-serif; font-size: 10pt; padding: 20px; line-height: 1.6">
 <p><a href="http://kritikustomeg.org/click/?u={user_id}&t={type}&c={campaign_id}&url=http://kritikustomeg.org/"><img src="http://kritikustomeg.org/email_header.jpg?u={user_id}&t={type}&c={campaign_id}" alt="Kritikus Tömeg" style="width: 100%" /></a></p>
 <p>Kedves {username}!</p>
 {html_message}
 <p><br /></p>
 <p>Üdvözlettel,<br />
 a KT szerkesztősége<br />
-<a href="http://kritikustomeg.org/click/?u={user_id}&t={type}&c={campaign_id}&url=http://kritikustomeg.org/" style="text-decoration: none; color: rgb(146,23,23)">kritikustomeg.org</a><br />
-<a href="http://kritikustomeg.org/click/?u={user_id}&t={type}&c={campaign_id}&url=https://www.facebook.com/kritikustomeg/" style="text-decoration: none; color: rgb(146,23,23)">www.facebook.com/kritikustomeg</a></p>
+<a href="http://kritikustomeg.org/click/?u={user_id}&t={type}&c={campaign_id}&url=http://kritikustomeg.org/" style="text-decoration: none; color: rgb(27,117,174)">kritikustomeg.org</a><br />
+<a href="http://kritikustomeg.org/click/?u={user_id}&t={type}&c={campaign_id}&url=https://www.facebook.com/kritikustomeg/" style="text-decoration: none; color: rgb(27,117,174)">www.facebook.com/kritikustomeg</a></p>
 {ps}
 </body>
 </html>
@@ -31,7 +31,7 @@ https://www.facebook.com/kritikustomeg/
 
 WELCOME_EMAIL_SUBJECT = u'[Kritikus Tömeg] regisztráció'
 WELCOME_EMAIL_BODY = u'''<p>Üdvözlünk a Kritikus Tömegen. Ahhoz, hogy hosszú távon is használni tudd az oldalt, szükséged van egy jelszóra, amivel be tudsz lépni. A jelszó megadásához kattints erre a linkre:</p>
-<p><a href="{verification_url}" style="text-decoration: none; color: rgb(146,23,23)">{verification_url}</a></p>'''
+<p><a href="{verification_url}" style="text-decoration: none; color: rgb(27,117,174)">{verification_url}</a></p>'''
 
 
 WELCOME_PM_BODY = u'''Kedves {username}!
@@ -67,7 +67,7 @@ a szerk
 
 PASSWORD_RESET_EMAIL_SUBJECT = u'[Kritikus Tömeg] jelszó'
 PASSWORD_RESET_EMAIL_BODY = u'''<p>A Kritikus Tömegen jelezted, hogy nem emlékszel a jelszavadra. Erre a linkre kattintva megadhatsz egy új jelszót:</p>
-<p><a href="{reset_password_url}" style="text-decoration: none; color: rgb(146,23,23)">{reset_password_url}</a></p>'''
+<p><a href="{reset_password_url}" style="text-decoration: none; color: rgb(27,117,174)">{reset_password_url}</a></p>'''
 
 
 PM_EMAIL_SUBJECT = u'[Kritikus Tömeg] {sent_by} üzenetet írt neked'
