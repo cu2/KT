@@ -96,22 +96,6 @@
             <br class="clear" />
         </div>
         <p><a href="{% url 'films_of_past_days' %}">Korábbi napok filmjei...</a></p>
-        {% if not request.user.is_authenticated %}
-            <h2>Facebook</h2>
-            <div style="width: 100%; overflow: hidden; height: 214px; text-align: center">
-            <div style="max-width: 100%; overflow: hidden; height: 214px; margin: 0 auto">
-                <div id="fb-root"></div>
-                <script>(function(d, s, id) {
-                    var js, fjs = d.getElementsByTagName(s)[0];
-                    if (d.getElementById(id)) return;
-                    js = d.createElement(s); js.id = id;
-                    js.src = "//connect.facebook.net/hu_HU/sdk.js#xfbml=1&version=v2.5&appId=259204284100889";
-                    fjs.parentNode.insertBefore(js, fjs);
-                }(document, 'script', 'facebook-jssdk'));</script>
-                <div class="fb-page" data-href="https://www.facebook.com/kritikustomeg" data-width="500" data-height="214" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true" data-show-posts="false">            </div>
-            </div>
-            </div>
-        {% endif %}
         {% if latest_content %}
             <h2>Legfrissebb írások</h2>
             {% for _, content_type, content in latest_content %}
