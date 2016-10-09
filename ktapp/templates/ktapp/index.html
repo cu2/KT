@@ -1,6 +1,7 @@
 {% extends "ktapp/layout.html" %}
 {% load kt_extras %}
 {% load humanize %}
+{% load static %}
 
 {% block title %}Kritikus Tömeg{% endblock %}
 
@@ -84,7 +85,31 @@
                 <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} ({{ film.year }})"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
             {% endif %}
             <p class="film_block_content">
-                {{ film|film_url_html_big }}
+                {% if film.average_rating %}
+                    <span class="film_block_average">
+                        {{ film|film_avg_rating_html }}
+                        {% spaceless %}
+                        <span class="film_block_rating_stars">
+                            {% for r in ratings %}
+                                {% if r <= film_avg_rating_int %}
+                                    <img class="icon" src="{% static 'ktapp/images/kt-icon-50-star-text-48.png' %}" alt="&#x2605;" />
+                                {% elif r == film_avg_rating_int|add:1 %}
+                                    {% if film_avg_rating_frac <= 2 %}
+                                        <img class="icon" src="{% static 'ktapp/images/kt-icon-49-star-empty-text-48.png' %}" alt="&#x2606;" />
+                                    {% elif film_avg_rating_frac >= 3 and film_avg_rating_frac <= 7 %}
+                                        <img class="icon" src="{% static 'ktapp/images/kt-icon-x-star-0.5-text-48.png' %}" alt="&#x2606;" />
+                                    {% elif film_avg_rating_frac >= 8 %}
+                                        <img class="icon" src="{% static 'ktapp/images/kt-icon-50-star-text-48.png' %}" alt="&#x2605;" />
+                                    {% endif %}
+                                {% else %}
+                                    <img class="icon" src="{% static 'ktapp/images/kt-icon-49-star-empty-text-48.png' %}" alt="&#x2606;" />
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        {% endspaceless %}
+                    </span>
+                {% endif %}
+                {{ film|film_url_html_big_w_year }}
                 ({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
                 <br />
                 {% for country in film.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}

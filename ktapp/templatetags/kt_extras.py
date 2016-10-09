@@ -96,6 +96,21 @@ def film_url_html_big(film, subpage='film_main'):
 
 
 @register.filter
+def film_url_html_big_w_year(film, subpage='film_main'):
+    if film.second_title:
+        second_row = film.second_title
+    else:
+        second_row = '&nbsp;'
+    return mark_safe(u'<b><a href="{url}"{vapiti}>{orig_title} ({year})</a></b><br />\n{second_row}'.format(
+        url=reverse(subpage, args=(film.id, film.slug_cache)),
+        vapiti=' class="vapiti"' if film.main_premier_year == settings.VAPITI_YEAR else '',
+        orig_title=film.orig_title,
+        year=film.year,
+        second_row='%s<br />\n' % second_row if second_row else '',
+    ))
+
+
+@register.filter
 def film_url_html_from_role(role, subpage='film_main'):
     if role.film_second_title:
         second_row = role.film_second_title

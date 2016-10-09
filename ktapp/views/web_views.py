@@ -92,6 +92,9 @@ def index(request):
     #
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
+        'ratings': range(1, 6),
+        'film_avg_rating_int': int(film_of_the_day.average_rating) if film_of_the_day.average_rating else 0,
+        'film_avg_rating_frac': int(10 * (film_of_the_day.average_rating - int(film_of_the_day.average_rating))) if film_of_the_day.average_rating else 0,
         'latest_content': sorted(latest_content, key=lambda x: x[0], reverse=True)[:10],
         'toplist': toplist_of_the_day,
         'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
