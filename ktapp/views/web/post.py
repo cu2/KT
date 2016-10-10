@@ -448,6 +448,20 @@ def set_main_poster(request):
 
 @require_POST
 @login_required
+@kt_utils.kt_permission_required('edit_picture')
+def set_main_picture(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
+    if picture.number_of_artists == 1:
+        artist = picture.artists.all()[0]
+        artist.main_picture = picture
+        artist.save(update_fields=['main_picture'])
+        return HttpResponseRedirect(reverse('artist_picture', args=(artist.id, artist.slug_cache, picture.id)) + '#pix')
+    return HttpResponseRedirect(next_url)
+
+
+@require_POST
+@login_required
 @kt_utils.kt_permission_required('delete_picture')
 def delete_picture(request):
     picture = get_object_or_404(models.Picture, pk=request.POST['picture'])

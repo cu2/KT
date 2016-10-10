@@ -25,6 +25,19 @@
                     <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
                 {% endif %}
             </div>
+            {% if permission_edit_picture and picture.number_of_artists == 1 %}
+                <div class="main_poster_edit_block" style="margin: 20px">
+                    {% if picture.id != artist.main_picture.id %}
+                        <form action="{% url 'set_main_picture' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="picture" value="{{ picture.id }}" />
+                            <p class="center"><input type="submit" class="small_button" value="Kép beállítása profilképnek" /></p>
+                        </form>
+                    {% else %}
+                        <p class="center">{{ artist.name }} profilképe.</p>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% endif %}
         {% if pictures|length > 1 %}
             {% for picture in pictures %}

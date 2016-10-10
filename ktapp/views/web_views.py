@@ -615,6 +615,7 @@ def artist_pictures(request, id, name_slug):
     context = {
         'artist': artist,
         'pictures': pictures,
+        'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
     }
     if len(pictures) == 1:
         picture = pictures[0]
@@ -633,6 +634,7 @@ def artist_picture(request, id, name_slug, picture_id):
         'artist': artist,
         'film': picture.film,
         'pictures': pictures,
+        'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
     }
     context.update(kt_utils.get_selected_picture_details(models.Picture, picture.film, picture, next_picture))
     return render(request, 'ktapp/artist_pictures.html', context)
