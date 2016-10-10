@@ -802,6 +802,33 @@ table.sortable tr.header_tr {
   cursor: pointer;
   color: @link-color;
 }
+.td_artist {
+  padding: 0 3px;
+}
+.td_artist>div, .td_artist>a {
+  display: flex;
+  align-items: center;
+  height: 50px;
+}
+.artist_picture_container {
+  flex: 0 0 50px;
+  vertical-align: middle;
+  overflow: hidden;
+  display: none;
+  @media(min-width: 768px) {
+    display: inline-block;
+  }
+}
+.artist_picture {
+  height: 50px;
+}
+.artist_name {
+  padding-left: 0;
+  @media(min-width: 768px) {
+    padding-left: 10px;
+  }
+}
+
 
 
 .paging {

@@ -135,7 +135,7 @@ def film_main(request, id, film_slug, film, base_context):
         'active_tab': 'main',
         'rating': rating,
         'ratings': range(1, 6),
-        'roles': film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).select_related('artist').order_by('role_name'),
+        'roles': film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).select_related('artist').order_by('artist__name'),
         'votes': zip(
             [film.num_specific_rating(r) for r in range(5, 0, -1)],
             votes,

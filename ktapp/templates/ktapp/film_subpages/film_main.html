@@ -31,15 +31,31 @@
             <div class="hover_show_button_context">
                 <h3>Szereplők{% if permission_new_role %} <span class="hover_show_button button small_button" id="show_new_role_form">új szereplő felvétele</span>{% endif %}</h3>
                 <table class="fullsize" id="table_of_roles">
-                    <thead>
-                        <th>Szerep</th>
-                        <th>Színész</th>
-                    </thead>
                     <tbody>
                     {% for role in roles %}
                         <tr class="{% cycle 'odd' '' %}">
-                            <td class="half_td"><a href="{% url 'role' role.id role.slug_cache %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}</td>
-                            <td><a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">{{ role.artist.name }}</a></td>
+                            <td class="td_artist">
+                                <a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">
+                                    {% with picture=role.artist.main_picture %}
+                                        <div class="artist_picture_container">
+                                        {% if picture %}
+                                            <img src="{{ picture.get_display_urls.min }}" class="artist_picture" style="margin-left: {{ picture.get_margin_left }}px" alt="" />
+                                        {% else %}
+                                        {% endif %}
+                                        </div>
+                                    {% endwith %}
+                                    <div class="artist_name">
+                                        {{ role.artist.name }}
+                                    </div>
+                                </a>
+                            </td>
+                            <td class="half_td td_artist">
+                                <div>
+                                    <span>
+                                        <a href="{% url 'role' role.id role.slug_cache %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}
+                                    </span>
+                                </div>
+                            </td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -52,23 +68,23 @@
                     <input type="hidden" id="new_role_film" value="{{ film.pk }}" />
                     <table class="fullsize">
                         <tr class="header_tr">
-                            <td class="half_td">Szerep</td>
-                            <td>Színész</td>
+                            <td class="half_td">Színész</td>
+                            <td>Szerep</td>
                         </tr>
                         <tr>
-                            <td>
-                                <input type="text" id="new_role_name" class="full_input" /><br />
-                                <select id="new_role_type">
-                                    <option value="F">teljes valójában</option>
-                                    <option value="V"{% if film.genre_cache_is_animation %} selected="selected"{% endif %}>csak a hangja</option>
-                                </select>
-                            </td>
                             <td>
                                 <input type="text" id="new_role_artist" class="full_input" /><br />
                                 <select id="new_role_gender">
                                     <option value="U">neme:</option>
                                     <option value="M">férfi</option>
                                     <option value="F">nő</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" id="new_role_name" class="full_input" /><br />
+                                <select id="new_role_type">
+                                    <option value="F">teljes valójában</option>
+                                    <option value="V"{% if film.genre_cache_is_animation %} selected="selected"{% endif %}>csak a hangja</option>
                                 </select>
                             </td>
                         </tr>
@@ -256,7 +272,7 @@
                             <a href="{% url 'user_profile' wish_user.id wish_user.slug_cache %}"{% if wish_user.id in special_users %} style="font-weight: bold"{% endif %}>{{ wish_user.username }}</a>{% if not forloop.last %}, {% endif %}
                         {% endfor %}
                         </span>
-                        <span id="all_users_wished_y" class="wish_details" style="display: none">
+                        <span id="all_users_wished_n" class="wish_details" style="display: none">
                             <br />
                             {% for wish_user in all_wishes.N.1 %}
                                 <a href="{% url 'user_profile' wish_user.id wish_user.slug_cache %}"{% if wish_user.id in special_users %} style="font-weight: bold"{% endif %}>{{ wish_user.username }}</a>{% if not forloop.last %}, {% endif %}

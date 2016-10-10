@@ -507,7 +507,7 @@ $(function() {
     });
     $('#show_new_role_form').click(function () {
         $('#new_role_form').toggle();
-        if ($('#new_role_form').is(':visible')) $('#new_role_name').focus();
+        if ($('#new_role_form').is(':visible')) $('#new_role_artist').focus();
     });
     $('#show_plot_edit_form').click(function () {
         $('#plot_text').toggle();
@@ -617,12 +617,12 @@ $(function() {
                     var role_name = $('#new_role_name').val();
                     if ($('#new_role_type').val() === 'V') role_name += ' (hangja)';
                     var artist_name = $('#new_role_artist').val();
-                    $('#table_of_roles').append('<tr><td>' + role_name + '</td><td>' + artist_name + '</td></tr>');
+                    $('#table_of_roles').append('<tr><td>' + artist_name + '</td><td>' + role_name + '</td></tr>');
                     $('#new_role_name').val('');
                     $('#new_role_artist').val('');
                     $('#new_role_gender').val('U');
                 }
-                $('#new_role_name').focus();
+                $('#new_role_artist').focus();
             }, 'json');
         }
     });
