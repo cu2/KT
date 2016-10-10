@@ -943,6 +943,12 @@ class Artist(models.Model):
             return artist_list[0]
         return None
 
+    def calculate_main_picture(self, exclude=None):
+        for pic in sorted(self.picture_set.all(), key=lambda pic: (-pic.film.number_of_ratings if pic.film else 0, pic.id)):
+            if pic.number_of_artists == 1 and (exclude is None or exclude != pic.id):
+                return pic
+        return None
+
 
 class FilmArtistRelationship(models.Model):
     film = models.ForeignKey(Film)

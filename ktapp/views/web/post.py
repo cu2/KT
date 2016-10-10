@@ -380,18 +380,26 @@ def delete_review(request):
 @kt_utils.kt_permission_required('new_picture')
 def new_picture(request):
     film = get_object_or_404(models.Film, pk=request.POST['film'])
-    if request.POST:
-        upload_form = kt_forms.PictureUploadForm(request.POST, request.FILES)
-        if upload_form.is_valid():
-            picture = upload_form.save(commit=False)
-            picture.created_by = request.user
-            picture.save()
-            possible_artists = {
-                unicode(artist.id): artist for artist in film.artists.all()
-            }
-            for artist_id in request.POST.getlist('picture_artist_cb'):
-                if artist_id in possible_artists:
-                    picture.artists.add(possible_artists[artist_id])
+    upload_form = kt_forms.PictureUploadForm(request.POST, request.FILES)
+    if upload_form.is_valid():
+        picture = upload_form.save(commit=False)
+        picture.created_by = request.user
+        picture.save()
+        possible_artists = {
+            unicode(artist.id): artist for artist in film.artists.all()
+        }
+        number_of_artists = 0
+        for artist_id in request.POST.getlist('picture_artist_cb'):
+            if artist_id in possible_artists:
+                picture.artists.add(possible_artists[artist_id])
+                number_of_artists += 1
+        picture.number_of_artists = number_of_artists
+        picture.save(update_fields=['number_of_artists'])
+        if picture.number_of_artists == 1:
+            artist = picture.artists.all()[0]
+            if artist.main_picture is None:
+                artist.main_picture = artist.calculate_main_picture()
+                artist.save(update_fields=['main_picture'])
     return HttpResponseRedirect(reverse('film_pictures', args=(film.pk, film.slug_cache)))
 
 
@@ -403,13 +411,27 @@ def edit_picture(request):
     picture.picture_type = request.POST.get('picture_type', 'O')
     picture.source_url = request.POST.get('source_url', '')
     picture.save()
+    if picture.number_of_artists == 1:
+        artist = picture.artists.all()[0]
+        if artist.main_picture.id == picture.id:
+            artist.main_picture = artist.calculate_main_picture(exclude=picture.id)
+            artist.save(update_fields=['main_picture'])
     picture.artists.clear()
     possible_artists = {
         unicode(artist.id): artist for artist in picture.film.artists.all()
     }
+    number_of_artists = 0
     for artist_id in request.POST.getlist('picture_artist_cb_edit'):
         if artist_id in possible_artists:
             picture.artists.add(possible_artists[artist_id])
+            number_of_artists += 1
+    picture.number_of_artists = number_of_artists
+    picture.save(update_fields=['number_of_artists'])
+    if picture.number_of_artists == 1:
+        artist = picture.artists.all()[0]
+        if artist.main_picture is None:
+            artist.main_picture = artist.calculate_main_picture()
+            artist.save(update_fields=['main_picture'])
     return HttpResponseRedirect(reverse('film_picture', args=(picture.film.pk, picture.film.slug_cache, picture.id)) + '#pix')
 
 
@@ -429,6 +451,11 @@ def set_main_poster(request):
 @kt_utils.kt_permission_required('delete_picture')
 def delete_picture(request):
     picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
+    if picture.number_of_artists == 1:
+        artist = picture.artists.all()[0]
+        if artist.main_picture.id == picture.id:
+            artist.main_picture = artist.calculate_main_picture(exclude=picture.id)
+            artist.save(update_fields=['main_picture'])
     picture.delete()
     return HttpResponseRedirect(reverse('film_pictures', args=(picture.film.pk, picture.film.slug_cache)))
 
