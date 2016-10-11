@@ -22,8 +22,13 @@
             <a name="pix" class="jumptarget"></a>
             <br />
             {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film|oneliner_film_url_html_w_year:"film_pictures" }} című filmben
-            {% if picture.source_url %}
-                <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
+            {% if picture.created_by or picture.source_url %}
+                <span class="picture_source"><br />
+                    {% if picture.source_url %}
+                        forrás: <a href="{{ picture.source_url }}" target="_blank">{{ picture.get_source_domain }}</a>{% endif %}{% if picture.created_by %}{% if picture.source_url %},{% endif %}
+                        feltöltötte: <a href="{% url 'user_profile' picture.created_by.id picture.created_by.slug_cache %}">{{ picture.created_by.username }}</a>
+                    {% endif %}
+                    </span>
             {% endif %}
         </div>
     {% endif %}
