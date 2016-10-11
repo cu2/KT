@@ -1164,17 +1164,15 @@ def latest_pictures(request):
           f.slug_cache AS film_slug_cache,
           f.orig_title AS film_orig_title,
           f.second_title AS film_second_title,
-          f.year AS film_year
-        FROM
-          ktapp_picture p USE INDEX (ktapp_picture_created_at_3047bfe36ccde785_uniq)
-        INNER JOIN
-          ktapp_film f
-        ON
-          f.id = p.film_id
-        ORDER BY
-          p.created_at DESC
-        LIMIT
-          100
+          f.year AS film_year,
+          a.id AS artist_id,
+          a.slug_cache AS artist_slug_cache,
+          a.name AS artist_name
+        FROM ktapp_picture p USE INDEX (ktapp_picture_created_at_3047bfe36ccde785_uniq)
+        LEFT JOIN ktapp_film f ON f.id = p.film_id
+        LEFT JOIN ktapp_artist a ON a.id = p.artist_id
+        ORDER BY p.created_at DESC
+        LIMIT 100
     '''))  # NOTE: apparently MySQL is an idiot
     return render(request, 'ktapp/latest_pictures.html', {
         'pictures': pictures,

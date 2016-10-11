@@ -11,7 +11,11 @@
     <div class="central-column-max">
 
     {% for p in pictures %}
-        <a href="{% url 'film_picture' p.film_id p.film_slug_cache p.id %}" title="{{ p.film_orig_title }} ({{ p.film_year }}){% if p.film_second_title %} / {{ p.film_second_title }}{% endif %}"><img src="{{ p.get_display_urls.mid }}" class="picture" alt="{{ p.film_orig_title }} ({{ p.film_year }}){% if p.film_second_title %} / {{ p.film_second_title }}{% endif %}" /></a>
+        {% if p.film_id %}
+            <a href="{% url 'film_picture' p.film_id p.film_slug_cache p.id %}" title="{{ p.film_orig_title }} ({{ p.film_year }}){% if p.film_second_title %} / {{ p.film_second_title }}{% endif %}"><img src="{{ p.get_display_urls.mid }}" class="picture" alt="{{ p.film_orig_title }} ({{ p.film_year }}){% if p.film_second_title %} / {{ p.film_second_title }}{% endif %}" /></a>
+        {% elif p.artist_id %}
+            <a href="{% url 'artist_picture' p.artist_id p.artist_slug_cache p.id %}" title="{{ p.artist_name }}"><img src="{{ p.get_display_urls.mid }}" class="picture" alt="{{ p.artist_name }}" /></a>
+        {% endif %}
     {% endfor %}
 
     </div>
