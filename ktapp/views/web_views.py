@@ -554,10 +554,6 @@ def top_films(request):
 
 def artist_main(request, id, name_slug):
     artist = get_object_or_404(models.Artist, pk=id)
-    try:
-        random_picture = artist.picture_set.all().order_by('?')[0]
-    except IndexError:
-        random_picture = None
     if request.POST:
         if kt_utils.check_permission('edit_artist', request.user):
             artist_name = kt_utils.strip_whitespace_and_separator(request.POST.get('artist_name', ''))
@@ -567,6 +563,12 @@ def artist_main(request, id, name_slug):
                 artist.gender = artist_gender
                 artist.save()
             return HttpResponseRedirect(reverse('artist', args=(artist.id, artist.slug_cache)))
+    random_picture = artist.main_picture
+    if random_picture is None:
+        try:
+            random_picture = artist.picture_set.all().order_by('?')[0]
+        except IndexError:
+            random_picture = None
     directions, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('director_id', artist.id)],
@@ -603,6 +605,7 @@ def artist_main(request, id, name_slug):
         'permission_edit_artist': kt_utils.check_permission('edit_artist', request.user),
         'permission_merge_artist': kt_utils.check_permission('merge_artist', request.user),
         'permission_approve_bio': kt_utils.check_permission('approve_bio', request.user),
+        'permission_new_picture': kt_utils.check_permission('new_picture', request.user),
         'imdb_link': 'http://imdb.com/find?s=nm&q=' + urlquote_plus(artist.name),
         'wiki_en_link': 'http://en.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(artist.name),
         'wiki_hu_link': 'http://hu.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(artist.name),
@@ -611,11 +614,13 @@ def artist_main(request, id, name_slug):
 
 def artist_pictures(request, id, name_slug):
     artist = get_object_or_404(models.Artist, pk=id)
-    pictures = sorted(artist.picture_set.all(), key=lambda pic: (-pic.film.year, pic.film.orig_title, pic.id))
+    pictures = sorted(artist.picture_set.all(), key=lambda pic: (-pic.film.year if pic.film else -9999, pic.film.orig_title if pic.film else '', pic.id))
     context = {
         'artist': artist,
         'pictures': pictures,
+        'permission_new_picture': kt_utils.check_permission('new_picture', request.user),
         'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
+        'permission_delete_picture': kt_utils.check_permission('delete_picture', request.user),
     }
     if len(pictures) == 1:
         picture = pictures[0]
@@ -628,13 +633,15 @@ def artist_pictures(request, id, name_slug):
 def artist_picture(request, id, name_slug, picture_id):
     artist = get_object_or_404(models.Artist, pk=id)
     picture = get_object_or_404(models.Picture, pk=picture_id)
-    pictures = sorted(artist.picture_set.all(), key=lambda pic: (-pic.film.year, pic.film.orig_title, pic.id))
+    pictures = sorted(artist.picture_set.all(), key=lambda pic: (-pic.film.year if pic.film else -9999, pic.film.orig_title if pic.film else '', pic.id))
     next_picture = kt_utils.get_next_picture(pictures, picture)
     context = {
         'artist': artist,
         'film': picture.film,
         'pictures': pictures,
+        'permission_new_picture': kt_utils.check_permission('new_picture', request.user),
         'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
+        'permission_delete_picture': kt_utils.check_permission('delete_picture', request.user),
     }
     context.update(kt_utils.get_selected_picture_details(models.Picture, picture.film, picture, next_picture))
     return render(request, 'ktapp/artist_pictures.html', context)

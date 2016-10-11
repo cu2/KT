@@ -285,12 +285,9 @@ def film_awards(request, id, film_slug, film, base_context):
 @_generic_film_view
 def film_pictures(request, id, film_slug, film, base_context):
     pictures = sorted(film.picture_set.all(), key=lambda pic: kt_utils.picture_index(pic, film))
-    upload_form = kt_forms.PictureUploadForm(initial={'film': film})
-    upload_form.fields['film'].widget = forms.HiddenInput()
     context = dict(base_context, **{
         'active_tab': 'pictures',
         'pictures': pictures,
-        'upload_form': upload_form,
         'all_artists_in_film': film.artists.filter(filmartistrelationship__role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).all().order_by('name'),
         'permission_new_picture': kt_utils.check_permission('new_picture', request.user),
         'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
@@ -310,12 +307,9 @@ def film_picture(request, id, film_slug, film, base_context, picture_id):
         raise Http404
     pictures = sorted(film.picture_set.all(), key=lambda pic: kt_utils.picture_index(pic, film))
     next_picture = kt_utils.get_next_picture(pictures, picture)
-    upload_form = kt_forms.PictureUploadForm(initial={'film': film})
-    upload_form.fields['film'].widget = forms.HiddenInput()
     context = dict(base_context, **{
         'active_tab': 'pictures',
         'pictures': pictures,
-        'upload_form': upload_form,
         'all_artists_in_film': film.artists.filter(filmartistrelationship__role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).all().order_by('name'),
         'permission_new_picture': kt_utils.check_permission('new_picture', request.user),
         'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),

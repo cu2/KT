@@ -379,28 +379,50 @@ def delete_review(request):
 @login_required
 @kt_utils.kt_permission_required('new_picture')
 def new_picture(request):
-    film = get_object_or_404(models.Film, pk=request.POST['film'])
+    if request.POST.get('film', 0):
+        film = get_object_or_404(models.Film, id=request.POST.get('film', 0))
+        artist = None
+    else:
+        film = None
+        artist = get_object_or_404(models.Artist, id=request.POST.get('artist', 0))
+        request.POST['picture_type'] = models.Picture.PICTURE_TYPE_ACTOR_PROFILE
+    picture = None
     upload_form = kt_forms.PictureUploadForm(request.POST, request.FILES)
     if upload_form.is_valid():
         picture = upload_form.save(commit=False)
         picture.created_by = request.user
+        picture.film = film
         picture.save()
-        possible_artists = {
-            unicode(artist.id): artist for artist in film.artists.all()
-        }
-        number_of_artists = 0
-        for artist_id in request.POST.getlist('picture_artist_cb'):
-            if artist_id in possible_artists:
-                picture.artists.add(possible_artists[artist_id])
-                number_of_artists += 1
-        picture.number_of_artists = number_of_artists
-        picture.save(update_fields=['number_of_artists'])
-        if picture.number_of_artists == 1:
-            artist = picture.artists.all()[0]
-            if artist.main_picture is None:
-                artist.main_picture = artist.calculate_main_picture()
-                artist.save(update_fields=['main_picture'])
-    return HttpResponseRedirect(reverse('film_pictures', args=(film.pk, film.slug_cache)))
+        if request.POST.get('film', 0):
+            possible_artists = {
+                unicode(artist.id): artist for artist in film.artists.all()
+            }
+            number_of_artists = 0
+            for artist_id in request.POST.getlist('picture_artist_cb'):
+                if artist_id in possible_artists:
+                    picture.artists.add(possible_artists[artist_id])
+                    number_of_artists += 1
+            picture.number_of_artists = number_of_artists
+            picture.save(update_fields=['number_of_artists'])
+            if picture.number_of_artists == 1:
+                artist = picture.artists.all()[0]
+                if artist.main_picture is None:
+                    artist.main_picture = artist.calculate_main_picture()
+                    artist.save(update_fields=['main_picture'])
+        else:
+            picture.number_of_artists = 1
+            picture.artist = artist
+            picture.save(update_fields=['number_of_artists', 'artist'])
+            picture.artists.add(artist)
+            artist.main_picture = picture
+            artist.save(update_fields=['main_picture'])
+    if request.POST.get('film', 0):
+        return HttpResponseRedirect(reverse('film_pictures', args=(film.pk, film.slug_cache)))
+    else:
+        if picture:
+            return HttpResponseRedirect(reverse('artist_picture', args=(artist.id, artist.slug_cache, picture.id)) + '#pix')
+        else:
+            return HttpResponseRedirect(reverse('artist_pictures', args=(artist.id, artist.slug_cache)))
 
 
 @require_POST
@@ -465,13 +487,17 @@ def set_main_picture(request):
 @kt_utils.kt_permission_required('delete_picture')
 def delete_picture(request):
     picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
+    if picture.film:
+        next_url = reverse('film_pictures', args=(picture.film.id, picture.film.slug_cache))
+    else:
+        next_url = reverse('artist_pictures', args=(picture.artist.id, picture.artist.slug_cache))
     if picture.number_of_artists == 1:
         artist = picture.artists.all()[0]
         if artist.main_picture.id == picture.id:
             artist.main_picture = artist.calculate_main_picture(exclude=picture.id)
             artist.save(update_fields=['main_picture'])
     picture.delete()
-    return HttpResponseRedirect(reverse('film_pictures', args=(picture.film.pk, picture.film.slug_cache)))
+    return HttpResponseRedirect(next_url)
 
 
 @require_POST

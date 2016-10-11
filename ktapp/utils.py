@@ -255,7 +255,7 @@ def get_selected_picture_details(model, film, picture, next_picture):
         'next_picture': next_picture,
         'pic_height': model.THUMBNAIL_SIZES['max'][1],
         'artists': picture.artists.all(),
-        'film_title_article': 'az' if film.orig_title[:1].lower() in u'aáeéiíoóöőuúüű' else 'a',
+        'film_title_article': ('az' if film.orig_title[:1].lower() in u'aáeéiíoóöőuúüű' else 'a') if film else '',
     }
 
 

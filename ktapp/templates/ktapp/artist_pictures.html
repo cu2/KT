@@ -13,6 +13,7 @@
 {% block main %}
 <div class="row">
     <div class="central-column-max">
+
         {% if picture %}
             <div class="center jumptarget_wrapper" style="min-height: {{ pic_height|add:5 }}px">
                 <div class="mobile-scroller">
@@ -20,7 +21,11 @@
                 </div>
                 <a name="pix" class="jumptarget"></a>
                 <br />
-                {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film|oneliner_film_url_html_w_year:"film_pictures" }} című filmben
+                {% if picture.film %}
+                    {% for artist in artists %}{% if not forloop.first %}{% if forloop.last %} és {% else %}, {% endif %}{% endif %}<a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>{% endfor %} {{ film_title_article }} {{ film|oneliner_film_url_html_w_year:"film_pictures" }} című filmben
+                {% else %}
+                    <a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a>
+                {% endif %}
                 {% if picture.source_url %}
                     <span class="picture_source"><br />(<a href="{{ picture.source_url }}">forrás</a>)</span>
                 {% endif %}
@@ -38,12 +43,41 @@
                     {% endif %}
                 </div>
             {% endif %}
+            {% if permission_delete_picture and picture.film == None %}
+                <p style="text-align: center; font-size: 8pt">(<span class="action_text" id="show_picture_delete_button">kép törlése</span>)</p>
+                <div class="picture_delete_block" style="display: none">
+                    <form action="{% url 'delete_picture' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="picture" value="{{ picture.id }}" />
+                        <p class="center"><input type="submit" value="Kép törlése" /></p>
+                    </form>
+                </div>
+            {% endif %}
         {% endif %}
+
         {% if pictures|length > 1 %}
             {% for picture in pictures %}
                 <a href="{% url 'artist_picture' artist.id artist.slug_cache picture.id %}#pix"><img src="{{ picture.get_display_urls.min }}" style="width: {{ picture.get_widths.min }}px; height: {{ picture.get_heights.min }}px" class="kt-thumbnail" /></a>
             {% endfor %}
         {% endif %}
+
+        {% if permission_new_picture %}
+            <h3>Új profilkép feltöltése</h3>
+            <ul>
+                <li>A kép legyen legalább 720 pixel széles, maximum kb 2000 pixel. Ha kevéssé híres színészről van szó, és alig van kép a neten, jó a kisebb kép is.</li>
+                <li><b>Négyzet alakú</b> vagy annál szélesebb legyen, aminek ha a rendszer automatice levágja a két szélét (négyzet alakúra), akkor is látszódik a szinész arca.</li>
+                <li>A kép a <b>színész arcát</b> mutassa, hogy kicsiben is fel lehessen ismerni, vagyis ne egész alakos legyen.</li>
+                <li>Minél "semlegesebb" a kép, annál jobb. Vagyis <b>a színészre legyen jellemző, ne valamelyik konkrét szerepére</b>. Semmiképp se legyen maszkos vagy erőteljesen kosztümös.</li>
+            </ul>
+            <form action="{% url 'new_picture' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="artist" value="{{ artist.id }}" />
+                <p><label for="id_img">Kép:</label> <input type="file" name="img" id="id_img" /></p>
+                <p><label for="id_source_url">Honnan való? (a kép pontos webcíme, nem csak az oldalé)</label> <input type="text" name="source_url" id="id_source_url" maxlength="250" /></p>
+                <p class="center"><input type="submit" value="Profilkép feltöltése" /></p>
+            </form>
+        {% endif %}
+
     </div>
 </div>
 {% endblock %}
