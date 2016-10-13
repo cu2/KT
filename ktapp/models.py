@@ -1264,8 +1264,8 @@ class Picture(models.Model):
             zoom = 1.0 * img.width / self.get_width('max')
         else:
             zoom = 1.0 * img.height / self.get_height('max')
-        x1, x2 = round(zoom * x), round(zoom * (x + w))
-        y1, y2 = round(zoom * y), round(zoom * (y + h))
+        x1, x2 = int(round(zoom * x)), int(round(zoom * (x + w)))
+        y1, y2 = int(round(zoom * y)), int(round(zoom * (y + h)))
         img2 = img.crop((x1, y1, x2, y2))
         img2.save(local_name)
         self.width = img2.width
