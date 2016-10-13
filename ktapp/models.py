@@ -1259,7 +1259,7 @@ class Picture(models.Model):
         new_name = get_picture_upload_name(self, self.img.name)
         new_local_name = settings.MEDIA_ROOT + new_name
         # download from s3:
-        if not kt_utils.download_file_from_s3(unicode(self.img), new_local_name):
+        if not kt_utils.download_file_from_s3_with_retry(unicode(self.img), new_local_name):
             raise IOError
         # crop:
         img = Image.open(new_local_name)

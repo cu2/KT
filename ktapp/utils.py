@@ -385,6 +385,14 @@ def download_file_from_s3(remote_name, local_name):
     return False
 
 
+def download_file_from_s3_with_retry(remote_name, local_name, retry_count=2):
+    if download_file_from_s3(remote_name, local_name):
+        return True
+    if retry_count:
+        return download_file_from_s3_with_retry(remote_name, local_name, retry_count-1)
+    return False
+
+
 def delete_file_from_s3(remote_name):
     try:
         boto3_session = boto3.session.Session(
