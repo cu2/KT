@@ -1254,12 +1254,14 @@ class Picture(models.Model):
             self.film.save(update_fields=['number_of_pictures', 'main_poster'])
 
     def crop(self, x, y, w, h):
-        local_name = settings.MEDIA_ROOT + unicode(self.img)
+        orig_local_name = settings.MEDIA_ROOT + unicode(self.img)
+        orig_width, orig_height = self.width, self.height
+        new_local_name = get_picture_upload_name(self, self.img.name)
         # download from s3:
-        if not kt_utils.download_file_from_s3(unicode(self.img), local_name):
+        if not kt_utils.download_file_from_s3(unicode(self.img), new_local_name):
             raise IOError
         # crop:
-        img = Image.open(local_name)
+        img = Image.open(new_local_name)
         if img.width > img.height:
             zoom = 1.0 * img.width / self.get_width('max')
         else:
@@ -1267,13 +1269,18 @@ class Picture(models.Model):
         x1, x2 = int(round(zoom * x)), int(round(zoom * (x + w)))
         y1, y2 = int(round(zoom * y)), int(round(zoom * (y + h)))
         img2 = img.crop((x1, y1, x2, y2))
-        img2.save(local_name)
+        img2.save(new_local_name)
         self.width = img2.width
         self.height = img2.height
-        self.save(update_fields=['width', 'height'])
+        self.img.name = new_local_name
+        self.save(update_fields=['width', 'height', 'img'])
         # upload to s3:
         if not kt_utils.upload_file_to_s3(settings.MEDIA_ROOT + unicode(self.img), unicode(self.img)):
-            self.delete()
+            # restore original on error:
+            self.width = orig_width
+            self.height = orig_height
+            self.img.name = orig_local_name
+            self.save(update_fields=['width', 'height', 'img'])
             raise IOError
         # generate thumbnails and upload to s3:
         for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
