@@ -421,7 +421,7 @@ def new_picture(request):
         return HttpResponseRedirect(reverse('film_pictures', args=(film.pk, film.slug_cache)))
     else:
         if picture:
-            return HttpResponseRedirect(reverse('artist_picture', args=(artist.id, artist.slug_cache, picture.id)) + '#pix')
+            return HttpResponseRedirect(reverse('crop_picture', args=(picture.id,)))
         else:
             return HttpResponseRedirect(reverse('artist_pictures', args=(artist.id, artist.slug_cache)))
 

@@ -48,7 +48,7 @@
                     {% endif %}
                 </div>
             {% endif %}
-            {% if permission_edit_picture and picture.artist != None and request.user.id == 1 %}
+            {% if permission_edit_picture and picture.artist != None %}
                 <p class="center">
                     <a href="{% url 'crop_picture' picture.id %}">Profilkép méretre vágása</a>
                 </p>
