@@ -1258,10 +1258,23 @@ class Picture(models.Model):
         # download from s3:
         if not kt_utils.download_file_from_s3(unicode(self.img), local_name):
             raise IOError
-        # crop
+        # crop:
         img = Image.open(local_name)
-        img.crop((x, y, x + w, y + h))
-        img.save(local_name)
+        if img.width > img.height:
+            zoom = 1.0 * img.width / self.get_width('max')
+        else:
+            zoom = 1.0 * img.height / self.get_height('max')
+        x1, x2 = round(zoom * x), round(zoom * (x + w))
+        y1, y2 = round(zoom * y), round(zoom * (y + h))
+        img2 = img.crop((x1, y1, x2, y2))
+        img2.save(local_name)
+        self.width = img2.width
+        self.height = img2.height
+        self.save(update_fields=['width', 'height'])
+        # upload to s3:
+        if not kt_utils.upload_file_to_s3(settings.MEDIA_ROOT + unicode(self.img), unicode(self.img)):
+            self.delete()
+            raise IOError
         # generate thumbnails and upload to s3:
         for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
             self.generate_thumbnail(w, h)

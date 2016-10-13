@@ -651,19 +651,17 @@ def artist_picture(request, id, name_slug, picture_id):
 @kt_utils.kt_permission_required('edit_picture')
 def crop_picture(request, id):
     picture = get_object_or_404(models.Picture, id=id)
+    artist = picture.artist
     if request.POST:
         x = int(request.POST.get('x'))
         y = int(request.POST.get('y'))
         w = int(request.POST.get('w'))
         h = int(request.POST.get('h'))
         picture.crop(x, y, w, h)
-        if picture.artist:
-            artist = picture.artist
-            return HttpResponseRedirect(reverse('artist_picture', args=(artist.id, artist.slug_cache, picture.id)) + '#pix')
-        next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
-        return HttpResponseRedirect(next_url)
+        return HttpResponseRedirect(reverse('artist_picture', args=(artist.id, artist.slug_cache, picture.id)) + '#pix')
     return render(request, 'ktapp/crop_picture.html', {
         'picture': picture,
+        'artist': artist,
     })
 
 

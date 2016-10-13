@@ -20,6 +20,7 @@
     <script type="application/javascript">
         $('#image').cropper({
             aspectRatio: 1,
+            viewMode: 1,
             crop: function (e) {
                 $('#picture_x').val(e.x);
                 $('#picture_y').val(e.y);
@@ -44,7 +45,12 @@
             <input type="hidden" name="y" id="picture_y" />
             <input type="hidden" name="w" id="picture_w" />
             <input type="hidden" name="h" id="picture_h" />
-            <p class="center"><input type="submit" value="Kép méretre vágása" /></p>
+            <p class="center">
+            </p>
+            <p>
+                <input type="submit" value="Kép méretre vágása" />
+                <a href="{% url 'artist_pictures' artist.id artist.slug_cache picture.id %}#pix" class="button small_button" style="float: right">Mégsem</a>
+            </p>
         </form>
 
     </div>
