@@ -1254,9 +1254,10 @@ class Picture(models.Model):
             self.film.save(update_fields=['number_of_pictures', 'main_poster'])
 
     def crop(self, x, y, w, h):
-        orig_local_name = settings.MEDIA_ROOT + unicode(self.img)
+        orig_name = self.img.name
         orig_width, orig_height = self.width, self.height
-        new_local_name = get_picture_upload_name(self, self.img.name)
+        new_name = get_picture_upload_name(self, self.img.name)
+        new_local_name = settings.MEDIA_ROOT + new_name
         # download from s3:
         if not kt_utils.download_file_from_s3(unicode(self.img), new_local_name):
             raise IOError
@@ -1272,14 +1273,14 @@ class Picture(models.Model):
         img2.save(new_local_name)
         self.width = img2.width
         self.height = img2.height
-        self.img.name = new_local_name
+        self.img.name = new_name
         self.save(update_fields=['width', 'height', 'img'])
         # upload to s3:
         if not kt_utils.upload_file_to_s3(settings.MEDIA_ROOT + unicode(self.img), unicode(self.img)):
             # restore original on error:
             self.width = orig_width
             self.height = orig_height
-            self.img.name = orig_local_name
+            self.img.name = orig_name
             self.save(update_fields=['width', 'height', 'img'])
             raise IOError
         # generate thumbnails and upload to s3:
