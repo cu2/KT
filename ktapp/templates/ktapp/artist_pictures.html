@@ -48,6 +48,11 @@
                     {% endif %}
                 </div>
             {% endif %}
+            {% if permission_edit_picture and request.user.id == 1 %}
+                <p class="center">
+                    <a href="{% url 'crop_picture' picture.id %}">Profilkép méretre vágása</a>
+                </p>
+            {% endif %}
             {% if permission_delete_picture and picture.film == None %}
                 <p style="text-align: center; font-size: 8pt">(<span class="action_text" id="show_picture_delete_button">kép törlése</span>)</p>
                 <div class="picture_delete_block" style="display: none">

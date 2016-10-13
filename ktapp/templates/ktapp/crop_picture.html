@@ -1,0 +1,52 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+{% load static %}
+
+{% block header %}
+    <h1>Profilkép méretre vágása</h1>
+{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/cropper.min.css' %}" />
+    <style type="text/css">
+        img {
+            max-width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'ktapp/js/cropper.min.js' %}"></script>
+    <script type="application/javascript">
+        $('#image').cropper({
+            aspectRatio: 1,
+            crop: function (e) {
+                $('#picture_x').val(e.x);
+                $('#picture_y').val(e.y);
+                $('#picture_w').val(e.width);
+                $('#picture_h').val(e.height);
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="central-column-max">
+        <div>
+            <img id="image" src="{{ picture.get_display_urls.max }}">
+        </div>
+
+        <br />
+        <form action="{% url 'crop_picture' picture.id %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="x" id="picture_x" />
+            <input type="hidden" name="y" id="picture_y" />
+            <input type="hidden" name="w" id="picture_w" />
+            <input type="hidden" name="h" id="picture_h" />
+            <p class="center"><input type="submit" value="Kép méretre vágása" /></p>
+        </form>
+
+    </div>
+</div>
+{% endblock %}

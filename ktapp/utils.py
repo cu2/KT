@@ -5,6 +5,7 @@ import datetime
 import hashlib
 import imghdr
 import json
+import os
 import re
 
 from django.contrib.auth import authenticate
@@ -307,14 +308,16 @@ def get_vapiti_nominees(award_model, vapiti_type):
         return [(nominee_award.film_id, nominee_award.artist_id) for nominee_award in nominee_awards]
 
 
-def upload_file_to_s3(local_name, remote_name):
 
-    def md5(fname):
-        hash = hashlib.md5()
-        with open(fname, 'rb') as f:
-            for chunk in iter(lambda: f.read(4096), b''):
-                hash.update(chunk)
-        return hash.hexdigest()
+def get_local_md5(fname):
+    hash = hashlib.md5()
+    with open(fname, 'rb') as f:
+        for chunk in iter(lambda: f.read(4096), b''):
+            hash.update(chunk)
+    return hash.hexdigest()
+
+
+def upload_file_to_s3(local_name, remote_name):
 
     mime_type = imghdr.what(local_name)
     if mime_type:
@@ -329,7 +332,7 @@ def upload_file_to_s3(local_name, remote_name):
             region_name=settings.AWS_DEFAULT_REGION,
         )
         s3 = boto3_session.resource('s3')
-        local_md5 = md5(local_name)
+        local_md5 = get_local_md5(local_name)
         key = s3.Object('kt.static', remote_name)
         key.put(
             Body=open(local_name, 'rb'),
@@ -351,6 +354,34 @@ def upload_file_to_s3(local_name, remote_name):
             key.delete()
         except:
             pass
+    return False
+
+
+def download_file_from_s3(remote_name, local_name):
+
+    try:
+        boto3_session = boto3.session.Session(
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            region_name=settings.AWS_DEFAULT_REGION,
+        )
+        s3 = boto3_session.resource('s3')
+        remote_md5 = s3.Object('kt.static', remote_name).e_tag[1:-1]
+        s3.meta.client.download_file('kt.static', remote_name, local_name)
+        local_md5 = get_local_md5(local_name)
+    except Exception as e:
+        print e
+        try:
+            os.unlink(local_name)
+        except:
+            pass
+        return False
+    if local_md5 == remote_md5:
+        return True
+    try:
+        os.unlink(local_name)
+    except:
+        pass
     return False
 
 

@@ -1253,6 +1253,35 @@ class Picture(models.Model):
                     self.film.main_poster = self.film.picture_set.filter(picture_type=self.PICTURE_TYPE_DVD).order_by('id')[0]
             self.film.save(update_fields=['number_of_pictures', 'main_poster'])
 
+    def crop(self, x, y, w, h):
+        local_name = settings.MEDIA_ROOT + unicode(self.img)
+        # download from s3:
+        if not kt_utils.download_file_from_s3(unicode(self.img), local_name):
+            raise IOError
+        # crop
+        img = Image.open(local_name)
+        img.crop((x, y, x + w, y + h))
+        img.save(local_name)
+        # generate thumbnails and upload to s3:
+        for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
+            self.generate_thumbnail(w, h)
+            _, outfilename, _, s3_key = self.get_thumbnail_filename(w, h)
+            if not kt_utils.upload_file_to_s3(outfilename, s3_key):
+                self.delete()
+                raise IOError
+        # delete orig locally:
+        try:
+            os.remove(settings.MEDIA_ROOT + unicode(self.img))
+        except OSError:
+            pass
+        # delete thumbnails locally:
+        for _, (w, h) in self.THUMBNAIL_SIZES.iteritems():
+            _, filename, _, _ = self.get_thumbnail_filename(w, h)
+            try:
+                os.remove(filename)
+            except OSError:
+                pass
+
     def __unicode__(self):
         return unicode(self.img)
 

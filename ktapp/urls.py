@@ -128,6 +128,7 @@ urlpatterns += [
     url(r'^torol_szereplo$', post_views.delete_role, name='delete_role'),
     url(r'^osszevon_muvesz$', post_views.merge_artist, name='merge_artist'),
     url(r'^fokep$', post_views.set_main_picture, name='set_main_picture'),
+    url(r'^kepkivagas/(?P<id>\d+)/$', web_views.crop_picture, name='crop_picture'),
 
     url(r'^forum/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.forum, name='forum'),
     url(r'^forum/$', web_views.list_of_topics, name='list_of_topics'),

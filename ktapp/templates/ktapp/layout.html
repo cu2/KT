@@ -21,6 +21,7 @@
         {% elif design_version == 'v2' %}
             <link href="{% static 'ktapp/css/kt-bootstrap-v2.min.css' %}?csshash-v2=ef415e396065baad4f2d5ee9dded62af" rel="stylesheet" />
         {% endif %}
+        {% block extra_css %}{% endblock %}
 
         <!--[if lt IE 9]>
             <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -359,5 +360,6 @@
         <script src="{% static 'ktapp/js/stupidtable.min.js' %}"></script>
         <script src="{% static 'ktapp/js/kt.js' %}?jshash=e0bbbc7bee058c85b163fe0f3678e621"></script>
         <script src="{% static 'ktapp/js/bootstrap.min.js' %}"></script>
+        {% block extra_js %}{% endblock %}
     </body>
 </html>
