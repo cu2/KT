@@ -392,6 +392,7 @@ def new_picture(request):
         picture = upload_form.save(commit=False)
         picture.created_by = request.user
         picture.film = film
+        picture.artist = artist
         picture.save()
         if request.POST.get('film', 0):
             possible_artists = {
