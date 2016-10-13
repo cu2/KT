@@ -653,10 +653,10 @@ def crop_picture(request, id):
     picture = get_object_or_404(models.Picture, id=id)
     artist = picture.artist
     if request.POST:
-        x = int(request.POST.get('x'))
-        y = int(request.POST.get('y'))
-        w = int(request.POST.get('w'))
-        h = int(request.POST.get('h'))
+        x = int(round(request.POST.get('x')))
+        y = int(round(request.POST.get('y')))
+        w = int(round(request.POST.get('w')))
+        h = int(round(request.POST.get('h')))
         picture.crop(x, y, w, h)
         return HttpResponseRedirect(reverse('artist_picture', args=(artist.id, artist.slug_cache, picture.id)) + '#pix')
     return render(request, 'ktapp/crop_picture.html', {
