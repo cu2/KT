@@ -893,7 +893,7 @@ $(function() {
     $.getScript('//connect.facebook.net/hu_HU/sdk.js', function(){
         FB.init({
             appId: '259204284100889',
-            version: 'v2.4'
+            version: 'v2.8'
         });
     });
 
