@@ -169,6 +169,7 @@ def search(request):
                 'subtitle': subtitle,
                 'subsubtitle': subsubtitle,
                 'thumbnail': artist.main_picture.get_display_urls()['min'] if artist.main_picture else '',
+                'thumbnail_margin_left': artist.main_picture.get_margin_left_autocomplete() if artist.main_picture else 0,
             })
         results.append({
             'domain': 'artists',

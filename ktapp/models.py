@@ -1353,6 +1353,9 @@ class Picture(models.Model):
     def get_margin_left(self):
         return int(round((50.0 - 50.0 / self.height * self.width) / 2))
 
+    def get_margin_left_autocomplete(self):
+        return int(round((50.0 - 50.0 / self.height * self.width) / 2 * 0.8 - 5))
+
 
 @receiver(post_delete, sender=Picture)
 def delete_picture(sender, instance, **kwargs):

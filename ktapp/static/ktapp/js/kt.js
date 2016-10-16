@@ -106,9 +106,19 @@ var ktApp = {
                             search_autocomplete_results_html += '<ul>';
                             for(var i = 0; i < results.length; i++) {
                                 search_autocomplete_results_html += '<li><a href="' + results[i].url + '">';
-                                search_autocomplete_results_html += '<span class="search-autocomplete-results-thumbnail-container">';
-                                if (results[i].thumbnail) search_autocomplete_results_html += '<img src="' + results[i].thumbnail + '" />';
-                                search_autocomplete_results_html += '</span>';
+                                if (domain === 'artists') {
+                                    search_autocomplete_results_html += '<span class="search-autocomplete-results-artist-thumbnail-container">';
+                                    if (results[i].thumbnail) {
+                                        search_autocomplete_results_html += '<img src="' + results[i].thumbnail + '" style="margin-left: ' + (results[i].thumbnail_margin_left) + 'px" />';
+                                    }
+                                    search_autocomplete_results_html += '</span>';
+                                } else {
+                                    search_autocomplete_results_html += '<span class="search-autocomplete-results-thumbnail-container">';
+                                    if (results[i].thumbnail) {
+                                        search_autocomplete_results_html += '<img src="' + results[i].thumbnail + '" />';
+                                    }
+                                    search_autocomplete_results_html += '</span>';
+                                }
                                 search_autocomplete_results_html += results[i].title;
                                 if (results[i].subtitle) search_autocomplete_results_html += '<br /><span class="search-autocomplete-results-subtitle">' + results[i].subtitle + '</span>';
                                 if (results[i].subsubtitle) search_autocomplete_results_html += '<br /><span class="search-autocomplete-results-subtitle">' + results[i].subsubtitle + '</span>';
