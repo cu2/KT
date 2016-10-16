@@ -134,7 +134,7 @@ def search(request):
     if films:
         film_results = []
         for film in films:
-            actors = [r.artist.name for r in models.FilmArtistRelationship.objects.filter(film=film, role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).select_related('artist').order_by('-artist__number_of_ratings_as_actor')[:3]]
+            actors = [r.artist.name for r in models.FilmArtistRelationship.objects.filter(film=film, role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR, is_main_role=True).select_related('artist').order_by('artist__name')[:3]]
             film_results.append({
                 'url': reverse('film_main', args=(film.id, film.slug_cache)),
                 'title': film_title(film),
