@@ -4,7 +4,7 @@
 {% block title %}{{ role.role_name }} - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{{ role.role_name }}</h1>
+    <h1>{{ role.role_name }} <span style="font-weight: normal; font-size: 14px">[{% if role.is_main_role %}fő{% else %}mellék{% endif %}szereplő]</span></h1>
 {% endblock %}
 
 {% block main %}
@@ -47,6 +47,13 @@
             <p>
                 <label for="id_role_name">Név:</label>
                 <input type="text" name="role_name" id="id_role_name" value="{{ role.role_name }}" />
+            </p>
+            <p>
+                <label for="id_is_main_role">Fő/mellékszerep:</label>
+                <select name="is_main_role" id="id_is_main_role">
+                    <option value="1"{% if role.is_main_role %} selected="selected"{% endif %}>főszerep</option>
+                    <option value="0"{% if not role.is_main_role %} selected="selected"{% endif %}>mellékszerep</option>
+                </select>
             </p>
             <p>
                 <label for="id_role_type">Típus:</label>

@@ -509,6 +509,9 @@ $(function() {
         $('#new_role_form').toggle();
         if ($('#new_role_form').is(':visible')) $('#new_role_artist').focus();
     });
+    $('#show_table_of_roles_aux').click(function () {
+        $('#table_of_roles_aux').toggle();
+    });
     $('#show_plot_edit_form').click(function () {
         $('#plot_text').toggle();
         $('#plot_edit_form').toggle();
@@ -609,6 +612,7 @@ $(function() {
                 csrfmiddlewaretoken: $.cookie('csrftoken'),
                 film_id: $('#new_role_film').val(),
                 role_name: $('#new_role_name').val(),
+                is_main_role: $('#new_is_main_role').val(),
                 role_type: $('#new_role_type').val(),
                 role_artist: $('#new_role_artist').val(),
                 role_gender: $('#new_role_gender').val()
@@ -617,7 +621,12 @@ $(function() {
                     var role_name = $('#new_role_name').val();
                     if ($('#new_role_type').val() === 'V') role_name += ' (hangja)';
                     var artist_name = $('#new_role_artist').val();
-                    $('#table_of_roles').append('<tr><td>' + artist_name + '</td><td>' + role_name + '</td></tr>');
+                    if ($('#new_is_main_role').val() == 1) {
+                        $('#table_of_roles').append('<tr><td>' + artist_name + '</td><td>' + role_name + '</td></tr>');
+                    } else {
+                        $('#table_of_roles_aux').show();
+                        $('#table_of_roles_aux').append('<tr><td>' + artist_name + '</td><td>' + role_name + '</td></tr>');
+                    }
                     $('#new_role_name').val('');
                     $('#new_role_artist').val('');
                     $('#new_role_gender').val('U');
@@ -625,6 +634,17 @@ $(function() {
                 $('#new_role_artist').focus();
             }, 'json');
         }
+    });
+
+    $('.edit_is_main_role').click(function() {
+        $.post('/szerk_szereplo', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            role_id: $(this).data('role-id')
+        }, function(data) {
+            if (data.success) {
+                document.location.reload();
+            }
+        }, 'json');
     });
 
     $('.input_for_artists')

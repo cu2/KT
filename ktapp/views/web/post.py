@@ -1187,35 +1187,50 @@ def merge_artist(request):
 @login_required
 @kt_utils.kt_permission_required('new_role')
 def new_role(request):
-    if request.POST:
-        role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))  # NOTE: role name *can* contain , or ;
-        role_type = kt_utils.strip_whitespace(request.POST.get('role_type', ''))
-        role_artist = kt_utils.strip_whitespace_and_separator(request.POST.get('role_artist', ''))
-        role_gender = kt_utils.strip_whitespace(request.POST.get('role_gender', ''))
-        try:
-            film = models.Film.objects.get(id=request.POST.get('film_id', 0))
-        except models.Film.DoesNotExist:
-            film = None
-        if film and role_name != '' and role_type in ['F', 'V'] and role_artist != '' and ',' not in role_artist and role_gender in ['M', 'F']:
-            artist = models.Artist.get_artist_by_name(role_artist)
-            if artist is None:
-                artist = models.Artist.objects.create(
-                    name=role_artist,
-                    gender=role_gender,
-                )
-            if artist.gender != role_gender:
-                artist.gender = role_gender
-                artist.save()
-            models.FilmArtistRelationship.objects.create(
-                film=film,
-                artist=artist,
-                role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR,
-                actor_subtype=role_type,
-                role_name=role_name,
-                created_by=request.user,
+    role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))  # NOTE: role name *can* contain , or ;
+    role_type = kt_utils.strip_whitespace(request.POST.get('role_type', ''))
+    if role_type not in {'F', 'V'}:
+        role_type = 'F'
+    is_main_role = kt_utils.strip_whitespace(request.POST.get('is_main_role', '')) == '1'
+    role_artist = kt_utils.strip_whitespace_and_separator(request.POST.get('role_artist', ''))
+    role_gender = kt_utils.strip_whitespace(request.POST.get('role_gender', ''))
+    if role_gender not in {'M', 'F'}:
+        role_gender = 'M'
+    try:
+        film = models.Film.objects.get(id=request.POST.get('film_id', 0))
+    except models.Film.DoesNotExist:
+        film = None
+    if film and role_name != '' and role_artist != '' and ',' not in role_artist:
+        artist = models.Artist.get_artist_by_name(role_artist)
+        if artist is None:
+            artist = models.Artist.objects.create(
+                name=role_artist,
+                gender=role_gender,
             )
-            return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+        if artist.gender != role_gender:
+            artist.gender = role_gender
+            artist.save()
+        models.FilmArtistRelationship.objects.create(
+            film=film,
+            artist=artist,
+            role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR,
+            is_main_role=is_main_role,
+            actor_subtype=role_type,
+            role_name=role_name,
+            created_by=request.user,
+        )
+        return HttpResponse(json.dumps({'success': True}), content_type='application/json')
     return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+
+
+@require_POST
+@login_required
+@kt_utils.kt_permission_required('edit_role')
+def edit_role(request):
+    role = get_object_or_404(models.FilmArtistRelationship, id=request.POST.get('role_id', 0))
+    role.is_main_role = not role.is_main_role
+    role.save(update_fields=['is_main_role'])
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
 @require_POST
@@ -1223,8 +1238,7 @@ def new_role(request):
 @kt_utils.kt_permission_required('delete_role')
 def delete_role(request):
     role = get_object_or_404(models.FilmArtistRelationship, id=request.POST.get('role', 0))
-    if request.POST:
-        role.delete()
+    role.delete()
     return HttpResponseRedirect(reverse('film_main', args=(role.film.id, role.film.slug_cache)))
 
 

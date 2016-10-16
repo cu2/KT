@@ -671,9 +671,13 @@ def role(request, id, name_slug):
         if kt_utils.check_permission('edit_role', request.user):
             role_name = kt_utils.strip_whitespace(request.POST.get('role_name', ''))  # NOTE: role name *can* contain , or ;
             role_type = kt_utils.strip_whitespace(request.POST.get('role_type', ''))
-            if role_name != '' and role_type in ['F', 'V']:
+            if role_type not in {'F', 'V'}:
+                role_type = 'F'
+            is_main_role = kt_utils.strip_whitespace(request.POST.get('is_main_role', '')) == '1'
+            if role_name != '':
                 role.role_name = role_name
                 role.actor_subtype = role_type
+                role.is_main_role = is_main_role
                 role.save()
             return HttpResponseRedirect(reverse('role', args=(role.id, role.slug_cache)))
     context = {

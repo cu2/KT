@@ -29,10 +29,20 @@
             </div>
             {% if roles or permission_new_role %}
             <div class="hover_show_button_context">
-                <h3>Szereplők{% if permission_new_role %} <span class="hover_show_button button small_button" id="show_new_role_form">új szereplő felvétele</span>{% endif %}</h3>
-                <table class="fullsize" id="table_of_roles">
-                    <tbody>
-                    {% for role in roles %}
+                {% for role in roles %}
+                    {% ifchanged role.is_main_role %}
+                        {% if role.is_main_role %}
+                            <h3>Szereplők</h3>
+                            <table class="fullsize" id="table_of_roles">
+                            <tbody>
+                        {% else %}
+                            </tbody>
+                            </table>
+                            <h3><span class="action_text" id="show_table_of_roles_aux">További szereplők...</span></h3>
+                            <table class="fullsize" id="table_of_roles_aux" style="display: none">
+                            <tbody>
+                        {% endif %}
+                    {% endifchanged %}
                         <tr class="{% cycle 'odd' '' %}">
                             <td class="td_artist">
                                 <a href="{% url 'artist' role.artist.id role.artist.slug_cache %}">
@@ -49,11 +59,16 @@
                                     </div>
                                 </a>
                             </td>
-                            <td class="half_td td_artist">
+                            <td class="half_td td_role">
                                 <div>
                                     <span>
                                         <a href="{% url 'role' role.id role.slug_cache %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}
                                     </span>
+                                    {% if permission_edit_role %}
+                                        <span class="button small_button edit_is_main_role" data-role-id="{{ role.id }}">
+                                            {% if role.is_main_role %}\/{% else %}/\{% endif %}
+                                        </span>
+                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -63,8 +78,9 @@
             </div>
             {% endif %}
             {% if permission_new_role %}
+                <p><br /></p>
+                <span class="button small_button" id="show_new_role_form">új szereplő felvétele</span>
                 <div id="new_role_form" style="display: none">
-                    <h3>Új szereplő</h3>
                     <input type="hidden" id="new_role_film" value="{{ film.pk }}" />
                     <table class="fullsize">
                         <tr class="header_tr">
@@ -82,6 +98,10 @@
                             </td>
                             <td>
                                 <input type="text" id="new_role_name" class="full_input" /><br />
+                                <select id="new_is_main_role">
+                                    <option value="1">főszerep</option>
+                                    <option value="0">mellékszerep</option>
+                                </select><br />
                                 <select id="new_role_type">
                                     <option value="F">teljes valójában</option>
                                     <option value="V"{% if film.genre_cache_is_animation %} selected="selected"{% endif %}>csak a hangja</option>
@@ -98,9 +118,11 @@
             {% endif %}
 
             {% if film.iszdb_link %}
+                <p><br /></p>
                 <p><b>Szinkron infók</b>: <a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ film.iszdb_link|urlencode }}&t=is&f={{ film.id }}{% else %}{{ film.iszdb_link }}{% endif %}" target="_blank">iszdb.hu</a></p>
             {% endif %}
             {% if permission_edit_iszdb %}
+                <p><br /></p>
                 <form action="{% url 'edit_iszdb' %}" method="post" class="inline">
                     {% csrf_token %}
                     <input type="hidden" name="film_id" value="{{ film.pk }}" />
