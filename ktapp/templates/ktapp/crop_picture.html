@@ -26,16 +26,22 @@
                 $('#picture_y').val(e.y);
                 $('#picture_w').val(e.width);
                 $('#picture_h').val(e.height);
-            }
+            },
+            preview: '#crop_preview'
         });
     </script>
 {% endblock %}
 
 {% block main %}
 <div class="row">
-    <div class="central-column-max">
-        <div>
-            <img id="image" src="{{ picture.get_display_urls.max }}">
+    <div class="central-column">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between">
+            <div style="flex: 0 0 100px">
+                <div id="crop_preview" style="width: 50px; height: 50px; overflow: hidden"></div>
+            </div>
+            <div>
+                <img id="image" src="{{ picture.get_display_urls.max }}">
+            </div>
         </div>
 
         <br />
