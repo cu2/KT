@@ -1249,6 +1249,18 @@ def confirm_main_roles(request):
     film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
     film.main_roles_confirmed = True
     film.save(update_fields=['main_roles_confirmed'])
+    kt_utils.changelog(
+        models.Change,
+        request.user,
+        'confirm_main_roles',
+        'film:%s' % film.id,
+        {
+            'main_roles_confirmed': False,
+        },
+        {
+            'main_roles_confirmed': True,
+        },
+    )
     return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
