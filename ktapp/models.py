@@ -972,6 +972,7 @@ class FilmArtistRelationship(models.Model):
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
     main_picture = models.ForeignKey('Picture', blank=True, null=True, related_name='main_role_picture', on_delete=models.SET_NULL)
+    is_main_role = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.role_type + '[' + self.role_name + ']:' + unicode(self.film) + '/' + unicode(self.artist)
