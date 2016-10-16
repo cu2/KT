@@ -245,6 +245,7 @@ class Film(models.Model):
     genre_cache_is_animation = models.BooleanField(default=False)
     genre_cache_is_docu = models.BooleanField(default=False)
     number_of_actors = models.PositiveIntegerField(default=0)
+    main_roles_confirmed = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.orig_title + ' [' + unicode(self.year) + ']'

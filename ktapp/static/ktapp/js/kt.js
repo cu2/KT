@@ -657,6 +657,17 @@ $(function() {
         }, 'json');
     });
 
+    $('#confirm_main_roles').click(function() {
+        $.post('/jovahagy_foszereplok', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            film_id: $(this).data('film-id')
+        }, function(data) {
+            if (data.success) {
+                $(this).hide();
+            }
+        }.bind(this), 'json');
+    });
+
     $('.input_for_artists')
         .bind('keydown', function(event) {
             if (event.keyCode === $.ui.keyCode.TAB &&

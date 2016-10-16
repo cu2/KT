@@ -1244,6 +1244,16 @@ def delete_role(request):
 
 @require_POST
 @login_required
+@kt_utils.kt_permission_required('edit_role')
+def confirm_main_roles(request):
+    film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
+    film.main_roles_confirmed = True
+    film.save(update_fields=['main_roles_confirmed'])
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+@require_POST
+@login_required
 @kt_utils.kt_permission_required('new_topic')
 def new_topic(request):
     if request.POST:

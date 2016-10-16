@@ -27,12 +27,17 @@
                 {% endif %}
                 <br class="clear" />
             </div>
-            {% if roles or permission_new_role %}
+            {% if roles or permission_new_role or permission_edit_role %}
             <div class="hover_show_button_context">
                 {% for role in roles %}
                     {% ifchanged role.is_main_role %}
                         {% if role.is_main_role %}
-                            <h3>Szereplők</h3>
+                            <h3>
+                                Szereplők
+                                {% if permission_edit_role and not film.main_roles_confirmed %}
+                                    <input type="submit" class="small_button" id="confirm_main_roles" data-film-id="{{ film.id }}" value="Stimmel, ezek a főszereplők" />
+                                {% endif %}
+                            </h3>
                             <table class="fullsize" id="table_of_roles">
                             <tbody>
                         {% else %}
