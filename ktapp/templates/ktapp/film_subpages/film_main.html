@@ -28,23 +28,42 @@
                 <br class="clear" />
             </div>
             {% if roles or permission_new_role or permission_edit_role %}
-            <div class="hover_show_button_context">
+            {% if roles and permission_edit_role %}
+                <p class="fine-print">
+                    {% if film.main_roles_confirmed %}
+                        Ha valaki rosszul lett besorolva fő/mellékszereplőnek, kattints a neve melletti fel/lenyílra, hogy átminősítsd.
+                    {% else %}
+                        A színészek fő- és mellékszereplőkre felosztása automatikusan történt, ami sokszor hibás. Ha ismered a filmet és van egy perced, kérjük fusd át a lenti listát, x-eld be, akik rossz helyen vannak, majd kattints a "kijelölt szereplők fel/leminősítése" gombra. Ezzel átrakod őket a megfelelő kategóriába. Ha úgy látod, minden stimmel, <span title="Stimmel, ők a főszereplők" class="action_text" id="confirm_main_roles" data-film-id="{{ film.id }}">kattints ide</span>.
+                    {% endif %}
+                </p>
+            {% endif %}
+            <div>
                 {% for role in roles %}
                     {% ifchanged role.is_main_role %}
                         {% if role.is_main_role %}
-                            <h3>
-                                Szereplők
-                                {% if permission_edit_role and not film.main_roles_confirmed %}
-                                    <input type="submit" class="small_button" id="confirm_main_roles" data-film-id="{{ film.id }}" value="Stimmel, ezek a főszereplők" />
-                                {% endif %}
-                            </h3>
+                            <h3>Szereplők</h3>
                             <table class="fullsize" id="table_of_roles">
                             <tbody>
                         {% else %}
                             </tbody>
                             </table>
-                            <h3><span class="action_text" id="show_table_of_roles_aux">További szereplők...</span></h3>
-                            <table class="fullsize" id="table_of_roles_aux" style="display: none">
+                            {% if permission_edit_role and not film.main_roles_confirmed %}
+                                <h3>További szereplők...</h3>
+                                <table class="fullsize" id="table_of_roles_aux">
+                            {% else %}
+                                <h3><span class="action_text" id="show_table_of_roles_aux">További szereplők...</span></h3>
+                                <table class="fullsize" id="table_of_roles_aux" style="display: none">
+                            {% endif %}
+                            {% if permission_edit_role and not film.main_roles_confirmed %}
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>
+                                        <span class="button small_button multi_edit_is_main_role" data-film-id="{{ film.id }}">kijelölt szereplők fel/leminősítése</span>
+                                    </th>
+                                </tr>
+                                </thead>
+                            {% endif %}
                             <tbody>
                         {% endif %}
                     {% endifchanged %}
@@ -70,13 +89,29 @@
                                         <a href="{% url 'role' role.id role.slug_cache %}">{{ role.role_name }}</a>{% if role.actor_subtype == 'V' %} (hangja){% endif %}{% if role.actor_subtype == 'D' %} (magyar hangja){% endif %}
                                     </span>
                                     {% if permission_edit_role %}
-                                        <span class="button small_button edit_is_main_role" data-role-id="{{ role.id }}">
-                                            {% if role.is_main_role %}\/{% else %}/\{% endif %}
-                                        </span>
+                                        {% if film.main_roles_confirmed %}
+                                            <span class="button small_button edit_is_main_role" data-role-id="{{ role.id }}">
+                                                {% if role.is_main_role %}\/{% else %}/\{% endif %}
+                                            </span>
+                                        {% else %}
+                                            <span data-role-id="{{ role.id }}">
+                                                <input type="checkbox" class="checkbox_is_main_role" data-role-id="{{ role.id }}" />
+                                            </span>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </td>
                         </tr>
+                        {% if forloop.last and role.is_main_role %}
+                            {% if permission_edit_role and not film.main_roles_confirmed %}
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <span class="button small_button multi_edit_is_main_role" data-film-id="{{ film.id }}">kijelölt szereplők fel/leminősítése</span>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endif %}
                     {% endfor %}
                     </tbody>
                 </table>

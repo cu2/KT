@@ -125,6 +125,7 @@ urlpatterns += [
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.artist_main, name='artist'),
     url(r'^szereplo/(?P<id>\d+)/(?P<name_slug>[^/]*)$', web_views.role, name='role'),
     url(r'^uj_szereplo$', post_views.new_role, name='new_role'),
+    url(r'^szerk_szereplok$', post_views.edit_roles, name='edit_roles'),
     url(r'^szerk_szereplo$', post_views.edit_role, name='edit_role'),
     url(r'^torol_szereplo$', post_views.delete_role, name='delete_role'),
     url(r'^osszevon_muvesz$', post_views.merge_artist, name='merge_artist'),

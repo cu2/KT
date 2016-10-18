@@ -657,15 +657,30 @@ $(function() {
         }, 'json');
     });
 
+    $('.multi_edit_is_main_role').click(function() {
+        var role_ids = $.map($('.checkbox_is_main_role:checked'), function(elem) {
+            return $(elem).data('role-id');
+        });
+        $.post('/szerk_szereplok', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            film_id: $(this).data('film-id'),
+            role_ids: role_ids.join(',')
+        }, function(data) {
+            if (data.success) {
+                document.location.reload();
+            }
+        }, 'json');
+    });
+
     $('#confirm_main_roles').click(function() {
         $.post('/jovahagy_foszereplok', {
             csrfmiddlewaretoken: $.cookie('csrftoken'),
             film_id: $(this).data('film-id')
         }, function(data) {
             if (data.success) {
-                $(this).hide();
+                document.location.reload();
             }
-        }.bind(this), 'json');
+        }, 'json');
     });
 
     $('.input_for_artists')

@@ -1235,6 +1235,26 @@ def edit_role(request):
 
 @require_POST
 @login_required
+@kt_utils.kt_permission_required('edit_role')
+def edit_roles(request):
+    film = get_object_or_404(models.Film, id=request.POST.get('film_id', 0))
+    try:
+        role_ids = request.POST.get('role_ids', '').split(',')
+    except Exception:
+        role_ids = []
+    for role_id in role_ids:
+        try:
+            role = models.FilmArtistRelationship.objects.get(id=role_id, film_id=film.id)
+        except models.FilmArtistRelationship.DoesNotExist:
+            role = None
+        if role:
+            role.is_main_role = not role.is_main_role
+            role.save(update_fields=['is_main_role'])
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+@require_POST
+@login_required
 @kt_utils.kt_permission_required('delete_role')
 def delete_role(request):
     role = get_object_or_404(models.FilmArtistRelationship, id=request.POST.get('role', 0))
