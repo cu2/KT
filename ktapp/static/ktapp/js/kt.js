@@ -657,6 +657,7 @@ $(function() {
         }, 'json');
     });
 
+    $('.checkbox_is_main_role').prop('checked', false);
     $('.multi_edit_is_main_role').click(function() {
         var role_ids = $.map($('.checkbox_is_main_role:checked'), function(elem) {
             return $(elem).data('role-id');
