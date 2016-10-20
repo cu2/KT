@@ -340,7 +340,8 @@ def approve_review(request):
     review = get_object_or_404(models.Review, pk=request.POST.get('review_id', 0))
     if review.film == film:
         review.approved = True
-        review.save()
+        review.created_at = datetime.datetime.now()
+        review.save(update_fields=['approved', 'created_at'])
     return HttpResponseRedirect(reverse('film_articles', args=(film.pk, film.slug_cache)))
 
 
