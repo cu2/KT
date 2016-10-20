@@ -1268,6 +1268,7 @@ def articles(request):
         active_tab = 'latest'
         latest_content = []
         for item in models.Review.objects.select_related('film', 'created_by').filter(approved=True).order_by('-created_at')[:50]:
+            item.author = item.created_by
             latest_content.append((item.created_at, 'review', item))
         for item in models.Link.objects.filter(featured=True).exclude(lead='').select_related('author', 'created_by', 'film', 'artist').order_by('-created_at')[:50]:
             latest_content.append((item.created_at, 'link', item))
