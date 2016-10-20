@@ -24,6 +24,7 @@ from ktapp import sqls as kt_sqls
 from ktapp import texts
 
 
+ARTICLES_PER_PAGE = 50
 COMMENTS_PER_PAGE = 100
 MESSAGES_PER_PAGE = 50
 FILMS_PER_PAGE = 100
@@ -1344,8 +1345,27 @@ def articles(request):
             WHERE l.lead != '' AND l.film_id IS NULL AND l.artist_id IS NULL
             ORDER BY name, id
         '''))
+
+    p, max_pages = 1, 1
+    if t != 'latest':
+        number_of_articles = len(list_of_articles)
+        p = int(request.GET.get('p', 0))
+        if p == 1:
+            return HttpResponseRedirect(reverse('articles') + '?t={t}'.format(t=t))
+        max_pages = int(math.ceil(1.0 * number_of_articles / ARTICLES_PER_PAGE))
+        if max_pages == 0:
+            max_pages = 1
+        if p == 0:
+            p = 1
+        if p > max_pages:
+            return HttpResponseRedirect(reverse('articles') + '?t={t}&p={p}'.format(t=t, p=max_pages))
+        list_of_articles = list_of_articles[(p-1)*ARTICLES_PER_PAGE:p*ARTICLES_PER_PAGE]
+
     return render(request, 'ktapp/articles_subpages/about_%s.html' % active_tab, {
         'active_tab': active_tab,
+        'url_param_t': t,
+        'p': p,
+        'max_pages': max_pages,
         'articles': list_of_articles,
         'permission_suggest_link': kt_utils.check_permission('suggest_link', request.user),
         'permission_new_link': kt_utils.check_permission('new_link', request.user),

@@ -17,6 +17,50 @@
         </ul>
     </nav>
 
+    {% if active_tab != 'latest' and max_pages >= 2 %}
+        <ul class="paging">
+            <li>{% if p == 1 %}<b>1</b>{% else %}<a href="{% url 'articles' %}?t={{ url_param_t }}">1</a>{% endif %}</li>
+            {% if p >= 4 %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            {% if p >= 3 %}
+                <li><a href="{% url 'articles' %}?t={{ url_param_t }}&p={{ p|add:"-1" }}">{{ p|add:"-1" }}</a></li>
+            {% endif %}
+            {% if 2 <= p and p <= max_pages|add:"-1" %}
+                <li><b>{{ p }}</b></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-2" %}
+                <li><a href="{% url 'articles' %}?t={{ url_param_t }}&p={{ p|add:"1" }}">{{ p|add:"1" }}</a></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-3" %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'articles' %}?t={{ url_param_t }}&p={{ max_pages }}">{{ max_pages }}</a>{% endif %}</li>
+        </ul>
+    {% endif %}
+
     {% block premier_main %}{% endblock %}
+
+    {% if active_tab != 'latest' and max_pages >= 2 %}
+        <ul class="paging">
+            <li>{% if p == 1 %}<b>1</b>{% else %}<a href="{% url 'articles' %}?t={{ url_param_t }}">1</a>{% endif %}</li>
+            {% if p >= 4 %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            {% if p >= 3 %}
+                <li><a href="{% url 'articles' %}?t={{ url_param_t }}&p={{ p|add:"-1" }}">{{ p|add:"-1" }}</a></li>
+            {% endif %}
+            {% if 2 <= p and p <= max_pages|add:"-1" %}
+                <li><b>{{ p }}</b></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-2" %}
+                <li><a href="{% url 'articles' %}?t={{ url_param_t }}&p={{ p|add:"1" }}">{{ p|add:"1" }}</a></li>
+            {% endif %}
+            {% if p <= max_pages|add:"-3" %}
+                <li class="paging_ellipsis">...</li>
+            {% endif %}
+            <li>{% if p == max_pages %}<b>{{ max_pages }}</b>{% else %}<a href="{% url 'articles' %}?t={{ url_param_t }}&p={{ max_pages }}">{{ max_pages }}</a>{% endif %}</li>
+        </ul>
+    {% endif %}
 
 {% endblock %}
