@@ -119,6 +119,7 @@ urlpatterns += [
     url(r'^valtozasok/$', web_views.changes, name='changes'),
     url(r'^hianyos_filmek/$', film_views.films_with_missing_data, name='films_with_missing_data'),
     url(r'^analytics/$', web_views.analytics, name='analytics'),
+    url(r'^logs/$', web_views.view_logs, name='view_logs'),
 
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)/kepek/$', web_views.artist_pictures, name='artist_pictures'),
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)/kepek/(?P<picture_id>\d+)$', web_views.artist_picture, name='artist_picture'),

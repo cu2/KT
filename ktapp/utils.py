@@ -130,6 +130,7 @@ def check_permission(perm, user, silent=True):
             'edit_usertoplist': 'all',
             'delete_usertoplist': 'all',
             'analytics': 'superuser',
+            'logs': 'superuser',
             'move_to_off': 'inner_staff',
             'ban_user': 'inner_staff',
             'see_core': 'inner_staff',

@@ -5,6 +5,7 @@ import datetime
 import hashlib
 import math
 import json
+import subprocess
 from collections import defaultdict
 
 from django.db import connection
@@ -2008,6 +2009,23 @@ def analytics(request):
         'wau_data': wau_data,
         'email_data': email_data,
     })
+
+
+@login_required
+@kt_utils.kt_permission_required('logs')
+def view_logs(request):
+    log_path = '/home/publisher/kt/logs/kt_exception'
+    cmd = 'ls -lt ' + log_path + ' | head -n 50 | awk \'$5{print $9}\''
+    content = []
+    for filename in subprocess.check_output(cmd, shell=True).strip().split('\n')[:10]:
+        content.append('============================= ' + filename)
+        for line in open(log_path + '/' + filename, 'rt'):
+            content.append(line.strip())
+        content.append('=============================')
+        content.append('')
+        content.append('')
+        content.append('')
+    return HttpResponse('\n'.join(content), content_type='text/plain')
 
 
 MISSING_URLS = {
