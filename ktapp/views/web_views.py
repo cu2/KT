@@ -9,7 +9,7 @@ from collections import defaultdict
 
 from django.db import connection
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponseRedirect, Http404, HttpResponse
+from django.http import HttpResponseRedirect, Http404, HttpResponse, HttpResponseNotFound
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django import forms
@@ -2010,6 +2010,13 @@ def analytics(request):
     })
 
 
+MISSING_URLS = {
+    '/feed_kommentek.php',
+    '/feed_bemutatok.php',
+    '/wp-login.php',
+    '/rendezo.php',
+}
+
 def old_url(request):
     print request.path
     if request.path == '/film.php':
@@ -2104,4 +2111,6 @@ def old_url(request):
         return HttpResponseRedirect(reverse('latest_pictures'))
     if request.path == '/hasonlok.php':
         return HttpResponseRedirect(reverse('similar_users'))
+    if request.path in MISSING_URLS:
+        return HttpResponseNotFound()
     raise Http404
