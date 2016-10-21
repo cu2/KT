@@ -2018,12 +2018,15 @@ def view_logs(request):
         max_logfile_count = int(request.GET.get('n', '10'))
     except ValueError:
         max_logfile_count = 10
-    log_path = '/home/publisher/kt/logs/kt_exception'
-    cmd = 'ls -lt ' + log_path + ' | head -n 50 | awk \'$5{print $9}\''
+    logtype = request.GET.get('t', '')
+    if logtype not in {'cron_log', 'django_debug', 'gunicorn_supervisor', 'kt_access', 'kt_exception', 'nginx'}:
+        logtype = 'kt_exception'
+    logpath = '/home/publisher/kt/logs/%s' % logtype
+    cmd = 'ls -lt ' + logpath + ' | head -n 50 | awk \'$5{print $9}\''
     content = []
     for filename in subprocess.check_output(cmd, shell=True).strip().split('\n')[:max_logfile_count]:
         content.append('============================= ' + filename)
-        for line in open(log_path + '/' + filename, 'rt'):
+        for line in open(logpath + '/' + filename, 'rt'):
             content.append(line.strip())
         content.append('=============================')
         content.append('')
