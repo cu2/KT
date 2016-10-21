@@ -1245,12 +1245,17 @@ def edit_roles(request):
         role_ids = []
     for role_id in role_ids:
         try:
-            role = models.FilmArtistRelationship.objects.get(id=role_id, film_id=film.id)
-        except models.FilmArtistRelationship.DoesNotExist:
-            role = None
-        if role:
-            role.is_main_role = not role.is_main_role
-            role.save(update_fields=['is_main_role'])
+            role_id = int(role_id)
+        except ValueError:
+            role_id = None
+        if role_id:
+            try:
+                role = models.FilmArtistRelationship.objects.get(id=role_id, film_id=film.id)
+            except models.FilmArtistRelationship.DoesNotExist:
+                role = None
+            if role:
+                role.is_main_role = not role.is_main_role
+                role.save(update_fields=['is_main_role'])
     return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
