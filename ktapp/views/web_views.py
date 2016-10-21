@@ -2014,10 +2014,14 @@ def analytics(request):
 @login_required
 @kt_utils.kt_permission_required('logs')
 def view_logs(request):
+    try:
+        max_logfile_count = int(request.GET.get('n', '10'))
+    except ValueError:
+        max_logfile_count = 10
     log_path = '/home/publisher/kt/logs/kt_exception'
     cmd = 'ls -lt ' + log_path + ' | head -n 50 | awk \'$5{print $9}\''
     content = []
-    for filename in subprocess.check_output(cmd, shell=True).strip().split('\n')[:10]:
+    for filename in subprocess.check_output(cmd, shell=True).strip().split('\n')[:max_logfile_count]:
         content.append('============================= ' + filename)
         for line in open(log_path + '/' + filename, 'rt'):
             content.append(line.strip())
@@ -2033,6 +2037,7 @@ MISSING_URLS = {
     '/feed_bemutatok.php',
     '/wp-login.php',
     '/rendezo.php',
+    '/ksz.php',
 }
 
 def old_url(request):
