@@ -2014,35 +2014,51 @@ def analytics(request):
 @login_required
 @kt_utils.kt_permission_required('logs')
 def view_logs(request):
+    logtype = request.GET.get('t', '')
+    if logtype not in {'cron_log', 'django_debug', 'gunicorn_supervisor', 'kt_access', 'kt_exception'}:
+        logtype = 'kt_exception'
     try:
         max_logfile_count = int(request.GET.get('n', '10'))
     except ValueError:
         max_logfile_count = 10
-    logtype = request.GET.get('t', '')
-    if logtype not in {'cron_log', 'django_debug', 'gunicorn_supervisor', 'kt_access', 'kt_exception', 'nginx'}:
-        logtype = 'kt_exception'
     try:
         max_logfile_length = int(request.GET.get('l', '1000'))
     except ValueError:
         max_logfile_length = 1000
 
-    logpath = '/home/publisher/kt/logs/%s' % logtype
-    cmd = 'ls -lt ' + logpath + ' | awk \'$5{print $9}\' | head -n ' + str(max_logfile_count)
     content = []
-    for filename in subprocess.check_output(cmd, shell=True).strip().split('\n'):
+    logpath = '/home/publisher/kt/logs/%s' % logtype
+    if logtype in {'cron_log', 'django_debug'}:
+        if logtype == 'cron_log':
+            filename = 'cron.log'
+        else:
+            filename = 'gunicorn_supervisor.log'
+        cmd = 'tail -n ' + str(max_logfile_length) + ' ' + logpath + '/' + filename
         content.append('================================ ' + filename)
-        linecount = 0
-        for line in open(logpath + '/' + filename, 'rt'):
-            linecount += 1
-            if linecount > max_logfile_length:
-                content.append('----------truncated...----------')
-                break
+        for line in subprocess.check_output(cmd, shell=True).strip().split('\n'):
             content.append(line.strip())
         content.append('================================')
-        content.append('')
-        content.append('')
-        content.append('')
-    return HttpResponse('\n'.join(content), content_type='text/plain')
+    else:
+        cmd = 'ls -lt ' + logpath + ' | awk \'$5{print $9}\' | head -n ' + str(max_logfile_count)
+        for filename in subprocess.check_output(cmd, shell=True).strip().split('\n'):
+            content.append('================================ ' + filename)
+            linecount = 0
+            for line in open(logpath + '/' + filename, 'rt'):
+                linecount += 1
+                if linecount > max_logfile_length:
+                    content.append('----------truncated...----------')
+                    break
+                content.append(line.strip())
+            content.append('================================')
+            content.append('')
+            content.append('')
+            content.append('')
+    return render(request, 'ktapp/logs.html', {
+        'content': '\n'.join(content),
+        'logtype': logtype,
+        'max_logfile_count': max_logfile_count,
+        'max_logfile_length': max_logfile_length,
+    })
 
 
 MISSING_URLS = {
