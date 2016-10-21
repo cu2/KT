@@ -2021,14 +2021,24 @@ def view_logs(request):
     logtype = request.GET.get('t', '')
     if logtype not in {'cron_log', 'django_debug', 'gunicorn_supervisor', 'kt_access', 'kt_exception', 'nginx'}:
         logtype = 'kt_exception'
+    try:
+        max_logfile_length = int(request.GET.get('l', '1000'))
+    except ValueError:
+        max_logfile_length = 1000
+
     logpath = '/home/publisher/kt/logs/%s' % logtype
-    cmd = 'ls -lt ' + logpath + ' | head -n 50 | awk \'$5{print $9}\''
+    cmd = 'ls -lt ' + logpath + ' | awk \'$5{print $9}\' | head -n ' + str(max_logfile_count)
     content = []
-    for filename in subprocess.check_output(cmd, shell=True).strip().split('\n')[:max_logfile_count]:
-        content.append('============================= ' + filename)
+    for filename in subprocess.check_output(cmd, shell=True).strip().split('\n'):
+        content.append('================================ ' + filename)
+        linecount = 0
         for line in open(logpath + '/' + filename, 'rt'):
+            linecount += 1
+            if linecount > max_logfile_length:
+                content.append('----------truncated...----------')
+                break
             content.append(line.strip())
-        content.append('=============================')
+        content.append('================================')
         content.append('')
         content.append('')
         content.append('')
