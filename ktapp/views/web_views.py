@@ -709,6 +709,55 @@ def role(request, id, name_slug):
     return render(request, 'ktapp/role.html', context)
 
 
+@login_required
+@kt_utils.kt_permission_required('check_missing_data')
+def artists_with_missing_data(request):
+    p = int(request.GET.get('p', 0))
+    if p < 1:
+        p = 1
+    offset_min, offset_max = (p - 1) * 100, p * 100
+    miss_type = request.GET.get('tipus', '')
+    if miss_type not in {'szinesz_profilkep', 'rendezo_profilkep', 'kepek', 'nem'}:
+        miss_type = 'szinesz_profilkep'
+    if miss_type == 'szinesz_profilkep':
+        artists = models.Artist.objects.raw('''
+        SELECT a.*
+        FROM ktapp_artist a
+        LEFT JOIN ktapp_picture p ON p.artist_id = a.id
+        WHERE p.id IS NULL
+        ORDER BY a.number_of_ratings_as_actor DESC
+        LIMIT {offset}, {limit}
+        '''.format(offset=offset_min, limit=100))
+    elif miss_type == 'rendezo_profilkep':
+        artists = models.Artist.objects.raw('''
+        SELECT a.*
+        FROM ktapp_artist a
+        LEFT JOIN ktapp_picture p ON p.artist_id = a.id
+        WHERE p.id IS NULL
+        ORDER BY a.number_of_ratings_as_director DESC
+        LIMIT {offset}, {limit}
+        '''.format(offset=offset_min, limit=100))
+    elif miss_type == 'kepek':
+        artists = models.Artist.objects.raw('''
+        SELECT a.*
+        FROM ktapp_artist a
+        LEFT JOIN ktapp_picture_artists pa ON pa.artist_id = a.id
+        GROUP BY a.id
+        HAVING COUNT(pa.id) = 0
+        ORDER BY a.number_of_ratings_as_actor DESC
+        LIMIT {offset}, {limit}
+        '''.format(offset=offset_min, limit=100))
+    elif miss_type == 'nem':
+        artists = models.Artist.objects.filter(gender=models.Artist.GENDER_TYPE_UNKNOWN).order_by('-number_of_ratings')[offset_min:offset_max]
+    else:
+        raise Http404
+    return render(request, 'ktapp/artists_with_missing_data.html', {
+        'active_tab': miss_type,
+        'artists': artists,
+        'p': p,
+    })
+
+
 def list_of_topics(request):
     return render(request, 'ktapp/list_of_topics.html', {
         'topics': models.Topic.objects.all().select_related('last_comment', 'last_comment__created_by'),

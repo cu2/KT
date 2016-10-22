@@ -101,12 +101,13 @@
                                         {% endif %}
                                         <li><a href="{% url 'suggested_films' %}">Beküldött filmek{% if number_of_suggested_films %} [{{ number_of_suggested_films }}]{% endif %}</a></li>
                                         <li><a href="{% url 'suggested_links' %}">Beküldött linkek{% if number_of_suggested_links %} [{{ number_of_suggested_links }}]{% endif %}</a></li>
-                                        {% if user.is_staff %}
+                                        {% if user.is_staff or user.is_reliable %}
                                             <li><a href="{% url 'suggested_reviews' %}">Beküldött elemzések{% if number_of_suggested_reviews %} [{{ number_of_suggested_reviews }}]{% endif %}</a></li>
                                             <li><a href="{% url 'suggested_bios' %}">Beküldött portrék{% if number_of_suggested_bios %} [{{ number_of_suggested_bios }}]{% endif %}</a></li>
                                         {% endif %}
+                                        <li><a href="{% url 'films_with_missing_data' %}">Hiányos filmek</a></li>
+                                        <li><a href="{% url 'artists_with_missing_data' %}">Hiányos színészek</a></li>
                                         {% if user.is_staff or user.is_reliable %}
-                                            <li><a href="{% url 'films_with_missing_data' %}">Hiányos filmek</a></li>
                                             <li><a href="{% url 'changes' %}">Változások</a></li>
                                         {% endif %}
                                     {% endif %}
@@ -306,6 +307,7 @@
                         <li><a href="{% url 'suggested_bios' %}">Beküldött portrék{% if number_of_suggested_bios %} [{{ number_of_suggested_bios }}]{% endif %}</a></li>
                     {% endif %}
                     <li><a href="{% url 'films_with_missing_data' %}">Hiányos filmek</a></li>
+                    <li><a href="{% url 'artists_with_missing_data' %}">Hiányos színészek</a></li>
                     {% if user.is_staff or user.is_reliable %}
                         <li><a href="{% url 'changes' %}">Változások</a></li>
                     {% endif %}

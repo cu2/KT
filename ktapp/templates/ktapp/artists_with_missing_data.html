@@ -1,0 +1,43 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Hiányos művészek - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Hiányos művészek</h1>
+{% endblock %}
+
+{% block main %}
+
+    <nav id="tabs" class="clearfix">
+        <ul>
+            <li style="width: 25%"{% if active_tab == 'szinesz_profilkep' %} class="active_tab"{% endif %}><a href="{% url 'artists_with_missing_data' %}?tipus=szinesz_profilkep">színész profilkép</a></li>
+            <li style="width: 25%"{% if active_tab == 'rendezo_profilkep' %} class="active_tab"{% endif %}><a href="{% url 'artists_with_missing_data' %}?tipus=rendezo_profilkep">rendező profilkép</a></li>
+            <li style="width: 25%"{% if active_tab == 'kepek' %} class="active_tab"{% endif %}><a href="{% url 'artists_with_missing_data' %}?tipus=kepek">képek</a></li>
+            <li style="width: 25%"{% if active_tab == 'nem' %} class="active_tab"{% endif %}><a href="{% url 'artists_with_missing_data' %}?tipus=nem">nem</a></li>
+        </ul>
+    </nav>
+
+    <div class="row">
+        <div class="central-column">
+            <table class="fullsize">
+                <thead>
+                <tr class="header_tr">
+                    <th>{% if active_tab == 'szinesz_profilkep' or active_tab == 'kepek' %}Színész{% elif active_tab == 'rendezo_profilkep' %}Rendező{% else %}Művész{% endif %}</th>
+                    <th>Ismertség</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for artist in artists %}
+                    <tr class="{% cycle '' 'odd' %}">
+                        <td><a href="{% url 'artist' artist.id artist.slug_cache %}">{{ artist.name }}</a></td>
+                        <td class="center">{{ artist.number_of_ratings }} ({{ artist.number_of_films }})</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <p class="center"><a href="{% url 'artists_with_missing_data' %}?tipus={{ active_tab }}&p={{ p|add:"1" }}">Következő oldal &gt;&gt;</a></p>
+        </div>
+    </div>
+
+{% endblock %}

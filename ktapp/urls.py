@@ -118,6 +118,7 @@ urlpatterns += [
 
     url(r'^valtozasok/$', web_views.changes, name='changes'),
     url(r'^hianyos_filmek/$', film_views.films_with_missing_data, name='films_with_missing_data'),
+    url(r'^hianyos_muveszek/$', web_views.artists_with_missing_data, name='artists_with_missing_data'),
     url(r'^analytics/$', web_views.analytics, name='analytics'),
     url(r'^logs/$', web_views.view_logs, name='view_logs'),
 
