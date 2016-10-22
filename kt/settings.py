@@ -119,6 +119,7 @@ TEMPLATES = [
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
                 'kt.context_processors.get_design_version_context',
+                'kt.context_processors.get_number_of_suggested_stuff_for_admins',
             ],
         },
     },
