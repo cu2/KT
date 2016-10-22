@@ -2028,7 +2028,7 @@ def view_logs(request):
 
     content = []
     logpath = '/home/publisher/kt/logs/%s' % logtype
-    if logtype in {'cron_log', 'django_debug'}:
+    if logtype in {'cron_log', 'gunicorn_supervisor'}:
         if logtype == 'cron_log':
             filename = 'cron.log'
         else:
@@ -2058,6 +2058,7 @@ def view_logs(request):
         'logtype': logtype,
         'max_logfile_count': max_logfile_count,
         'max_logfile_length': max_logfile_length,
+        'server_time': datetime.datetime.now(),
     })
 
 

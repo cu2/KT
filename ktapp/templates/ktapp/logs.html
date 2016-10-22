@@ -1,4 +1,5 @@
 {% extends "ktapp/layout.html" %}
+{% load tz %}
 
 {% block title %}Logs - Kritikus Tömeg{% endblock %}
 
@@ -17,6 +18,10 @@
         <a href="{% url 'view_logs' %}?t=kt_access">kt_access</a>
         |
         <a href="{% url 'view_logs' %}">kt_exception</a>
+    </p>
+    <p>
+        <b>{{ server_time|date:'Y-m-d H:i:s T' }}</b><br />
+        <b>{{ server_time|utc|date:'Y-m-d H:i:s T' }}</b>
     </p>
     <pre>{{ content }}</pre>
 {% endblock %}
