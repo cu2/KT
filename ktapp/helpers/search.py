@@ -54,15 +54,21 @@ def find_film_by_link(q):
     return None
 
 
+def search_safe_slugify(value):
+    # remove dashes from the beginning
+    # because __search='+-anything' breaks with ProgrammingError: (1064, "syntax error, unexpected '-'")
+    return slugify(value).lstrip('-')
+
+
 def find_artists(q_pieces, limit):
     return models.Artist.objects.filter(
-        slug_cache__search=' '.join(['+%s*' % slugify(q_piece) for q_piece in q_pieces if slugify(q_piece)])
+        slug_cache__search=' '.join(['+%s*' % search_safe_slugify(q_piece) for q_piece in q_pieces if search_safe_slugify(q_piece)])
     ).order_by('-number_of_ratings')[:limit]
 
 
 def find_users(q_pieces, limit):
     return models.KTUser.objects.filter(
-        slug_cache__search=' '.join(['+%s*' % slugify(q_piece) for q_piece in q_pieces if slugify(q_piece)])
+        slug_cache__search=' '.join(['+%s*' % search_safe_slugify(q_piece) for q_piece in q_pieces if search_safe_slugify(q_piece)])
     ).order_by('username')[:limit]
 
 
