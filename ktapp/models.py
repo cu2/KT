@@ -1216,7 +1216,10 @@ class Picture(models.Model):
             os.makedirs(outfiledir)
         img = Image.open(infilename)
         img.thumbnail((maxwidth, maxheight), Image.ANTIALIAS)
-        img.save(outfilename)
+        try:
+            img.save(outfilename)
+        except IOError:  # cannot write mode P as JPEG
+            img.convert('RGB').save(outfilename)
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
@@ -1272,7 +1275,10 @@ class Picture(models.Model):
         x1, x2 = int(round(zoom * x)), int(round(zoom * (x + w)))
         y1, y2 = int(round(zoom * y)), int(round(zoom * (y + h)))
         img2 = img.crop((x1, y1, x2, y2))
-        img2.save(new_local_name)
+        try:
+            img2.save(new_local_name)
+        except IOError:  # cannot write mode P as JPEG
+            img2.convert('RGB').save(new_local_name)
         self.width = img2.width
         self.height = img2.height
         self.img.name = new_name
@@ -1363,7 +1369,7 @@ def delete_picture(sender, instance, **kwargs):
     '''Update number_of_pictures and delete files from s3'''
     if instance.film:
         instance.film.number_of_pictures = instance.film.picture_set.count()
-        if instance.film.main_poster is not None and instance.film.main_poster.id == instance.id:
+        if instance.film.main_poster is not None and instance.film.main_poster_id == instance.id:
             try:
                 instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_POSTER).order_by('id')[0]
             except IndexError:
