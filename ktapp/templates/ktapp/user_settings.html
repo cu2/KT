@@ -6,12 +6,20 @@
 {% block header %}<h1>Egyéni beállítások</h1>{% endblock %}
 
 {% block main %}
-
+<div class="row">
+    <div class="central-column">
     <form action="" method="post">
         {% csrf_token %}
+        <p>
+            <label for="id_subscribed_to_campaigns"><b>Hírlevél</b> (KT-találkozókról, a Vapiti-szavazás kezdetéről, újításokról... átlag néhány havonta):</label>
+            <select id="id_subscribed_to_campaigns" name="subscribed_to_campaigns">
+                <option value="1"{% if user.subscribed_to_campaigns %} selected="selected"{% endif %}>feliratkozva</option>
+                <option value="0"{% if not user.subscribed_to_campaigns %} selected="selected"{% endif %}>leiratkozva</option>
+            </select>
+        </p>
         {% if user.id <= 17442 %}
         <p>
-            <label for="id_design_version">Színvilág</label>
+            <label for="id_design_version"><b>Színvilág</b>:</label>
             <select id="id_design_version" name="design_version">
                 <option value="2"{% if user.design_version == 2 %} selected="selected"{% endif %}>új (kék)</option>
                 <option value="1"{% if user.design_version == 1 %} selected="selected"{% endif %}>régi (barna)</option>
@@ -23,5 +31,6 @@
             <a href="{% url 'user_profile' user.id user.slug_cache %}" class="button small_button" style="float: right">Mégsem</a>
         </p>
     </form>
-
+    </div>
+</div>
 {% endblock %}

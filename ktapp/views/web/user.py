@@ -400,7 +400,8 @@ def user_settings(request):
         if design_version not in {1, 2}:
             design_version = 2
         request.user.design_version = design_version
-        request.user.save(update_fields=['design_version'])
+        request.user.subscribed_to_campaigns = request.POST.get('subscribed_to_campaigns') == '1'
+        request.user.save(update_fields=['design_version', 'subscribed_to_campaigns'])
         models.Event.objects.create(
             user=request.user,
             event_type=models.Event.EVENT_TYPE_EDIT_USER_SETTINGS,
@@ -408,3 +409,21 @@ def user_settings(request):
         return HttpResponseRedirect(next_url)
 
     return render(request, 'ktapp/user_settings.html')
+
+
+def unsubscribe_from_campaigns(request, user_id, token):
+    try:
+        user = models.KTUser.objects.get(id=int(user_id), token_to_unsubscribe=token)
+    except Exception:
+        return render(request, 'ktapp/unsubscribe_from_campaigns.html', {
+            'error': True,
+        })
+    if request.POST:
+        user.subscribed_to_campaigns = False
+        user.save(update_fields=['subscribed_to_campaigns'])
+        return HttpResponseRedirect(reverse('unsubscribe_from_campaigns', args=(user_id, token)))
+    return render(request, 'ktapp/unsubscribe_from_campaigns.html', {
+        'error': False,
+        'email': user.email,
+        'subscribed': user.subscribed_to_campaigns,
+    })

@@ -1,0 +1,28 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}<h1>Hírlevél leiratkozás</h1>{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="central-column">
+    {% if error %}
+        <p>Nincs ilyen email cím a rendszerben. Ha egy KT hírlevél végén kattintottál a leiratkozásra, és mégis ezt a hibát látod, írj a <span id="kt_email"></span>-ra, és megoldjuk.</p>
+    {% else %}
+        {% if subscribed %}
+            <form action="" method="post">
+                {% csrf_token %}
+                <p>
+                    <input type="submit" value="Leiratkozás ezzel az email címmel: {{ email }}" />
+                </p>
+            </form>
+        {% else %}
+            <p>Sikeresen leiratkoztál ezzel az email címmel: {{ email }}</p>
+            <p>Ha szeretnél újra feliratkozni, jelentkezz be, és a profilodon az Egyéni beállításoknál tudod megtenni.</p>
+        {% endif %}
+    {% endif %}
+    </div>
+</div>
+{% endblock %}
