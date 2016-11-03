@@ -15,6 +15,7 @@ from django.db.models import Q
 from django.db.models.signals import post_delete
 from django.dispatch.dispatcher import receiver
 from django.template.defaultfilters import slugify
+from django.utils.crypto import get_random_string
 from django.utils.html import strip_tags
 
 from kt import settings
@@ -107,6 +108,8 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_followers = models.PositiveIntegerField(default=0)
     opinion_leader = models.BooleanField(default=False)
     design_version = models.PositiveSmallIntegerField(default=1)
+    subscribed_to_campaigns = models.BooleanField(default=True)
+    token_to_unsubscribe = models.CharField(max_length=64, blank=True)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -184,6 +187,8 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
         self.bio = strip_tags(self.bio)
         self.bio_html = kt_utils.bbcode_to_html(self.bio)
         self.bio_snippet = strip_tags(self.bio_html)[:500]
+        if self.token_to_unsubscribe == '':
+            self.token_to_unsubscribe = get_random_string(64, allowed_chars='abcdefghijklmnopqrstuvwxyz0123456789')
         super(KTUser, self).save(*args, **kwargs)
 
     @classmethod
