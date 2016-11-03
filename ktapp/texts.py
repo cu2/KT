@@ -11,6 +11,7 @@ a KT szerkesztősége<br />
 <a href="https://kritikustomeg.org/click/?u={user_id}&t={type}&c={campaign_id}&url=https://kritikustomeg.org/" style="text-decoration: none; color: rgb(27,117,174)">kritikustomeg.org</a><br />
 <a href="https://kritikustomeg.org/click/?u={user_id}&t={type}&c={campaign_id}&url=https://www.facebook.com/kritikustomeg/" style="text-decoration: none; color: rgb(27,117,174)">www.facebook.com/kritikustomeg</a></p>
 {ps}
+{unsub_ps}
 </body>
 </html>
 '''
@@ -26,7 +27,23 @@ a KT szerkesztősége
 https://kritikustomeg.org/
 https://www.facebook.com/kritikustomeg/
 {ps}
+{unsub_ps}
 '''
+
+
+EMAIL_UNSUB_PS_HTML = u'''
+<p>Ha le szeretnél iratkozni, itt teheted meg:
+<a href="https://kritikustomeg.org/hirlevel_leiratkozas/{user_id}/{token}/?t={type}&c={campaign_id}" style="text-decoration: none; color: rgb(27,117,174)">https://kritikustomeg.org/hirlevel_leiratkozas/{user_id}/{token}/?t={type}&c={campaign_id}</a><br />
+</p>
+'''
+
+
+EMAIL_UNSUB_PS_TEXT = u'''
+
+Ha le szeretnél iratkozni, itt teheted meg:
+https://kritikustomeg.org/hirlevel_leiratkozas/{user_id}/{token}/?t={type}&c={campaign_id}
+'''
+
 
 
 WELCOME_EMAIL_SUBJECT = u'[Kritikus Tömeg] regisztráció'

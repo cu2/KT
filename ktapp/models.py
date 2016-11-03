@@ -124,6 +124,22 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, html_message, text_message=None, email_type='', campaign_id=0, html_ps='', text_ps='', from_email=settings.DEFAULT_FROM_EMAIL, **kwargs):
         if text_message is None:
             text_message = strip_tags(html_message.replace('</p>\n<p>', '\n\n'))
+        if campaign_id:
+            html_unsub_ps = texts.EMAIL_UNSUB_PS_HTML.format(
+                user_id=self.id,
+                token=self.token_to_unsubscribe,
+                type=email_type,
+                campaign_id=campaign_id,
+            )
+            unsub_ps = texts.EMAIL_UNSUB_PS_TEXT.format(
+                user_id=self.id,
+                token=self.token_to_unsubscribe,
+                type=email_type,
+                campaign_id=campaign_id,
+            )
+        else:
+            html_unsub_ps = ''
+            unsub_ps = ''
         html_content = texts.EMAIL_TEMPLATE_HTML.format(
             username=self.username,
             html_message=html_message,
@@ -131,11 +147,13 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
             type=email_type,
             campaign_id=campaign_id,
             ps=html_ps,
+            unsub_ps=html_unsub_ps,
         )
         text_content = texts.EMAIL_TEMPLATE_TEXT.format(
             username=self.username,
             text_message=text_message,
             ps=text_ps,
+            unsub_ps=unsub_ps,
         )
         email = EmailMultiAlternatives(
             subject,
