@@ -421,7 +421,21 @@ def unsubscribe_from_campaigns(request, user_id, token):
     if request.POST:
         user.subscribed_to_campaigns = False
         user.save(update_fields=['subscribed_to_campaigns'])
-        return HttpResponseRedirect(reverse('unsubscribe_from_campaigns', args=(user_id, token)))
+        email_type = request.GET.get('t', '')
+        campaign_id = request.GET.get('c', 0)
+        if campaign_id:
+            try:
+                campaign = models.EmailCampaign.objects.get(id=campaign_id)
+            except models.EmailCampaign.DoesNotExist:
+                campaign = None
+        else:
+            campaign = None
+        models.EmailUnsubscribe.objects.create(
+            user=user,
+            email_type=email_type,
+            campaign=campaign,
+        )
+        return HttpResponseRedirect(reverse('unsubscribe_from_campaigns', args=(user_id, token)) + '?t=' + email_type + '&c=' + campaign_id)
     return render(request, 'ktapp/unsubscribe_from_campaigns.html', {
         'error': False,
         'email': user.email,

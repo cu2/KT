@@ -1762,6 +1762,13 @@ class EmailClick(models.Model):
     url = models.CharField(max_length=250)
 
 
+class EmailUnsubscribe(models.Model):
+    user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
+    email_type = models.CharField(max_length=250, blank=True, null=True)
+    campaign = models.ForeignKey(EmailCampaign, blank=True, null=True, on_delete=models.SET_NULL)
+    unsubscribed_at = models.DateTimeField(auto_now_add=True)
+
+
 class HourlyActiveUser(models.Model):
     user = models.ForeignKey(KTUser)
     day = models.DateField()

@@ -185,7 +185,7 @@ urlpatterns += [
     url(r'^regisztracio$', user_views.registration, name='registration'),
     url(r'^email_ellenorzes/(?P<token>.*)$', user_views.verify_email, name='verify_email'),
     url(r'^jelszo_reset/(?P<token>.*)$', user_views.reset_password, name='reset_password'),
-    url(r'^hirlevel_leiratkozas/(?P<user_id>\d+)/(?P<token>.*)$', user_views.unsubscribe_from_campaigns, name='unsubscribe_from_campaigns'),
+    url(r'^hirlevel_leiratkozas/(?P<user_id>\d+)/(?P<token>.*)/$', user_views.unsubscribe_from_campaigns, name='unsubscribe_from_campaigns'),
 
     url(r'^uzik/$', user_views.messages, name='messages'),
     url(r'^uj_uzenet$', user_views.new_message, name='new_message'),
