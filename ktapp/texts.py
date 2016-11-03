@@ -32,8 +32,8 @@ https://www.facebook.com/kritikustomeg/
 
 
 EMAIL_UNSUB_PS_HTML = u'''
-<p>Ha le szeretnél iratkozni, itt teheted meg:
-<a href="https://kritikustomeg.org/hirlevel_leiratkozas/{user_id}/{token}/?t={type}&c={campaign_id}" style="text-decoration: none; color: rgb(27,117,174)">https://kritikustomeg.org/hirlevel_leiratkozas/{user_id}/{token}/?t={type}&c={campaign_id}</a><br />
+<p style="font-size: 8pt">
+Ha le szeretnél iratkozni, <a href="https://kritikustomeg.org/hirlevel_leiratkozas/{user_id}/{token}/?t={type}&c={campaign_id}" style="text-decoration: none; color: rgb(27,117,174)">itt teheted meg</a>.
 </p>
 '''
 
