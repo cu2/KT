@@ -455,3 +455,19 @@ def get_design_version(request):
     # else:
     #     design_version = 2
     # return design_version
+
+
+def parse_porthu_link(raw_link):
+    if raw_link.isdigit():
+        return raw_link
+    if 'i_film_id' in raw_link:
+        try:
+            return int(raw_link[raw_link.index('i_film_id')+10:].split('&')[0])
+        except ValueError:
+            return None
+    if '/movie-' in raw_link:  # new style from 2016 nov
+        try:
+            return int(raw_link[raw_link.index('/movie-')+7:])
+        except ValueError:
+            return None
+    return None

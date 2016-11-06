@@ -2,7 +2,7 @@ from django.db.models import Q
 from django.template.defaultfilters import slugify
 
 from ktapp import models
-
+from ktapp import utils as kt_utils
 
 def get_q_pieces(q):  # limit length of query string and number of query pieces
     return q[:200].split()[:20]
@@ -24,10 +24,7 @@ def find_film_by_link(q):
                 return film
     # search by port.hu link:
     if 'port.hu' in q:
-        try:
-            porthu_link = q[q.index('i_film_id=')+10:].split('&')[0]
-        except Exception:
-            porthu_link = None
+        porthu_link = kt_utils.parse_porthu_link(q)
         if porthu_link:
             try:
                 film = models.Film.objects.get(porthu_link=porthu_link)

@@ -555,15 +555,7 @@ def edit_film(request):
         else:
             film.imdb_link = ''
         film_porthu_link = kt_utils.strip_whitespace(request.POST.get('film_porthu_link', ''))
-        if film_porthu_link.isdigit():
-            film.porthu_link = film_porthu_link
-        elif 'i_film_id' in film_porthu_link:
-            try:
-                film.porthu_link = int(film_porthu_link[film_porthu_link.index('i_film_id')+10:].split('&')[0])
-            except ValueError:
-                film.porthu_link = None
-        else:
-            film.porthu_link = None
+        film.porthu_link = kt_utils.parse_porthu_link(film_porthu_link)
         film.wikipedia_link_en = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_en', ''))
         film.wikipedia_link_hu = kt_utils.strip_whitespace(request.POST.get('film_wikipedia_link_hu', ''))
         film.save()
