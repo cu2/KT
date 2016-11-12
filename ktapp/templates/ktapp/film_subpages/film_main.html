@@ -1,5 +1,6 @@
 {% extends "ktapp/film_subpages/film_base.html" %}
 {% load kt_extras %}
+{% load static %}
 
 {% block film_main %}
     <div class="row">
@@ -41,7 +42,14 @@
                 {% for role in roles %}
                     {% ifchanged role.is_main_role %}
                         {% if role.is_main_role %}
-                            <h3>Szereplők</h3>
+                            <h3>
+                                Szereplők
+                                {% if film.iszdb_link %}
+                                    <a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ film.iszdb_link|urlencode }}&t=is&f={{ film.id }}{% else %}{{ film.iszdb_link }}{% endif %}" target="_blank" style="float: right">
+                                        <img src="{% static 'ktapp/images/iszdb_35x14.png' %}" alt="iszdb.hu" title="szinkron" />
+                                    </a>
+                                {% endif %}
+                            </h3>
                             <table class="fullsize" id="table_of_roles">
                             <tbody>
                         {% else %}
@@ -157,10 +165,6 @@
                 </div>
             {% endif %}
 
-            {% if film.iszdb_link %}
-                <p><br /></p>
-                <p><b>Szinkron infók</b>: <a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ film.iszdb_link|urlencode }}&t=is&f={{ film.id }}{% else %}{{ film.iszdb_link }}{% endif %}" target="_blank">iszdb.hu</a></p>
-            {% endif %}
             {% if permission_edit_iszdb %}
                 <p><br /></p>
                 <form action="{% url 'edit_iszdb' %}" method="post" class="inline">
