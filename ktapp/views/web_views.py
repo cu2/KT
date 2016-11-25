@@ -139,6 +139,7 @@ def premiers(request):
         'active_tab': 'nowadays',
         'this_premier_year': this_year,
         'before_this_premier_year': this_year - 1,
+        'last_premier_year': settings.LAST_PREMIER_YEAR,
         'this_year': today.strftime('%Y'),
         'this_month': today.strftime('%m'),
         'this_day': today.strftime('%d'),
@@ -160,16 +161,22 @@ def premiers_in_a_year(request, year):
         ordering='premier_date',
         films_per_page=None,
     )
+    active_tab = 'this_year'
+    if year < this_year:
+        active_tab = 'other_year'
+    if year > this_year:
+        active_tab = 'next_year'
     return render(request, 'ktapp/premier_subpages/premiers_in_a_year.html', {
-        'active_tab': 'this_year' if year == this_year else 'last_year',
+        'active_tab': active_tab,
         'this_premier_year': this_year,
         'before_this_premier_year': this_year - 1,
+        'last_premier_year': settings.LAST_PREMIER_YEAR,
         'premier_list_full': films,
         'selected_year': year,
         'this_year': today.strftime('%Y'),
         'this_month': today.strftime('%m'),
         'this_day': today.strftime('%d'),
-        'premier_years': range(settings.FIRST_PREMIER_YEAR, settings.LAST_PREMIER_YEAR + 1),
+        'premier_years': range(settings.FIRST_PREMIER_YEAR, this_year),
     })
 
 
@@ -211,6 +218,7 @@ def premier_anniversaries(request, year, month, day):
         'active_tab': 'anniversaries',
         'this_premier_year': this_year,
         'before_this_premier_year': this_year - 1,
+        'last_premier_year': settings.LAST_PREMIER_YEAR,
         'this_year': today.strftime('%Y'),
         'this_month': today.strftime('%m'),
         'this_day': today.strftime('%d'),
