@@ -19,6 +19,9 @@
     <h2>Weekly active users (active=any kind)</h2>
     <div id="wau_chart_div"></div>
 
+    <h2>Forum activity</h2>
+    <div id="forum_chart_div"></div>
+
     <h2>Email campaigns</h2>
     <table>
         <thead>
@@ -91,6 +94,7 @@
                     [{{ row.0 }}, {{ row.1 }}, {{ row.2|escapejs }}]{% if not forloop.last %},{% endif %}
                 {% endfor %}
             ]);
+
             var wau_data = new google.visualization.DataTable();
             wau_data.addColumn('date', 'day');
             wau_data.addColumn('number', 'WAU');
@@ -99,6 +103,19 @@
                     [{{ row.0 }}, {{ row.1 }}]{% if not forloop.last %},{% endif %}
                 {% endfor %}
             ]);
+
+            var forum_data = new google.visualization.DataTable();
+            forum_data.addColumn('date', 'day');
+            forum_data.addColumn('number', 'comment');
+            forum_data.addColumn('number', 'MA7(comment)');
+            forum_data.addColumn('number', 'user');
+            forum_data.addColumn('number', 'MA7(user)');
+            forum_data.addRows([
+                {% for row in forum_data %}
+                    [{{ row.0 }}, {{ row.1 }}, {{ row.2|escapejs }}, {{ row.3 }}, {{ row.4|escapejs }}]{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ]);
+
             var line_options = {
                 height: 400,
                 chartArea: {
@@ -121,6 +138,8 @@
             dau_chart.draw(dau_data, line_options);
             var wau_chart = new google.visualization.LineChart(document.getElementById('wau_chart_div'));
             wau_chart.draw(wau_data, line_options);
+            var forum_chart = new google.visualization.LineChart(document.getElementById('forum_chart_div'));
+            forum_chart.draw(forum_data, line_options);
         }
     </script>
 

@@ -2029,6 +2029,30 @@ def analytics(request):
             row[1],
         ))
 
+    # forum
+    cursor.execute('''
+    SELECT DATE(created_at) AS day, COUNT(1) AS comment_count, COUNT(DISTINCT created_by_id) AS user_count
+    FROM ktapp_comment
+    WHERE domain = 'F'
+    AND created_at >= '2015-09-14' AND DATE(created_at) <= %s
+    GROUP BY day
+    ''', [yesterday])
+    forum_data = []
+    ma7_window_comment = []
+    ma7_window_user = []
+    for row in cursor.fetchall():
+        ma7_window_comment.append(row[1])
+        ma7_window_comment = ma7_window[-7:]
+        ma7_window_user.append(row[2])
+        ma7_window_user = ma7_window[-7:]
+        forum_data.append((
+            date2js(row[0]),
+            row[1],
+            1.0 * sum(ma7_window_comment) / len(ma7_window_comment),
+            row[2],
+            1.0 * sum(ma7_window_user) / len(ma7_window_user),
+        ))
+
     # email
     cursor.execute('''
     SELECT
@@ -2064,6 +2088,7 @@ def analytics(request):
         'activity_data': activity_data,
         'dau_data': dau_data,
         'wau_data': wau_data,
+        'forum_data': forum_data,
         'email_data': email_data,
     })
 
