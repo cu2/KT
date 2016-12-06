@@ -1960,3 +1960,34 @@ class ActiveUserCount(models.Model):
     wau_count = models.PositiveIntegerField(default=0)
     mau_count = models.PositiveIntegerField(default=0)
     new_count = models.PositiveIntegerField(default=0)
+
+
+class Notification(models.Model):
+    target_user = models.ForeignKey(KTUser, related_name='noti_target_user')
+    created_at = models.DateTimeField(auto_now_add=True)
+    NOTIFICATION_TYPE_COMMENT = 'Co'
+    NOTIFICATION_TYPES = [
+        (NOTIFICATION_TYPE_COMMENT, 'Comment'),
+    ]
+    notification_type = models.CharField(max_length=2, choices=NOTIFICATION_TYPES, default=NOTIFICATION_TYPE_COMMENT)
+    NOTIFICATION_SUBTYPE_COMMENT_REPLY = 'CoRe'
+    NOTIFICATION_SUBTYPE_COMMENT_MENTION = 'CoMe'
+    NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_RATED = 'CoRa'
+    NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_COMMENTED = 'CoCo'
+    NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_WISHED = 'CoWi'
+    NOTIFICATION_SUBTYPES = [
+        (NOTIFICATION_SUBTYPE_COMMENT_REPLY, 'Comment reply'),
+        (NOTIFICATION_SUBTYPE_COMMENT_MENTION, 'Comment mention'),
+        (NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_RATED, 'Comment on film you rated'),
+        (NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_COMMENTED, 'Comment on film you commented'),
+        (NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_WISHED, 'Comment on film you wished'),
+    ]
+    notification_subtype = models.CharField(max_length=4, choices=NOTIFICATION_SUBTYPES, blank=True)
+    film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
+    source_user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL, related_name='noti_source_user')
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        index_together = [
+            ['target_user', 'created_at'],
+        ]
