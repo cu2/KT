@@ -209,6 +209,8 @@ def new_comment(request):
             }),
             some_id=comment.id,
         )
+        if domain_type == models.Comment.DOMAIN_FILM:
+            kt_utils.create_comment_notifications(film, request.user, comment)
     if domain_type == models.Comment.DOMAIN_FILM:
         return HttpResponseRedirect(reverse('film_comments', args=(domain.pk, domain.slug_cache)))
     elif domain_type == models.Comment.DOMAIN_TOPIC:
