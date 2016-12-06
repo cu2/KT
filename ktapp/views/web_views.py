@@ -2042,9 +2042,9 @@ def analytics(request):
     ma7_window_user = []
     for row in cursor.fetchall():
         ma7_window_comment.append(row[1])
-        ma7_window_comment = ma7_window[-7:]
+        ma7_window_comment = ma7_window_comment[-7:]
         ma7_window_user.append(row[2])
-        ma7_window_user = ma7_window[-7:]
+        ma7_window_user = ma7_window_user[-7:]
         forum_data.append((
             date2js(row[0]),
             row[1],
