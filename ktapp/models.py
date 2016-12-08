@@ -110,6 +110,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     design_version = models.PositiveSmallIntegerField(default=1)
     subscribed_to_campaigns = models.BooleanField(default=True)
     token_to_unsubscribe = models.CharField(max_length=64, blank=True)
+    unread_notification_count = models.PositiveIntegerField(default=0)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
@@ -1991,3 +1992,14 @@ class Notification(models.Model):
         index_together = [
             ['target_user', 'created_at'],
         ]
+
+    def save(self, *args, **kwargs):
+        super(Notification, self).save(*args, **kwargs)
+        self.target_user.unread_notification_count = Notification.objects.filter(target_user=self.target_user, is_read=False).count()
+        self.target_user.save(update_fields=['unread_notification_count'])
+
+
+@receiver(post_delete, sender=Notification)
+def delete_notification(sender, instance, **kwargs):
+    instance.target_user.unread_notification_count = Notification.objects.filter(target_user=instance.target_user, is_read=False).count()
+    instance.target_user.save(update_fields=['unread_notification_count'])
