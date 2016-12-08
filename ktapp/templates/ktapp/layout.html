@@ -17,9 +17,9 @@
         <link rel="shortcut icon" href="{% static 'ktapp/images/favicon.ico' %}" />
         <link rel="stylesheet" type="text/css" href="{% static 'ktapp/css/jquery-ui.min.css' %}" />
         {% if design_version == 'v1' %}
-            <link href="{% static 'ktapp/css/kt-bootstrap-v1.min.css' %}?csshash-v1=a30021bc4efa0f972df2e78481103496" rel="stylesheet" />
+            <link href="{% static 'ktapp/css/kt-bootstrap-v1.min.css' %}?csshash-v1=e9a8a7bbd752b6b1168090997801adcf" rel="stylesheet" />
         {% elif design_version == 'v2' %}
-            <link href="{% static 'ktapp/css/kt-bootstrap-v2.min.css' %}?csshash-v2=9655daf0965cbbc8e186171ba832e618" rel="stylesheet" />
+            <link href="{% static 'ktapp/css/kt-bootstrap-v2.min.css' %}?csshash-v2=7b91ad72a41467ad702ec07ca964e033" rel="stylesheet" />
         {% endif %}
         {% block extra_css %}{% endblock %}
 
@@ -81,6 +81,9 @@
                                     {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
                                         <img class="new-message-warning" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-11-envelope-notification{{ design_version_postfix }}-48.png" alt="" />
                                     {% endif %}
+                                    {% if user.unread_notification_count%}
+                                        <img class="unread-notification-warning" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-334-bell-notification{{ design_version_postfix }}-48.png" alt="" />
+                                    {% endif %}
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li><a href="{% url 'user_profile' user.id user.slug_cache %}">Profil: {{ user.username }}</a></li>
@@ -90,6 +93,11 @@
                                             {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
                                                 <img class="icon menu-item-icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-11-envelope-notification-menu{{ design_version_postfix }}-48.png" alt="" />
                                             {% endif %}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="{% url 'notifications' %}">
+                                            Értesítések {% if user.unread_notification_count %}({{ user.unread_notification_count }}){% endif %}
                                         </a>
                                     </li>
                                     {% if user.is_staff or user.is_reliable or user.core_member %}
@@ -258,6 +266,9 @@
                         {% if not user.last_message_checking_at or user.last_message_at > user.last_message_checking_at %}
                             <img class="icon hamburger-menu-item-icon" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-11-envelope-notification-hamburger{{ design_version_postfix }}-48.png" alt="" />
                         {% endif %}
+                    </a></li>
+                    <li><a href="{% url 'notifications' %}">
+                        Értesítések {% if user.unread_notification_count %}({{ user.unread_notification_count }}){% endif %}
                     </a></li>
                 {% else %}
                     <li><a href="{% url 'login' %}?next={{ request.build_absolute_uri }}">Bejelentkezés</a></li>

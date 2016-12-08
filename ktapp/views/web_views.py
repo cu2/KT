@@ -1966,6 +1966,13 @@ def everybody(request):
 
 
 @login_required
+def notifications(request):
+    return render(request, 'ktapp/notifications.html', {
+        'notifications': models.Notification.objects.filter(target_user=request.user).select_related('source_user', 'film').order_by('-created_at'),
+    })
+
+
+@login_required
 @kt_utils.kt_permission_required('analytics')
 def analytics(request):
 

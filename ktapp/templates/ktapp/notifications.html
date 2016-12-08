@@ -1,0 +1,39 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Értesítések</h1>
+{% endblock %}
+
+{% block main %}
+
+    <table class="fullsize">
+        <tr class="header_tr">
+            <th>Ki</th>
+            <th>Mikor</th>
+            <th>Mit csinált</th>
+            <th>Hol</th>
+        </tr>
+        {% for notification in notifications %}
+            <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
+                <td>{% if notification.source_user %}<a href="{% url 'user_profile' notification.source_user.id notification.source_user.slug_cache %}">{{ notification.source_user.username }}</a>{% endif %}</td>
+                <td class="nowrap">{{ notification.created_at|date:"Y-m-d H:i:s" }}</td>
+                <td>
+                    {% if notification.notification_type == 'Co' %}
+                        {% if notification.notification_subtype == 'CoRe' %}
+                            válaszolt egy kommentedre
+                        {% else %}
+                            kommentelt
+                        {% endif %}
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'film_main' notification.film.id notification.film.slug_cache %}">{{ notification.film.orig_title }} ({{ notification.film.year }})</a>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

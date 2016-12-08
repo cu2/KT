@@ -144,6 +144,7 @@ urlpatterns += [
     url(r'^kedvencek/$', web_views.favourites, name='favourites'),
     url(r'^hasonlok/$', web_views.similar_users, name='similar_users'),
     url(r'^mindenki/$', web_views.everybody, name='everybody'),
+    url(r'^ertesitesek/$', web_views.notifications, name='notifications'),
 
     url(r'^felhasznaloi_toplista/(?P<id>\d+)/(?P<title_slug>[^/]*)$', web_views.usertoplist, name='usertoplist'),
     url(r'^felhasznaloi_toplistak/$', web_views.usertoplists, name='usertoplists'),
