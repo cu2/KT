@@ -197,9 +197,19 @@ def film_comments(request, id, film_slug, film, base_context):
     comment_form.fields['topic'].widget = forms.HiddenInput()
     comment_form.fields['poll'].widget = forms.HiddenInput()
     comment_form.fields['reply_to'].widget = forms.HiddenInput()
+    if request.user.is_authenticated():
+        noti_comment_ids = {noti.comment_id for noti in models.Notification.objects.filter(target_user=request.user, notification_type=models.Notification.NOTIFICATION_TYPE_COMMENT, film=film)}
+        models.Notification.objects.filter(target_user=request.user, notification_type=models.Notification.NOTIFICATION_TYPE_COMMENT, film=film).delete()
+        extended_comments = []
+        for comment in comments:
+            if comment.id in noti_comment_ids:
+                comment.notified = True
+            extended_comments.append(comment)
+    else:
+        extended_comments = comments
     return render(request, 'ktapp/film_subpages/film_comments.html', dict(base_context, **{
         'active_tab': 'comments',
-        'comments': comments,
+        'comments': extended_comments,
         'comment_form': comment_form,
         'reply_to_comment': reply_to_comment,
         'p': p,

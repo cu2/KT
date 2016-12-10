@@ -1,5 +1,5 @@
 {% load kt_extras %}
-<div class="comment_block">
+<div class="comment_block{% if comment.notified %} comment_block_notified{% endif %}">
     <div class="comment_block_author">
         {{ comment.created_at|date:"Y-m-d H:i:s" }}
         {% if show_comment_source %}
