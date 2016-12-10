@@ -1658,3 +1658,23 @@ ul.poll li {
     font-size: 16pt;
   }
 }
+
+
+
+
+.noti_block {
+  display: block;
+  margin: 20px 0;
+  padding: 5px;
+  background: @block-content-bg;
+  color: @text-color;
+}
+.noti_block:hover, .noti_block:focus, .noti_block:active {
+  color: @text-color;
+}
+.noti_block:after {
+  clear: both;
+}
+.noti_block_read, .noti_block_read:hover, .noti_block_read:focus, .noti_block_read:active {
+  color: @text-light-color;
+}

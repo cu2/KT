@@ -1998,6 +1998,13 @@ class Notification(models.Model):
         self.target_user.unread_notification_count = Notification.objects.filter(target_user=self.target_user, is_read=False).count()
         self.target_user.save(update_fields=['unread_notification_count'])
 
+    @property
+    def url(self):
+        if self.notification_type == 'Co':
+            if self.film:
+                return reverse('film_comments', args=(self.film.id, self.film.slug_cache))
+        return None
+
 
 @receiver(post_delete, sender=Notification)
 def delete_notification(sender, instance, **kwargs):

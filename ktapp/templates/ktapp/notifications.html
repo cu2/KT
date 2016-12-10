@@ -8,19 +8,23 @@
 {% endblock %}
 
 {% block main %}
+<div class="row">
+    <div class="central-column">
 
-    <table class="fullsize">
-        <tr class="header_tr">
-            <th>Ki</th>
-            <th>Mikor</th>
-            <th>Mit csinált</th>
-            <th>Hol</th>
-        </tr>
-        {% for notification in notifications %}
-            <tr class="{% cycle '' 'odd' %}" style="vertical-align: top">
-                <td>{% if notification.source_user %}<a href="{% url 'user_profile' notification.source_user.id notification.source_user.slug_cache %}">{{ notification.source_user.username }}</a>{% endif %}</td>
-                <td class="nowrap">{{ notification.created_at|date:"Y-m-d H:i:s" }}</td>
-                <td>
+    {% for notification in notifications %}
+        {% if notification.url %}
+            <a href="{{ notification.url }}" class="noti_block{% if notification.is_read %} noti_block_read{% endif %}">
+        {% else %}
+            <div class="noti_block{% if notification.is_read %} noti_block_read{% endif %}">
+        {% endif %}
+            <div style="float: left; width: 50px">
+                <img src="{{ notification.film.main_poster.get_display_urls.min }}" class="picture" style="height: 60px" alt="{{ notification.film.orig_title }} ({{ notification.film.year }})" />
+            </div>
+            <div>
+                <div>
+                    {% if notification.source_user %}
+                        <b>{{ notification.source_user.username }}</b>
+                    {% endif %}
                     {% if notification.notification_type == 'Co' %}
                         {% if notification.notification_subtype == 'CoRe' %}
                             válaszolt egy kommentedre
@@ -28,12 +32,21 @@
                             kommentelt
                         {% endif %}
                     {% endif %}
-                </td>
-                <td>
-                    <a href="{% url 'film_main' notification.film.id notification.film.slug_cache %}">{{ notification.film.orig_title }} ({{ notification.film.year }})</a>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+                </div>
+                <div>
+                    <b>{{ notification.film|oneliner_film_html_w_year }}</b>
+                </div>
+                <div style="text-align: right">
+                    {{ notification.created_at|date:"Y-m-d H:i:s" }}
+                </div>
+            </div>
+        {% if notification.url %}
+            </a>
+        {% else %}
+            </div>
+        {% endif %}
+    {% endfor %}
 
+    </div>
+</div>
 {% endblock %}

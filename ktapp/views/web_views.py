@@ -1967,8 +1967,12 @@ def everybody(request):
 
 @login_required
 def notifications(request):
+    notis = list(models.Notification.objects.filter(target_user=request.user).select_related('source_user', 'film').order_by('-created_at'))
+    models.Notification.objects.filter(target_user=request.user).update(is_read=True)
+    request.user.unread_notification_count = models.Notification.objects.filter(target_user=request.user, is_read=False).count()
+    request.user.save(update_fields=['unread_notification_count'])
     return render(request, 'ktapp/notifications.html', {
-        'notifications': models.Notification.objects.filter(target_user=request.user).select_related('source_user', 'film').order_by('-created_at'),
+        'notifications': notis,
     })
 
 
