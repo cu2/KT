@@ -504,4 +504,5 @@ def create_comment_notifications(film, source_user, comment):
                 notification_subtype=subtype,
                 film=film,
                 source_user=source_user,
+                comment=comment,
             )

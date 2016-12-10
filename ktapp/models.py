@@ -1987,6 +1987,7 @@ class Notification(models.Model):
     film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
     source_user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL, related_name='noti_source_user')
     is_read = models.BooleanField(default=False)
+    comment = models.ForeignKey(Comment, blank=True, null=True, on_delete=models.SET_NULL)
 
     class Meta:
         index_together = [
