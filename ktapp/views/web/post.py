@@ -241,7 +241,7 @@ def edit_comment(request):
                 poll=comment.poll,
                 details=json.dumps({
                     'domain': comment.domain,
-                    }),
+                }),
                 some_id=comment.id,
             )
         return HttpResponseRedirect(next_url)
@@ -553,7 +553,7 @@ def edit_film(request):
         if film_imdb_link.startswith('tt'):
             film.imdb_link = film_imdb_link
         elif 'imdb.com' in film_imdb_link and '/tt' in film_imdb_link:
-            film.imdb_link = film_imdb_link[film_imdb_link.index('/tt')+1:].split('/')[0]
+            film.imdb_link = film_imdb_link[film_imdb_link.index('/tt') + 1:].split('/')[0]
         else:
             film.imdb_link = ''
         film_porthu_link = kt_utils.strip_whitespace(request.POST.get('film_porthu_link', ''))
@@ -1503,6 +1503,9 @@ def move_to_off(request):
                 link_text=link_text,
             )
             comment.save()
+            # OFF is to decrease visibility of comments, so notifications should be removed:
+            for noti in models.Notification.objects.filter(comment=comment):
+                noti.delete()  # one-by-one so it sends post delete signal
     if domain_object:
         models.Comment.fix_comments(domain, domain_object)
         models.Comment.fix_comments('T', off_topic)
