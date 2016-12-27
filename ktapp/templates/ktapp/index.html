@@ -92,6 +92,7 @@
     </div>
 
     <div class="col-sm-6 col-sm-pull-6">
+
         <h2>A nap filmje</h2>
         <div class="film_block">
             {% if film.main_poster %}
@@ -134,6 +135,49 @@
             <br class="clear" />
         </div>
         <p><a href="{% url 'films_of_past_days' %}">Korábbi napok filmjei...</a></p>
+
+        {% if premier_film_list %}
+            <h2>Bemutatók</h2>
+            <div id="carousel-premiers" class="carousel slide" data-ride="carousel" data-interval="10000">
+                <ol class="carousel-indicators">
+                    {% for film in premier_film_list %}
+                        <li data-target="#carousel-premiers" data-slide-to="{{ forloop.counter0 }}"{% if forloop.counter0 == cookie_kt_carousel_premiers_index %} class="active"{% endif %}></li>
+                    {% endfor %}
+                </ol>
+                <div class="carousel-inner" role="listbox">
+                    {% for film in premier_film_list %}
+                        <div class="item{% if forloop.counter0 == cookie_kt_carousel_premiers_index %} active{% endif %}" data-slide-index="{{ forloop.counter0 }}">
+                            <div class="film_block">
+                                {% if film.main_poster %}
+                                    <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} ({{ film.year }})"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
+                                {% endif %}
+                                <p class="film_block_content">
+                                    {{ film|film_url_html_big }}
+                                    ({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+                                    <br />
+                                    {% for country in film.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
+                                    {% for genre in film.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                </p>
+                                <p class="film_block_content">
+                                    {{ film.plot_summary|truncatechars_html:300 }}
+                                </p>
+                                <br class="clear" />
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <a class="left carousel-control" href="#carousel-premiers" role="button" data-slide="prev">
+                    <img class="glyphicon glyphicon-chevron-left" aria-hidden="true" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-225-chevron-left-link{{ design_version_postfix }}-48.png" alt="" />
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="right carousel-control" href="#carousel-premiers" role="button" data-slide="next">
+                    <img class="glyphicon glyphicon-chevron-right" aria-hidden="true" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-224-chevron-right-link{{ design_version_postfix }}-48.png" alt="" />
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+            <p><a href="{% url 'premiers' %}">További bemutatók...</a></p>
+        {% endif %}
+
         {% if latest_content %}
             <h2>Legfrissebb írások</h2>
             {% for _, content_type, content in latest_content %}

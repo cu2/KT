@@ -39,6 +39,23 @@ def index(request):
     hash_of_the_day = int(hashlib.md5(now.strftime('%Y-%m-%d')).hexdigest(), 16)
     # film of the day
     film_of_the_day = models.OfTheDay.objects.filter(domain='F', public=True).order_by('-day')[0].film
+    # premiers
+    today = datetime.date.today()
+    offset = today.weekday()  # this Monday
+    from_date = today - datetime.timedelta(days=offset)
+    until_date = today - datetime.timedelta(days=offset-6)
+    premier_film_list = []
+    for film in models.Film.objects.filter(main_premier__gte=from_date, main_premier__lte=until_date):
+        premier_film_list.append(film)
+    for item in models.Premier.objects.filter(when__gte=from_date, when__lte=until_date).select_related('film'):
+        premier_film_list.append(item.film)
+    premier_film_list.sort(key=lambda item: (item.orig_title, item.id))
+    try:
+        cookie_kt_carousel_premiers_index = int(request.COOKIES.get('kt-carousel-premiers-index', '0'))
+    except:
+        cookie_kt_carousel_premiers_index = 0
+    if cookie_kt_carousel_premiers_index > len(premier_film_list) - 1:
+        cookie_kt_carousel_premiers_index = 0
     # latest_content
     latest_content = []
     for item in models.Review.objects.select_related('film', 'created_by').filter(approved=True).order_by('-created_at')[:10]:
@@ -97,6 +114,8 @@ def index(request):
         'ratings': range(1, 6),
         'film_avg_rating_int': int(film_of_the_day.average_rating) if film_of_the_day.average_rating else 0,
         'film_avg_rating_frac': int(10 * (film_of_the_day.average_rating - int(film_of_the_day.average_rating))) if film_of_the_day.average_rating else 0,
+        'premier_film_list': premier_film_list,
+        'cookie_kt_carousel_premiers_index': cookie_kt_carousel_premiers_index,
         'latest_content': sorted(latest_content, key=lambda x: x[0], reverse=True)[:10],
         'toplist': toplist_of_the_day,
         'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
