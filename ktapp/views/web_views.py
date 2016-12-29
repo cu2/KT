@@ -834,11 +834,21 @@ def forum(request, id, title_slug):
     comment_form.fields['poll'].widget = forms.HiddenInput()
     comment_form.fields['reply_to'].widget = forms.HiddenInput()
     now = datetime.datetime.now()
+    if request.user.is_authenticated():
+        noti_comment_ids = {noti.comment_id for noti in models.Notification.objects.filter(target_user=request.user, notification_type=models.Notification.NOTIFICATION_TYPE_COMMENT, topic=topic)}
+        models.Notification.objects.filter(target_user=request.user, notification_type=models.Notification.NOTIFICATION_TYPE_COMMENT, topic=topic).delete()
+        extended_comments = []
+        for comment in comments:
+            if comment.id in noti_comment_ids:
+                comment.notified = True
+            extended_comments.append(comment)
+    else:
+        extended_comments = comments
     return render(request, 'ktapp/forum.html', {
         'topic': topic,
         'closed': (topic.closed_until > now) if topic.closed_until else False,
         'closed_seconds': int((topic.closed_until - now).total_seconds()) if topic.closed_until else 0,
-        'comments': comments,
+        'comments': extended_comments,
         'comment_form': comment_form,
         'reply_to_comment': reply_to_comment,
         'p': p,
@@ -1212,11 +1222,22 @@ def poll(request, id, title_slug):
     comment_form.fields['topic'].widget = forms.HiddenInput()
     comment_form.fields['poll'].widget = forms.HiddenInput()
     comment_form.fields['reply_to'].widget = forms.HiddenInput()
+    comments = selected_poll.comment_set.select_related('created_by', 'reply_to', 'reply_to__created_by').all()
+    if request.user.is_authenticated():
+        noti_comment_ids = {noti.comment_id for noti in models.Notification.objects.filter(target_user=request.user, notification_type=models.Notification.NOTIFICATION_TYPE_COMMENT, poll=selected_poll)}
+        models.Notification.objects.filter(target_user=request.user, notification_type=models.Notification.NOTIFICATION_TYPE_COMMENT, poll=selected_poll).delete()
+        extended_comments = []
+        for comment in comments:
+            if comment.id in noti_comment_ids:
+                comment.notified = True
+            extended_comments.append(comment)
+    else:
+        extended_comments = comments
     return render(request, 'ktapp/poll.html', {
         'poll': selected_poll,
         'pollchoices': pollchoices,
         'sum_number_of_votes': sum_number_of_votes,
-        'comments': selected_poll.comment_set.select_related('created_by', 'reply_to', 'reply_to__created_by').all(),
+        'comments': extended_comments,
         'comment_form': comment_form,
         'reply_to_comment': reply_to_comment,
         'permission_poll_admin': kt_utils.check_permission('poll_admin', request.user),
@@ -1986,7 +2007,7 @@ def everybody(request):
 
 @login_required
 def notifications(request):
-    notis = list(models.Notification.objects.filter(target_user=request.user).select_related('source_user', 'film').order_by('-created_at'))
+    notis = list(models.Notification.objects.filter(target_user=request.user).select_related('source_user', 'film', 'topic', 'poll').order_by('-created_at'))
     models.Notification.objects.filter(target_user=request.user).update(is_read=True)
     request.user.unread_notification_count = models.Notification.objects.filter(target_user=request.user, is_read=False).count()
     request.user.save(update_fields=['unread_notification_count'])

@@ -1985,6 +1985,8 @@ class Notification(models.Model):
     ]
     notification_subtype = models.CharField(max_length=4, choices=NOTIFICATION_SUBTYPES, blank=True)
     film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
+    topic = models.ForeignKey(Topic, blank=True, null=True, on_delete=models.SET_NULL)
+    poll = models.ForeignKey(Poll, blank=True, null=True, on_delete=models.SET_NULL)
     source_user = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL, related_name='noti_source_user')
     is_read = models.BooleanField(default=False)
     comment = models.ForeignKey(Comment, blank=True, null=True, on_delete=models.SET_NULL)
@@ -2004,6 +2006,10 @@ class Notification(models.Model):
         if self.notification_type == 'Co':
             if self.film:
                 return reverse('film_comments', args=(self.film.id, self.film.slug_cache))
+            if self.topic:
+                return reverse('forum', args=(self.topic.id, self.topic.slug_cache))
+            if self.poll:
+                return reverse('poll', args=(self.poll.id, self.poll.slug_cache))
         return None
 
 

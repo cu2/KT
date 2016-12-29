@@ -18,7 +18,9 @@
             <div class="noti_block{% if notification.is_read %} noti_block_read{% endif %}">
         {% endif %}
             <div style="float: left; width: 50px">
-                <img src="{{ notification.film.main_poster.get_display_urls.min }}" class="picture" style="height: 60px" alt="{{ notification.film.orig_title }} ({{ notification.film.year }})" />
+                {% if notification.film %}
+                    <img src="{{ notification.film.main_poster.get_display_urls.min }}" class="picture" style="height: 60px" alt="{{ notification.film.orig_title }} ({{ notification.film.year }})" />
+                {% endif %}
             </div>
             <div>
                 <div>
@@ -34,7 +36,15 @@
                     {% endif %}
                 </div>
                 <div>
-                    <b>{{ notification.film|oneliner_film_html_w_year }}</b>
+                    <b>
+                        {% if notification.film %}
+                            {{ notification.film|oneliner_film_html_w_year }}
+                        {% elif notification.topic %}
+                            [{{ notification.topic }}]
+                        {% elif notification.poll %}
+                            [{{ notification.poll }}]
+                        {% endif %}
+                    </b>
                 </div>
                 <div style="text-align: right">
                     {{ notification.created_at|date:"Y-m-d H:i:s" }}
