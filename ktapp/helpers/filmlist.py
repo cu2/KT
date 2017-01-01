@@ -61,7 +61,7 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                         # ))
                         # title_matches.append('title_match_%s' % title_piece_num)
                 if title_where:
-                    additional_where.append('''(f.slug_cache = %(full_title_slug)s OR f.orig_title = %(full_title)s OR f.second_title = %(full_title)s OR f.third_title = %(full_title)s) OR ({pieces})'''.format(pieces=' AND '.join(title_where)))
+                    additional_where.append('''((f.slug_cache = %(full_title_slug)s OR f.orig_title = %(full_title)s OR f.second_title = %(full_title)s OR f.third_title = %(full_title)s) OR ({pieces}))'''.format(pieces=' AND '.join(title_where)))
                 else:
                     additional_where.append('''(f.slug_cache = %(full_title_slug)s OR f.orig_title = %(full_title)s OR f.second_title = %(full_title)s OR f.third_title = %(full_title)s)''')
                 additional_select.append('''CASE WHEN f.slug_cache = %(full_title_slug)s OR f.orig_title = %(full_title)s OR f.second_title = %(full_title)s OR f.third_title = %(full_title)s THEN 1 ELSE 0 END full_title_match,''')
