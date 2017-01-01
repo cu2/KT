@@ -87,6 +87,8 @@ def index(request):
     random_quote = models.Quote.objects.all().order_by('?')[0]
     random_trivia = models.Trivia.objects.all().order_by('?')[0]
 
+    # vapiti
+    vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     # game
     # before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
     # during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
@@ -123,6 +125,7 @@ def index(request):
         'random_poll': random_poll,
         'random_quote': random_quote,
         'random_trivia': random_trivia,
+        'vapiti_round': vapiti_round,
         'before_game': before_game,
         'during_game': during_game,
         'banners': banners,
