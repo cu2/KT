@@ -53,10 +53,13 @@ def vote(request):
                 }),
             )
     elif rating == -1:  # redate
+        now = datetime.datetime.now()
         try:
             new_date = datetime.datetime.strptime(request.POST.get('vote_redate_to', '')[:10], '%Y-%m-%d')
         except ValueError:
-            new_date = datetime.datetime.now()
+            new_date = now
+        if new_date > now:
+            new_date = now
         try:
             old_vote = models.Vote.objects.get(film=film, user=request.user)
         except models.Vote.DoesNotExist:
