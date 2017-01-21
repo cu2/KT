@@ -89,6 +89,10 @@ def index(request):
 
     # vapiti
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
+    vapiti_round_2_has_nominees = False
+    if vapiti_round == 2:
+        if kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_GOLD):
+            vapiti_round_2_has_nominees = True
     # game
     # before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
     # during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
@@ -126,6 +130,9 @@ def index(request):
         'random_quote': random_quote,
         'random_trivia': random_trivia,
         'vapiti_round': vapiti_round,
+        'vapiti_round_2_has_nominees': vapiti_round_2_has_nominees,
+        'vapiti_end_of_round_2': round_2_dates[1][-2:],
+        'vapiti_result_day': result_day[-2:],
         'before_game': before_game,
         'during_game': during_game,
         'banners': banners,
