@@ -13,6 +13,9 @@
                 {% endautoescape %}
             </div>
         </div>
+        <p>
+            <a href="{% url 'film_articles' film.id film.film_slug %}">Vissza a cikkekhez...</a>
+        </p>
     </div>
 </div>
 {% endblock %}
