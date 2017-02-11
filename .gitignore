@@ -5,6 +5,7 @@ media/
 .idea/
 *.iml
 bootstrap/
+.vscode/
 
 
 ### Template from https://github.com/github/gitignore/blob/master/Python.gitignore
