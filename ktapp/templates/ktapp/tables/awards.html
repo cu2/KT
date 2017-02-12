@@ -10,9 +10,12 @@
         {% else %}
         <th>Művész</th>
         {% endif %}
+        {% if permission_delete_award %}
+        <th></th>
+        {% endif %}
     </tr>
 {% for a in awards %}
-    <tr class="{% cycle '' 'odd' %}">
+    <tr class="{% cycle '' 'odd' %} hover_show_button_context">
         <td>{{ a.name }}</td>
         <td>{{ a.year }}</td>
         <td>{{ a.category }}</td>
@@ -28,6 +31,11 @@
                 {% endif %}
             {% endif %}
             {{ a.note }}
+        </td>
+        {% endif %}
+        {% if permission_delete_award %}
+        <td>
+            <button class="button small_button hover_show_button delete_award_button" data-id="{{ a.id }}">X</button>
         </td>
         {% endif %}
     </tr>

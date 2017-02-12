@@ -904,6 +904,15 @@ def new_award(request):
 
 @require_POST
 @login_required
+@kt_utils.kt_permission_required('delete_award')
+def delete_award(request):
+    award = get_object_or_404(models.Award, id=request.POST.get('award_id', 0))
+    award.delete()
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+@require_POST
+@login_required
 @kt_utils.kt_permission_required('new_link')
 def new_link(request):
     film_id = request.POST.get('film_id', 0)

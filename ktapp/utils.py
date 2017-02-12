@@ -109,6 +109,7 @@ def check_permission(perm, user, silent=True):
             'suggest_film': 'core',
             'new_film': 'reliable',
             'edit_film': 'reliable',
+            'delete_award': 'admin',
             'edit_premiers': 'admin',
             'edit_artist': 'core',
             'merge_artist': 'admin',

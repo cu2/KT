@@ -93,6 +93,7 @@ urlpatterns += [
     url(r'^szerk_folytatasok$', post_views.edit_sequels, name='edit_sequels'),
     url(r'^szerk_iszdb$', post_views.edit_iszdb, name='edit_iszdb'),
     url(r'^uj_dij$', post_views.new_award, name='new_award'),
+    url(r'^torol_dij$', post_views.delete_award, name='delete_award'),
     url(r'^offba$', post_views.move_to_off, name='move_to_off'),
 
     url(r'^uj_link$', post_views.new_link, name='new_link'),

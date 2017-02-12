@@ -684,6 +684,17 @@ $(function() {
         }, 'json');
     });
 
+    $('.delete_award_button').click(function() {
+        $.post('/torol_dij', {
+            csrfmiddlewaretoken: $.cookie('csrftoken'),
+            award_id: $(this).data('id')
+        }, function(data) {
+            if (data.success) {
+                document.location.reload();
+            }
+        }, 'json');
+    });
+
     $('.input_for_artists')
         .bind('keydown', function(event) {
             if (event.keyCode === $.ui.keyCode.TAB &&

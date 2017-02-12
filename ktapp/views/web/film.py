@@ -290,6 +290,7 @@ def film_awards(request, id, film_slug, film, base_context):
         'active_tab': 'awards',
         'awards': film.award_set.all().order_by('name', 'year', 'category'),
         'permission_edit_film': kt_utils.check_permission('edit_film', request.user),
+        'permission_delete_award': kt_utils.check_permission('delete_award', request.user),
     }))
 
 
