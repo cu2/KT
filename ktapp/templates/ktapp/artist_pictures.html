@@ -35,7 +35,7 @@
                     </span>
                 {% endif %}
             </div>
-            {% if permission_edit_picture and picture.number_of_artists == 1 %}
+            {% if permission_set_main_picture and picture.number_of_artists == 1 %}
                 <div class="main_poster_edit_block" style="margin: 20px">
                     {% if picture.id != artist.main_picture.id %}
                         <form action="{% url 'set_main_picture' %}" method="post">
@@ -48,7 +48,7 @@
                     {% endif %}
                 </div>
             {% endif %}
-            {% if permission_edit_picture and picture.artist != None %}
+            {% if permission_set_main_picture and picture.artist != None %}
                 <p class="center">
                     <a href="{% url 'crop_picture' picture.id %}">Profilkép méretre vágása</a>
                 </p>
@@ -71,7 +71,7 @@
             {% endfor %}
         {% endif %}
 
-        {% if permission_new_picture %}
+        {% if permission_set_main_picture %}
             <h3>Új profilkép feltöltése</h3>
             <ul>
                 <li>A kép legyen legalább 720 pixel széles, maximum kb 2000 pixel. Ha kevéssé híres színészről van szó, és alig van kép a neten, jó a kisebb kép is.</li>

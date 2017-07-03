@@ -646,7 +646,7 @@ def artist_main(request, id, name_slug):
         'permission_edit_artist': kt_utils.check_permission('edit_artist', request.user),
         'permission_merge_artist': kt_utils.check_permission('merge_artist', request.user),
         'permission_approve_bio': kt_utils.check_permission('approve_bio', request.user),
-        'permission_new_picture': kt_utils.check_permission('new_picture', request.user),
+        'permission_set_main_picture': kt_utils.check_permission('set_main_picture', request.user),
         'imdb_link': 'http://imdb.com/find?s=nm&q=' + urlquote_plus(artist.name),
         'wiki_en_link': 'http://en.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(artist.name),
         'wiki_hu_link': 'http://hu.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(artist.name),
@@ -662,6 +662,7 @@ def artist_pictures(request, id, name_slug):
         'permission_new_picture': kt_utils.check_permission('new_picture', request.user),
         'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
         'permission_delete_picture': kt_utils.check_permission('delete_picture', request.user),
+        'permission_set_main_picture': kt_utils.check_permission('set_main_picture', request.user),
     }
     if len(pictures) == 1:
         picture = pictures[0]
@@ -683,13 +684,14 @@ def artist_picture(request, id, name_slug, picture_id):
         'permission_new_picture': kt_utils.check_permission('new_picture', request.user),
         'permission_edit_picture': kt_utils.check_permission('edit_picture', request.user),
         'permission_delete_picture': kt_utils.check_permission('delete_picture', request.user),
+        'permission_set_main_picture': kt_utils.check_permission('set_main_picture', request.user),
     }
     context.update(kt_utils.get_selected_picture_details(models.Picture, picture.film, picture, next_picture))
     return render(request, 'ktapp/artist_pictures.html', context)
 
 
 @login_required
-@kt_utils.kt_permission_required('edit_picture')
+@kt_utils.kt_permission_required('set_main_picture')
 def crop_picture(request, id):
     picture = get_object_or_404(models.Picture, id=id)
     artist = picture.artist

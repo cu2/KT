@@ -27,7 +27,7 @@
 
     {% if random_picture %}
         <p style="text-align: center"><a href="{% url 'artist_pictures' artist.id artist.slug_cache %}"><img src="{{ random_picture.get_display_urls.mid }}" style="width: {{ random_picture.get_widths.mid }}px; height: {{ random_picture.get_heights.mid }}px" class="picture" /></a></p>
-    {% elif permission_new_picture %}
+    {% elif permission_set_main_picture %}
         <p style="text-align: center"><a href="{% url 'artist_pictures' artist.id artist.slug_cache %}">Profilkép feltöltése</a></p>
     {% endif %}
 

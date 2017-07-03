@@ -388,6 +388,8 @@ def new_picture(request):
         film = get_object_or_404(models.Film, id=request.POST.get('film', 0))
         artist = None
     else:
+        if not kt_utils.check_permission('set_main_picture', request.user):
+            return HttpResponseForbidden
         film = None
         artist = get_object_or_404(models.Artist, id=request.POST.get('artist', 0))
         request.POST['picture_type'] = models.Picture.PICTURE_TYPE_ACTOR_PROFILE
@@ -476,7 +478,7 @@ def set_main_poster(request):
 
 @require_POST
 @login_required
-@kt_utils.kt_permission_required('edit_picture')
+@kt_utils.kt_permission_required('set_main_picture')
 def set_main_picture(request):
     next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
     picture = get_object_or_404(models.Picture, pk=request.POST['picture'])
