@@ -2017,3 +2017,28 @@ class Notification(models.Model):
 def delete_notification(sender, instance, **kwargs):
     instance.target_user.unread_notification_count = Notification.objects.filter(target_user=instance.target_user, is_read=False).count()
     instance.target_user.save(update_fields=['unread_notification_count'])
+
+
+class UserContribution(KTUser):
+    count_film = models.PositiveIntegerField(default=0)
+    rank_film = models.PositiveIntegerField(default=0)
+    count_role = models.PositiveIntegerField(default=0)
+    rank_role = models.PositiveIntegerField(default=0)
+    count_keyword = models.PositiveIntegerField(default=0)
+    rank_keyword = models.PositiveIntegerField(default=0)
+    count_picture = models.PositiveIntegerField(default=0)
+    rank_picture = models.PositiveIntegerField(default=0)
+    count_trivia = models.PositiveIntegerField(default=0)
+    rank_trivia = models.PositiveIntegerField(default=0)
+    count_quote = models.PositiveIntegerField(default=0)
+    rank_quote = models.PositiveIntegerField(default=0)
+    count_review = models.PositiveIntegerField(default=0)
+    rank_review = models.PositiveIntegerField(default=0)
+    count_link = models.PositiveIntegerField(default=0)
+    rank_link = models.PositiveIntegerField(default=0)
+    count_biography = models.PositiveIntegerField(default=0)
+    rank_biography = models.PositiveIntegerField(default=0)
+    count_poll = models.PositiveIntegerField(default=0)
+    rank_poll = models.PositiveIntegerField(default=0)
+    count_usertoplist = models.PositiveIntegerField(default=0)
+    rank_usertoplist = models.PositiveIntegerField(default=0)
