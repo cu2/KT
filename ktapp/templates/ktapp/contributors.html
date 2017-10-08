@@ -1,0 +1,53 @@
+{% extends "ktapp/layout.html" %}
+
+{% block title %}Jófejek - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Jófejek</h1>
+{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="central-column-max">
+        <p>Felhasználók, akik az elmúlt egy évben a legtöbb tartalmat adták az oldalhoz.</p>
+        <table class="fullsize sortable">
+            <thead>
+                <tr class="header_tr">
+                    <th data-sort="int">#</th>
+                    <th data-sort="string">User</th>
+                    <th data-sort="int">Filmek</th>
+                    <th data-sort="int">Szereplők</th>
+                    <th data-sort="int">Kulcsszavak</th>
+                    <th data-sort="int">Képek</th>
+                    <th data-sort="int">Idézetek</th>
+                    <th data-sort="int">Érdekességek</th>
+                    <th data-sort="int">Cikkek</th>
+                    <th data-sort="int">Kritikák</th>
+                    <th data-sort="int">Életrajzok</th>
+                    <th data-sort="int">Toplisták</th>
+                    <th data-sort="int">Szavazások</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr class="{% cycle '' 'odd' %}">
+                    <td class="center">{{ forloop.counter }}</td>
+                    <td><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></td>
+                    <td data-sort-value="{{ user.rank_film }}" class="center">{{ user.count_film }}</td>
+                    <td data-sort-value="{{ user.rank_role }}" class="center">{{ user.count_role }}</td>
+                    <td data-sort-value="{{ user.rank_keyword }}" class="center">{{ user.count_keyword }}</td>
+                    <td data-sort-value="{{ user.rank_picture }}" class="center">{{ user.count_picture }}</td>
+                    <td data-sort-value="{{ user.rank_quote }}" class="center">{{ user.count_quote }}</td>
+                    <td data-sort-value="{{ user.rank_trivia }}" class="center">{{ user.count_trivia }}</td>
+                    <td data-sort-value="{{ user.rank_link }}" class="center">{{ user.count_link }}</td>
+                    <td data-sort-value="{{ user.rank_review }}" class="center">{{ user.count_review }}</td>
+                    <td data-sort-value="{{ user.rank_biography }}" class="center">{{ user.count_biography }}</td>
+                    <td data-sort-value="{{ user.rank_usertoplist }}" class="center">{{ user.count_usertoplist }}</td>
+                    <td data-sort-value="{{ user.rank_poll }}" class="center">{{ user.count_poll }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

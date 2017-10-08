@@ -199,6 +199,7 @@
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
                                 <li><a href="{% url 'similar_users' %}">Hasonlók</a></li>
+                                <li><a href="{% url 'contributors' %}">Jófejek</a></li>
                                 <li><a href="{% url 'everybody' %}">Mindenki</a></li>
                             </ul>
                         </li>
@@ -302,6 +303,7 @@
                 <li class="hamburger-divider"></li>
                 <li><a href="{% url 'favourites' %}">Kedvenceid</a></li>
                 <li><a href="{% url 'similar_users' %}">Hasonlók</a></li>
+                <li><a href="{% url 'contributors' %}">Jófejek</a></li>
                 <li><a href="{% url 'everybody' %}">Mindenki</a></li>
 
                 {% if user.is_staff or user.is_reliable or user.core_member %}

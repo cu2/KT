@@ -144,6 +144,7 @@ urlpatterns += [
     url(r'^legfrissebb_kommentek/$', web_views.latest_comments, name='latest_comments'),
     url(r'^kedvencek/$', web_views.favourites, name='favourites'),
     url(r'^hasonlok/$', web_views.similar_users, name='similar_users'),
+    url(r'^jofejek/$', web_views.contributors, name='contributors'),
     url(r'^mindenki/$', web_views.everybody, name='everybody'),
     url(r'^ertesitesek/$', web_views.notifications, name='notifications'),
 
