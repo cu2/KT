@@ -1796,8 +1796,6 @@ def ban_user(request):
         target_user = models.KTUser.objects.get(id=request.POST.get('target_user_id', 0))
     except models.KTUser.DoesNotExist:
         return HttpResponseRedirect(next_url)
-    if target_user.is_staff:
-        return HttpResponseRedirect(next_url)
     action = request.POST.get('action')
     state_before = {
         'is_active': target_user.is_active,
