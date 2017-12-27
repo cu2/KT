@@ -397,6 +397,7 @@ def search(request):
     return render(request, 'ktapp/search.html', {
         'q': q,
         'films': films[:settings.MAX_SEARCH_RESULTS],
+        'more_films': len(films) > settings.MAX_SEARCH_RESULTS,
         'sequels': sequels[:settings.MAX_SEARCH_RESULTS],
         'topics': topics[:settings.MAX_SEARCH_RESULTS],
         'polls': polls[:settings.MAX_SEARCH_RESULTS],

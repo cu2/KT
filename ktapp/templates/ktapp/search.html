@@ -36,6 +36,9 @@
             {% endfor %}
             </tbody>
         </table>
+        {% if more_films %}
+        <p class="table_footer"><a href="/osszetett_kereso/?title={{ q|urlencode }}">További találatok...</a></p>
+        {% endif %}
         {% endif %}
 
         {% if sequels %}
