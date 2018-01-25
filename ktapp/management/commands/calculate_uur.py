@@ -3,6 +3,8 @@ import datetime
 from django.core.management.base import BaseCommand
 from django.db import connection
 
+from ktapp import models
+
 
 INSERT_SQL_TEMPLATE_1 = '''
 INSERT INTO ktapp_useruserrating (
@@ -172,38 +174,59 @@ class Command(BaseCommand):
     help = 'Calculate user-user recommendation'
 
     def add_arguments(self, parser):
-        parser.add_argument('user_id', nargs='+', type=int)
+        parser.add_argument('user_id', nargs='*', type=int)
+
+    def calculate_uur(self, user_id):
+        self.stdout.write('Refreshing user-user recommendation for user %d...' % user_id)
+        now = datetime.datetime.now()
+
+        self.stdout.write('Calculating generic...')
+        benchmark_now = datetime.datetime.now()
+        self.cursor.execute(GENERIC_SIMILARITY_TEMPLATE, (now, user_id))
+        general_similarity = [row for row in self.cursor.fetchall()]
+        self.stdout.write('Calculated in %d sec.' % (datetime.datetime.now() - benchmark_now).total_seconds())
+        self.stdout.write('Updating generic...')
+        benchmark_now = datetime.datetime.now()
+        self.cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_1_id = %d AND keyword_id IS NULL''' % user_id)
+        self.cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_2_id = %d AND keyword_id IS NULL''' % user_id)
+        for row in general_similarity:
+            self.cursor.execute(INSERT_SQL_TEMPLATE_1, row)
+            if row[0] != row[1]:
+                self.cursor.execute(INSERT_SQL_TEMPLATE_2, row)
+        self.stdout.write('Updated in %d sec.' % (datetime.datetime.now() - benchmark_now).total_seconds())
+
+        self.stdout.write('Calculating keyword...')
+        benchmark_now = datetime.datetime.now()
+        self.cursor.execute(KEYWORD_SIMILARITY_TEMPLATE, (now, user_id))
+        general_similarity = [row for row in self.cursor.fetchall()]
+        self.stdout.write('Calculated in %d sec.' % (datetime.datetime.now() - benchmark_now).total_seconds())
+        self.stdout.write('Updating keyword...')
+        benchmark_now = datetime.datetime.now()
+        self.cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_1_id = %d AND keyword_id IS NOT NULL''' % user_id)
+        self.cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_2_id = %d AND keyword_id IS NOT NULL''' % user_id)
+        for row in general_similarity:
+            self.cursor.execute(INSERT_SQL_TEMPLATE_1, row)
+            if row[0] != row[1]:
+                self.cursor.execute(INSERT_SQL_TEMPLATE_2, row)
+        self.stdout.write('Updated in %d sec.' % (datetime.datetime.now() - benchmark_now).total_seconds())
+
+        connection.commit()
+        u = models.KTUser.objects.get(id=user_id)
+        u.last_uur_calculation_at = now
+        u.save()
+        self.stdout.write('Refreshed user-user recommendation for user %d in %f sec.' % (
+            user_id,
+            (datetime.datetime.now() - now).total_seconds(),
+        ))
 
     def handle(self, *args, **options):
-        cursor = connection.cursor()
-        for user_id in options['user_id']:
-            self.stdout.write('Refreshing user-user recommendation for user %d...' % user_id)
-            now = datetime.datetime.now()
-
-            self.stdout.write('Calculating generic...')
-            cursor.execute(GENERIC_SIMILARITY_TEMPLATE, (now, user_id))
-            general_similarity = [row for row in cursor.fetchall()]
-            self.stdout.write('Updating generic...')
-            cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_1_id = %d AND keyword_id IS NULL''' % user_id)
-            cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_2_id = %d AND keyword_id IS NULL''' % user_id)
-            for row in general_similarity:
-                cursor.execute(INSERT_SQL_TEMPLATE_1, row)
-                if row[0] != row[1]:
-                    cursor.execute(INSERT_SQL_TEMPLATE_2, row)
-
-            self.stdout.write('Calculating keyword...')
-            cursor.execute(KEYWORD_SIMILARITY_TEMPLATE, (now, user_id))
-            general_similarity = [row for row in cursor.fetchall()]
-            self.stdout.write('Updating keyword...')
-            cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_1_id = %d AND keyword_id IS NOT NULL''' % user_id)
-            cursor.execute('''DELETE FROM ktapp_useruserrating WHERE user_2_id = %d AND keyword_id IS NOT NULL''' % user_id)
-            for row in general_similarity:
-                cursor.execute(INSERT_SQL_TEMPLATE_1, row)
-                if row[0] != row[1]:
-                    cursor.execute(INSERT_SQL_TEMPLATE_2, row)
-
-            connection.commit()
-            self.stdout.write('Refreshed user-user recommendation for user %d in %f sec.' % (
-                user_id,
-                (datetime.datetime.now() - now).total_seconds(),
-            ))
+        self.cursor = connection.cursor()
+        if options['user_id']:
+            for user_id in options['user_id']:
+                self.calculate_uur(user_id)
+        else:
+            try:
+                u = models.KTUser.objects.filter(last_uur_calculation_at=None, number_of_ratings__gte=100).order_by('-last_activity_at')[0]
+                self.calculate_uur(u.id)
+            except IndexError:
+                pass
