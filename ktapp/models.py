@@ -111,6 +111,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     subscribed_to_campaigns = models.BooleanField(default=True)
     token_to_unsubscribe = models.CharField(max_length=64, blank=True)
     unread_notification_count = models.PositiveIntegerField(default=0)
+    last_uur_calculation_at = models.DateTimeField(blank=True, null=True)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
