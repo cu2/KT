@@ -225,8 +225,17 @@ class Command(BaseCommand):
             for user_id in options['user_id']:
                 self.calculate_uur(user_id)
         else:
+            a_year_ago = datetime.date.today() - datetime.timedelta(days=365)
+            a_month_ago = datetime.date.today() - datetime.timedelta(days=30)
             try:
-                u = models.KTUser.objects.filter(last_uur_calculation_at=None, number_of_ratings__gte=100).order_by('-last_activity_at')[0]
-                self.calculate_uur(u.id)
-            except IndexError:
-                pass
+                if random.random() < 0.5:
+                    # relatively new users: less than a year
+                    # selected_user_id = models.KTUser.objects.filter(last_activity_at__gte=a_month_ago, date_joined__gte=a_year_ago, number_of_ratings__gte=50).only('id').order_by('?')[0].id
+                    selected_user_id = models.KTUser.objects.filter(last_uur_calculation_at=None, last_activity_at__gte=a_month_ago, date_joined__gte=a_year_ago, number_of_ratings__gte=50).only('id').order_by('?')[0].id
+                else:
+                    # relatively old users
+                    # selected_user_id = models.KTUser.objects.filter(last_activity_at__gte=a_month_ago, date_joined__lt=a_year_ago, number_of_ratings__gte=100).only('id').order_by('?')[0].id
+                    selected_user_id = models.KTUser.objects.filter(last_uur_calculation_at=None, last_activity_at__gte=a_month_ago, date_joined__lt=a_year_ago, number_of_ratings__gte=100).only('id').order_by('?')[0].id
+            except Exception:
+                return
+            self.calculate_uur(selected_user_id)
