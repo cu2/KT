@@ -111,6 +111,7 @@
     <div class="col-sm-6 col-sm-pull-6">
 
         <h2>A nap filmje</h2>
+        {% if film %}
         <div class="film_block">
             {% if film.main_poster %}
                 <a href="{% url 'film_main' film.id film.slug_cache %}" title="{{ film.orig_title }} ({{ film.year }})"><img src="{{ film.main_poster.get_display_urls.mid }}" class="picture film_block_picture" alt="{{ film.orig_title }} ({{ film.year }})" /></a>
@@ -151,6 +152,7 @@
             </p>
             <br class="clear" />
         </div>
+        {% endif %}
         <p><a href="{% url 'films_of_past_days' %}">Korábbi napok filmjei...</a></p>
 
         {% if premier_film_list %}

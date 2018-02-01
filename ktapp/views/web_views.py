@@ -38,7 +38,10 @@ def index(request):
     now = datetime.datetime.now()
     hash_of_the_day = int(hashlib.md5(now.strftime('%Y-%m-%d')).hexdigest(), 16)
     # film of the day
-    film_of_the_day = models.OfTheDay.objects.filter(domain='F', public=True).order_by('-day')[0].film
+    try:
+        film_of_the_day = models.OfTheDay.objects.filter(domain='F', public=True).order_by('-day')[0].film
+    except Exception:
+        film_of_the_day = None
     # premiers
     today = datetime.date.today()
     offset = today.weekday()  # this Monday
@@ -120,8 +123,8 @@ def index(request):
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
         'ratings': range(1, 6),
-        'film_avg_rating_int': int(film_of_the_day.average_rating) if film_of_the_day.average_rating else 0,
-        'film_avg_rating_frac': int(10 * (film_of_the_day.average_rating - int(film_of_the_day.average_rating))) if film_of_the_day.average_rating else 0,
+        'film_avg_rating_int': int(film_of_the_day.average_rating) if film_of_the_day and film_of_the_day.average_rating else 0,
+        'film_avg_rating_frac': int(10 * (film_of_the_day.average_rating - int(film_of_the_day.average_rating))) if film_of_the_day and film_of_the_day.average_rating else 0,
         'premier_film_list': premier_film_list,
         'cookie_kt_carousel_premiers_index': cookie_kt_carousel_premiers_index,
         'latest_content': sorted(latest_content, key=lambda x: x[0], reverse=True)[:10],
