@@ -685,6 +685,9 @@ $(function() {
     });
 
     $('.delete_award_button').click(function() {
+        if (! confirm('Biztosan törölni akarod ezt a díjat?')) {
+          return;
+        }
         $.post('/torol_dij', {
             csrfmiddlewaretoken: $.cookie('csrftoken'),
             award_id: $(this).data('id')
