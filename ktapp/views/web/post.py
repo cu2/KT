@@ -392,7 +392,6 @@ def new_picture(request):
             return HttpResponseForbidden
         film = None
         artist = get_object_or_404(models.Artist, id=request.POST.get('artist', 0))
-        request.POST['picture_type'] = models.Picture.PICTURE_TYPE_ACTOR_PROFILE
     picture = None
     upload_form = kt_forms.PictureUploadForm(request.POST, request.FILES)
     if upload_form.is_valid():

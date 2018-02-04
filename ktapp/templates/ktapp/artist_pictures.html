@@ -82,6 +82,7 @@
             <form action="{% url 'new_picture' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="hidden" name="artist" value="{{ artist.id }}" />
+                <input type="hidden" name="picture_type" value="A" />
                 <p><label for="id_img">Kép:</label> <input type="file" name="img" id="id_img" /></p>
                 <p><label for="id_source_url">Honnan való? (a kép pontos webcíme, nem csak az oldalé)</label> <input type="text" name="source_url" id="id_source_url" maxlength="250" /></p>
                 <p class="center"><input type="submit" value="Profilkép feltöltése" /></p>
