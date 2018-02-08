@@ -94,6 +94,14 @@ def strip_whitespace_and_separator(value):
 
 def check_permission(perm, user, silent=True):
     if user.is_authenticated():
+        # hacky way of exceptions:
+        if user.id == 4083 and perm in {
+            'new_quote', 'edit_quote', 'delete_quote',
+            'new_trivia', 'edit_trivia', 'delete_trivia',
+        }:
+            if silent:
+                return False
+            raise PermissionDenied
         grp = {
             'new_quote': 'core',
             'edit_quote': 'core',
