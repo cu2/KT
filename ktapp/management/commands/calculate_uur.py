@@ -234,8 +234,7 @@ class Command(BaseCommand):
                     selected_user_id = models.KTUser.objects.filter(last_activity_at__gte=a_month_ago, date_joined__gte=a_year_ago, number_of_ratings__gte=50).only('id').order_by('?')[0].id
                 else:
                     # relatively old users
-                    # selected_user_id = models.KTUser.objects.filter(last_activity_at__gte=a_month_ago, date_joined__lt=a_year_ago, number_of_ratings__gte=100).only('id').order_by('?')[0].id
-                    selected_user_id = models.KTUser.objects.filter(last_uur_calculation_at=None, last_activity_at__gte=a_month_ago, date_joined__lt=a_year_ago, number_of_ratings__gte=100).only('id').order_by('?')[0].id
+                    selected_user_id = models.KTUser.objects.filter(last_activity_at__gte=a_month_ago, date_joined__lt=a_year_ago, number_of_ratings__gte=100).only('id').order_by('?')[0].id
             except Exception:
                 return
             self.calculate_uur(selected_user_id)
