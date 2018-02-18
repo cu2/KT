@@ -420,6 +420,8 @@ def delete_file_from_s3(remote_name):
 
 def get_finance(model):
     collected_so_far = model.objects.aggregate(Sum('money'))['money__sum']
+    if collected_so_far is None:
+        collected_so_far = 0
     required_so_far = (datetime.date.today() - datetime.date(2009, 10, 22)).days / 365.0 * 100000.0
     missing = int(round(collected_so_far - required_so_far))
     percent = 100.0 * (missing + 100000) / 100000
