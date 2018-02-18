@@ -1688,6 +1688,31 @@ def finance(request):
 
 
 def vapiti_general(request):
+    if request.user.is_authenticated() and request.user.id in {1}:
+        try:
+            cursor = connection.cursor()
+            cursor.execute(kt_sqls.VAPITI_WINNER_GOLD, (settings.VAPITI_YEAR,))
+            winner_film = models.Film.objects.get(id=cursor.fetchone()[0])
+            cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_FEMALE, (settings.VAPITI_YEAR,))
+            winner_female_role = models.FilmArtistRelationship.objects.get(id=cursor.fetchone()[0])
+            cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_MALE, (settings.VAPITI_YEAR,))
+            winner_male_role = models.FilmArtistRelationship.objects.get(id=cursor.fetchone()[0])
+            future_winners = {
+                'year': settings.VAPITI_YEAR,
+                'g': winner_film,
+                'f': {
+                    'artist': models.Artist.objects.get(id=winner_female_role.artist_id),
+                    'film': models.Film.objects.get(id=winner_female_role.film_id),
+                },
+                'm': {
+                    'artist': models.Artist.objects.get(id=winner_male_role.artist_id),
+                    'film': models.Film.objects.get(id=winner_male_role.film_id),
+                },
+            }
+        except Exception:
+            future_winners = None
+    else:
+        future_winners = None
     raw_awards = [(a, a.film_id, a.artist) for a in models.Award.objects.filter(
         name=u'Vapiti',
         category__in=texts.VAPITI_WINNER_CATEGORIES.values(),
@@ -1729,6 +1754,7 @@ def vapiti_general(request):
         for film in sorted(film_list, key=lambda film: film.award.id):
             final_awards[-1][category].append(film)
     return render(request, 'ktapp/vapiti_subpages/vapiti_general.html', {
+        'future_winners': future_winners,
         'vapiti_year': settings.VAPITI_YEAR,
         'awards': final_awards,
     })
