@@ -99,8 +99,8 @@ def index(request):
     if vapiti_round == 2:
         if kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_GOLD):
             vapiti_round_2_has_nominees = True
-    # vapiti_event_url = 'https://www.facebook.com/events/471508806573371/'
-    vapiti_event_url = ''
+    vapiti_event_url = 'https://www.facebook.com/events/147921529229970/'
+    # vapiti_event_url = ''
     # game
     # before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
     # during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
@@ -1688,31 +1688,33 @@ def finance(request):
 
 
 def vapiti_general(request):
-    if request.user.is_authenticated() and request.user.id in {1}:
-        try:
-            cursor = connection.cursor()
-            cursor.execute(kt_sqls.VAPITI_WINNER_GOLD, (settings.VAPITI_YEAR,))
-            winner_film = models.Film.objects.get(id=cursor.fetchone()[0])
-            cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_FEMALE, (settings.VAPITI_YEAR,))
-            winner_female_role = models.FilmArtistRelationship.objects.get(id=cursor.fetchone()[0])
-            cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_MALE, (settings.VAPITI_YEAR,))
-            winner_male_role = models.FilmArtistRelationship.objects.get(id=cursor.fetchone()[0])
-            future_winners = {
-                'year': settings.VAPITI_YEAR,
-                'g': winner_film,
-                'f': {
-                    'artist': models.Artist.objects.get(id=winner_female_role.artist_id),
-                    'film': models.Film.objects.get(id=winner_female_role.film_id),
-                },
-                'm': {
-                    'artist': models.Artist.objects.get(id=winner_male_role.artist_id),
-                    'film': models.Film.objects.get(id=winner_male_role.film_id),
-                },
-            }
-        except Exception:
-            future_winners = None
-    else:
-        future_winners = None
+    future_winners = None
+    if request.user.is_authenticated() and request.user.id in {1, 13114}:
+        today_str = datetime.date.today().strftime('%Y-%m-%d')
+        vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
+        if today_str == result_day:
+            try:
+                cursor = connection.cursor()
+                cursor.execute(kt_sqls.VAPITI_WINNER_GOLD, (settings.VAPITI_YEAR,))
+                winner_film = models.Film.objects.get(id=cursor.fetchone()[0])
+                cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_FEMALE, (settings.VAPITI_YEAR,))
+                winner_female_role = models.FilmArtistRelationship.objects.get(id=cursor.fetchone()[0])
+                cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_MALE, (settings.VAPITI_YEAR,))
+                winner_male_role = models.FilmArtistRelationship.objects.get(id=cursor.fetchone()[0])
+                future_winners = {
+                    'year': settings.VAPITI_YEAR,
+                    'g': winner_film,
+                    'f': {
+                        'artist': models.Artist.objects.get(id=winner_female_role.artist_id),
+                        'film': models.Film.objects.get(id=winner_female_role.film_id),
+                    },
+                    'm': {
+                        'artist': models.Artist.objects.get(id=winner_male_role.artist_id),
+                        'film': models.Film.objects.get(id=winner_male_role.film_id),
+                    },
+                }
+            except Exception:
+                pass
     raw_awards = [(a, a.film_id, a.artist) for a in models.Award.objects.filter(
         name=u'Vapiti',
         category__in=texts.VAPITI_WINNER_CATEGORIES.values(),
