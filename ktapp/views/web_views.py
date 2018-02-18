@@ -67,11 +67,14 @@ def index(request):
         latest_content.append((item.created_at, 'link', item))
     # toplist of the day
     number_of_toplists = models.UserToplist.objects.filter(quality=True).count()
-    toplist_no_of_the_day = hash_of_the_day % number_of_toplists
-    try:
-        toplist_of_the_day = models.UserToplist.objects.filter(quality=True).order_by('id')[toplist_no_of_the_day]
-    except models.Film.DoesNotExist:
-        toplist_of_the_day = models.UserToplist.objects.get(id=1)
+    if number_of_toplists:
+        toplist_no_of_the_day = hash_of_the_day % number_of_toplists
+        try:
+            toplist_of_the_day = models.UserToplist.objects.filter(quality=True).order_by('id')[toplist_no_of_the_day]
+        except Exception:
+            toplist_of_the_day = None
+    else:
+        toplist_of_the_day = None
     # buzz
     buzz_comment_domains = {}
     for comment in models.Comment.objects.exclude(topic_id=87)[:1000]:  # skip OFF topic
@@ -129,7 +132,7 @@ def index(request):
         'cookie_kt_carousel_premiers_index': cookie_kt_carousel_premiers_index,
         'latest_content': sorted(latest_content, key=lambda x: x[0], reverse=True)[:10],
         'toplist': toplist_of_the_day,
-        'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number'),
+        'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number') if toplist_of_the_day else None,
         'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids),
         'random_poll': random_poll,
         'random_quote': random_quote,

@@ -247,6 +247,7 @@
         {% include 'ktapp/blocks/film_addon_block.html' with addon=random_trivia show_addon_source=True addon_type='trivia' %}
         <p><a href="{% url 'latest_trivias' %}">További érdekességek...</a></p>
         <h2>A nap toplistája</h2>
+        {% if toplist %}
         <p><b><a href="{% url 'usertoplist' toplist.id toplist.slug_cache %}">{{ toplist.title }}</a></b>{% if toplist.created_by %} (<a href="{% url 'user_profile' toplist.created_by.id toplist.created_by.slug_cache %}">{{ toplist.created_by.username }}</a>){% endif %}</p>
         <div class="hidden-xs">
         {% if toplist.toplist_type == 'F' %}
@@ -283,6 +284,7 @@
             </table>
         {% endif %}
         </div>
+        {% endif %}
         <p><a href="{% url 'usertoplists' %}">További toplisták...</a></p>
     </div>
 
