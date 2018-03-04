@@ -99,8 +99,8 @@ def index(request):
     if vapiti_round == 2:
         if kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_GOLD):
             vapiti_round_2_has_nominees = True
-    vapiti_event_url = 'https://www.facebook.com/events/147921529229970/'
-    # vapiti_event_url = ''
+    # vapiti_event_url = 'https://www.facebook.com/events/147921529229970/'
+    vapiti_event_url = ''
     # game
     # before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
     # during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
