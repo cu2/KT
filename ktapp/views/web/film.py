@@ -529,7 +529,7 @@ def films_with_missing_data(request):
         p = 1
     offset_min, offset_max = (p - 1) * 100, p * 100
     miss_type = request.GET.get('tipus', '')
-    if miss_type not in {'tortenet', 'plakat', 'foszereplok', 'szereplok', 'szinkron'}:
+    if miss_type not in {'tortenet', 'plakat', 'foszereplok', 'szereplok', 'szinkron', 'imdb', 'porthu'}:
         miss_type = 'tortenet'
     if miss_type == 'tortenet':
         films = models.Film.objects.filter(plot_summary='').filter(genre_cache_is_short=False).order_by('-number_of_ratings')[offset_min:offset_max]
@@ -541,6 +541,10 @@ def films_with_missing_data(request):
         films = models.Film.objects.filter(number_of_actors=0).filter(genre_cache_is_animation=False, genre_cache_is_short=False, genre_cache_is_docu=False).order_by('-number_of_ratings')[offset_min:offset_max]
     elif miss_type == 'szinkron':
         films = models.Film.objects.filter(iszdb_link='').filter(genre_cache_is_animation=False, genre_cache_is_short=False, genre_cache_is_docu=False).order_by('-number_of_ratings')[offset_min:offset_max]
+    elif miss_type == 'imdb':
+        films = models.Film.objects.filter(imdb_link='').filter(genre_cache_is_short=False).order_by('-number_of_ratings')[offset_min:offset_max]
+    elif miss_type == 'porthu':
+        films = models.Film.objects.filter(porthu_link=None).filter(genre_cache_is_short=False).order_by('-number_of_ratings')[offset_min:offset_max]
     else:
         raise Http404
     return render(request, 'ktapp/films_with_missing_data.html', {
