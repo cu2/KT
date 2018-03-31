@@ -1,7 +1,14 @@
 # Django settings for kt project.
 
 # import local (i.e. gitignored) settings:
-import kt.settings_local
+try:
+    import kt.settings_local
+except:
+    DATABASE_DEFAULT_PASSWORD = 'password'
+    LOCAL_SECRET_KEY = 'secret'
+else:
+    DATABASE_DEFAULT_PASSWORD = kt.settings_local.DATABASE_DEFAULT_PASSWORD
+    LOCAL_SECRET_KEY = kt.settings_local.SECRET_KEY
 
 import os
 
@@ -17,13 +24,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'ktdb',                      # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ktdb_dev',
         'USER': 'ktadmin',
-        'PASSWORD': kt.settings_local.DATABASE_DEFAULT_PASSWORD,
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
+        'PASSWORD': DATABASE_DEFAULT_PASSWORD,
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -97,7 +103,7 @@ COMPRESS_PRECOMPILERS = (
 
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = kt.settings_local.SECRET_KEY
+SECRET_KEY = LOCAL_SECRET_KEY
 
 
 TEMPLATES = [
