@@ -42,7 +42,7 @@ This will:
 - create a virtualenv
 - install all requirements
 - initialize the database
-- load test data into it
+- load test data into it (this will take some time)
 
 
 ## How to run KT
@@ -50,3 +50,5 @@ This will:
 ```
 ./scripts/run.sh
 ```
+
+and open http://localhost:8000/ in the browser.
