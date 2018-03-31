@@ -1,23 +1,17 @@
 # Kritikus Tömeg
 
-This project aims to rewrite [Kritikus Tömeg](http://kritikustomeg.org/), a Hungarian movie site, database, recommendation engine from scratch. Partly to have readable, open source code and community driven development, mostly to be able to rethink the whole idea (see [UX docs](docs/ux_plan.md)).
+[Kritikus Tömeg](https://kritikustomeg.org/) is a Hungarian movie site, community, database, recommendation engine.
 
 
 ## Developer guide
 
-If you want to participate, here are some rules and guide.
+If you want to participate, here are some rules and guidelines.
 
 Even though KT is Hungarian, code (especially open source code) should always be English. Someday, somewhere (maybe) some Danish guys might decide to start *Kritisk masse* (or the Russians *Критическая масса*). If code is English, they only need to translate URLs and templates (and build a database) (and of course raise a community).
 
-For Hungarian communication and coordination use [this topic](http://kritikustomeg.org/forum.php?tid=187) on KT.
+For Hungarian communication and coordination use [this topic](https://kritikustomeg.org/forum/187/kritikus-kod) on KT.
 
-### TODO
-
-See [issues on GitHub](https://github.com/cu2/KT/issues).
-
-### Coding style
-
-Most importantly:
+Please use "standard" coding style:
 
 - use only space for indentation (4 of them per level)
 - lines should end with `LF` (`\n`, `\x0A`)
@@ -25,82 +19,34 @@ Most importantly:
 
 Otherwise follow PEP-8 and use pylint.
 
-### Install guide
 
-See below.
+## How to install KT
 
-### Database changes
+First make sure you have these installed:
 
-Whenever you change `models.py`, don't forget to create a migration:
+- Python 2.7 (https://www.python.org/)
+- MySQL (http://dev.mysql.com/downloads/mysql/)
+- Virtualenv (http://www.virtualenv.org/en/latest/)
 
-    python manage.py makemigrations
+Create a database with the root user:
+```
+mysql -u root < scripts/create-db.sql
+```
 
-and apply it:
+Install KT with this script:
+```
+./scripts/setup.sh
+```
 
-    python manage.py migrate
-
-This way, not only your database schema will follow the change, but others can easily follow.
-
-For more details read [the documentation of Django Migrations](https://docs.djangoproject.com/en/1.7/topics/migrations/).
-
-
-
-## Install guide
-
-### Python 2.7
-
-Important: Python 3 *is* different.
-
-### Virtualenv
-
-Install [virtualenv](http://www.virtualenv.org/en/latest/).
-
-Create a virtualenv in `kt`:
-
-    cd /path/to/kt/
-    virtualenv venv
-
-Activate it:
-
-    . venv/bin/activate
-
-Install all requirements:
-
-    pip install -r requirements.txt
-
-### MySQL
-
-Install [MySQL](http://dev.mysql.com/downloads/mysql/).
-
-Create a database:
-
-    create database ktdb default character set utf8 default collate utf8_hungarian_ci;
-
-Add an admin user that Django uses (locally):
-
-    grant all on ktdb.* to ktadmin@localhost identified by '<something>';
-    flush privileges;
-
-where `<something>` = anything random, but same as `kt/settings_local.py/DATABASE_DEFAULT_PASSWORD`.
-
-Initialize your database (mostly empty tables):
-
-    python manage.py migrate
+This will:
+- create a virtualenv
+- install all requirements
+- initialize the database
+- load test data into it
 
 
-### Webserver
+## How to run KT
 
-For development Django's built-in server is fine:
-
-    python manage.py runserver [<port>]
-
-For production use Apache, Lighttpd, nginx...
-
-### kt/settings_local.py
-
-This file is not in the public repo, because it contains secrets:
-
-    DATABASE_DEFAULT_PASSWORD = ''
-    SECRET_KEY = ''
-
-Don't forget to create this file and fill in the secrets with some random stuff.
+```
+./scripts/run.sh
+```
