@@ -97,9 +97,9 @@ STATICFILES_FINDERS = (
 )
 
 
-COMPRESS_PRECOMPILERS = (
-    ('text/jsx', 'browserify -t reactify mobileapp/src/app/index.jsx > {outfile}'),
-)
+# COMPRESS_PRECOMPILERS = (
+#     ('text/jsx', 'browserify -t reactify mobileapp/src/app/index.jsx > {outfile}'),
+# )
 
 
 # Make this unique, and don't share it with anybody.
