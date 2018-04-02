@@ -160,7 +160,7 @@ INSTALLED_APPS = (
     'compressor',
     'rest_framework',
     'ktapp',
-    'mobileapp',
+    # 'mobileapp',
 )
 
 REST_FRAMEWORK = {
