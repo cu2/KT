@@ -1394,7 +1394,7 @@ def delete_picture(sender, instance, **kwargs):
     '''Update number_of_pictures and delete files from s3'''
     if instance.film:
         instance.film.number_of_pictures = instance.film.picture_set.count()
-        if instance.film.main_poster is not None and instance.film.main_poster_id == instance.id:
+        if instance.film.main_poster == instance:
             try:
                 instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_POSTER).order_by('id')[0]
             except IndexError:
