@@ -1389,20 +1389,26 @@ class Picture(models.Model):
         return int(round((50.0 - 50.0 / self.height * self.width) / 2 * 0.8 - 5))
 
 
+@receiver(pre_delete, sender=Picture)
+def pre_delete_picture(sender, instance, **kwargs):
+    '''Update main_poster'''
+    if instance.film and instance.film.main_poster == instance:
+        try:
+            instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_POSTER).exclude(id=instance.id).order_by('id')[0]
+        except IndexError:
+            try:
+                instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_DVD).exclude(id=instance.id).order_by('id')[0]
+            except IndexError:
+                instance.film.main_poster = None
+        instance.film.save(update_fields=['main_poster'])
+
+
 @receiver(post_delete, sender=Picture)
 def delete_picture(sender, instance, **kwargs):
     '''Update number_of_pictures and delete files from s3'''
     if instance.film:
         instance.film.number_of_pictures = instance.film.picture_set.count()
-        if instance.film.main_poster == instance:
-            try:
-                instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_POSTER).order_by('id')[0]
-            except IndexError:
-                try:
-                    instance.film.main_poster = instance.film.picture_set.filter(picture_type=instance.PICTURE_TYPE_DVD).order_by('id')[0]
-                except IndexError:
-                    instance.film.main_poster = None
-        instance.film.save(update_fields=['number_of_pictures', 'main_poster'])
+        instance.film.save(update_fields=['number_of_pictures'])
     kt_utils.delete_file_from_s3(unicode(instance.img))
     for _, (w, h) in instance.THUMBNAIL_SIZES.iteritems():
         _, _, _, s3_key = instance.get_thumbnail_filename(w, h)
