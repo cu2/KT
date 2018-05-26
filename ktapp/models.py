@@ -12,7 +12,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserM
 from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, pre_delete
 from django.dispatch.dispatcher import receiver
 from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
