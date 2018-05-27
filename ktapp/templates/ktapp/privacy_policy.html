@@ -1,0 +1,95 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+
+{% block title %}Adatvédelmi tájékoztató - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Adatvédelmi tájékoztató</h1>
+{% endblock %}
+
+{% block main %}
+<div class="row">
+    <div class="central-column">
+
+    <p>Az oldal használata során akarva-akaratlanul adatokat szolgáltatsz magadról nekünk. Az alábbiakban olvashatsz arról, hogy milyen adatokról van szó, azok hogyan kerülnek hozzánk, mi célból, és ki hogyan fér hozzá.</p>
+
+
+    <h2>Regisztrációs adatok</h2>
+    <p>Az egyedi user azonosítót leszámítva, amit a rendszer generál automatikusan, mindegyiket te adod meg.</p>
+    <ul>
+        <li>
+            <b>Egyedi user azonosító</b>.
+            Mindenhol az adatbázisban ez a szám azonosít téged. Ez teszi lehetővé például, hogy ha valamilyen okból megváltoztatod a felhasználóneved, a szavazataid, kommentjeid... továbbra is megmaradjanak és hozzád kapcsolódjanak.<br />
+            Ezt bárki láthatja, aki megkeres az oldalon, mert a profil oldalad URL-jében szerepel.
+        </li>
+        <li>
+            <b>Felhasználónév</b>.
+            A számítógépnek jó, hogy egy számmal tud rád hivatkozni, neked és a közösség többi tagjának viszont nem lenne túl praktikus.<br />
+            Szintén bárki hozzáférhet, hiszen a profil oldaladon, illetve minden filmnél, ahol szavazol vagy kommentelsz, megjelenik.
+        </li>
+        <li>
+            <b>Email cím</b>.
+            Egyrészt ez teszi lehetővé, hogy jelszót tudj változtatni. Ilyenkor küldünk egy jelszóváltoztató emailt. Ez azért így működik, hogy ha véletlenül más hozzáfér a számítógépedhez, ne tudja simán ellopni a regisztrációdat azzal, hogy csak úgy megváltoztatja a jelszavad. Az emailedhez is hozzá kell férnie (amit remélhetőleg rendesen védesz).<br />
+            Másrészt így tudunk tájékoztatást küldeni a fontosabb változásokról vagy eseményekről. Ez évi 2-3 hírlevelet szokott jelenteni: a Vapiti-szavazás indulásáról, a Vapiti-díjkiosztóról és a KT-szülinapról. Erről bármikor leiratkozhatsz (vagy újra fel) a profil oldaladon (azon belül: Egyéni beállítások).<br />
+            Rajtad kívül csak a KT adminja fér hozzá, ő is csak azért, mert még nem lett lefejlesztve, hogy az emailek titkosítva legyenek tárolva.
+        </li>
+        <li>
+            <b>Jelszó</b>.
+            Ennek köszönhető, hogy csak az tud belépni a nevedben, aki tudja a jelszavad. Remélhetőleg ez kizárólag te vagy.<br />
+            A jelszavadhoz valójában még te sem férsz hozzá, mert olyan módon van titkosítva, amit nem lehet visszafejteni (<a href="https://hu.wikipedia.org/wiki/Kriptogr%C3%A1fiai_hash_f%C3%BCggv%C3%A9ny" target="_blank">hash</a>-nek hívják az ilyet). Ezért van, hogy ha elfelejted a jelszavad, nem tudod lekérni a rendszertől, csak újat tudsz beállítani.
+        </li>
+    </ul>
+
+
+    <h2>A használat során általad megadott adatok</h2>
+    <p>Ezeknek a nagy része bárki számára hozzáférhető akár a profil oldaladon, akár a filmeknél, kommenteknél. A kivételek a lenti listában külön fel vannak tüntetve.</p>
+    <p>Az adatgyűjtés célja alapvetően az, hogy ki tudd fejezni magad, legfőképp a filmes ízlésedet, véleményedet.</p>
+    <ul>
+        <li><b>Demográfiai adatok</b>: nem, születési év, lakhely. Ezeknél választhatsz, hogy publikusak legyenek-e vagy sem.</li>
+        <li><b>Profil adatok</b>: bemutatkozás, kedvenc rendezőid, színészeid, műfajaid, országaid, korszakaid.</li>
+        <li><b>Profilkép</b></li>
+        <li><b>Szavazatok</b>. A szavazatokból számolódnak hasonlóságok és ízlés adatok is. Előbbinél mindenki csak annyit lát, hogy hozzá mennyire hasonlítasz. Utobbi pedig elérhető a profil oldaladon.</li>
+        <li><b>Kommentek</b></li>
+        <li><b>Kívánságok</b></li>
+        <li><b>Kedvenc felhasználók</b>. Őket csak te látod, hiszen itt nem az a cél, hogy kifejezd önmagad (mint a szavazatoknál vagy kommenteknél), hanem hogy követni tud a számodra érdekes emberek filmes tevékenységét. Ami nyilvános mindenkiről, hogy hányan jelölték kedvencnek.</li>
+        <li><b>Toplisták</b></li>
+        <li><b>Írások</b></li>
+        <li><b>Privát üzenetek</b>. Ezeket csak te illetve a címzett látja.</li>
+        <li><b>Vapiti jelölések</b>. Ezeket szintén csak te látod. A rendszer pedig összesítést számol belőlük, amiből megszületnek a Vapiti eredmények.</li>
+    </ul>
+    <p>A fentieken kívül, ha feltöltesz képet filmhez, színészhez, ha beküldesz idézetet, érdekességet, akkor a rendszer eltárolja, hogy te küldted be, és ez meg is jelenik az oldalon. Illetve ezekből számolódik a <a href="{% url 'contributors' %}">Jófejek</a> lista.</p>
+
+
+    <h2>Automatikusan gyűjtött adatok</h2>
+    <p>Minden alkalommal, amikor megnézel egy oldalt a KT-n, a szerver automatikusan letárol bizonyos adatokat (úgynevezett logokban). Ez akkor is megtörténik, ha nem vagy bejelentkezve (vagy akárcsak regisztrálva).</p>
+    <p>Ennek alapvetően három célja van:</p>
+    <ul>
+        <li>Az oldal fejlesztése. Innen lehet például észrevenni, hogy valamelyik oldaltípus (mondjuk a részletes kereső) nagyon lassú, vagyis érdemes dolgozni rajta, hogy gyorsabb legyen. Vagy mondjuk kiderül, hogy az egyik menüpontból az emberek rendszeresen visszafordulnak: az egyik lehetséges ok, hogy félrevezető a neve, és mindenki, aki rákattint mást várt. Vagy hogy van olyan funkció az oldalon, amit gyakorlatilag senki nem használ.</li>
+        <li>Hibák keresése és javítása. Általában ritkán szól valaki, ha nem tölt be az egyik oldal és helyette "Server error"-t kap. A logokban ezek a hibák technikai részletekkel együtt ("traceback") megjelennek.</li>
+        <li>Visszaélések felderítése. Sajnos néha előfordul, hogy valaki megszegi a <a href="{% url 'rulez' %}">szabályzatot</a>. Súlyosabb esetben ez kitiltáshoz vezethet. És ilyenkor van, aki nem bírja elfogadni a döntést, hanem álnéven visszatér. A logok segítenek beazonosítani az ilyen embereket.</li>
+    </ul>
+    <p>Ezekhez a logokhoz kizárólag a KT adminja fér hozzá.</p>
+    <p>Az adatok az alábbiak:</p>
+    <ul>
+        <li><b>Dátum és idő</b>: mikor nézted meg az oldalt</li>
+        <li><b>IP cím</b>: milyen IP címről</li>
+        <li><b>User agent</b>: ebből nagyjából a böngésződ és az operációs rendszered típusa derül ki. Ebből olyasmiket lehet megtudni, minthogy van olyan oldal, amit mobilról soha nem nyit meg senki. Ami jelezhet valamilyen problémát, ha amúgy mobilon is hasznos lenne az az oldal.</li>
+        <li><b>URL</b>: ez adja meg, hogy melyik oldalon vagy</li>
+        <li><b>Referer</b>: ez pedig azt, hogy melyik oldalról jöttél. Így lehet képet kapni mind a KT-n belüli navigációról, mind arról, hogy honnan jönnek a látogatók.</li>
+        <li><b>Felhasználónév és egyedi azonosító</b>: ha be vagy jelentkezve</li>
+        <li><b>Látogató azonosító</b>: az interneten valójában senkit sem lehet tökéletesen beazonosítani. Ez egy cookie-alapú közelítés.</li>
+        <li><b>Válaszidő</b>: mennyi idő telt el a szerveren az oldal lekérés beérkezése és a válasz megszületése között (ezredmásodpercben)</li>
+    </ul>
+
+
+    <h2>Egyéb tudnivalók</h2>
+    <p>Az adatbázisról naponta mentés készül, hogy ha bármi baj történik, akkor helyre lehessen állítani. 30 nap után ezeket a mentések törlődnek. Ez azt jelenti, hogy ha például módosítod egy osztályzatod, akkor a régi szavazat 30 napig még tárolva van.</p>
+    <p>Adatok továbbítása: az adatokat senkinek sem továbbítjuk. Mivel az oldalon reklámok sincsenek, így még statisztikai jelleggel sem. Viszont ami adatok nyilvánosan megjelennek, pl szavazatok (részletesebb lásd fentebb), azokhoz bárki hozzáférhet, azokat bárki gyűjtheti (az már az ő felelősségük, hogy mit kezdenek vele). Például a Google indexeli az oldalt, vagyis bejárja az egész KT-t és eltárolja az összes aloldalt.</p>
+    <p>A KT az Amazon Web Services egy szerverén fut, az adatbázis is ott található. Az adatbázis mentések illetve a logok S3-ra kerülnek fel (ami szintén az Amazon szolgáltatása). Ezekhez kizárólag a KT adminjának van hozzáférése.</p>
+    <p>A KT adminja, egyben a KT üzemeltetője, és így az adatok kezelője Németh András (alias <a href="{% url 'user_profile' 1 'cucu' %}">cucu</a>).</p>
+
+
+    </div>
+</div>
+{% endblock %}

@@ -1631,6 +1631,10 @@ def rulez(request):
     return render(request, 'ktapp/rulez.html')
 
 
+def privacy_policy(request):
+    return render(request, 'ktapp/privacy_policy.html')
+
+
 def blacklist(request):
     set_of_user_ids = set()
     list_of_bans = []
