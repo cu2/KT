@@ -11,13 +11,13 @@
     <form action="" method="post">
         {% csrf_token %}
         <p>
-            <label for="id_subscribed_to_campaigns"><b>Hírlevél</b> (KT-találkozókról, a Vapiti-szavazás kezdetéről, újításokról... átlag néhány havonta):</label>
+            <label for="id_subscribed_to_campaigns"><b>Hírlevél</b> (évente 2-3, KT-találkozókról, a Vapiti-szavazás kezdetéről, újításokról...):</label>
             <select id="id_subscribed_to_campaigns" name="subscribed_to_campaigns">
                 <option value="1"{% if user.subscribed_to_campaigns %} selected="selected"{% endif %}>feliratkozva</option>
                 <option value="0"{% if not user.subscribed_to_campaigns %} selected="selected"{% endif %}>leiratkozva</option>
             </select>
         </p>
-        {% if user.id <= 17442 %}
+        {% if user.id <= 17442 and user.design_version == 1 %}
         <p>
             <label for="id_design_version"><b>Színvilág</b>:</label>
             <select id="id_design_version" name="design_version">
