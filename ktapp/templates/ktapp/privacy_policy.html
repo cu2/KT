@@ -12,7 +12,7 @@
 <div class="row">
     <div class="central-column">
 
-    <p>Az oldal használata során akarva-akaratlanul adatokat szolgáltatsz magadról nekünk. Az alábbiakban olvashatsz arról, hogy milyen adatokról van szó, azok hogyan kerülnek hozzánk, mi célból, és ki hogyan fér hozzá.</p>
+    <p>A Kritikus Tömeg (KT) használata során akarva-akaratlanul adatokat szolgáltatsz magadról nekünk. Az alábbiakban olvashatsz arról, hogy milyen adatokról van szó, azok hogyan kerülnek hozzánk, mi célból, és ki hogyan fér hozzá.</p>
 
 
     <h2>Regisztrációs adatok</h2>
@@ -20,7 +20,7 @@
     <ul>
         <li>
             <b>Egyedi user azonosító</b>.
-            Mindenhol az adatbázisban ez a szám azonosít téged. Ez teszi lehetővé például, hogy ha valamilyen okból megváltoztatod a felhasználóneved, a szavazataid, kommentjeid... továbbra is megmaradjanak és hozzád kapcsolódjanak.<br />
+            Mindenhol az adatbázisban ez a szám azonosít téged. Ez teszi lehetővé például, hogy ha valamilyen okból megváltoztatod a felhasználóneved, akkor a szavazataid, kommentjeid továbbra is megmaradjanak és hozzád kapcsolódjanak.<br />
             Ezt bárki láthatja, aki megkeres az oldalon, mert a profil oldalad URL-jében szerepel.
         </li>
         <li>
@@ -50,9 +50,9 @@
         <li><b>Profil adatok</b>: bemutatkozás, kedvenc rendezőid, színészeid, műfajaid, országaid, korszakaid.</li>
         <li><b>Profilkép</b></li>
         <li><b>Szavazatok</b>. A szavazatokból számolódnak hasonlóságok és ízlés adatok is. Előbbinél mindenki csak annyit lát, hogy hozzá mennyire hasonlítasz. Utobbi pedig elérhető a profil oldaladon.</li>
-        <li><b>Kommentek</b></li>
+        <li><b>Kommentek</b>. Fontos tudnivaló, hogy a szerkesztőség a <a href="{% url 'rulez' %}">szabályzatnak</a> nem megfelelő kommenteket moderálhatja (részben vagy egészben törölheti, illetve OFF-ba rakhatja).</li>
         <li><b>Kívánságok</b></li>
-        <li><b>Kedvenc felhasználók</b>. Őket csak te látod, hiszen itt nem az a cél, hogy kifejezd önmagad (mint a szavazatoknál vagy kommenteknél), hanem hogy követni tud a számodra érdekes emberek filmes tevékenységét. Ami nyilvános mindenkiről, hogy hányan jelölték kedvencnek.</li>
+        <li><b>Kedvenc felhasználók</b>. Őket csak te látod, hiszen itt nem az a cél, hogy kifejezd önmagad (mint a szavazatoknál vagy kommenteknél), hanem hogy követni tudd a számodra érdekes emberek filmes tevékenységét. Ami nyilvános mindenkiről, hogy hányan jelölték kedvencnek.</li>
         <li><b>Toplisták</b></li>
         <li><b>Írások</b></li>
         <li><b>Privát üzenetek</b>. Ezeket csak te illetve a címzett látja.</li>
@@ -66,7 +66,7 @@
     <p>Ennek alapvetően három célja van:</p>
     <ul>
         <li>Az oldal fejlesztése. Innen lehet például észrevenni, hogy valamelyik oldaltípus (mondjuk a részletes kereső) nagyon lassú, vagyis érdemes dolgozni rajta, hogy gyorsabb legyen. Vagy mondjuk kiderül, hogy az egyik menüpontból az emberek rendszeresen visszafordulnak: az egyik lehetséges ok, hogy félrevezető a neve, és mindenki, aki rákattint mást várt. Vagy hogy van olyan funkció az oldalon, amit gyakorlatilag senki nem használ.</li>
-        <li>Hibák keresése és javítása. Általában ritkán szól valaki, ha nem tölt be az egyik oldal és helyette "Server error"-t kap. A logokban ezek a hibák technikai részletekkel együtt ("traceback") megjelennek.</li>
+        <li>Hibák keresése és javítása. Általában ritkán szól valaki, ha nem tölt be az egyik oldal és helyette "Server error"-t kap. A logokban ezek a hibák technikai részletekkel együtt megjelennek.</li>
         <li>Visszaélések felderítése. Sajnos néha előfordul, hogy valaki megszegi a <a href="{% url 'rulez' %}">szabályzatot</a>. Súlyosabb esetben ez kitiltáshoz vezethet. És ilyenkor van, aki nem bírja elfogadni a döntést, hanem álnéven visszatér. A logok segítenek beazonosítani az ilyen embereket.</li>
     </ul>
     <p>Ezekhez a logokhoz kizárólag a KT adminja fér hozzá.</p>
@@ -78,16 +78,26 @@
         <li><b>URL</b>: ez adja meg, hogy melyik oldalon vagy</li>
         <li><b>Referer</b>: ez pedig azt, hogy melyik oldalról jöttél. Így lehet képet kapni mind a KT-n belüli navigációról, mind arról, hogy honnan jönnek a látogatók.</li>
         <li><b>Felhasználónév és egyedi azonosító</b>: ha be vagy jelentkezve</li>
-        <li><b>Látogató azonosító</b>: az interneten valójában senkit sem lehet tökéletesen beazonosítani. Ez egy cookie-alapú közelítés.</li>
-        <li><b>Válaszidő</b>: mennyi idő telt el a szerveren az oldal lekérés beérkezése és a válasz megszületése között (ezredmásodpercben)</li>
+        <li><b>Látogató azonosító</b>: az interneten valójában senkit sem lehet tökéletesen beazonosítani. Ez egy cookie-alapú közelítés (lásd lentebb).</li>
+        <li><b>Válaszidő</b>: mennyi idő telt el a szerveren az oldal lekérés beérkezése és a válasz megszületése között (ezredmásodpercben). Ha lassú a neted, számodra ennél sokkal lassabb is lehet az oldal, de azon a KT nem tud segíteni. A szerveren eltelt válaszidő viszont fejleszthető.</li>
     </ul>
+
+
+    <h2>Cookie-k</h2>
+    <p>A cookie (magyarul "süti" (nem mintha ettől érthetőbb lenne)) "egy információcsomag, amelyet a szerver küld a webböngészőnek, majd a böngésző visszaküld a szervernek minden, a szerver felé irányított kérés alkalmával" (a <a href="https://hu.wikipedia.org/wiki/HTTP-s%C3%BCti" target="_blank">Wikipédia</a> szerint). Hogy milyen cookie-kat küld a böngésződnek a KT (illetve a böngésződ a KT-nek)?</p>
+    <p>Amikor először látogatod meg a KT-t, a szerver generál neked egy látogató azonosítót. Ez egy random karaktersorozat (például <tt>vaeo9b2aoru4rg3rae9j9ek1xny2nz0q</tt>). Ezt a böngésződ cookie formájában tárolja el, és minden alkalommal, amikor megnézel egy oldalt a KT-n, automatikusan elküldi a KT szerverének. Hogy mi a célja, arról az előző pontban (Automatikusan gyűjtött adatok) olvashatsz részletesebben.</p>
+    <p>A másik cookie a "session" azonosító, ami azt jelzi, hogy be vagy-e jelentkezve és ha igen, ki vagy. Ha ezt törlöd, az kb ugyanaz, mintha kijelentkeznél az oldalról. Biztonsági okokból ez is csak egy random karaktersorozat, vagyis hiába írod át ("hekkeled meg"), nem fogsz tudni más nevében belépni.</p>
+    <p>Van egy harmadik, ami azt tárolja, hogy a nyitó oldalon a Bemutatók szekcióban épp melyik filmnél tartasz. Enélkül akárhányszor a nyitó oldalra lépnél, mindig ugyanazt a filmet látnád először, és onnan kezdene végigmenni az aktuális bemutatókon. Léteznek ennyire ártalmatlan cookie-k is.</p>
+    <p>Aztán van egy olyan, ami CSRF néven fut. Ez - meglepő módon - megint csak egy random karaktersorozat. Enélkül egy rosszindulatú figura csinálhatna egy weboldalt, amit ha meglátogatsz, miközben be vagy lépve a KT-ra, a tudtod nélkül 5-ös adnál az <a href="{% url 'film_main' 28641 'alomnet-2009' %}">Álom.net</a>-re. Talán azt hiszed, ilyen rosszindulat nem is létezik, de ki tudja. Jobb nem kockáztatni. A <a href="https://hu.wikipedia.org/wiki/Cross-site_request_forgery" target="_blank">CSRF</a> egy komplikált trükk, olyannyira, hogy 2008 környékén például a WiW (fiatalabbak kedvéért: az egykori "magyar Facebook") nem volt rendesen védett, vagyis ott a tudtod nélkül friendelhettél be rossz arcokat.</p>
+    <p>És végül a Google Analytics-nek is van pár cookie-ja, amik a statisztika gyűjtésben segítenek. Innen lehet például tudni, hogy hányan nézik a KT-t mobilról, vagy hogy átlagosan hány oldalt néznek meg a látogatók.</p>
 
 
     <h2>Egyéb tudnivalók</h2>
     <p>Az adatbázisról naponta mentés készül, hogy ha bármi baj történik, akkor helyre lehessen állítani. 30 nap után ezeket a mentések törlődnek. Ez azt jelenti, hogy ha például módosítod egy osztályzatod, akkor a régi szavazat 30 napig még tárolva van.</p>
-    <p>Adatok továbbítása: az adatokat senkinek sem továbbítjuk. Mivel az oldalon reklámok sincsenek, így még statisztikai jelleggel sem. Viszont ami adatok nyilvánosan megjelennek, pl szavazatok (részletesebb lásd fentebb), azokhoz bárki hozzáférhet, azokat bárki gyűjtheti (az már az ő felelősségük, hogy mit kezdenek vele). Például a Google indexeli az oldalt, vagyis bejárja az egész KT-t és eltárolja az összes aloldalt.</p>
-    <p>A KT az Amazon Web Services egy szerverén fut, az adatbázis is ott található. Az adatbázis mentések illetve a logok S3-ra kerülnek fel (ami szintén az Amazon szolgáltatása). Ezekhez kizárólag a KT adminjának van hozzáférése.</p>
-    <p>A KT adminja, egyben a KT üzemeltetője, és így az adatok kezelője Németh András (alias <a href="{% url 'user_profile' 1 'cucu' %}">cucu</a>).</p>
+    <p>Adatok továbbítása: az adatokat senkinek sem továbbítjuk. Mivel az oldalon reklámok sincsenek, így még statisztikai jelleggel sem. Viszont ami adatok nyilvánosan megjelennek, pl szavazatok (részletesebben lásd fentebb), azokhoz bárki hozzáférhet, azokat bárki gyűjtheti (az már az ő felelősségük, hogy mit kezdenek vele). Például a Google indexeli az oldalt, vagyis bejárja az egész KT-t és eltárolja az összes aloldalt.</p>
+    <p>A KT az <a href="https://hu.wikipedia.org/wiki/Amazon_Web_Services" target="_blank">Amazon Web Services</a> egy szerverén fut, az adatbázis is ott található. Az adatbázis mentések illetve a logok S3-ra kerülnek fel (ami szintén az Amazon szolgáltatása). Ezekhez kizárólag a KT adminjának van hozzáférése.</p>
+    <p>A KT adminja, egyben a KT üzemeltetője, és így az adatok kezelője Németh András (alias <a href="{% url 'user_profile' 1 'cucu' %}">cucu</a>). Bármilyen kérdés, kérés, panasz esetén <a href="{% url 'user_messages' 1 'cucu' %}">privát üzenetben</a> vagy a <span id="kt_email"></span> email címen érheted el őt.</p>
+    <p>Ha valamiért inkább egy hatóságnak szeretnél panaszt tenni, akkor keresd a <a href="https://naih.hu/" target="_blank">Nemzeti Adatvédelmi és Információszabadság Hatóságot</a>, nekik az adatvédelem a szakterületük.</p>
 
 
     </div>
