@@ -177,6 +177,7 @@ def verify_email(request, token):
             else:
                 token_object.belongs_to.set_password(new_password1)
                 token_object.belongs_to.validated_email = True
+                token_object.belongs_to.validated_email_at = datetime.datetime.now()
                 token_object.belongs_to.save()
                 if not request.user.id:
                     login(request, kt_utils.custom_authenticate(models.KTUser, token_object.belongs_to.username, new_password1))
@@ -266,6 +267,7 @@ def reset_password(request, token):
             else:
                 token_object.belongs_to.set_password(new_password1)
                 token_object.belongs_to.validated_email = True
+                token_object.belongs_to.validated_email_at = datetime.datetime.now()
                 token_object.belongs_to.save()
                 if not request.user.id:
                     login(request, kt_utils.custom_authenticate(models.KTUser, token_object.belongs_to.username, new_password1))

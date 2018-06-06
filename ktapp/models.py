@@ -47,6 +47,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     follow = models.ManyToManyField('KTUser', symmetrical=False, through='Follow', through_fields=('who', 'whom'))
     slug_cache = models.CharField(max_length=250, blank=True)
     validated_email = models.BooleanField(default=False)
+    validated_email_at = models.DateTimeField(blank=True, null=True)
     core_member = models.BooleanField(default=False)
     i_county_id = models.SmallIntegerField(default=-1)
     email_notification = models.BooleanField(default=False)
