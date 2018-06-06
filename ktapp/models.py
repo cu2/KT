@@ -166,7 +166,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
             [self.email],
         )
         email.attach_alternative(html_content, 'text/html')
-        if settings.LOCAL_MAIL:
+        if settings.LOCAL_MAIL or settings.ENV == 'local':
             print '[SUBJECT] %s' % email.subject
             print '[FROM] %s' % email.from_email
             print '[TO] %s' % self.email

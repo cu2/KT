@@ -26,6 +26,8 @@
                 Ez a felhasználónév foglalt. Ha régebben már regisztráltál, <a href="{% url 'login' %}?next={{ next }}">itt tudsz bejelentkezni</a>.
             {% elif error_type == 'email_taken' %}
                 Ezzel az email címmel már regisztrált valaki. Ha te voltál az, <a href="{% url 'login' %}?next={{ next }}">itt tudsz bejelentkezni</a>.
+            {% elif error_type == 'no_sign_pp' %}
+                Ha nem fogadod el az adatvédelmi tájékoztatót, akkor nem regisztrálhatsz.
             {% endif %}
         </p>
     {% endif %}
@@ -36,6 +38,12 @@
         <p>Felhasználónév: <input type="text" name="username" value="{{ username }}" class="focus_this" /></p>
         <p>Email cím: <input type="email" name="email" value="{{ email }}" /></p>
         <p class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></p>
+        <p>
+            <input type="checkbox" id="id_sign_pp" name="sign_pp" /> <label for="id_sign_pp">Elfogadom az</label> <a href="{% url 'privacy_policy' %}" target="_blank">adatvédelmi tájékoztatót</a>. Enélkül nem regisztrálhatsz.
+        </p>
+        <p>
+            <input type="checkbox" id="id_subscribe" name="subscribe" /> <label for="id_subscribe">Feliratkozom a hírlevélre (évi 2-3).</label> Ez teljesen opcionális, és később is bármikor módosíthatod.
+        </p>
         <p>
             <input type="submit" value="Regisztráció" />
             <a href="{{ next }}" class="button small_button" style="float: right">Mégsem</a>

@@ -37,6 +37,8 @@ def registration(request):
     username = kt_utils.strip_whitespace(request.POST.get('username', ''))
     email = kt_utils.strip_whitespace(request.POST.get('email', ''))
     nickname = request.POST.get('nickname', '')
+    sign_pp = request.POST.get('sign_pp', '')
+    subscribe = request.POST.get('subscribe', '')
     if request.method == 'POST':
         if nickname != '':
             error_type = 'robot'
@@ -52,20 +54,27 @@ def registration(request):
             error_type = 'email_taken'
         elif models.KTUser.objects.filter(username=username).count():
             error_type = 'name_taken'
+        elif sign_pp == '':
+            error_type = 'no_sign_pp'
         else:
             password = get_random_string(32)
             user = models.KTUser.objects.create_user(username, email, password)
             ip = get_ip(request)
+            now = datetime.datetime.now()
             user.ip_at_registration = ip
             user.ip_at_last_login = ip
-            user.last_activity_at = datetime.datetime.now()
+            user.last_activity_at = now
             user.design_version = kt_utils.get_design_version(request)
+            if subscribe != '':
+                user.subscribed_to_campaigns = True
+            user.signed_privacy_policy = True
+            user.signed_privacy_policy_at = now
             user.save()
             token = get_random_string(64)
             models.PasswordToken.objects.create(
                 token=token,
                 belongs_to=user,
-                valid_until=datetime.datetime.now() + datetime.timedelta(days=30),
+                valid_until=now + datetime.timedelta(days=30),
             )
             html_message = texts.WELCOME_EMAIL_BODY.format(
                 verification_url=request.build_absolute_uri(reverse('verify_email', args=(token,))),
