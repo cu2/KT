@@ -130,10 +130,10 @@ class LoggingMiddleware(object):
             'response_status_code': response.status_code,
         })
         if kutma:
-            if settings.ENV == 'prod':
-                cookie_domain = '.kritikustomeg.org'
-            else:
+            if settings.ENV == 'local':
                 cookie_domain = 'localhost'
+            else:
+                cookie_domain = '.kritikustomeg.org'
             response.set_cookie('kutma', kutma, max_age=SECONDS_IN_A_YEAR, domain=cookie_domain)
         return response
 
