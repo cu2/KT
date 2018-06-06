@@ -49,7 +49,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     validated_email = models.BooleanField(default=False)
     core_member = models.BooleanField(default=False)
     i_county_id = models.SmallIntegerField(default=-1)
-    email_notification = models.BooleanField(default=True)
+    email_notification = models.BooleanField(default=False)
     facebook_rating_share = models.BooleanField(default=True)
     added_role = models.PositiveIntegerField(default=0)
     added_artist = models.PositiveIntegerField(default=0)
@@ -108,10 +108,12 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_followers = models.PositiveIntegerField(default=0)
     opinion_leader = models.BooleanField(default=False)
     design_version = models.PositiveSmallIntegerField(default=1)
-    subscribed_to_campaigns = models.BooleanField(default=True)
+    subscribed_to_campaigns = models.BooleanField(default=False)
     token_to_unsubscribe = models.CharField(max_length=64, blank=True)
     unread_notification_count = models.PositiveIntegerField(default=0)
     last_uur_calculation_at = models.DateTimeField(blank=True, null=True)
+    signed_privacy_policy = models.BooleanField(default=False)
+    signed_privacy_policy_at = models.DateTimeField(blank=True, null=True)
 
     objects = UserManager()
     USERNAME_FIELD = 'username'
