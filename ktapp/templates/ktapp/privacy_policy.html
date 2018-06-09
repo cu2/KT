@@ -93,11 +93,21 @@
 
 
     <h2>Egyéb tudnivalók</h2>
-    <p>Az adatbázisról naponta mentés készül, hogy ha bármi baj történik, akkor helyre lehessen állítani. 30 nap után ezeket a mentések törlődnek. Ez azt jelenti, hogy ha például módosítod egy osztályzatod, akkor a régi szavazat 30 napig még tárolva van.</p>
+    <p>Az adatbázisról naponta mentés készül, hogy ha bármi baj történik, akkor helyre lehessen állítani. 30 nap után ezek a mentések törlődnek. Ez azt jelenti, hogy ha például módosítod egy osztályzatod, akkor a régi szavazat 30 napig még tárolva van.</p>
     <p>Adatok továbbítása: az adatokat senkinek sem továbbítjuk. Mivel az oldalon reklámok sincsenek, így még statisztikai jelleggel sem. Viszont ami adatok nyilvánosan megjelennek, pl szavazatok (részletesebben lásd fentebb), azokhoz bárki hozzáférhet, azokat bárki gyűjtheti (az már az ő felelősségük, hogy mit kezdenek vele). Például a Google indexeli az oldalt, vagyis bejárja az egész KT-t és eltárolja az összes aloldalt.</p>
     <p>A KT az <a href="https://hu.wikipedia.org/wiki/Amazon_Web_Services" target="_blank">Amazon Web Services</a> egy szerverén fut, az adatbázis is ott található. Az adatbázis mentések illetve a logok S3-ra kerülnek fel (ami szintén az Amazon szolgáltatása). Ezekhez kizárólag a KT adminjának van hozzáférése.</p>
     <p>A KT adminja, egyben a KT üzemeltetője, és így az adatok kezelője Németh András (alias <a href="{% url 'user_profile' 1 'cucu' %}">cucu</a>). Bármilyen kérdés, kérés, panasz esetén <a href="{% url 'user_messages' 1 'cucu' %}">privát üzenetben</a> vagy a <span id="kt_email"></span> email címen érheted el őt.</p>
     <p>Ha valamiért inkább egy hatóságnak szeretnél panaszt tenni, akkor keresd a <a href="https://naih.hu/" target="_blank">Nemzeti Adatvédelmi és Információszabadság Hatóságot</a>, nekik az adatvédelem a szakterületük.</p>
+
+
+    {% if user.id and not user.signed_privacy_policy %}
+    <form action="{% url 'privacy_policy' %}" method="post">
+        {% csrf_token %}
+        <p><br /></p>
+        <p class="center"><input type="submit" value="Elfogadom a fentieket" class="button" /></p>
+        <p><br /></p>
+    </form>
+    {% endif %}
 
 
     </div>

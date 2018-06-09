@@ -1632,6 +1632,11 @@ def rulez(request):
 
 
 def privacy_policy(request):
+    if request.user.is_authenticated() and request.POST:
+        request.user.signed_privacy_policy = True
+        request.user.signed_privacy_policy_at = datetime.datetime.now()
+        request.user.save()
+        return HttpResponseRedirect(reverse('index'))
     return render(request, 'ktapp/privacy_policy.html')
 
 
