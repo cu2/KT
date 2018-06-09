@@ -1526,6 +1526,25 @@ def move_to_off(request):
 
 @require_POST
 @login_required
+@kt_utils.kt_permission_required('set_game_master')
+def set_game_master(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    try:
+        target_user = models.KTUser.objects.get(id=request.POST.get('target_user_id', 0))
+    except models.KTUser.DoesNotExist:
+        return HttpResponseRedirect(next_url)
+    action = request.POST.get('action')
+    if action == 'set':
+        target_user.is_game_master = True
+        target_user.save(update_fields=['is_game_master'])
+    elif action == 'unset':
+        target_user.is_game_master = False
+        target_user.save(update_fields=['is_game_master'])
+    return HttpResponseRedirect(next_url)
+
+
+@require_POST
+@login_required
 def close_topic(request):
     if not request.user.is_game_master:
         return HttpResponseForbidden()

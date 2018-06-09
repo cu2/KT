@@ -180,6 +180,28 @@
             </p>
         {% endif %}
 
+        {% if permission_set_game_master %}
+            {% if selected_user.is_game_master %}
+                <form action="{% url 'set_game_master' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                    <input type="hidden" name="action" value="unset" />
+                    <p>
+                        Játékmester. <input type="submit" value="Elveszem tőle a játékmesteri jogokat" class="small_button" />
+                    </p>
+                </form>
+            {% else %}
+                <form action="{% url 'set_game_master' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                    <input type="hidden" name="action" value="set" />
+                    <p>
+                        <input type="submit" value="Játékmesterré teszem" class="small_button" />
+                    </p>
+                </form>
+            {% endif %}
+        {% endif %}
+
         {% if user.is_authenticated %}
 
             {% if list_of_bans %}
