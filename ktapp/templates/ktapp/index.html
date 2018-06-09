@@ -9,7 +9,18 @@
 
 {% block main %}
 
-    {% for banner in banners %}
+{% if user.id and not user.signed_privacy_policy %}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="banner">
+            <p>Történelmi pillanat: van adatvédelmi tájékoztatónk! Talán már a könyöködön jön ki a sok GDPR-os email és cikk. Itt annyiban különleges a helyzet, hogy szemben sok más oldallal, a KT-nak soha nem volt adatvédelmi bármije. Most végre van.</p>
+            <p>Annyi a kérésünk, hogy <a href="{% url 'privacy_policy' %}" class="bold">olvasd el, és fogadd el</a>. Hogy miért jó ez neked? Mert szemben az elmúlt hónapokkal, évekkel mostantól lesz némi fogalmad arról, hogy mit tudunk rólad és miért.</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% for banner in banners %}
 <div class="row">
     <div class="col-sm-12">
         <div class="banner">
@@ -54,7 +65,7 @@
         </div>
     </div>
 </div>
-    {% endfor %}
+{% endfor %}
 
 <div class="row">
 
