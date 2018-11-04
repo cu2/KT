@@ -2162,7 +2162,20 @@ def analytics(request):
             row[2],
         ))
 
+    return render(request, 'ktapp/analytics.html', {
+        'activity_data': activity_data,
+        'dau_data': dau_data,
+        'wau_data': wau_data,
+        'forum_data': forum_data,
+    })
+
+
+@login_required
+@kt_utils.kt_permission_required('analytics')
+def email_analytics(request):
     # email
+    # NOTE: it's very slow
+    cursor = connection.cursor()
     cursor.execute('''
     SELECT
       s.camp, LEFT(s.sent_at, 10) AS sent_at, COALESCE(cmp.subject, '') AS subject,
@@ -2192,12 +2205,7 @@ def analytics(request):
     ORDER BY s.sent_at, s.camp
     ''')
     email_data = [row for row in cursor.fetchall()]
-
-    return render(request, 'ktapp/analytics.html', {
-        'activity_data': activity_data,
-        'dau_data': dau_data,
-        'wau_data': wau_data,
-        'forum_data': forum_data,
+    return render(request, 'ktapp/email_analytics.html', {
         'email_data': email_data,
     })
 

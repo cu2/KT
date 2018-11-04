@@ -121,6 +121,7 @@ urlpatterns += [
     url(r'^hianyos_filmek/$', film_views.films_with_missing_data, name='films_with_missing_data'),
     url(r'^hianyos_muveszek/$', web_views.artists_with_missing_data, name='artists_with_missing_data'),
     url(r'^analytics/$', web_views.analytics, name='analytics'),
+    url(r'^email_analytics/$', web_views.email_analytics, name='email_analytics'),
     url(r'^logs/$', web_views.view_logs, name='view_logs'),
 
     url(r'^muvesz/(?P<id>\d+)/(?P<name_slug>[^/]*)/kepek/$', web_views.artist_pictures, name='artist_pictures'),

@@ -1,0 +1,41 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+
+{% block title %}Email analytics - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Email analytics</h1>
+{% endblock %}
+
+{% block main %}
+
+    <h2>Email campaigns</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>camp</th>
+                <th>sent_at</th>
+                <th>subject</th>
+                <th>sent_to</th>
+                <th>email#</th>
+                <th>opened_by</th>
+                <th>clicked_by</th>
+                <th>open%</th>
+                <th>open_email%</th>
+                <th>click%</th>
+                <th>click_email%</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in email_data %}
+            <tr>
+                {% for item in row %}
+                    <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
