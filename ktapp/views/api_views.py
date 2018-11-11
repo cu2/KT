@@ -4,6 +4,7 @@ import datetime
 import json
 from collections import OrderedDict
 
+from django.conf import settings
 from django.http import HttpResponse
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
@@ -13,7 +14,6 @@ from rest_framework import viewsets
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
 
-from kt import settings
 from ktapp import models
 from ktapp import serializers
 from ktapp.helpers import filmlist, search as kt_search

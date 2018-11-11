@@ -3,9 +3,9 @@ import datetime
 from django import template
 from django.utils.safestring import mark_safe
 from django.utils.http import urlquote_plus as urlquote_plus_function
+from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from kt import settings
 from ktapp.utils import strip_whitespace as strip_whitespace_function
 
 

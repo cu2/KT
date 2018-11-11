@@ -7,6 +7,7 @@ import string
 from PIL import Image
 from urlparse import urlparse
 
+from django.conf import settings
 from django.db import models, connection
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.core.mail import EmailMultiAlternatives
@@ -18,7 +19,6 @@ from django.template.defaultfilters import slugify
 from django.utils.crypto import get_random_string
 from django.utils.html import strip_tags
 
-from kt import settings
 from ktapp import utils as kt_utils
 from ktapp import texts
 
