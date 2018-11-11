@@ -1443,31 +1443,40 @@ class Message(models.Model):
 
     @classmethod
     def send_message(cls, sent_by, content, recipients):
+        is_private = len(recipients)==1
+        excluded_recipients = set()
+        if sent_by:
+            for ignore in IgnoreUser.objects.filter(whom=sent_by, ignore_pm=True):
+                excluded_recipients.add(ignore.who)
         if sent_by is None:
             owners = recipients
         else:
             owners = recipients | {sent_by}
-        for owner in owners:
+        message_times = []
+        for owner in owners - excluded_recipients:
             message = Message.objects.create(
                 sent_by=sent_by,
                 content=content,
                 owned_by=owner,
-                private=len(recipients)==1,
+                private=is_private,
             )
+            if sent_by is None or owner != sent_by:
+                message_times.append((owner, message.sent_at))
             for recipient in recipients:
                 message.sent_to.add(recipient)
             message.save()
             owner.number_of_messages = Message.objects.filter(owned_by=owner).count()
             owner.save(update_fields=['number_of_messages'])
-            for recipient in recipients:
-                recipient.number_of_messages = Message.objects.filter(owned_by=recipient).count()
-                if recipient.last_message_at is None or recipient.last_message_at < message.sent_at:
-                    recipient.last_message_at = message.sent_at
-                recipient.save(update_fields=['number_of_messages', 'last_message_at'])
-        if sent_by and len(recipients)==1:
+        for recipient, message_sent_at in message_times:
+            recipient.number_of_messages = Message.objects.filter(owned_by=recipient).count()
+            if recipient.last_message_at is None or recipient.last_message_at < message_sent_at:
+                recipient.last_message_at = message_sent_at
+            recipient.save(update_fields=['number_of_messages', 'last_message_at'])
+        if sent_by and is_private:
             other = list(recipients)[0]
             MessageCountCache.update_cache(owned_by=sent_by, partner=other)
-            MessageCountCache.update_cache(owned_by=other, partner=sent_by)
+            if other not in excluded_recipients:
+                MessageCountCache.update_cache(owned_by=other, partner=sent_by)
 
 
 @receiver(post_delete, sender=Message)
@@ -2052,3 +2061,42 @@ class UserContribution(KTUser):
     rank_poll = models.PositiveIntegerField(default=0)
     count_usertoplist = models.PositiveIntegerField(default=0)
     rank_usertoplist = models.PositiveIntegerField(default=0)
+
+
+class IgnoreUser(models.Model):
+    who = models.ForeignKey(KTUser, related_name='+', on_delete=models.CASCADE)
+    whom = models.ForeignKey(KTUser, related_name='+', on_delete=models.CASCADE)
+    when = models.DateTimeField(auto_now_add=True)
+    ignore_pm = models.BooleanField(default=False)
+    ignore_comment = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ['who', 'whom']
+
+    @classmethod
+    def get(cls, who, whom):
+        try:
+            ignore_user = cls.objects.get(who=who, whom=whom)
+        except cls.DoesNotExist:
+            return False, False
+        return ignore_user.ignore_pm, ignore_user.ignore_comment
+
+    @classmethod
+    def set(cls, who, whom, ignore_pm=None, ignore_comment=None):
+        if ignore_pm is None or ignore_comment is None:
+            old_ignore_pm, old_ignore_comment = cls.get(who=who, whom=whom)
+            if ignore_pm is None:
+                ignore_pm = old_ignore_pm
+            if ignore_comment is None:
+                ignore_comment = old_ignore_comment
+        if not ignore_pm and not ignore_comment:
+            cls.objects.filter(who=who, whom=whom).delete()
+            return
+        cls.objects.update_or_create(
+            who=who,
+            whom=whom,
+            defaults={
+                'ignore_pm': ignore_pm,
+                'ignore_comment': ignore_comment,
+            }
+        )

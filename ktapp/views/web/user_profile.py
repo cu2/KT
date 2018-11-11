@@ -108,6 +108,9 @@ def user_profile(request, id, name_slug):
         cursor.execute(kt_sqls.SIMILARITY_PER_GENRE, (request.user.id, selected_user.id))
         for row in cursor.fetchall():
             similarity_per_genre.append(row)
+    ignore_pm, ignore_comment = False, False
+    if request.user.is_authenticated():
+        ignore_pm, ignore_comment = models.IgnoreUser.get(who=request.user, whom=selected_user)
     return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
         'active_tab': 'profile',
         'selected_user': selected_user,
@@ -124,6 +127,8 @@ def user_profile(request, id, name_slug):
         'latest_comments': models.Comment.objects.filter(id__in=latest_comments).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by'),
         'myfav': models.Follow.objects.filter(who=request.user, whom=selected_user).count() if request.user.is_authenticated() else 0,
         'fav_count': models.Follow.objects.filter(whom=selected_user).count(),
+        'ignore_pm': ignore_pm,
+        'ignore_comment': ignore_comment,
         'profile': profile,
         'fav_directors': list(models.Artist.objects.raw('''
             SELECT a.*

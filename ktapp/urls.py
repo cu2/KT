@@ -198,6 +198,7 @@ urlpatterns += [
 
     url(r'^uj_kedvenc$', post_views.follow, name='follow'),
     url(r'^torol_kedvenc$', post_views.unfollow, name='unfollow'),
+    url(r'^ignoralas$', post_views.ignore_user, name='ignore_user'),
 
     url(r'^kitilt$', post_views.ban_user, name='ban_user'),
 

@@ -204,6 +204,25 @@
 
         {% if user.is_authenticated %}
 
+            {% if selected_user.id != user.id %}
+                <h2>Ignorálás</h2>
+                <form action="{% url 'ignore_user' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
+                    <p>
+                        {% if ignore_pm %}
+                            Nem kaphatsz tőle privát üzenetet.
+                            <input type="hidden" name="action" value="clear_ignore_pm" />
+                            <input type="submit" value="Mégis szeretnék." class="small_button" />
+                        {% else %}
+                            Kaphatsz tőle privát üzenetet.
+                            <input type="hidden" name="action" value="set_ignore_pm" />
+                            <input type="submit" value="Nem szeretnék." class="small_button" />
+                        {% endif %}
+                    </p>
+                </form>
+            {% endif %}
+
             {% if list_of_bans %}
                 {% if selected_user.id == user.id or permission_ban_user %}
                     <h2>Korábbi kitiltások</h2>

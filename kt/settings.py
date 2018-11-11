@@ -159,6 +159,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'compressor',
     'rest_framework',
+    'test_without_migrations',
     'ktapp',
     # 'mobileapp',
 )

@@ -1355,6 +1355,22 @@ def unfollow(request):
 
 @require_POST
 @login_required
+def ignore_user(request):
+    next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
+    try:
+        target_user = models.KTUser.objects.get(id=request.POST.get('target_user_id', 0))
+    except models.KTUser.DoesNotExist:
+        return HttpResponseRedirect(next_url)
+    action = request.POST.get('action')
+    if action == 'set_ignore_pm':
+        models.IgnoreUser.set(who=request.user, whom=target_user, ignore_pm=True)
+    elif action == 'clear_ignore_pm':
+        models.IgnoreUser.set(who=request.user, whom=target_user, ignore_pm=False)
+    return HttpResponseRedirect(next_url)
+
+
+@require_POST
+@login_required
 def delete_message(request):
     next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
     try:
