@@ -8,12 +8,13 @@ import json
 import os
 import re
 
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import user_passes_test
 from django.core.exceptions import PermissionDenied
+from django.db import migrations
 from django.db.models import Sum
 
-from kt import settings
 from ktapp import texts
 
 
@@ -525,3 +526,9 @@ def create_comment_notifications(source_user, comment, film, topic, poll):
                 source_user=source_user,
                 comment=comment,
             )
+
+
+def run_sql_except_on_sqlite(sql, reverse_sql):
+    if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
+        return migrations.RunSQL(migrations.RunSQL.noop, migrations.RunSQL.noop)
+    return migrations.RunSQL(sql, reverse_sql)

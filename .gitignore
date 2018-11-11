@@ -5,6 +5,7 @@ media/
 *.iml
 bootstrap/
 .vscode/
+db.sqlite3
 
 
 ### Template from https://github.com/github/gitignore/blob/master/Python.gitignore

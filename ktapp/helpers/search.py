@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import Q
 from django.template.defaultfilters import slugify
 
@@ -58,12 +59,20 @@ def search_safe_slugify(value):
 
 
 def find_artists(q_pieces, limit):
+    if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
+        return models.Artist.objects.filter(
+            slug_cache__icontains=' '.join([q_piece for q_piece in q_pieces if q_piece])
+        ).order_by('-number_of_ratings')[:limit]
     return models.Artist.objects.filter(
         slug_cache__search=' '.join(['+%s*' % search_safe_slugify(q_piece) for q_piece in q_pieces if search_safe_slugify(q_piece)])
     ).order_by('-number_of_ratings')[:limit]
 
 
 def find_users(q_pieces, limit):
+    if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
+        return models.KTUser.objects.filter(
+            slug_cache__icontains=' '.join([q_piece for q_piece in q_pieces if q_piece])
+        ).order_by('username')[:limit]
     return models.KTUser.objects.filter(
         slug_cache__search=' '.join(['+%s*' % search_safe_slugify(q_piece) for q_piece in q_pieces if search_safe_slugify(q_piece)])
     ).order_by('username')[:limit]

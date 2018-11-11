@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
+from ktapp.utils import run_sql_except_on_sqlite
 
 
 class Migration(migrations.Migration):
@@ -12,8 +13,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            ('CREATE FULLTEXT INDEX fulltext_idx_slug_cache ON ktapp_ktuser (slug_cache)',),
-            ('DROP INDEX fulltext_idx_slug_cache ON ktapp_ktuser',),
-        ),
+        run_sql_except_on_sqlite(
+            sql='CREATE FULLTEXT INDEX fulltext_idx_slug_cache ON ktapp_ktuser (slug_cache)',
+            reverse_sql='DROP INDEX fulltext_idx_slug_cache ON ktapp_ktuser',
+        )
     ]

@@ -45,19 +45,20 @@ class LoggingMiddleware(object):
                 user_id = request.user.id
                 username = request.user.username
                 day = utcnow.strftime('%Y-%m-%d')
-                cursor = connection.cursor()
-                cursor.execute('''
-                INSERT INTO ktapp_hourlyactiveuser
-                (user_id, day, hour, counter)
-                VALUES(%s, %s, %s, 1)
-                ON DUPLICATE KEY UPDATE counter = counter + 1
-                ''', [user_id, day, utcnow.hour])
-                cursor.execute('''
-                INSERT INTO ktapp_dailyactiveuser
-                (user_id, day, counter)
-                VALUES(%s, %s, 1)
-                ON DUPLICATE KEY UPDATE counter = counter + 1
-                ''', [user_id, day])
+                if settings.DATABASES['default']['ENGINE'] != 'django.db.backends.sqlite3':
+                    cursor = connection.cursor()
+                    cursor.execute('''
+                    INSERT INTO ktapp_hourlyactiveuser
+                    (user_id, day, hour, counter)
+                    VALUES(%s, %s, %s, 1)
+                    ON DUPLICATE KEY UPDATE counter = counter + 1
+                    ''', [user_id, day, utcnow.hour])
+                    cursor.execute('''
+                    INSERT INTO ktapp_dailyactiveuser
+                    (user_id, day, counter)
+                    VALUES(%s, %s, 1)
+                    ON DUPLICATE KEY UPDATE counter = counter + 1
+                    ''', [user_id, day])
         except AttributeError:
             pass
         session_key = ''
