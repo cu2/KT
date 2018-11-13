@@ -1443,6 +1443,7 @@ class Message(models.Model):
 
     @classmethod
     def send_message(cls, sent_by, content, recipients):
+        recipients = set(recipients)
         is_private = len(recipients)==1
         excluded_recipients = set()
         if sent_by:
