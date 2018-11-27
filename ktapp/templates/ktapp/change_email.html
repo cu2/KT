@@ -1,0 +1,40 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}<h1>Email módosítása</h1>{% endblock %}
+
+{% block main %}
+
+    {% if error_type == 'ok' %}
+
+        <p>Ellenőrzésképpen küldtünk egy linket emailben az új címedre ({{ email }}). Ha nem találod, nézz be a spam mappába is, hátha oda került véletlenül. Ha sehogy sem találod, <a href="{% url 'change_email' %}">próbáld újra</a>.</p>
+        <p><a href="{% url 'index' %}">Tovább a nyitó oldalra...</a></p>
+
+    {% else %}
+
+        {% if error_type %}
+            <p class="error">
+                {% if error_type == 'robot' %}
+                    Ha láttál olyan mezőt, amire az van írva, hogy "hagyd üresen", azt hagyd üresen. :-)
+                {% elif error_type == 'password_invalid' %}
+                    Véletlenül elgépelted a jelenlegi jelszavad. Légyszi próbáld újra.
+                {% endif %}
+            </p>
+        {% endif %}
+
+        <form action="" method="post">
+            {% csrf_token %}
+            <p>Új email címed: <input type="text" name="new_email" class="focus_this" /> (a jelenleg beállított címed: {{user.email}})</p>
+            <p>Jelenlegi jelszavad: <input type="password" name="password" /> (ellenőrzésképpen)</p>
+            <p class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></p>
+            <p>
+                <input type="submit" value="Email módosítása" />
+                <a href="{% url 'user_profile' user.id user.slug_cache %}" class="button small_button" style="float: right">Mégsem</a>
+            </p>
+        </form>
+
+    {% endif %}
+
+{% endblock %}

@@ -26,6 +26,7 @@ from ktapp import texts
 class KTUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=64, unique=True)
     email = models.EmailField(blank=True, unique=True)
+    future_email = models.EmailField(blank=True)
     is_staff = models.BooleanField(default=False)  # admin
     is_inner_staff = models.BooleanField(default=False)  # active admin
     is_active = models.BooleanField(default=True)  # delete
@@ -126,7 +127,9 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.username
 
-    def email_user(self, subject, html_message, text_message=None, email_type='', campaign_id=0, html_ps='', text_ps='', from_email=settings.DEFAULT_FROM_EMAIL, **kwargs):
+    def email_user(self, subject, html_message, text_message=None, to_email=None, email_type='', campaign_id=0, html_ps='', text_ps='', from_email=settings.DEFAULT_FROM_EMAIL, **kwargs):
+        if to_email is None:
+            to_email = self.email
         if text_message is None:
             text_message = strip_tags(html_message.replace('</p>\n<p>', '\n\n'))
         if campaign_id:
@@ -164,13 +167,13 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
             subject,
             text_content,
             from_email,
-            [self.email],
+            [to_email],
         )
         email.attach_alternative(html_content, 'text/html')
         if settings.LOCAL_MAIL or settings.ENV == 'local':
             print '[SUBJECT] %s' % email.subject
             print '[FROM] %s' % email.from_email
-            print '[TO] %s' % self.email
+            print '[TO] %s' % to_email
             print '[BODY]'
             print email.body
             print '[/BODY]'
@@ -190,7 +193,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
                 user=self,
                 email_type=email_type,
                 campaign=campaign,
-                email=self.email,
+                email=to_email,
                 is_pm=True,
                 is_email=True,
                 is_success=success,

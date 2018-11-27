@@ -306,6 +306,80 @@ def change_password(request):
 
 
 @login_required
+def change_email(request):
+    if not request.user.validated_email:
+        return HttpResponseRedirect(reverse('user_profile', args=(request.user.id, request.user.slug_cache)))
+    error_type = ''
+    password = request.POST.get('password', '')
+    new_email = request.POST.get('new_email', '')
+    nickname = request.POST.get('nickname', '')
+    if request.method == 'POST':
+        if nickname != '':
+            error_type = 'robot'
+        elif not request.user.check_password(password):
+            error_type = 'password_invalid'
+        else:
+            request.user.future_email = new_email
+            request.user.save()
+            token = get_random_string(64)
+            models.PasswordToken.objects.create(
+                token=token,
+                belongs_to=request.user,
+                valid_until=datetime.datetime.now() + datetime.timedelta(days=30),
+            )
+            html_message = texts.CHANGE_EMAIL_EMAIL_BODY.format(
+                email=new_email,
+                verification_url=request.build_absolute_uri(reverse('verify_new_email', args=(token,))),
+            )
+            request.user.email_user(
+                texts.CHANGE_EMAIL_EMAIL_SUBJECT,
+                html_message,
+                to_email=new_email,
+                email_type='change_email',
+            )
+            error_type = 'ok'
+    return render(request, 'ktapp/change_email.html', {
+        'error_type': error_type,
+        'email': new_email,
+    })
+
+
+@login_required
+def verify_new_email(request, token):
+    error_type = ''
+    email = ''
+    token_object = None
+    if len(token) != 64:
+        error_type = 'short_token'
+    else:
+        token_object = models.PasswordToken.get_token(token)
+        if token_object:
+            if token_object.valid_until < datetime.datetime.now():
+                error_type = 'invalid_token'
+            else:
+                if request.user.id:
+                    if request.user.id != token_object.belongs_to.id:
+                        logout(request)
+                if not token_object.belongs_to.is_active:
+                    error_type = 'ban'
+        else:
+            error_type = 'invalid_token'
+    if error_type == '':
+        token_object.belongs_to.email = token_object.belongs_to.future_email
+        token_object.belongs_to.future_email = ''
+        token_object.belongs_to.validated_email = True
+        token_object.belongs_to.validated_email_at = datetime.datetime.now()
+        token_object.belongs_to.save()
+        error_type = 'ok'
+        email = token_object.belongs_to.email
+        token_object.delete()
+    return render(request, 'ktapp/verify_new_email.html', {
+        'error_type': error_type,
+        'email': email,
+    })
+
+
+@login_required
 def messages(request):
     messages_qs = models.Message.objects.filter(owned_by=request.user).select_related('sent_by')
     number_of_messages = messages_qs.count()

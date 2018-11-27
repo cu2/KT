@@ -87,6 +87,12 @@ PASSWORD_RESET_EMAIL_BODY = u'''<p>A Kritikus Tömegen jelezted, hogy nem emlék
 <p><a href="{reset_password_url}" style="text-decoration: none; color: rgb(27,117,174)">{reset_password_url}</a></p>'''
 
 
+CHANGE_EMAIL_EMAIL_SUBJECT = u'[Kritikus Tömeg] email cím módosítás'
+CHANGE_EMAIL_EMAIL_BODY = u'''<p>A Kritikus Tömegen jelezted, hogy ez az új email címed: {email}</p>
+<p>Ahhoz, hogy tényleges módosuljon az email címed, kattints erre a linkre:</p>
+<p><a href="{verification_url}" style="text-decoration: none; color: rgb(27,117,174)">{verification_url}</a></p>'''
+
+
 PM_EMAIL_SUBJECT = u'[Kritikus Tömeg] {sent_by} üzenetet írt neked'
 PM_EMAIL_BODY = u'''Kedves {username}!
 

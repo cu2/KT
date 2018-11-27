@@ -1,0 +1,35 @@
+{% extends "ktapp/layout.html" %}
+{% load kt_extras %}
+
+{% block title %}Kritikus Tömeg{% endblock %}
+
+{% block header %}<h1>Email módosítása</h1>{% endblock %}
+
+{% block main %}
+
+    {% if error_type == 'ok' %}
+
+        <p>Az email címed módosítottuk az általad megadottra: {{email}}</p>
+        <p><a href="{% url 'index' %}">Tovább a nyitó oldalra...</a></p>
+
+    {% elif error_type == 'short_token' %}
+
+        <p class="error">
+            Ez a link sajnos nem jó. Nem lehet, hogy véletlenül rosszul másoltad ki az emailből? Ha nem erről van szó, semmi gond, csak <a href="{% url 'change_email' %}">kérj egy új emailt</a>, és próbáld meg az abban található linkkel.
+        </p>
+
+    {% elif error_type == 'invalid_token' %}
+
+        <p class="error">
+            Ennek a linknek már lejárt a "szavatossága". Semmi probléma, <a href="{% url 'change_email' %}">kérj egy új emailt</a>, és próbáld meg az abban található linkkel.
+        </p>
+
+    {% elif error_type == 'ban' %}
+
+        <p class="error">
+            Úgy tűnik, ki vagy tiltva.
+        </p>
+
+    {% endif %}
+
+{% endblock %}
