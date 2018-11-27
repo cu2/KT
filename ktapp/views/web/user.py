@@ -307,8 +307,6 @@ def change_password(request):
 
 @login_required
 def change_email(request):
-    if not request.user.validated_email:
-        return HttpResponseRedirect(reverse('user_profile', args=(request.user.id, request.user.slug_cache)))
     error_type = ''
     password = request.POST.get('password', '')
     new_email = request.POST.get('new_email', '')

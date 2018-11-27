@@ -304,8 +304,8 @@
                 <h2>Egyéb</h2>
                 <p><a href="{% url 'edit_profile' %}">Profil szerkesztése</a></p>
                 <p><a href="{% url 'user_settings' %}">Egyéni beállítások</a></p>
+                <p><a href="{% url 'change_email' %}">Email módosítása</a></p>
                 {% if user.validated_email %}
-                    <p><a href="{% url 'change_email' %}">Email módosítása</a></p>
                     <p><a href="{% url 'change_password' %}">Jelszó módosítása</a></p>
                 {% endif %}
             {% endif %}
