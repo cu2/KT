@@ -501,6 +501,8 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
             order_fields = ['f.number_of_comments', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'serial_number':
             order_fields = ['utli.serial_number', 'f.orig_title', 'f.year', 'f.id']
+        if order_field == 'sequel':
+            order_fields = ['f.year', 'sequel.serial_number', 'f.orig_title', 'f.id']
         if order_fields:
             order_by = ', '.join(['%s %s' % (order_fields[0], order_order)] + [of for of in order_fields[1:]])
     if page:

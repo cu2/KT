@@ -1150,7 +1150,14 @@ class Sequel(models.Model):
         ordering = ['sequel_type', 'name']
 
     def all_films(self):
-        return self.films.all().order_by('year', 'orig_title', 'id')
+        return [
+            fs.film
+            for fs in FilmSequelRelationship.objects.filter(
+                sequel=self,
+            ).select_related('film').order_by(
+                'film__year', 'serial_number', 'film__orig_title', 'film__id',
+            )
+        ]
 
     def save(self, *args, **kwargs):
         self.slug_cache = slugify(self.name)
@@ -1160,7 +1167,7 @@ class Sequel(models.Model):
 class FilmSequelRelationship(models.Model):
     film = models.ForeignKey(Film)
     sequel = models.ForeignKey(Sequel)
-    serial_number = models.PositiveSmallIntegerField(default=0)  # NOTE: not yet used
+    serial_number = models.PositiveSmallIntegerField(default=0)
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
 

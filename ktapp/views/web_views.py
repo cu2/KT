@@ -1346,7 +1346,7 @@ def sequel(request, id, title_slug):
     films, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('sequel', selected_sequel.id)],
-        ordering='year',
+        ordering='sequel',
         films_per_page=None,
     )
     return render(request, 'ktapp/sequel.html', {

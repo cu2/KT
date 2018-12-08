@@ -124,7 +124,7 @@ def film_main(request, id, film_slug, film, base_context):
         films, _ = filmlist.filmlist(
             user_id=request.user.id,
             filters=[('sequel', seq.id)],
-            ordering='year',
+            ordering='sequel',
             films_per_page=None,
         )
         sequels.append({
