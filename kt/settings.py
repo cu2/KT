@@ -233,7 +233,7 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 MAX_SEARCH_RESULTS = 10
 VAPITI_YEAR = 2018
 FIRST_PREMIER_YEAR = 1970
-LAST_PREMIER_YEAR = 2018
+LAST_PREMIER_YEAR = 2019
 
 # if True, KTUser.email_user() will print the email instead of sending it
 try:
