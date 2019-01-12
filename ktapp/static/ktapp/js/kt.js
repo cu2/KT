@@ -771,6 +771,50 @@ $(function() {
             }
         });
 
+    $('#id_film_imdb_link').blur(function() {
+        var imdb_link = $(this).val().trim();
+        if (imdb_link === '') {
+            $('#similar_films_imdb').html('');
+            return;
+        }
+        var valid_imdb_link = false;
+        if (imdb_link.substr(0, 2) === 'tt') {
+            if (imdb_link.length === 9) {
+                valid_imdb_link = true;
+            }
+        } else {
+            if (imdb_link.indexOf('imdb.com') !== -1 && imdb_link.indexOf('/tt') !== -1) {
+                tt_part = imdb_link.substr(imdb_link.indexOf('/tt') + 1, 9);
+                if (tt_part.length === 9 && tt_part.indexOf('/') === -1) {
+                    valid_imdb_link = true;
+                }
+            }
+        }
+        if (valid_imdb_link) {
+            $.getJSON('/api/autocomplete/films-imdb/', {
+                q: imdb_link
+            }, function(data) {
+                if (data.length) {
+                    var similar_films = '';
+                    for (var i=0; i < data.length; i++) {
+                        var title = data[i].orig_title;
+                        if (data[i].second_title) {
+                            title = title + ' / ' + data[i].second_title;
+                        }
+                        if (data[i].year) title = title + ' (' + data[i].year + ')';
+                        else title = title + ' (???)';
+                        similar_films += '<li><a href="film/' + data[i].id + '/' + data[i].slug + '">' + title + '</a></li>';
+                    }
+                    $('#similar_films_imdb').html('<p>Már van film ugyanezzel az IMDB linkkel:</p><ul>' + similar_films + '</ul>');
+                } else {
+                    $('#similar_films_imdb').html('');
+                }
+            }, 'json');
+        } else {
+            $('#similar_films_imdb').html('<p><b>Ide biztos, hogy egy IMDB linket írtál be? Nem úgy néz ki.</b></p>');
+        }
+    });
+
     $('#id_film_orig_title').blur(function() {
         $.getJSON('/api/autocomplete/films/', {
             q: $(this).val()

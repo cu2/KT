@@ -16,6 +16,7 @@ from rest_framework.response import Response
 
 from ktapp import models
 from ktapp import serializers
+from ktapp import utils as kt_utils
 from ktapp.helpers import filmlist, search as kt_search
 
 
@@ -354,6 +355,29 @@ def get_films(request):
         return HttpResponse(json.dumps(
             [get_plain_film(film) for film in films]
         ), content_type='application/json')
+    return HttpResponse(json.dumps(
+        [
+            {
+                'id': film.id,
+                'orig_title': film.orig_title,
+                'second_title': film.second_title,
+                'third_title': film.third_title,
+                'year': film.year,
+                'slug': film.slug_cache,
+            } for film in films
+        ]
+    ), content_type='application/json')
+
+
+def get_films_imdb(request):
+    raw_imdb_link = kt_utils.strip_whitespace(request.GET.get('q', ''))
+    if raw_imdb_link.startswith('tt'):
+        imdb_link = raw_imdb_link
+    elif 'imdb.com' in raw_imdb_link and '/tt' in raw_imdb_link:
+        imdb_link = raw_imdb_link[raw_imdb_link.index('/tt')+1:].split('/')[0]
+    else:
+        return HttpResponse(json.dumps([]), content_type='application/json')
+    films = models.Film.objects.filter(imdb_link=imdb_link)[:10]
     return HttpResponse(json.dumps(
         [
             {

@@ -14,8 +14,13 @@
             <form action="{% url 'suggest_film' %}" method="post">
                 {% csrf_token %}
                 <p>
+                    <label for="id_film_imdb_link">IMDb link (a film imdb-s oldalának teljes url-je):</label><br />
+                    <input type="text" name="film_imdb_link" id="id_film_imdb_link" class="focus_this" tabindex="9" />
+                </p>
+                <div id="similar_films_imdb"></div>
+                <p>
                     <label for="id_film_orig_title">Eredeti cím:</label><br />
-                    <input type="text" name="film_orig_title" id="id_film_orig_title" class="focus_this" tabindex="10" />
+                    <input type="text" name="film_orig_title" id="id_film_orig_title" tabindex="10" />
                 </p>
                 <div id="similar_films"></div>
                 <p>
@@ -42,10 +47,6 @@
                 <p>
                     <label for="id_film_plot">Történet:</label><br />
                     <textarea name="film_plot" id="id_film_plot" tabindex="18"></textarea>
-                </p>
-                <p>
-                    <label for="id_film_imdb_link">IMDb link (a film imdb-s oldalának teljes url-je):</label><br />
-                    <input type="text" name="film_imdb_link" id="id_film_imdb_link" tabindex="19" />
                 </p>
                 <p>
                     <label for="id_film_porthu_link">port.hu link (a film port.hu-s oldalának teljes url-je, kivéve, ha a tv-műsorból jutottál oda):</label><br />

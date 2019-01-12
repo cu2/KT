@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^api/autocomplete/artists/$', api_views.get_artists, name='get_artists'),
     url(r'^api/autocomplete/keywords/$', api_views.get_keywords, name='get_keywords'),
     url(r'^api/autocomplete/films/$', api_views.get_films, name='get_films'),
+    url(r'^api/autocomplete/films-imdb/$', api_views.get_films_imdb, name='get_films_imdb'),
     url(r'^api/autocomplete/sequels/$', api_views.get_sequels, name='get_sequels'),
     url(r'^api/autocomplete/awards/$', api_views.get_awards, name='get_awards'),
     url(r'^api/autocomplete/vapiti_films/$', api_views.get_vapiti_films, name='get_vapiti_films'),
