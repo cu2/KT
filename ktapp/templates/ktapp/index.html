@@ -72,11 +72,11 @@
     <div class="col-sm-6 col-sm-push-6">
         {% if request.user.is_authenticated and request.user.core_member %}
             {% if vapiti_round == 1 %}
-                <h2>Vapiti {{ vapiti_year }} első forduló</h2>
+                <h2>Vapiti {{ vapiti_year }} első forduló (még {{ vapiti_round_1_end_datetime|timeuntil }})</h2>
                 <p>Jelölj filmet az <a href="{% url 'vapiti_gold' %}">Arany Vapitire</a>, színészt a <a href="{% url 'vapiti_silver' 'noi' %}">Női</a> és <a href="{% url 'vapiti_silver' 'ferfi' %}">Férfi</a> Ezüst Vapitire. Január 21-ig van időd, utána kezdődik a második forduló a 10-10-10 legjobb jelölttel.</p>
             {% endif %}
             {% if vapiti_round == 2 %}
-                <h2>Vapiti {{ vapiti_year }} második forduló</h2>
+                <h2>Vapiti {{ vapiti_year }} második forduló (még {{ vapiti_round_2_end_datetime|timeuntil }})</h2>
                 {% if vapiti_round_2_has_nominees %}
                   <p>Válaszd ki a legjobb <a href="{% url 'vapiti_gold_2' %}">filmet</a>, <a href="{% url 'vapiti_silver_2' 'ferfi' %}">férfi</a> és <a href="{% url 'vapiti_silver_2' 'noi' %}">női</a> színészt a 10-10-10 jelölt közül. Február {{ vapiti_end_of_round_2 }}-ig van időd pótolni, amiket még nem láttál, és leadni a végső szavazatod.</p>
                   {% if vapiti_event_url %}

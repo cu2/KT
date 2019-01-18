@@ -95,6 +95,8 @@ def index(request):
 
     # vapiti
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
+    vapiti_round_1_end_datetime = datetime.datetime.strptime(round_2_dates[0], '%Y-%m-%d')
+    vapiti_round_2_end_datetime = datetime.datetime.strptime(result_day, '%Y-%m-%d')
     vapiti_round_2_has_nominees = False
     if vapiti_round == 2:
         if kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_GOLD):
@@ -139,6 +141,8 @@ def index(request):
         'random_trivia': random_trivia,
         'vapiti_year': settings.VAPITI_YEAR,
         'vapiti_round': vapiti_round,
+        'vapiti_round_1_end_datetime': vapiti_round_1_end_datetime,
+        'vapiti_round_2_end_datetime': vapiti_round_2_end_datetime,
         'vapiti_round_2_has_nominees': vapiti_round_2_has_nominees,
         'vapiti_end_of_round_2': round_2_dates[1][-2:],
         'vapiti_result_day': result_day[-2:],
