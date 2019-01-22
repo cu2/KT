@@ -85,6 +85,7 @@ def index(request):
             if comment.created_at > buzz_comment_domains[key][1]:
                 buzz_comment_domains[key] = (comment.id, comment.created_at)
     buzz_comment_ids = [id for id, _ in sorted(buzz_comment_domains.values(), key=lambda x: x[1], reverse=True)[:20]]
+    buzz_comments = models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids)
     # random poll, quote and trivia
     try:
         random_poll = models.Poll.objects.filter(state=models.Poll.STATE_OPEN).order_by('?')[0]
@@ -101,8 +102,19 @@ def index(request):
     if vapiti_round == 2:
         if kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_GOLD):
             vapiti_round_2_has_nominees = True
-    # vapiti_event_url = 'https://www.facebook.com/events/147921529229970/'
-    vapiti_event_url = ''
+    vapiti_comment = None
+    if vapiti_round == 1 or vapiti_round == 2:
+        if settings.VAPITI_TOPIC_ID:
+            vapiti_in_buzz = False
+            for c in buzz_comments:
+                if c.topic_id == settings.VAPITI_TOPIC_ID:
+                    vapiti_in_buzz = True
+            if not vapiti_in_buzz:
+                try:
+                    vapiti_comment = models.Comment.objects.select_related('topic', 'created_by', 'reply_to', 'reply_to__created_by').filter(topic_id=settings.VAPITI_TOPIC_ID)[0]
+                except Exception:
+                    pass
+
     # game
     # before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
     # during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
@@ -135,7 +147,7 @@ def index(request):
         'latest_content': sorted(latest_content, key=lambda x: x[0], reverse=True)[:10],
         'toplist': toplist_of_the_day,
         'toplist_list': models.UserToplistItem.objects.filter(usertoplist=toplist_of_the_day).select_related('film', 'director', 'actor').order_by('serial_number') if toplist_of_the_day else None,
-        'buzz_comments': models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids),
+        'buzz_comments': buzz_comments,
         'random_poll': random_poll,
         'random_quote': random_quote,
         'random_trivia': random_trivia,
@@ -146,7 +158,8 @@ def index(request):
         'vapiti_round_2_has_nominees': vapiti_round_2_has_nominees,
         'vapiti_end_of_round_2': round_2_dates[1][-2:],
         'vapiti_result_day': result_day[-2:],
-        'vapiti_event_url': vapiti_event_url,
+        'vapiti_event_url': settings.VAPITI_EVENT_URL,
+        'vapiti_comment': vapiti_comment,
         'before_game': before_game,
         'during_game': during_game,
         'banners': banners,

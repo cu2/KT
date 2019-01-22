@@ -127,6 +127,9 @@
             {% include 'ktapp/blocks/comment_block.html' with comment=c show_comment_source=True %}
             {% if forloop.counter > 5 %}</div>{% endif %}
         {% endfor %}
+        {% if vapiti_comment %}
+            {% include 'ktapp/blocks/comment_block.html' with comment=vapiti_comment show_comment_source=True %}
+        {% endif %}
         <p><a href="{% url 'latest_comments' %}">További kommentek...</a></p>
     </div>
 

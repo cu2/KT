@@ -231,9 +231,14 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
 
 MAX_SEARCH_RESULTS = 10
-VAPITI_YEAR = 2018
 FIRST_PREMIER_YEAR = 1970
 LAST_PREMIER_YEAR = 2019
+
+VAPITI_YEAR = 2018
+VAPITI_TOPIC_ID = 211
+# VAPITI_EVENT_URL = 'https://www.facebook.com/events/147921529229970/'
+VAPITI_EVENT_URL = ''
+
 
 # if True, KTUser.email_user() will print the email instead of sending it
 try:
