@@ -1757,7 +1757,7 @@ def vote_vapiti(request):
                 selected_nominee = None
                 for film_id, artist_id in nominee_ids:
                     try:
-                        role = models.FilmArtistRelationship.objects.select_related('film', 'artist').get(film_id=film_id, artist_id=artist_id)
+                        role = models.FilmArtistRelationship.objects.select_related('film', 'artist').get(film_id=film_id, artist_id=artist_id, role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR)
                     except models.FilmArtistRelationship.DoesNotExist:
                         continue
                     if role.id == vapiti_id:
