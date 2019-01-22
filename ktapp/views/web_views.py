@@ -2000,6 +2000,7 @@ def vapiti_silver_winners(request, gender):
         for role in models.FilmArtistRelationship.objects.filter(
             film_id__in=[film_id for _, film_id, _ in raw_awards],
             artist_id__in=[artist.id for _, _, artist in raw_awards],
+            role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR,
         )
     }
     films, _ = filmlist.filmlist(
