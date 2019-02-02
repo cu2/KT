@@ -115,6 +115,23 @@ def index(request):
                 except Exception:
                     pass
 
+    vapiti_film_list = []
+    if vapiti_round == 2 and vapiti_round_2_has_nominees:
+        vapiti_film_ids = set()
+        for film_id in kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_GOLD):
+            vapiti_film_ids.add(film_id)
+        for film_id, artist_id in kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE):
+            vapiti_film_ids.add(film_id)
+        for film_id, artist_id in kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_SILVER_MALE):
+            vapiti_film_ids.add(film_id)
+        vapiti_film_list = [film for film in models.Film.objects.filter(id__in=vapiti_film_ids).order_by('orig_title', 'id')]
+    try:
+        cookie_kt_carousel_vapiti_index = int(request.COOKIES.get('kt-carousel-vapiti-index', '0'))
+    except:
+        cookie_kt_carousel_vapiti_index = 0
+    if cookie_kt_carousel_vapiti_index > len(vapiti_film_list) - 1:
+        cookie_kt_carousel_vapiti_index = 0
+
     # game
     # before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
     # during_game = (now.weekday() == 6 and now.hour >= 20 or now.weekday() == 0)
@@ -160,6 +177,8 @@ def index(request):
         'vapiti_result_day': result_day[-2:],
         'vapiti_event_url': settings.VAPITI_EVENT_URL,
         'vapiti_comment': vapiti_comment,
+        'vapiti_film_list': vapiti_film_list,
+        'cookie_kt_carousel_vapiti_index': cookie_kt_carousel_vapiti_index,
         'before_game': before_game,
         'during_game': during_game,
         'banners': banners,

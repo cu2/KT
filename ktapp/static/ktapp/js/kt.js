@@ -1001,6 +1001,14 @@ $(function() {
         });
     });
 
+    $('#carousel-vapiti').on('slide.bs.carousel', function (e) {
+        $.cookie('kt-carousel-vapiti-index', $(e.relatedTarget).data('slide-index'), {
+            expires: 365,
+            path: '/',
+            domain: '.kritikustomeg.org'
+        });
+    });
+
     $('ul.nav li.dropdown').hover(function() {
         $(this).find('.dropdown-menu').stop(true, true).show();
     }, function() {
