@@ -779,13 +779,16 @@ $(function() {
         }
         var valid_imdb_link = false;
         if (imdb_link.substr(0, 2) === 'tt') {
-            if (imdb_link.length === 9) {
+            if (imdb_link.length === 9 || imdb_link.length === 10) {
                 valid_imdb_link = true;
             }
         } else {
             if (imdb_link.indexOf('imdb.com') !== -1 && imdb_link.indexOf('/tt') !== -1) {
-                tt_part = imdb_link.substr(imdb_link.indexOf('/tt') + 1, 9);
-                if (tt_part.length === 9 && tt_part.indexOf('/') === -1) {
+                tt_part = imdb_link.substr(imdb_link.indexOf('/tt') + 1);
+                if (tt_part.indexOf('/') !== -1) {
+                    tt_part = tt_part.substr(0, tt_part.indexOf('/'));
+                }
+                if ((tt_part.length === 9 || tt_part.length === 10) && tt_part.indexOf('/') === -1) {
                     valid_imdb_link = true;
                 }
             }
