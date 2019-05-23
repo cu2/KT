@@ -1170,6 +1170,9 @@ def merge_artist(request):
         for pic in artist_to_delete.picture_set.all():
             pic.artists.add(artist_to_leave)
             pic.artists.remove(artist_to_delete)
+            if pic.artist == artist_to_delete:
+                pic.artist = artist_to_leave
+                pic.save(update_fields=['artist'])
         for bio in models.Biography.objects.filter(artist=artist_to_delete):
             bio.artist = artist_to_leave
             bio.save(update_fields=['artist'])
