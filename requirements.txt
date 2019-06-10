@@ -1,4 +1,4 @@
-Django==1.11.18
+Django==1.11.21
 django-ipware==2.0.1
 djangorestframework==3.7.7
 django-compressor==2.2
