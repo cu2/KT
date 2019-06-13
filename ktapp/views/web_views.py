@@ -78,12 +78,9 @@ def index(request):
     buzz_comment_ids = [id for id, _ in sorted(buzz_comment_domains.values(), key=lambda x: x[1], reverse=True)[:20]]
     buzz_comments = models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids)
     # random poll, quote and trivia
-    try:
-        random_poll = models.Poll.objects.filter(state=models.Poll.STATE_OPEN).order_by('?')[0]
-    except IndexError:
-        random_poll = None
-    random_quote = models.Quote.objects.all().order_by('?')[0]
-    random_trivia = models.Trivia.objects.all().order_by('?')[0]
+    random_poll = kt_utils.get_random_item(models.Poll.objects.filter(state=models.Poll.STATE_OPEN))
+    random_quote = kt_utils.get_random_item(models.Quote.objects)
+    random_trivia = kt_utils.get_random_item(models.Trivia.objects)
 
     # vapiti
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()

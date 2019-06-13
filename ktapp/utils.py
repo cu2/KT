@@ -6,6 +6,7 @@ import hashlib
 import imghdr
 import json
 import os
+import random
 import re
 
 from django.conf import settings
@@ -555,3 +556,11 @@ def get_premiers_for_today():
 
     cache.set('get_premiers_for_today', premier_film_list, timeout=3600)
     return premier_film_list
+
+
+def get_random_item(queryset):
+    cnt = queryset.count()
+    if cnt == 0:
+        return None
+    idx = random.randint(0, cnt - 1)
+    return queryset.all()[idx]
