@@ -11,6 +11,7 @@ import re
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import user_passes_test
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.db import migrations
 from django.db.models import Sum
@@ -532,3 +533,25 @@ def run_sql_except_on_sqlite(sql, reverse_sql):
     if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.sqlite3':
         return migrations.RunSQL(migrations.RunSQL.noop, migrations.RunSQL.noop)
     return migrations.RunSQL(sql, reverse_sql)
+
+
+def get_premiers_for_today():
+    cached_value = cache.get('get_premiers_for_today')
+    print('get_premiers_for_today', cached_value)
+    if cached_value is not None:
+        return cached_value
+
+    from ktapp import models
+    today = datetime.date.today()
+    offset = today.weekday()  # this Monday
+    from_date = today - datetime.timedelta(days=offset)
+    until_date = today - datetime.timedelta(days=offset-6)
+    premier_film_list = []
+    for film in models.Film.objects.filter(main_premier__gte=from_date, main_premier__lte=until_date):
+        premier_film_list.append(film)
+    for item in models.Premier.objects.filter(when__gte=from_date, when__lte=until_date).select_related('film'):
+        premier_film_list.append(item.film)
+    premier_film_list.sort(key=lambda item: (item.orig_title, item.id))
+
+    cache.set('get_premiers_for_today', premier_film_list, timeout=3600)
+    return premier_film_list

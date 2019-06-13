@@ -43,16 +43,7 @@ def index(request):
     except Exception:
         film_of_the_day = None
     # premiers
-    today = datetime.date.today()
-    offset = today.weekday()  # this Monday
-    from_date = today - datetime.timedelta(days=offset)
-    until_date = today - datetime.timedelta(days=offset-6)
-    premier_film_list = []
-    for film in models.Film.objects.filter(main_premier__gte=from_date, main_premier__lte=until_date):
-        premier_film_list.append(film)
-    for item in models.Premier.objects.filter(when__gte=from_date, when__lte=until_date).select_related('film'):
-        premier_film_list.append(item.film)
-    premier_film_list.sort(key=lambda item: (item.orig_title, item.id))
+    premier_film_list = kt_utils.get_premiers_for_today()
     try:
         cookie_kt_carousel_premiers_index = int(request.COOKIES.get('kt-carousel-premiers-index', '0'))
     except:
