@@ -83,14 +83,13 @@ def film_main(request, id, film_slug, film, base_context):
             leader_users.add(u.user.id)
             if len(leader_users) >= 12:
                 break
-    votes = []
-    for idx, r in enumerate(range(5, 0, -1)):
-        votes.append(([], []))
-        for u in film.vote_set.filter(rating=r).select_related('user').order_by('user__username'):
-            if u.user.id in special_users or u.user.id in leader_users:
-                votes[idx][0].append(u)
-            else:
-                votes[idx][1].append(u)
+    votes = [([], []), ([], []), ([], []), ([], []), ([], [])]
+    for u in film.vote_set.select_related('user').order_by('user__username'):
+        idx = 5 - u.rating
+        if u.user.id in special_users or u.user.id in leader_users:
+            votes[idx][0].append(u)
+        else:
+            votes[idx][1].append(u)
 
     wish_leader_users = set()
     for wish in models.Wishlist.objects.filter(film=film).select_related('wished_by').filter(wished_by__opinion_leader=True).order_by('-wished_by__number_of_followers'):
