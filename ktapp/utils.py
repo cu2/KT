@@ -8,6 +8,7 @@ import json
 import os
 import random
 import re
+import time
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -564,3 +565,14 @@ def get_random_item(queryset):
         return None
     idx = random.randint(0, cnt - 1)
     return queryset.all()[idx]
+
+
+def save_profile_data(function_name, section_name, profile_time):
+    current_time = time.time()
+    with open('/home/publisher/kt/kt-profile-{}.log'.format(os.getpid()), 'at') as f:
+        f.write('{}\t{}\t{}\n'.format(
+            function_name,
+            section_name,
+            1000 * (current_time - profile_time),
+        ))
+    return current_time
