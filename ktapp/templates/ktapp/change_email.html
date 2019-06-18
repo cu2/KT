@@ -28,7 +28,7 @@
             {% csrf_token %}
             <p>
                 Új email címed:
-                <input type="text" name="new_email" class="focus_this" />
+                <input type="email" name="new_email" class="focus_this" />
                 {% if current_email %}
                 (a jelenleg beállított címed: {{current_email}})
                 {% else %}
