@@ -336,9 +336,13 @@ def change_email(request):
                 email_type='change_email',
             )
             error_type = 'ok'
+    current_email = request.user.email
+    if current_email.startswith('user.uid.') and current_email.endswith('@kritikustomeg.org'):
+        current_email = ''
     return render(request, 'ktapp/change_email.html', {
         'error_type': error_type,
         'email': new_email,
+        'current_email': current_email,
     })
 
 

@@ -26,7 +26,15 @@
 
         <form action="" method="post">
             {% csrf_token %}
-            <p>Új email címed: <input type="text" name="new_email" class="focus_this" /> (a jelenleg beállított címed: {{user.email}})</p>
+            <p>
+                Új email címed:
+                <input type="text" name="new_email" class="focus_this" />
+                {% if current_email %}
+                (a jelenleg beállított címed: {{current_email}})
+                {% else %}
+                (jelenleg nincs beállított címed)
+                {% endif %}
+            </p>
             <p>Jelenlegi jelszavad: <input type="password" name="password" /> (ellenőrzésképpen)</p>
             <p class="additional_input">Hagyd üresen: <input type="text" name="nickname" value="" /></p>
             <p>
