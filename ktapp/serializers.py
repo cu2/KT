@@ -39,6 +39,7 @@ class ShortKeywordSerializer(serializers.HyperlinkedModelSerializer):
 class ArtistSerializer(serializers.HyperlinkedModelSerializer):  # TODO: films directed, roles
     class Meta:
         model = models.Artist
+        fields = ('url', 'name', 'gender', 'number_of_films', 'number_of_ratings', 'average_rating')
 
 
 class ShortArtistSerializer(serializers.HyperlinkedModelSerializer):
