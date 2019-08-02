@@ -2003,9 +2003,15 @@ class Notification(models.Model):
     notification_type = models.CharField(max_length=2, choices=NOTIFICATION_TYPES, default=NOTIFICATION_TYPE_COMMENT)
     NOTIFICATION_SUBTYPE_COMMENT_REPLY = 'CoRe'
     NOTIFICATION_SUBTYPE_COMMENT_MENTION = 'CoMe'
+    NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_SUBSCRIBED_TO = 'CoFS'
+    NOTIFICATION_SUBTYPE_COMMENT_ON_TOPIC_YOU_SUBSCRIBED_TO = 'CoTS'
+    NOTIFICATION_SUBTYPE_COMMENT_ON_POLL_YOU_SUBSCRIBED_TO = 'CoPS'
     NOTIFICATION_SUBTYPES = [
         (NOTIFICATION_SUBTYPE_COMMENT_REPLY, 'Comment reply'),
         (NOTIFICATION_SUBTYPE_COMMENT_MENTION, 'Comment mention'),
+        (NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_SUBSCRIBED_TO, 'Comment on film you subscribed to'),
+        (NOTIFICATION_SUBTYPE_COMMENT_ON_TOPIC_YOU_SUBSCRIBED_TO, 'Comment on topic you subscribed to'),
+        (NOTIFICATION_SUBTYPE_COMMENT_ON_POLL_YOU_SUBSCRIBED_TO, 'Comment on poll you subscribed to'),
     ]
     notification_subtype = models.CharField(max_length=4, choices=NOTIFICATION_SUBTYPES, blank=True)
     film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
@@ -2041,6 +2047,37 @@ class Notification(models.Model):
 def delete_notification(sender, instance, **kwargs):
     instance.target_user.unread_notification_count = Notification.objects.filter(target_user=instance.target_user, is_read=False).count()
     instance.target_user.save(update_fields=['unread_notification_count'])
+
+
+class Subscription(models.Model):
+    SUBSCRIPTION_TYPE_SUBSCRIBE = 'S'
+    SUBSCRIPTION_TYPE_IGNORE = 'I'
+    SUBSCRIPTION_TYPES = [
+        (SUBSCRIPTION_TYPE_SUBSCRIBE, 'Subscribe'),
+        (SUBSCRIPTION_TYPE_IGNORE, 'Ignore'),
+    ]
+
+    user = models.ForeignKey(KTUser)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    subscription_type = models.CharField(max_length=1, choices=SUBSCRIPTION_TYPES, default=SUBSCRIPTION_TYPE_SUBSCRIBE)
+    film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
+    topic = models.ForeignKey(Topic, blank=True, null=True, on_delete=models.SET_NULL)
+    poll = models.ForeignKey(Poll, blank=True, null=True, on_delete=models.SET_NULL)
+
+    @classmethod
+    def get_subscription_status(cls, user, film=None, topic=None, poll=None):
+        qs = cls.objects.filter(user=user)
+        if film:
+            qs = qs.filter(film=film)
+        if topic:
+            qs = qs.filter(topic=topic)
+        if poll:
+            qs = qs.filter(poll=poll)
+        try:
+            sub = qs[0]
+        except IndexError:
+            return ''
+        return sub.subscription_type
 
 
 class UserContribution(KTUser):
