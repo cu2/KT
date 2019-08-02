@@ -2003,15 +2003,9 @@ class Notification(models.Model):
     notification_type = models.CharField(max_length=2, choices=NOTIFICATION_TYPES, default=NOTIFICATION_TYPE_COMMENT)
     NOTIFICATION_SUBTYPE_COMMENT_REPLY = 'CoRe'
     NOTIFICATION_SUBTYPE_COMMENT_MENTION = 'CoMe'
-    NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_RATED = 'CoRa'
-    NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_COMMENTED = 'CoCo'
-    NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_WISHED = 'CoWi'
     NOTIFICATION_SUBTYPES = [
         (NOTIFICATION_SUBTYPE_COMMENT_REPLY, 'Comment reply'),
         (NOTIFICATION_SUBTYPE_COMMENT_MENTION, 'Comment mention'),
-        (NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_RATED, 'Comment on film you rated'),
-        (NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_COMMENTED, 'Comment on film you commented'),
-        (NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_WISHED, 'Comment on film you wished'),
     ]
     notification_subtype = models.CharField(max_length=4, choices=NOTIFICATION_SUBTYPES, blank=True)
     film = models.ForeignKey(Film, blank=True, null=True, on_delete=models.SET_NULL)
