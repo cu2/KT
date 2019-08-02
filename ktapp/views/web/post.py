@@ -110,6 +110,11 @@ def vote(request):
                     'shared_on_facebook': fb == '1',
                 }),
             )
+            models.Subscription.subscribe(
+                action='sub',
+                user=request.user,
+                film=film,
+            )
         vote.rating = rating
         if not created:  # don't reset shared_on_facebook once a vote has been shared
             if fb == '1':
@@ -162,6 +167,12 @@ def wish(request):
     if wish_type in [type_code for type_code, type_name in models.Wishlist.WISH_TYPES] and action in {'+', '-'}:
         if action == '+':
             models.Wishlist.objects.get_or_create(film=film, wished_by=request.user, wish_type=wish_type)
+            if wish_type == models.Wishlist.WISH_TYPE_YES:
+                models.Subscription.subscribe(
+                    action='sub',
+                    user=request.user,
+                    film=film,
+                )
         else:
             models.Wishlist.objects.filter(film=film, wished_by=request.user, wish_type=wish_type).delete()
         if wish_type == models.Wishlist.WISH_TYPE_YES:
@@ -244,6 +255,13 @@ def new_comment(request):
                 'domain': domain_type,
             }),
             some_id=comment.id,
+        )
+        models.Subscription.subscribe(
+            action='sub',
+            user=request.user,
+            film=film,
+            topic=topic,
+            poll=poll,
         )
         kt_utils.create_comment_notifications(request.user, comment, film, topic, poll)
     if domain_type == models.Comment.DOMAIN_FILM:
