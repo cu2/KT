@@ -499,24 +499,8 @@ def create_comment_notifications(source_user, comment, film, topic, poll):
     # reply
     if comment.reply_to:
         target_users[comment.reply_to.created_by_id] = models.Notification.NOTIFICATION_SUBTYPE_COMMENT_REPLY
-    # mention
-    # TODO
-    if comment.domain == models.Comment.DOMAIN_FILM:
-        # commented lately
-        for c in models.Comment.objects.filter(domain=models.Comment.DOMAIN_FILM, film=film, created_at__gte=lately):
-            target_user_id = c.created_by_id
-            if target_user_id not in target_users:
-                target_users[target_user_id] = models.Notification.NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_COMMENTED
-        # rated lately
-        for v in models.Vote.objects.filter(film=film, when__gte=lately):
-            target_user_id = v.user_id
-            if target_user_id not in target_users:
-                target_users[target_user_id] = models.Notification.NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_RATED
-        # wished lately
-        for w in models.Wishlist.objects.filter(wish_type=models.Wishlist.WISH_TYPE_YES, film=film, wished_at__gte=lately):
-            target_user_id = w.wished_by_id
-            if target_user_id not in target_users:
-                target_users[target_user_id] = models.Notification.NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_WISHED
+    # TODO: mention
+    # TODO: subscribed
     for target_user_id, subtype in target_users.iteritems():
         if target_user_id != source_user.id:
             models.Notification.objects.create(
