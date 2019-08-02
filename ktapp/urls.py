@@ -73,6 +73,7 @@ urlpatterns += [
 
     url(r'^szavaz$', post_views.vote, name='vote'),
     url(r'^kivan$', post_views.wish, name='wish'),
+    url(r'^feliratkozik$', post_views.subscribe, name='subscribe'),
     url(r'^kommentel$', post_views.new_comment, name='new_comment'),
     url(r'^szerk_komment$', post_views.edit_comment, name='edit_comment'),
     url(r'^uj_idezet$', post_views.new_quote, name='new_quote'),

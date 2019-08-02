@@ -891,6 +891,12 @@ def forum(request, id, title_slug):
             extended_comments.append(comment)
     else:
         extended_comments = comments
+    your_subscription = ''
+    if request.user.is_authenticated():
+        your_subscription = models.Subscription.get_subscription_status(
+            user=request.user,
+            topic=topic,
+        )
     return render(request, 'ktapp/forum.html', {
         'topic': topic,
         'closed': (topic.closed_until > now) if topic.closed_until else False,
@@ -900,6 +906,7 @@ def forum(request, id, title_slug):
         'reply_to_comment': reply_to_comment,
         'p': p,
         'max_pages': max_pages,
+        'your_subscription': your_subscription,
     })
 
 
@@ -1280,6 +1287,12 @@ def poll(request, id, title_slug):
             extended_comments.append(comment)
     else:
         extended_comments = comments
+    your_subscription = ''
+    if request.user.is_authenticated():
+        your_subscription = models.Subscription.get_subscription_status(
+            user=request.user,
+            poll=selected_poll,
+        )
     return render(request, 'ktapp/poll.html', {
         'poll': selected_poll,
         'pollchoices': pollchoices,
@@ -1288,6 +1301,7 @@ def poll(request, id, title_slug):
         'comment_form': comment_form,
         'reply_to_comment': reply_to_comment,
         'permission_poll_admin': kt_utils.check_permission('poll_admin', request.user),
+        'your_subscription': your_subscription,
     })
 
 

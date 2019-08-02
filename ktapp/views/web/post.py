@@ -177,6 +177,73 @@ def wish(request):
 
 @require_POST
 @login_required
+def subscribe(request):
+    domain_type = request.POST['domain']
+    object_id = request.POST['object_id']
+    try:
+        if domain_type == models.Comment.DOMAIN_FILM:
+            domain = get_object_or_404(models.Film, pk=object_id)
+            film, topic, poll = domain, None, None
+        elif domain_type == models.Comment.DOMAIN_TOPIC:
+            domain = get_object_or_404(models.Topic, pk=object_id)
+            film, topic, poll = None, domain, None
+        elif domain_type == models.Comment.DOMAIN_POLL:
+            domain = get_object_or_404(models.Poll, pk=object_id)
+            film, topic, poll = None, None, domain
+        else:
+            raise Http404
+    except Http404:
+        return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+    action = request.POST.get('action', '')
+    if action not in {'sub', 'unsub', 'ignore', 'unignore'}:
+        return HttpResponse(json.dumps({'success': False}), content_type='application/json')
+
+    your_subscription = models.Subscription.get_subscription_status(
+        user=request.user,
+        film=film,
+        topic=topic,
+        poll=poll,
+    )
+
+    sub_data = {
+        'user': request.user,
+        'film': film,
+        'topic': topic,
+        'poll': poll,
+    }
+    if your_subscription == '':
+        if action == 'sub':
+            models.Subscription.objects.create(
+                subscription_type=models.Subscription.SUBSCRIPTION_TYPE_SUBSCRIBE,
+                **sub_data
+            )
+        elif action == 'ignore':
+            models.Subscription.objects.create(
+                subscription_type=models.Subscription.SUBSCRIPTION_TYPE_IGNORE,
+                **sub_data
+            )
+    elif your_subscription == 'S':
+        if action in {'unsub', 'ignore'}:
+            models.Subscription.objects.filter(**sub_data).delete()
+        if action == 'ignore':
+            models.Subscription.objects.create(
+                subscription_type=models.Subscription.SUBSCRIPTION_TYPE_IGNORE,
+                **sub_data
+            )
+    elif your_subscription == 'I':
+        if action in {'unignore', 'sub'}:
+            models.Subscription.objects.filter(**sub_data).delete()
+        if action == 'sub':
+            models.Subscription.objects.create(
+                subscription_type=models.Subscription.SUBSCRIPTION_TYPE_SUBSCRIBE,
+                **sub_data
+            )
+
+    return HttpResponse(json.dumps({'success': True}), content_type='application/json')
+
+
+@require_POST
+@login_required
 def new_comment(request):
     domain_type = request.POST['domain']
     if domain_type == models.Comment.DOMAIN_FILM:
