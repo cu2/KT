@@ -2079,6 +2079,48 @@ class Subscription(models.Model):
             return ''
         return sub.subscription_type
 
+    @classmethod
+    def subscribe(cls, action, user, film=None, topic=None, poll=None):
+        your_subscription = cls.get_subscription_status(
+            user=user,
+            film=film,
+            topic=topic,
+            poll=poll,
+        )
+        sub_data = {
+            'user': user,
+            'film': film,
+            'topic': topic,
+            'poll': poll,
+        }
+        if your_subscription == '':
+            if action == 'sub':
+                cls.objects.create(
+                    subscription_type=cls.SUBSCRIPTION_TYPE_SUBSCRIBE,
+                    **sub_data
+                )
+            elif action == 'ignore':
+                cls.objects.create(
+                    subscription_type=cls.SUBSCRIPTION_TYPE_IGNORE,
+                    **sub_data
+                )
+        elif your_subscription == 'S':
+            if action in {'unsub', 'ignore'}:
+                cls.objects.filter(**sub_data).delete()
+            if action == 'ignore':
+                cls.objects.create(
+                    subscription_type=cls.SUBSCRIPTION_TYPE_IGNORE,
+                    **sub_data
+                )
+        elif your_subscription == 'I':
+            if action in {'unignore', 'sub'}:
+                cls.objects.filter(**sub_data).delete()
+            if action == 'sub':
+                cls.objects.create(
+                    subscription_type=cls.SUBSCRIPTION_TYPE_SUBSCRIBE,
+                    **sub_data
+                )
+
 
 class UserContribution(KTUser):
     count_film = models.PositiveIntegerField(default=0)

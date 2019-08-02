@@ -198,47 +198,13 @@ def subscribe(request):
     if action not in {'sub', 'unsub', 'ignore', 'unignore'}:
         return HttpResponse(json.dumps({'success': False}), content_type='application/json')
 
-    your_subscription = models.Subscription.get_subscription_status(
+    models.Subscription.subscribe(
+        action=action,
         user=request.user,
         film=film,
         topic=topic,
         poll=poll,
     )
-
-    sub_data = {
-        'user': request.user,
-        'film': film,
-        'topic': topic,
-        'poll': poll,
-    }
-    if your_subscription == '':
-        if action == 'sub':
-            models.Subscription.objects.create(
-                subscription_type=models.Subscription.SUBSCRIPTION_TYPE_SUBSCRIBE,
-                **sub_data
-            )
-        elif action == 'ignore':
-            models.Subscription.objects.create(
-                subscription_type=models.Subscription.SUBSCRIPTION_TYPE_IGNORE,
-                **sub_data
-            )
-    elif your_subscription == 'S':
-        if action in {'unsub', 'ignore'}:
-            models.Subscription.objects.filter(**sub_data).delete()
-        if action == 'ignore':
-            models.Subscription.objects.create(
-                subscription_type=models.Subscription.SUBSCRIPTION_TYPE_IGNORE,
-                **sub_data
-            )
-    elif your_subscription == 'I':
-        if action in {'unignore', 'sub'}:
-            models.Subscription.objects.filter(**sub_data).delete()
-        if action == 'sub':
-            models.Subscription.objects.create(
-                subscription_type=models.Subscription.SUBSCRIPTION_TYPE_SUBSCRIBE,
-                **sub_data
-            )
-
     return HttpResponse(json.dumps({'success': True}), content_type='application/json')
 
 
