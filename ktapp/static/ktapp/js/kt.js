@@ -179,6 +179,31 @@ $(function() {
         });
     });
 
+    $('.subscription_eye').click(function() {
+        $('.subscription_eye_loader').show();
+        var domain = $(this).data('domain');
+        var object_id = $(this).data('id');
+        var action = $(this).data('action');
+        $.ajax({
+            type: 'POST',
+            url: '/feliratkozik',
+            data: {
+                csrfmiddlewaretoken: $.cookie('csrftoken'),
+                domain: domain,
+                object_id: object_id,
+                action: action,
+            },
+            success: function(data) {
+                if (data.success) {
+                    document.location.reload();
+                } else {
+                    $('.subscription_eye_loader').hide();
+                }
+            },
+            dataType: 'json'
+        });
+    });
+
     $('#search-input-mobile').on('input propertychange paste', function() {
         $('#search-input').val($('#search-input-mobile').val());
         ktApp.searchInputChanged = true;

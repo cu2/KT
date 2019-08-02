@@ -4,7 +4,27 @@
 {% block title %}{{ topic.title }} - Fórum - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{{ topic.title }}</h1>
+    <h1>
+        {{ topic.title }}
+
+        <span id="title_icon_block">
+            {% if request.user.is_authenticated %}
+                {% if your_subscription == 'S' %}
+                    <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-52-eye-open-link-48.png" alt="&#x1f441;" title="Feliratkozol?" data-action="unsub" data-domain="T" data-id="{{ topic.id }}" />
+                {% else %}
+                    <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-52-eye-open-link-unselected-48.png" alt="&#x1f441;" title="Feliratkozol?" data-action="sub" data-domain="T" data-id="{{ topic.id }}" />
+                {% endif %}
+                {% if your_subscription == 'I' %}
+                    <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-53-eye-close-link-48.png" alt="&#x1f441;" title="Ignorálod?" data-action="unignore" data-domain="T" data-id="{{ topic.id }}" />
+                {% else %}
+                    <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-53-eye-close-link-unselected-48.png" alt="&#x1f441;" title="Ignorálod?" data-action="ignore" data-domain="T" data-id="{{ topic.id }}" />
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}?next={{ request.build_absolute_uri }}"><img class="icon action_text" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-52-eye-open-link-unselected-48.png" alt="&#x1f441;" title="Feliratkozol?" /></a>
+            {% endif %}
+            <span class="subscription_eye_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>
+        </span>
+    </h1>
     <p class="title_comment">(<a href="{% url 'list_of_topics' %}">vissza a topikok listájához</a>)</p>
 {% endblock %}
 

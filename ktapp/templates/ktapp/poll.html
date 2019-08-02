@@ -5,7 +5,27 @@
 {% block title %}{{ poll.title }} - Közkérdés - Kritikus Tömeg{% endblock %}
 
 {% block header %}
-    <h1>{{ poll.title }}</h1>
+    <h1>
+        {{ poll.title }}
+
+        <span id="title_icon_block">
+            {% if request.user.is_authenticated %}
+                {% if your_subscription == 'S' %}
+                    <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-52-eye-open-link-48.png" alt="&#x1f441;" title="Feliratkozol?" data-action="unsub" data-domain="P" data-id="{{ poll.id }}" />
+                {% else %}
+                    <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-52-eye-open-link-unselected-48.png" alt="&#x1f441;" title="Feliratkozol?" data-action="sub" data-domain="P" data-id="{{ poll.id }}" />
+                {% endif %}
+                {% if your_subscription == 'I' %}
+                    <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-53-eye-close-link-48.png" alt="&#x1f441;" title="Ignorálod?" data-action="unignore" data-domain="P" data-id="{{ poll.id }}" />
+                {% else %}
+                    <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-53-eye-close-link-unselected-48.png" alt="&#x1f441;" title="Ignorálod?" data-action="ignore" data-domain="P" data-id="{{ poll.id }}" />
+                {% endif %}
+            {% else %}
+                <a href="{% url 'login' %}?next={{ request.build_absolute_uri }}"><img class="icon action_text" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-52-eye-open-link-unselected-48.png" alt="&#x1f441;" title="Feliratkozol?" /></a>
+            {% endif %}
+            <span class="subscription_eye_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>
+        </span>
+    </h1>
     {% if poll.state == 'O' %}
         <p>{% if poll.created_by %}<a href="{% url 'user_profile' poll.created_by.id poll.created_by.slug_cache %}">{{ poll.created_by.username }}</a> kérdése, {% endif %}{{ poll.open_from|date:"Y. F j." }}</p>
     {% else %}

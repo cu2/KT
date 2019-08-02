@@ -94,8 +94,7 @@
             <h1>
                 {{ film.orig_title }}{% if film.year %} <span class="film_year">({% if film.main_premier_year == vapiti_year %}<a href="{% url 'vapiti_gold' %}" class="vapiti">{{ film.year }}</a>{% else %}{{ film.year }}{% endif %})</span>{% endif %}
 
-                <span id="film_wish_star">
-                    {% spaceless %}
+                <span id="title_icon_block">
                     {% if request.user.is_authenticated %}
                         {% if your_wish_status %}
                             <img class="icon action_text wish_star" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-50-star-link{{ design_version_postfix }}-48.png" alt="&#x2605;" title="Meg akarod nézni?" data-action="-" data-film="{{ film.id }}" />
@@ -106,7 +105,22 @@
                         <a href="{% url 'login' %}?next={{ request.build_absolute_uri }}"><img class="icon action_text" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-49-star-empty-link{{ design_version_postfix }}-48.png" alt="&#x2606;" title="Meg akarod nézni?" /></a>
                     {% endif %}
                     <span class="wish_star_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>
-                    {% endspaceless %}
+
+                    {% if request.user.is_authenticated %}
+                        {% if your_subscription == 'S' %}
+                            <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-52-eye-open-link-48.png" alt="&#x1f441;" title="Feliratkozol?" data-action="unsub" data-domain="F" data-id="{{ film.id }}" />
+                        {% else %}
+                            <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-52-eye-open-link-unselected-48.png" alt="&#x1f441;" title="Feliratkozol?" data-action="sub" data-domain="F" data-id="{{ film.id }}" />
+                        {% endif %}
+                        {% if your_subscription == 'I' %}
+                            <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-53-eye-close-link-48.png" alt="&#x1f441;" title="Ignorálod?" data-action="unignore" data-domain="F" data-id="{{ film.id }}" />
+                        {% else %}
+                            <img class="icon action_text subscription_eye" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-53-eye-close-link-unselected-48.png" alt="&#x1f441;" title="Ignorálod?" data-action="ignore" data-domain="F" data-id="{{ film.id }}" />
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.build_absolute_uri }}"><img class="icon action_text" src="{{ STATIC_PREFIX }}ktapp/images/kt-icon-52-eye-open-link-unselected-48.png" alt="&#x1f441;" title="Feliratkozol?" /></a>
+                    {% endif %}
+                    <span class="subscription_eye_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>
                 </span>
 
             </h1>
