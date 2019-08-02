@@ -500,7 +500,25 @@ def create_comment_notifications(source_user, comment, film, topic, poll):
     if comment.reply_to:
         target_users[comment.reply_to.created_by_id] = models.Notification.NOTIFICATION_SUBTYPE_COMMENT_REPLY
     # TODO: mention
-    # TODO: subscribed
+    # subscribed
+    if comment.domain == models.Comment.DOMAIN_FILM:
+        noti_subtype = models.Notification.NOTIFICATION_SUBTYPE_COMMENT_ON_FILM_YOU_SUBSCRIBED_TO
+    elif comment.domain == models.Comment.DOMAIN_TOPIC:
+        noti_subtype = models.Notification.NOTIFICATION_SUBTYPE_COMMENT_ON_TOPIC_YOU_SUBSCRIBED_TO
+    elif comment.domain == models.Comment.DOMAIN_POLL:
+        noti_subtype = models.Notification.NOTIFICATION_SUBTYPE_COMMENT_ON_POLL_YOU_SUBSCRIBED_TO
+    else:
+        noti_subtype = None
+    if noti_subtype:
+        for sub in models.Subscription.objects.filter(
+            film=film,
+            topic=topic,
+            poll=poll,
+            subscription_type=models.Subscription.SUBSCRIPTION_TYPE_SUBSCRIBE,
+        ):
+            target_user_id = sub.user_id
+            if target_user_id not in target_users:
+                target_users[target_user_id] = noti_subtype
     for target_user_id, subtype in target_users.iteritems():
         if target_user_id != source_user.id:
             models.Notification.objects.create(
