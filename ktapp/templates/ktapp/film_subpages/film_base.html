@@ -200,11 +200,6 @@
                         {% endif %}
                     {% endfor %}
                     {% endspaceless %}
-                    {% if request.user.is_authenticated %}
-                        {% if not your_rating %}
-                            <span id="share_on_facebook_button" class="facebook_button facebook_button_{% if user.facebook_rating_share %}yes{% else %}no{% endif %}" title="Meg szeretnéd osztani Facebook-on?"></span>
-                        {% endif %}
-                    {% endif %}
                     <span class="vote_star_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>
                 </div>
                 {% if request.user.is_authenticated %}

@@ -1,11 +1,10 @@
 var ktApp = {
-    vote: function(film_id, rating, fb, vote_redate_to) {
+    vote: function(film_id, rating, vote_redate_to) {
         $.post('/szavaz', {
             csrfmiddlewaretoken: $.cookie('csrftoken'),
             ajax: '1',
             film_id: film_id,
             rating: rating,
-            fb: fb,
             vote_redate_to: vote_redate_to
         }, function(data) {
             if (data.success) {
@@ -151,51 +150,10 @@ $(function() {
         }
         var vote_redate_to = $('#vote_redate_to').val();
         $('.vote_star_loader').show();
-        var share_on_facebook = $('#share_on_facebook_button').hasClass('facebook_button_yes');
-        if (rating <= 0) {  // don't share if delete or redate
-            share_on_facebook = false;
-        }
-        if (share_on_facebook) {
-            var rating_string = '';
-            if (rating == 1) rating_string = 'Szerintem nézhetetlen. Szerinted?';
-            else if (rating == 2) rating_string = 'Szerintem rossz. Szerinted?';
-            else if (rating == 3) rating_string = 'Szerintem oké/elmegy. Szerinted?';
-            else if (rating == 4) rating_string = 'Szerintem jó. Szerinted?';
-            else rating_string = 'Szerintem zseniális. Szerinted?';
-            FB.ui({
-                method: 'feed',
-                link: window.location.href,
-                picture: $('#film_main_poster').attr('src'),
-                name: $('meta[property="og:title"]').attr('content') + ': ' + rating_string,
-                caption: $('meta[property="fb:caption"]').attr('content'),
-                description: $('meta[property="fb:description"]').attr('content')
-            }, function(response) {
-                if (response && response.post_id) {
-                    ktApp.vote(film_id, rating, 1, vote_redate_to);
-                } else {
-                    ktApp.vote(film_id, rating, 0, vote_redate_to);
-                }
-            });
-        } else {
-            ktApp.vote(film_id, rating, 0, vote_redate_to);
-        }
+        ktApp.vote(film_id, rating, vote_redate_to);
     });
     $('.vote_star_menu_toggle').click(function() {
         $('.vote_star_menu').toggle();
-    });
-    $('#share_on_facebook_button').click(function() {
-        $.post('/szerk_facebook', {
-            csrfmiddlewaretoken: $.cookie('csrftoken'),
-            share_on_facebook: ($(this).hasClass('facebook_button_no'))?'1':'0'
-        }, function(data) {
-            if (data.success) {
-                if (data.share_on_facebook) {
-                    $('#share_on_facebook_button').removeClass('facebook_button_no').addClass('facebook_button_yes');
-                } else {
-                    $('#share_on_facebook_button').removeClass('facebook_button_yes').addClass('facebook_button_no');
-                }
-            }
-        });
     });
 
     $('.wish_star').click(function() {
@@ -1022,13 +980,6 @@ $(function() {
 
     $('.comment_block_content .spoiler').each(function() {
         $('.show_spoilers_section').css('visibility', 'visible');
-    });
-
-    $.getScript('//connect.facebook.net/hu_HU/sdk.js', function(){
-        FB.init({
-            appId: '259204284100889',
-            version: 'v2.8'
-        });
     });
 
 });
