@@ -1,0 +1,28 @@
+version: '3.7'
+
+
+services:
+
+  kt:
+    image: kt-dev:0.0
+    volumes:
+      - type: bind
+        source: ../..
+        target: /app
+    ports:
+      - '8000:8000'
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - type: volume
+        source: db-data
+        target: /var/lib/mysql
+
+
+volumes:
+  db-data:
