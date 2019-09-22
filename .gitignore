@@ -1,5 +1,3 @@
-kt/settings_local.py
-kt/settings_prod.py
 media/
 .idea/
 *.iml
