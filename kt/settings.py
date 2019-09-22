@@ -6,7 +6,7 @@ try:
 except:
     VARIABLES = {
         'database_password': 'password',
-        'database_host': '',
+        'database_host': 'db',
         'secret_key': 'secret',
     }
 else:
