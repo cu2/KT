@@ -18,7 +18,8 @@ trap stop_system EXIT
 
 
 echo 'Initializing database...'
-docker volume rm -f kt-dev_db-data
+docker volume rm -f kt-db
+docker volume create kt-db
 dc up -d
 DB_CONTAINER_ID=$(dc ps -q db)
 KT_CONTAINER_ID=$(dc ps -q kt)

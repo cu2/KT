@@ -26,3 +26,5 @@ services:
 
 volumes:
   db-data:
+    external: true
+    name: kt-db
