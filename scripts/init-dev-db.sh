@@ -33,4 +33,4 @@ echo 'Loading test data...'
 docker exec "${KT_CONTAINER_ID}" python manage.py loaddata fixtures/initial_data.json
 echo 'Loaded'
 
-# dc down  # use trap instead
+# NOTE: trap is doing "dc down"
