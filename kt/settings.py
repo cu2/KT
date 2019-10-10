@@ -5,6 +5,8 @@ try:
     import overrides.variables
 except:
     VARIABLES = {
+        'database_name': 'ktdb_dev',
+        'database_user': 'ktadmin',
         'database_password': 'password',
         'database_host': 'db',
         'secret_key': 'secret',
@@ -27,8 +29,8 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ktdb_dev',
-        'USER': 'ktadmin',
+        'NAME': VARIABLES['database_name'],
+        'USER': VARIABLES['database_user'],
         'PASSWORD': VARIABLES['database_password'],
         'HOST': VARIABLES['database_host'],
         'PORT': '',
@@ -237,17 +239,11 @@ VAPITI_TOPIC_ID = 0
 VAPITI_EVENT_URL = ''
 
 
-# if True, KTUser.email_user() will print the email instead of sending it
-try:
-    LOCAL_MAIL = kt.settings_local.LOCAL_MAIL
-except:
-    LOCAL_MAIL = False
+# if True (or ENV=='local'), KTUser.email_user() will print the email instead of sending it
+LOCAL_MAIL = False
 
 
-try:
-    DEFAULT_FROM_EMAIL = kt.settings_local.DEFAULT_FROM_EMAIL
-except:
-    DEFAULT_FROM_EMAIL = None
+DEFAULT_FROM_EMAIL = None
 
 
 ENV = 'local'
