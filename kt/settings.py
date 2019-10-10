@@ -1,14 +1,18 @@
 # Django settings for kt project.
 
-# import local (i.e. gitignored) settings:
+# set VARIABLES either with default values or with overrides
 try:
-    import kt.settings_local
+    import overrides.variables
 except:
-    DATABASE_DEFAULT_PASSWORD = 'password'
-    LOCAL_SECRET_KEY = 'secret'
+    VARIABLES = {
+        'database_name': 'ktdb_dev',
+        'database_user': 'ktadmin',
+        'database_password': 'password',
+        'database_host': 'db',
+        'secret_key': 'secret',
+    }
 else:
-    DATABASE_DEFAULT_PASSWORD = kt.settings_local.DATABASE_DEFAULT_PASSWORD
-    LOCAL_SECRET_KEY = kt.settings_local.SECRET_KEY
+    VARIABLES = overrides.variables.VARIABLES
 
 import os
 
@@ -25,19 +29,13 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ktdb_dev',
-        'USER': 'ktadmin',
-        'PASSWORD': DATABASE_DEFAULT_PASSWORD,
-        'HOST': '',
+        'NAME': VARIABLES['database_name'],
+        'USER': VARIABLES['database_user'],
+        'PASSWORD': VARIABLES['database_password'],
+        'HOST': VARIABLES['database_host'],
         'PORT': '',
     }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -109,7 +107,7 @@ STATICFILES_FINDERS = (
 
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = LOCAL_SECRET_KEY
+SECRET_KEY = VARIABLES['secret_key']
 
 
 TEMPLATES = [
@@ -241,20 +239,18 @@ VAPITI_TOPIC_ID = 0
 VAPITI_EVENT_URL = ''
 
 
-# if True, KTUser.email_user() will print the email instead of sending it
-try:
-    LOCAL_MAIL = kt.settings_local.LOCAL_MAIL
-except:
-    LOCAL_MAIL = False
+# if True (or ENV=='local'), KTUser.email_user() will print the email instead of sending it
+LOCAL_MAIL = False
 
 
-try:
-    DEFAULT_FROM_EMAIL = kt.settings_local.DEFAULT_FROM_EMAIL
-except:
-    DEFAULT_FROM_EMAIL = None
+DEFAULT_FROM_EMAIL = None
 
 
-# override w settings_prod if KT_ENV=prod
 ENV = 'local'
-if os.getenv('KT_ENV', '') == 'prod':
-    from kt.settings_prod import *
+
+
+# import overrides.settings, if there's any
+try:
+    from overrides.settings import *
+except:
+    pass

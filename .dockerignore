@@ -2,9 +2,10 @@ media/
 .idea/
 *.iml
 bootstrap/
+.vscode/
 db.sqlite3
-.vscode/*
-!.vscode/launch.json
+
+docker/
 
 
 ### Template from https://github.com/github/gitignore/blob/master/Python.gitignore

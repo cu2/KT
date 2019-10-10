@@ -1,24 +1,13 @@
-#!/bin/bash -e
-set -o pipefail
+#!/usr/bin/env bash
+set -euo pipefail
 
-PARENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+__dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-if [ ! -d "$PARENT_DIR/virtualenv" ]; then
-  echo 'Creating virtualenv...'
-  virtualenv "$PARENT_DIR/virtualenv"
-  echo 'Created virtualenv.'
-fi
 
-. "$PARENT_DIR/virtualenv/bin/activate"
+echo "########## Building dev image..."
+"${__dir}/build-dev-image.sh"
+echo "########## Built."
 
-echo 'Installing requirements...'
-pip install -r "$PARENT_DIR/requirements.txt"
-echo 'Installed requirements.'
-
-echo 'Initializing database...'
-./manage.py migrate
-echo 'Initialized database.'
-
-echo 'Loading data...'
-./manage.py loaddata fixtures/initial_data.json
-echo 'Loaded data.'
+echo "########## Initializing dev db..."
+"${__dir}/init-dev-db.sh"
+echo "########## Initialized."

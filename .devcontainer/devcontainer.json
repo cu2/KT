@@ -1,0 +1,25 @@
+{
+    "name": "KT dev environment",
+    "dockerComposeFile": [
+        "../docker/dev/docker-compose.yml",
+        "docker-compose.yml"
+    ],
+    "service": "kt",
+    "workspaceFolder": "/app",
+    "settings": {
+        "python.pythonPath": "/usr/bin/python",
+        "python.linting.pylintEnabled": true,
+        "files.associations": {
+            "**/*.html": "html",
+            "**/templates/**/*.html": "django-html",
+            "**/templates/**/*": "django-txt",
+            "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+        },
+        "terminal.integrated.shell.linux": "/bin/bash"
+    },
+    "postCreateCommand": "apt-get update && apt-get install -y git",
+    "extensions": [
+        "ms-python.python",
+        "batisteo.vscode-django"
+    ]
+}
