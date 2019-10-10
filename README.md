@@ -58,6 +58,28 @@ If you want to reset your database for any reason, just run:
 ```
 
 
+## How to use Visual Studio Code
+
+Install [Visual Studio Code](https://code.visualstudio.com/download).
+
+Install the [Docker](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-docker) and [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extensions.
+
+Open KT in VSCode: File / Open... / choose the KT folder.
+
+In the Command Palette (press `F1`) choose `Remote-Containers: Reopen in Container`
+
+This will create two Docker containers (one for KT, one for MySQL), if they don't exist already. Now you can:
+
+- navigate the code (dependencies are properly included)
+- run/debug KT from VSCode: Debug / Start Debugging (`F5`)
+
+If you want to stop running KT: Debug / Stop Debugging.
+
+If you want to stop developing: `Remote-Containers: Reopen Locally`. This will stop the containers.
+
+Note: you cannot use `./scripts/start-dev.sh` and `Remote-Containers: Reopen in Container` at the same time. If you try, it will fail because port 8000 on your host machine cannot be forwarded to two different containers. And it might also corrupt your database volume (`kt-db`), because two MySQL server instances will try to use it. If the latter happens, you can reset the database with `./scripts/init-dev-db.sh`.
+
+
 ## Developer guide
 
 If you want to participate, here are some rules and guidelines.
