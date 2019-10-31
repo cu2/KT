@@ -18,8 +18,11 @@ class Command(BaseCommand):
             COALESCE(SUM(v.rating=4), 0) AS r4,
             COALESCE(SUM(v.rating=5), 0) AS r5
             FROM ktapp_film f
-            LEFT JOIN ktapp_vote v ON v.film_id = f.id
-            INNER JOIN ktapp_ktuser u ON u.id = v.user_id AND u.core_member = 1
+            LEFT JOIN (
+                SELECT v.film_id, v.rating
+                FROM ktapp_vote v
+                INNER JOIN ktapp_ktuser u ON u.id = v.user_id AND u.core_member = 1
+            ) v ON v.film_id = f.id
             GROUP BY f.id
         ) t
         SET f.number_of_ratings_1 = t.r1,
