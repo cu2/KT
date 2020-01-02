@@ -10,18 +10,10 @@
 
     <nav id="tabs" class="clearfix">
         <ul>
-        {% if this_premier_year < last_premier_year %}
-            <li style="width: 20%"{% if active_tab == 'nowadays' %} class="active_tab"{% endif %}><a href="{% url 'premiers' %}">mostanában</a></li>
-            <li style="width: 20%"{% if active_tab == 'this_year' %} class="active_tab"{% endif %}><a href="{% url 'premiers_in_a_year' this_premier_year %}">idén</a></li>
-            <li style="width: 20%"{% if active_tab == 'next_year' %} class="active_tab"{% endif %}><a href="{% url 'premiers_in_a_year' last_premier_year %}">jövőre</a></li>
-            <li style="width: 20%"{% if active_tab == 'other_year' %} class="active_tab"{% endif %}><a href="{% url 'premiers_in_a_year' before_this_premier_year %}">régebben</a></li>
-            <li style="width: 20%"{% if active_tab == 'anniversaries' %} class="active_tab"{% endif %}><a href="{% url 'premier_anniversaries' this_year this_month this_day %}">évfordulók</a></li>
-        {% else %}
             <li style="width: 25%"{% if active_tab == 'nowadays' %} class="active_tab"{% endif %}><a href="{% url 'premiers' %}">mostanában</a></li>
             <li style="width: 25%"{% if active_tab == 'this_year' %} class="active_tab"{% endif %}><a href="{% url 'premiers_in_a_year' this_premier_year %}">idén</a></li>
             <li style="width: 25%"{% if active_tab == 'other_year' %} class="active_tab"{% endif %}><a href="{% url 'premiers_in_a_year' before_this_premier_year %}">régebben</a></li>
             <li style="width: 25%"{% if active_tab == 'anniversaries' %} class="active_tab"{% endif %}><a href="{% url 'premier_anniversaries' this_year this_month this_day %}">évfordulók</a></li>
-        {% endif %}
         </ul>
     </nav>
 

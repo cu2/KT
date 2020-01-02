@@ -202,7 +202,6 @@ def premiers(request):
         'active_tab': 'nowadays',
         'this_premier_year': this_year,
         'before_this_premier_year': this_year - 1,
-        'last_premier_year': settings.LAST_PREMIER_YEAR,
         'this_year': today.strftime('%Y'),
         'this_month': today.strftime('%m'),
         'this_day': today.strftime('%d'),
@@ -216,8 +215,8 @@ def premiers_in_a_year(request, year):
     year = int(year)
     if year < settings.FIRST_PREMIER_YEAR:
         return HttpResponseRedirect(reverse('premiers_in_a_year', args=(settings.FIRST_PREMIER_YEAR,)))
-    if year > settings.LAST_PREMIER_YEAR:
-        return HttpResponseRedirect(reverse('premiers_in_a_year', args=(settings.LAST_PREMIER_YEAR,)))
+    if year > this_year:
+        return HttpResponseRedirect(reverse('premiers_in_a_year', args=(this_year,)))
     films, nice_filters = filmlist.filmlist(
         user_id=request.user.id,
         filters=[('premier_year', year)],
@@ -233,7 +232,6 @@ def premiers_in_a_year(request, year):
         'active_tab': active_tab,
         'this_premier_year': this_year,
         'before_this_premier_year': this_year - 1,
-        'last_premier_year': settings.LAST_PREMIER_YEAR,
         'premier_list_full': films,
         'selected_year': year,
         'this_year': today.strftime('%Y'),
@@ -281,7 +279,6 @@ def premier_anniversaries(request, year, month, day):
         'active_tab': 'anniversaries',
         'this_premier_year': this_year,
         'before_this_premier_year': this_year - 1,
-        'last_premier_year': settings.LAST_PREMIER_YEAR,
         'this_year': today.strftime('%Y'),
         'this_month': today.strftime('%m'),
         'this_day': today.strftime('%d'),
