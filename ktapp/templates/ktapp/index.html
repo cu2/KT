@@ -197,10 +197,10 @@
                                 {% endif %}
                                 <p class="film_block_content">
                                     {{ film|film_url_html_big }}
-                                    ({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+                                    ({{ film|film_directors }})
                                     <br />
                                     {% for country in film.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
-                                    {% for genre in film.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                    {{ film|film_genres:"all" }}
                                 </p>
                                 <p class="film_block_content">
                                     {{ film.plot_summary|truncatechars_html:300 }}
@@ -239,10 +239,10 @@
                                 {% endif %}
                                 <p class="film_block_content">
                                     {{ film|film_url_html_big }}
-                                    ({% for director in film.directors %}<a href="{% url 'artist' director.id director.slug_cache %}">{{ director.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+                                    ({{ film|film_directors }})
                                     <br />
                                     {% for country in film.countries %}{{ country.name }}{% if not forloop.last %}-{% endif %}{% endfor %}
-                                    {% for genre in film.genres %}{{ genre.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                                    {{ film|film_genres:"all" }}
                                 </p>
                                 <p class="film_block_content">
                                     {{ film.plot_summary|truncatechars_html:300 }}
