@@ -309,6 +309,11 @@ def get_vapiti_round():
 
 
 def get_vapiti_nominees(award_model, vapiti_type):
+    cache_name = 'get_vapiti_nominees_{}'.format(vapiti_type)
+    cached_value = cache.get(cache_name)
+    if cached_value is not None:
+        return cached_value
+
     vapiti_year = settings.VAPITI_YEAR
     if vapiti_type == 'G':
         nominee_awards = award_model.objects.filter(
@@ -316,14 +321,17 @@ def get_vapiti_nominees(award_model, vapiti_type):
             year=vapiti_year,
             category=texts.VAPITI_NOMINEE_CATEGORIES[vapiti_type],
         )
-        return [nominee_award.film_id for nominee_award in nominee_awards]
-    if vapiti_type in {'F', 'M'}:
+        nominee_list = [nominee_award.film_id for nominee_award in nominee_awards]
+    elif vapiti_type in {'F', 'M'}:
         nominee_awards = award_model.objects.filter(
             name=u'Vapiti',
             year=vapiti_year,
             category=texts.VAPITI_NOMINEE_CATEGORIES[vapiti_type],
         )
-        return [(nominee_award.film_id, nominee_award.artist_id) for nominee_award in nominee_awards]
+        nominee_list = [(nominee_award.film_id, nominee_award.artist_id) for nominee_award in nominee_awards]
+
+    cache.set(cache_name, nominee_list, timeout=3600)
+    return nominee_list
 
 
 
@@ -541,7 +549,6 @@ def run_sql_except_on_sqlite(sql, reverse_sql):
 
 def get_premiers_for_today():
     cached_value = cache.get('get_premiers_for_today')
-    print('get_premiers_for_today', cached_value)
     if cached_value is not None:
         return cached_value
 
