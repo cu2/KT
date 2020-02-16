@@ -164,6 +164,7 @@ def index(request):
         'vapiti_end_of_round_2': round_2_dates[1][-2:],
         'vapiti_result_day': result_day[-2:],
         'vapiti_event_url': settings.VAPITI_EVENT_URL,
+        'vapiti_event_location': settings.VAPITI_EVENT_LOCATION,
         'vapiti_comment': vapiti_comment,
         'vapiti_film_list': vapiti_film_list,
         'cookie_kt_carousel_vapiti_index': cookie_kt_carousel_vapiti_index,

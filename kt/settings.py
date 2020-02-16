@@ -234,8 +234,10 @@ FIRST_PREMIER_YEAR = 1970
 VAPITI_YEAR = 2019
 VAPITI_TOPIC_ID = 219
 # VAPITI_TOPIC_ID = 0
-# VAPITI_EVENT_URL = 'https://www.facebook.com/events/147921529229970/'
-VAPITI_EVENT_URL = ''
+VAPITI_EVENT_URL = 'https://www.facebook.com/events/619791135489436/'
+# VAPITI_EVENT_URL = ''
+VAPITI_EVENT_LOCATION = 'Budapesten az Andersen Pub-ban'
+# VAPITI_EVENT_LOCATION = ''
 
 
 # if True (or ENV=='local'), KTUser.email_user() will print the email instead of sending it

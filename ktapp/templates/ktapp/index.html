@@ -80,7 +80,7 @@
                 {% if vapiti_round_2_has_nominees %}
                   <p>Válaszd ki a legjobb <a href="{% url 'vapiti_gold_2' %}">filmet</a>, <a href="{% url 'vapiti_silver_2' 'ferfi' %}">férfi</a> és <a href="{% url 'vapiti_silver_2' 'noi' %}">női</a> színészt a 10-10-10 jelölt közül. Február {{ vapiti_end_of_round_2 }}-ig van időd pótolni, amiket még nem láttál, és leadni a végső szavazatod.</p>
                   {% if vapiti_event_url %}
-                      <p>Február {{ vapiti_result_day }} pénteken este 6-tól pedig <a href="{{ vapiti_event_url }}" target="_blank">díjkiosztó</a> buli Budapesten a Jelen Bisztróban. Gyere!</p>
+                      <p>Február {{ vapiti_result_day }} pénteken este 6-tól pedig <a href="{{ vapiti_event_url }}" target="_blank">díjkiosztó</a> buli {{ vapiti_event_location }}. Gyere!</p>
                   {% endif %}
                 {% else %}
                   <p>Reggel jönnek a jelöltek...</p>
