@@ -38,7 +38,7 @@
     <div class="comment_content comment_block_content">
         {% if comment.hidden %}
             <p class="hidden_comment">
-            {% if not request.user.is_game_master and comment.created_by.id != request.user.id %}
+            {% if not request.user.is_authenticated or not request.user.is_game_master and comment.created_by.id != request.user.id %}
                 [rejtett komment]
             {% else %}
                 {% autoescape off %}
