@@ -1134,8 +1134,8 @@ def new_usertoplist(request):
                 raw_film = request.POST.get('film_%d' % r, '').strip()
                 if raw_film == '':
                     continue
-                if '/' in raw_film:
-                    raw_orig_title, raw_second_title = raw_film.split('/')
+                if ' / ' in raw_film:
+                    raw_orig_title, raw_second_title = raw_film.split(' / ')
                 else:
                     raw_orig_title, raw_second_title = raw_film, ''
                 raw_orig_title = raw_orig_title.strip()
