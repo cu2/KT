@@ -259,6 +259,7 @@ class Film(models.Model):
     sequels = models.ManyToManyField('Sequel', through='FilmSequelRelationship')
     main_premier = models.DateField(blank=True, null=True)
     main_premier_year = models.PositiveIntegerField(blank=True, null=True)
+    vapiti_year = models.PositiveIntegerField(blank=True, null=True)
     slug_cache = models.CharField(max_length=250, blank=True)
     created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -403,7 +404,7 @@ class Vote(models.Model):
         self.user.number_of_ratings_3 = self.user.vote_set.filter(rating=3).count()
         self.user.number_of_ratings_4 = self.user.vote_set.filter(rating=4).count()
         self.user.number_of_ratings_5 = self.user.vote_set.filter(rating=5).count()
-        self.user.number_of_vapiti_votes = self.user.vote_set.filter(film__main_premier_year=settings.VAPITI_YEAR).count()
+        self.user.number_of_vapiti_votes = self.user.vote_set.filter(film__vapiti_year=settings.VAPITI_YEAR).count()
         self.user.vapiti_weight = self.user.number_of_ratings + 25 * self.user.number_of_vapiti_votes
         if self.user.number_of_ratings < 10:
             self.user.average_rating = None
@@ -436,7 +437,7 @@ def delete_vote(sender, instance, **kwargs):
     instance.user.number_of_ratings_3 = instance.user.vote_set.filter(rating=3).count()
     instance.user.number_of_ratings_4 = instance.user.vote_set.filter(rating=4).count()
     instance.user.number_of_ratings_5 = instance.user.vote_set.filter(rating=5).count()
-    instance.user.number_of_vapiti_votes = instance.user.vote_set.filter(film__main_premier_year=settings.VAPITI_YEAR).count()
+    instance.user.number_of_vapiti_votes = instance.user.vote_set.filter(film__vapiti_year=settings.VAPITI_YEAR).count()
     instance.user.vapiti_weight = instance.user.number_of_ratings + 25 * instance.user.number_of_vapiti_votes
     if instance.user.number_of_ratings < 10:
         instance.user.average_rating = None

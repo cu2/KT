@@ -70,7 +70,6 @@
     <table class="fullsize sortable">
         <thead>
         <tr class="header_tr">
-            <th data-sort="string">Bemutató</th>
             <th data-sort="string">Film</th>
             <th data-sort="int" data-sort-default="desc">Év</th>
             <th data-sort="string">Rendező</th>
@@ -86,7 +85,6 @@
         <tbody>
         {% for film in films_no %}
             <tr class="{% cycle '' 'odd' %}">
-                <td data-sort-value="{{ film.main_premier|date:"Y-m-d" }}">{{ film.main_premier|date:"F j." }}</td>
                 <td>{{ film|film_url_html }}</td>
                 <td class="center">{% if film.year %}{{ film.year }}{% endif %}</td>
                 <td>{{ film|film_directors }}</td>

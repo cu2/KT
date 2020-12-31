@@ -92,7 +92,7 @@
     <div id="film_header" class="hover_show_button_context">
         <div id="film_title">
             <h1>
-                {{ film.orig_title }}{% if film.year %} <span class="film_year">({% if film.main_premier_year == vapiti_year %}<a href="{% url 'vapiti_gold' %}" class="vapiti">{{ film.year }}</a>{% else %}{{ film.year }}{% endif %})</span>{% endif %}
+                {{ film.orig_title }}{% if film.year %} <span class="film_year">({% if film.vapiti_year == vapiti_year %}<a href="{% url 'vapiti_gold' %}" class="vapiti">{{ film.year }}</a>{% else %}{{ film.year }}{% endif %})</span>{% endif %}
 
                 <span id="title_icon_block">
                     {% if request.user.is_authenticated %}

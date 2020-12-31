@@ -442,7 +442,7 @@ def get_vapiti_films(request):
     films, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[
-            ('main_premier_year', settings.VAPITI_YEAR),
+            ('vapiti_year', settings.VAPITI_YEAR),
             ('title', q),
             ('seen_it', '1'),
         ],
@@ -474,7 +474,7 @@ def get_vapiti_artists(request):
     INNER JOIN ktapp_film f ON f.id = r.film_id
     INNER JOIN ktapp_vote v ON v.film_id = f.id AND v.user_id = {user_id}
     WHERE r.role_type = 'A' AND r.actor_subtype = 'F'
-    AND f.main_premier_year = {vapiti_year}
+    AND f.vapiti_year = {vapiti_year}
     AND a.gender = '{gender}'
     AND a.name LIKE %s
     ORDER BY a.name, a.id, r.role_name, r.id

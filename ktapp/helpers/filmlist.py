@@ -76,6 +76,11 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     additional_param['year_min'] = year_interval[0]
                     additional_param['year_max'] = year_interval[1]
                     nice_filters.append((filter_type, filter_value))
+            if filter_type == 'vapiti_year':
+                if filter_value:
+                    additional_where.append('''f.vapiti_year = %(vapiti_year)s''')
+                    additional_param['vapiti_year'] = filter_value
+                    nice_filters.append((filter_type, filter_value))
             if filter_type == 'main_premier_year':
                 if filter_value:
                     additional_where.append('''f.main_premier_year = %(main_premier_year)s''')

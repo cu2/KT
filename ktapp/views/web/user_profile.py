@@ -48,7 +48,7 @@ def _get_user_profile_numbers(request, selected_user):
 def user_profile(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
     number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
-    number_of_vapiti_votes = selected_user.vote_set.filter(film__main_premier_year=settings.VAPITI_YEAR).count()
+    number_of_vapiti_votes = selected_user.vote_set.filter(film__vapiti_year=settings.VAPITI_YEAR).count()
     latest_votes = [int(v) for v in selected_user.latest_votes.split(',') if v != ''][:10]
     latest_comments = [int(c) for c in selected_user.latest_comments.split(',') if c != ''][:10]
     # profile

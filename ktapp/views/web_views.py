@@ -1438,7 +1438,7 @@ def articles(request):
               CONCAT('L', l.id) AS id, l.name, 'link' AS url_type, l.id as orig_id,
               l.url,
               l.link_domain, l.lead,
-              f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year,
+              f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year, f.vapiti_year AS film_vapiti_year,
               u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
             FROM ktapp_link l
             INNER JOIN ktapp_film f ON f.id = l.film_id
@@ -1451,7 +1451,7 @@ def articles(request):
               CONCAT('R', r.id) AS id, CONCAT(f.orig_title, ' (', f.year, ')') AS name, 'review' AS url_type, r.id as orig_id,
               CONCAT('/film/', f.id, '/', f.slug_cache, '/elemzesek/', r.id) AS url,
               'Kritikus Tömeg' AS link_domain, CONCAT(r.snippet, '...') AS lead,
-              f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year,
+              f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year, f.vapiti_year AS film_vapiti_year,
               u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
             FROM ktapp_review r
             INNER JOIN ktapp_film f ON f.id = r.film_id
@@ -1820,8 +1820,8 @@ def vapiti_gold(request):
             my_vapiti_votes[vv.serial_number] = ('%s / %s' % (vv.film.orig_title, vv.film.second_title)) if vv.film.second_title else vv.film.orig_title
     films, _ = filmlist.filmlist(
         user_id=request.user.id,
-        filters=[('main_premier_year', settings.VAPITI_YEAR)],
-        ordering='main_premier',
+        filters=[('vapiti_year', settings.VAPITI_YEAR)],
+        ordering='title',
         films_per_page=None,
     )
     films_yes = []
@@ -1939,6 +1939,7 @@ def vapiti_silver(request, gender):
       f.orig_title AS film_orig_title,
       f.second_title AS film_second_title,
       f.main_premier_year AS film_main_premier_year,
+      f.vapiti_year AS film_vapiti_year,
       f.number_of_ratings,
       f.average_rating,
       {my_rating_select}
@@ -1947,7 +1948,7 @@ def vapiti_silver(request, gender):
     INNER JOIN ktapp_film f ON f.id = r.film_id
     {my_rating_join}
     WHERE r.role_type = 'A' AND r.actor_subtype = 'F'
-    AND f.main_premier_year = {vapiti_year}
+    AND f.vapiti_year = {vapiti_year}
     AND a.gender = '{gender}'
     ORDER BY a.name, a.id, r.role_name, r.id
     '''.format(
