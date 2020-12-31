@@ -6,6 +6,6 @@ django-test-without-migrations==0.6
 django-appconf==1.0.2  # pin it, so Python 2 is still supported
 MySQL-python==1.2.5
 sqlparse==0.3.0
-Pillow==5.0.0
+Pillow==7.1.0
 boto3==1.5.22
 pylint==1.9.5
