@@ -24,16 +24,20 @@ class Command(BaseCommand):
         models.Film.objects.filter(vapiti_year=vapiti_year).update(vapiti_year=None)
 
         film_ids = set()
-        for film in models.Film.objects.filter(main_premier_year=vapiti_year):
+        for film in models.Film.objects.filter(
+            vapiti_year=None,
+            main_premier_year=vapiti_year,
+        ):
             film_ids.add(film.id)
 
         for film in models.Film.objects.filter(
+            vapiti_year=None,
+            main_premier_year=None,
             year=vapiti_year,
             number_of_ratings__gte=20,
             genre_cache_is_music_video=False,
             genre_cache_is_mini=False,
             genre_cache_is_short=False,
-            main_premier_year=None,
         ):
             film_ids.add(film.id)
 
