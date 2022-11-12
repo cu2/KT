@@ -678,9 +678,9 @@ def artist_main(request, id, name_slug):
         'permission_merge_artist': kt_utils.check_permission('merge_artist', request.user),
         'permission_approve_bio': kt_utils.check_permission('approve_bio', request.user),
         'permission_set_main_picture': kt_utils.check_permission('set_main_picture', request.user),
-        'imdb_link': 'http://imdb.com/find?s=nm&q=' + urlquote_plus(artist.name),
-        'wiki_en_link': 'http://en.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(artist.name),
-        'wiki_hu_link': 'http://hu.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(artist.name),
+        'imdb_link': 'https://imdb.com/find?s=nm&q=' + urlquote_plus(artist.name),
+        'wiki_en_link': 'https://en.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(artist.name),
+        'wiki_hu_link': 'https://hu.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(artist.name),
     })
 
 

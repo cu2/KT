@@ -134,7 +134,7 @@ class LoggingMiddleware(object):
             if settings.ENV == 'local':
                 cookie_domain = 'localhost'
             else:
-                cookie_domain = '.kritikustomeg.org'
+                cookie_domain = '.{}'.format(settings.ROOT_DOMAIN)
             response.set_cookie('kutma', kutma, max_age=SECONDS_IN_A_YEAR, domain=cookie_domain)
         return response
 

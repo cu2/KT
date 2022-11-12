@@ -51,11 +51,11 @@ def _generic_film_view(view_function):
             'countries': list(film.countries()),
             'genres': film.genres_cache,
             'vapiti_year': settings.VAPITI_YEAR,
-            'film_link_imdb': 'http://www.imdb.com/title/%s/' % film.imdb_link if film.imdb_link else '',
-            'film_link_porthu': 'http://www.port.hu/pls/fi/films.film_page?i_where=2&i_film_id=%s&i_city_id=-1&i_county_id=1' % film.porthu_link if film.porthu_link else '',
-            'film_link_rt': 'http://www.rottentomatoes.com/search/?search=' + urlquote(film.orig_title),
-            'film_link_youtube': 'http://www.youtube.com/results?search_query=%s+trailer&search=Search' % urlquote_plus(film.orig_title),
-            'film_link_wiki_en': film.wikipedia_link_en.strip() if film.wikipedia_link_en else ('http://en.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(film.orig_title)),
+            'film_link_imdb': 'https://www.imdb.com/title/%s/' % film.imdb_link if film.imdb_link else '',
+            'film_link_porthu': 'https://www.port.hu/pls/fi/films.film_page?i_where=2&i_film_id=%s&i_city_id=-1&i_county_id=1' % film.porthu_link if film.porthu_link else '',
+            'film_link_rt': 'https://www.rottentomatoes.com/search/?search=' + urlquote(film.orig_title),
+            'film_link_youtube': 'https://www.youtube.com/results?search_query=%s+trailer&search=Search' % urlquote_plus(film.orig_title),
+            'film_link_wiki_en': film.wikipedia_link_en.strip() if film.wikipedia_link_en else ('https://en.wikipedia.org/w/wiki.phtml?search=' + urlquote_plus(film.orig_title)),
             'film_link_wiki_hu': film.wikipedia_link_hu.strip(),
             'your_rating': rating,
             'your_rating_date': rating_date,
@@ -508,7 +508,7 @@ def suggested_films(request):
 
     def get_real_imdb_link(film_imdb_link):
         if film_imdb_link:
-            return 'http://www.imdb.com/title/%s/' % film_imdb_link
+            return 'https://www.imdb.com/title/%s/' % film_imdb_link
         return None
 
     return render(request, 'ktapp/suggested_films.html', {

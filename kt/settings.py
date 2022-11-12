@@ -18,6 +18,8 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # get parent dir (i.e. KT project, not KT app)
 
+ROOT_DOMAIN = 'kritikustomeg.org'
+
 DEBUG = True
 
 ADMINS = (
@@ -128,8 +130,9 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                'kt.context_processors.get_design_version_context',
-                'kt.context_processors.get_number_of_suggested_stuff_for_admins',
+                'kt.context_processors.design_version_context',
+                'kt.context_processors.number_of_suggested_stuff_for_admins_context',
+                'kt.context_processors.settings_context',
             ],
         },
     },

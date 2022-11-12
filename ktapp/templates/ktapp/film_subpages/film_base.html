@@ -21,7 +21,7 @@
 {% block jsonld %}
 <script type="application/ld+json">
 {
-  "@context": "http://schema.org",
+  "@context": "https://schema.org",
   "@type": "Movie",
   "image": "{{ film.main_poster.get_display_urls.max }}",
   "thumbnailUrl": "{{ film.main_poster.get_display_urls.mid }}",
@@ -43,7 +43,7 @@
     {
       "@type": "Person",
       "name": "{{ director.name }}",
-      "url": "http://kritikustomeg.org{% url 'artist' director.id director.slug_cache %}"
+      "url": "https://{{ root_domain }}{% url 'artist' director.id director.slug_cache %}"
     }{% if not forloop.last %},{% endif %}
     {% endfor %}
   ],
@@ -75,7 +75,7 @@
     {
       "@type": "Person",
       "name": "{{ role.artist.name }}",
-      "url": "http://kritikustomeg.org{% url 'artist' role.artist.id role.artist.slug_cache %}"
+      "url": "https://{{ root_domain }}{% url 'artist' role.artist.id role.artist.slug_cache %}"
     }{% if not forloop.last %},{% endif %}
     {% endfor %}
   ],

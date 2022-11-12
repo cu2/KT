@@ -349,7 +349,10 @@ class Film(models.Model):
         self.save()
 
     def absolute_url(self):
-        return 'http://kritikustomeg.org%s' % reverse('film_main', args=(self.id, self.slug_cache))
+        return 'https://{}{}'.format(
+            settings.ROOT_DOMAIN,
+            reverse('film_main', args=(self.id, self.slug_cache)),
+        )
 
     def is_open_for_vote_from(self):
         if self.open_for_vote_from is None:
