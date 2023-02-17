@@ -2158,6 +2158,7 @@ def analytics(request):
     FROM ktapp_dailyactiveuser
     WHERE day BETWEEN '2015-09-14' AND %s
     GROUP BY day
+    ORDER BY day
     ''', [yesterday])
     dau_data = []
     ma7_window = []
@@ -2176,6 +2177,7 @@ def analytics(request):
     FROM ktapp_dailyactiveuser
     WHERE day BETWEEN '2015-09-14' AND %s
     GROUP BY week
+    ORDER BY week
     ''', [last_sunday])
     wau_data = []
     for row in cursor.fetchall():
@@ -2191,6 +2193,7 @@ def analytics(request):
     WHERE domain = 'F'
     AND created_at >= '2015-09-14' AND DATE(created_at) <= %s
     GROUP BY week
+    ORDER BY week
     ''', [last_sunday])
     forum_data = []
     for row in cursor.fetchall():
