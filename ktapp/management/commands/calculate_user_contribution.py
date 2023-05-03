@@ -50,7 +50,7 @@ class Command(BaseCommand):
             table_name = metric_name
         self.cursor.execute('''
         UPDATE ktapp_usercontribution uc, (
-            SELECT user_id, cnt, @rank := @rank + 1 as rank
+            SELECT user_id, cnt, @rank := @rank + 1 as user_rank
             FROM (
                 SELECT created_by_id AS user_id, COUNT(1) AS cnt
                 FROM ktapp_{table_name}
@@ -60,7 +60,7 @@ class Command(BaseCommand):
             ) ttt,
             (SELECT @rank := 0) r
         ) t
-        SET uc.count_{metric_name} = t.cnt, uc.rank_{metric_name} = t.rank
+        SET uc.count_{metric_name} = t.cnt, uc.rank_{metric_name} = t.user_rank
         WHERE uc.ktuser_ptr_id = t.user_id
         '''.format(
             metric_name=metric_name,
