@@ -334,7 +334,6 @@ def get_vapiti_nominees(award_model, vapiti_type):
     return nominee_list
 
 
-
 def get_local_md5(fname):
     hash = hashlib.md5()
     with open(fname, 'rb') as f:
@@ -343,8 +342,15 @@ def get_local_md5(fname):
     return hash.hexdigest()
 
 
-def upload_file_to_s3(local_name, remote_name):
+def make_dir_with_parents_exist_ok(path):
+    try:
+        os.makedirs(path, mode=0755)
+    except OSError as e:
+        if e.errno != os.errno.EEXIST:
+            raise
 
+
+def upload_file_to_s3(local_name, remote_name):
     mime_type = imghdr.what(local_name)
     if mime_type:
         mime_type = 'image/%s' % mime_type
@@ -384,7 +390,6 @@ def upload_file_to_s3(local_name, remote_name):
 
 
 def download_file_from_s3(remote_name, local_name):
-
     try:
         boto3_session = boto3.session.Session(
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -393,6 +398,7 @@ def download_file_from_s3(remote_name, local_name):
         )
         s3 = boto3_session.resource('s3')
         remote_md5 = s3.Object('kt.static', remote_name).e_tag[1:-1]
+        make_dir_with_parents_exist_ok(os.path.dirname(os.path.realpath(local_name)))
         s3.meta.client.download_file('kt.static', remote_name, local_name)
         local_md5 = get_local_md5(local_name)
     except Exception as e:
