@@ -257,14 +257,14 @@ SELECT
     WHEN f.year < 1920 THEN 1900
     ELSE FLOOR(f.year / 10) * 10
   END AS period,
-  CASE
+  ANY_VALUE(CASE
     WHEN f.year < 1920 THEN ''
     ELSE CAST((FLOOR(f.year / 10) * 10) AS CHAR)
-  END AS period_min,
-  CASE
+  END) AS period_min,
+  ANY_VALUE(CASE
     WHEN f.year < 1920 THEN 1919
     ELSE FLOOR(f.year / 10) * 10 + 9
-  END AS period_max,
+  END) AS period_max,
   AVG(v.rating) AS average_rating,
   ROUND(10.0 * AVG(v.rating)) AS average_rating_sort_value,
   COUNT(1) AS number_of_ratings,
