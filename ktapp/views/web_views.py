@@ -1450,7 +1450,7 @@ def articles(request):
             SELECT
               CONCAT('R', r.id) AS id, CONCAT(f.orig_title, ' (', f.year, ')') AS name, 'review' AS url_type, r.id as orig_id,
               CONCAT('/film/', f.id, '/', f.slug_cache, '/elemzesek/', r.id) AS url,
-              'Kritikus Tömeg' AS link_domain, CONCAT(r.snippet, '...') AS lead,
+              'Kritikus Tömeg' AS link_domain, CONCAT(r.snippet, '...') AS `lead`,
               f.id AS film_id, f.orig_title AS film_orig_title, f.second_title AS film_second_title, f.slug_cache AS film_slug_cache, f.year AS film_year, f.main_premier_year AS film_main_premier_year, f.vapiti_year AS film_vapiti_year,
               u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
             FROM ktapp_review r
@@ -1479,7 +1479,7 @@ def articles(request):
             SELECT
               CONCAT('B', b.id) AS id, a.name AS name, 'bio' AS url_type, b.id as orig_id,
               CONCAT('/muvesz/', a.id, '/', a.slug_cache) AS url,
-              'Kritikus Tömeg' AS link_domain, CONCAT(b.snippet, '...') AS lead,
+              'Kritikus Tömeg' AS link_domain, CONCAT(b.snippet, '...') AS `lead`,
               a.id AS artist_id, a.name AS artist_name, a.slug_cache AS artist_slug_cache,
               u.id AS author_user_id, u.username AS author_name, u.slug_cache AS author_slug_cache
             FROM ktapp_biography b
