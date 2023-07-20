@@ -9,11 +9,11 @@
 
 {% block main %}
     <p>
-        <a href="{% url 'view_logs' %}?t=cron_log">cron_log</a>
+        <a href="{% url 'view_logs' %}?t=cron">cron</a>
         |
         <a href="{% url 'view_logs' %}?t=django_debug">django_debug</a>
         |
-        <a href="{% url 'view_logs' %}?t=gunicorn_supervisor">gunicorn_supervisor</a>
+        <a href="{% url 'view_logs' %}?t=gunicorn">gunicorn</a>
         |
         <a href="{% url 'view_logs' %}?t=kt_access">kt_access</a>
         |

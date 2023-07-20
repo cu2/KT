@@ -2255,7 +2255,7 @@ def email_analytics(request):
 @kt_utils.kt_permission_required('logs')
 def view_logs(request):
     logtype = request.GET.get('t', '')
-    if logtype not in {'cron_log', 'django_debug', 'gunicorn_supervisor', 'kt_access', 'kt_exception'}:
+    if logtype not in {'cron', 'django_debug', 'gunicorn', 'kt_access', 'kt_exception'}:
         logtype = 'kt_exception'
     try:
         max_logfile_count = int(request.GET.get('n', '10'))
@@ -2267,12 +2267,12 @@ def view_logs(request):
         max_logfile_length = 1000
 
     content = []
-    logpath = '/home/publisher/kt/logs/%s' % logtype
-    if logtype in {'cron_log', 'gunicorn_supervisor'}:
-        if logtype == 'cron_log':
+    logpath = '/var/log/projects/kt/%s' % logtype
+    if logtype in {'cron', 'gunicorn'}:
+        if logtype == 'cron':
             filename = 'cron.log'
         else:
-            filename = 'gunicorn_supervisor.log'
+            filename = 'stderr.log'
         cmd = 'tail -n ' + str(max_logfile_length) + ' ' + logpath + '/' + filename
         content.append('================================ ' + filename)
         for line in subprocess.check_output(cmd, shell=True).strip().split('\n'):
