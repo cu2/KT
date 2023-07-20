@@ -244,7 +244,7 @@ def search(request):
                     'url': reverse('forum', args=(topic.id, topic.slug_cache)),
                     'title': topic.title,
                     'subtitle': '%s vélemény' % topic.number_of_comments,
-                    'subsubtitle': u'Utolsó: %s %s' % (topic.last_comment.created_at.strftime('%Y-%m-%d'), topic.last_comment.created_by.username),
+                    'subsubtitle': u'Utolsó: %s %s' % (topic.last_comment.created_at.strftime('%Y-%m-%d'), topic.last_comment.created_by.username) if topic.last_comment else '',
                     'thumbnail': '',
                 } for topic in topics
             ],
