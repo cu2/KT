@@ -442,14 +442,14 @@ def get_finance(model):
     collected_so_far = model.objects.aggregate(Sum('money'))['money__sum']
     if collected_so_far is None:
         collected_so_far = 0
-    required_so_far = (datetime.date.today() - datetime.date(2009, 10, 22)).days / 365.0 * 100000.0
-    missing = int(round(collected_so_far - required_so_far))
-    percent = 100.0 * (missing + 100000) / 100000
+    required_so_far = 4970 / 365.0 * 100000.0 + (datetime.date.today() - datetime.date(2023, 6, 1)).days / 365.0 * 150000.0
+    amount = int(round(collected_so_far - required_so_far))
+    percent = 100.0 * (amount + 150000) / 150000
     if percent > 100:
         percent = 100
     if percent < 0:
         percent = 0
-    return int(round(percent)), missing
+    return int(round(percent)), amount
 
 
 def get_banner_version(user_id):
@@ -458,13 +458,13 @@ def get_banner_version(user_id):
     else:
         version = user_id % 4
     if version == 0:
-        return 50, 2000
+        return 60, 2500
     elif version == 1:
-        return 40, 2500
+        return 50, 3000
     elif version == 2:
-        return 25, 4000
+        return 30, 5000
     else:
-        return 20, 5000
+        return 25, 6000
 
 
 def delete_sessions(user_id):

@@ -139,7 +139,7 @@ def index(request):
             banner.first_viewed_at = datetime.datetime.now()
         banner.viewed += 1
         banner.save()
-    finance_status, finance_missing = kt_utils.get_finance(models.Donation)
+    finance_status, finance_amount = kt_utils.get_finance(models.Donation)
     number_of_donators, amount_of_donation = kt_utils.get_banner_version(request.user.id)
     #
     return render(request, 'ktapp/index.html', {
@@ -172,7 +172,7 @@ def index(request):
         'during_game': during_game,
         'banners': banners,
         'finance_status': finance_status,
-        'finance_amount': finance_missing,
+        'finance_amount': finance_amount,
         'number_of_donators': number_of_donators,
         'amount_of_donation': amount_of_donation,
     })
@@ -1716,11 +1716,11 @@ def blacklist(request):
 
 
 def finance(request):
-    finance_status, finance_missing = kt_utils.get_finance(models.Donation)
+    finance_status, finance_amount = kt_utils.get_finance(models.Donation)
     number_of_donators, amount_of_donation = kt_utils.get_banner_version(request.user.id)
     return render(request, 'ktapp/finance.html', {
         'finance_status': finance_status,
-        'finance_amount': finance_missing,
+        'finance_amount': finance_amount,
         'number_of_donators': number_of_donators,
         'amount_of_donation': amount_of_donation,
         'donators': models.KTUser.objects.raw('''
