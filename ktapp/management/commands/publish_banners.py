@@ -32,7 +32,7 @@ class Command(BaseCommand):
         ).exclude(given_by_id=None).values('given_by_id'))
         target_population = user_ids - banner_user_ids - donation_user_ids
 
-        finance_status, _ = kt_utils.get_finance(models.Donation)
+        finance_status, finance_missing = kt_utils.get_finance(models.Donation)
         how_many_users = 34 - finance_status/3  # 1..34
         if how_many_users > len(target_population):
             how_many_users = len(target_population)
