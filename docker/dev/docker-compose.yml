@@ -1,6 +1,3 @@
-version: '3.7'
-
-
 services:
 
   kt:
@@ -12,16 +9,23 @@ services:
     ports:
       - '8000:8000'
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
-    image: mysql:5.7
+    image: mysql:8.0
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
     volumes:
       - type: volume
         source: db-data
         target: /var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 
 volumes:

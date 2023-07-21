@@ -5,7 +5,7 @@
 
 ## How to install KT
 
-You need [Docker](https://docs.docker.com/install/) and [docker-compose](https://docs.docker.com/compose/install/) installed on your machine.
+You need [Docker](https://docs.docker.com/install/) installed on your machine.
 
 Install KT with this script:
 ```
