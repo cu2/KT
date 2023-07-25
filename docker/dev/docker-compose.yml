@@ -22,9 +22,9 @@ services:
         target: /var/lib/mysql
     healthcheck:
       test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
-      start_period: 5s
-      interval: 5s
-      timeout: 5s
+      start_period: 1s
+      interval: 1s
+      timeout: 1s
       retries: 10
 
 
