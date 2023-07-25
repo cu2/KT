@@ -438,33 +438,19 @@ def delete_file_from_s3(remote_name):
         pass
 
 
-def get_finance(model):
-    collected_so_far = model.objects.aggregate(Sum('money'))['money__sum']
-    if collected_so_far is None:
-        collected_so_far = 0
-    required_so_far = (datetime.date.today() - datetime.date(2009, 10, 22)).days / 365.0 * 100000.0
-    missing = int(round(collected_so_far - required_so_far))
-    percent = 100.0 * (missing + 100000) / 100000
-    if percent > 100:
-        percent = 100
-    if percent < 0:
-        percent = 0
-    return int(round(percent)), missing
-
-
-def get_banner_version(user_id):
-    if user_id is None:
-        version = 0
-    else:
-        version = user_id % 4
-    if version == 0:
-        return 50, 2000
-    elif version == 1:
-        return 40, 2500
-    elif version == 2:
-        return 25, 4000
-    else:
-        return 20, 5000
+def get_current_finance():
+    from ktapp import models
+    server_cost = models.ServerCost.objects.filter(actual_cost__isnull=True).order_by('year').last()
+    if not server_cost:
+        return
+    donations = models.Donation.objects.filter(given_at__year=server_cost.year).aggregate(Sum('money'))['money__sum']
+    return {
+        'year': server_cost.year,
+        'opening_balance': server_cost.opening_balance,
+        'donations': donations,
+        'planned_cost': server_cost.planned_cost,
+        'estimated_closing_balance': server_cost.opening_balance + donations - server_cost.planned_cost,
+    }
 
 
 def delete_sessions(user_id):

@@ -32,10 +32,24 @@ class Command(BaseCommand):
         ).exclude(given_by_id=None).values('given_by_id'))
         target_population = user_ids - banner_user_ids - donation_user_ids
 
-        finance_status, finance_missing = kt_utils.get_finance(models.Donation)
-        how_many_users = 34 - finance_status/3  # 1..34
+        current_finance = kt_utils.get_current_finance()
+        if current_finance is None:
+            self.stdout.write('Skip publishing fundraiser banner.')
+            return
+        current_balance = current_finance['opening_balance'] + current_finance['donations']
+        plan_fulfillment = 100.0 * current_balance / current_finance['planned_cost']
+        if plan_fulfillment < 0:
+            plan_fulfillment = 0
+        if plan_fulfillment > 100:
+            plan_fulfillment = 100
+
+        how_many_users = int(34 - plan_fulfillment / 3.0)  # 0..34
         if how_many_users > len(target_population):
             how_many_users = len(target_population)
+        if how_many_users == 0:
+            self.stdout.write('Skip publishing fundraiser banner.')
+            return
+
         self.stdout.write('Publishing fundraiser banner for %d users... (out of %d)' % (how_many_users, len(target_population)))
         for user_id in random.sample(target_population, how_many_users):
             self.stdout.write('%d' % user_id)

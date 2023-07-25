@@ -1,0 +1,36 @@
+{% load humanize %}
+
+<p>A Kritikus Tömeg elsősorban a szerkesztők és sok más ember ingyenes és önkéntes munkájának köszönheti a fennmaradását. Másodsorban van olyan költsége is, melyet tényleg ki kell fizetni. Ez pedig a szerver, amin fut. Erre a célra gyűjtünk adományokat. Itt láthatod, mennyi van a kasszában (illetve mennyi hiányzik belőle) az idei évre, és ha úgy érzed, belefér a büdzsédbe, kérjük, támogass minket:</p>
+<table class="centered_pos">
+    <tbody>
+        <tr>
+            <td>áthozott összeg tavalyról</th>
+            <td class="right">{{ current_finance.opening_balance|intcomma}}</td>
+        </tr>
+        <tr>
+            <td>eddigi támogatások</th>
+            <td class="right">{{ current_finance.donations|intcomma }}</td>
+        </tr>
+        <tr>
+            <td>tervezett költség</th>
+            <td class="right">{{ current_finance.planned_cost|intcomma }}</td>
+        </tr>
+        <tr>
+            <td class="bold">aktuális mérleg</th>
+            <td class="right bold">{{ current_finance.estimated_closing_balance|intcomma }}</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>Ha szeretnél hozzájárulni a szerver fenntartásához, erre a számlaszámra utalhatsz:</p>
+<p class="finance_target">
+    Németh András<br />
+    12010154-00562473-00100006 (Raiffeisen Bank)*<br />
+    megjegyzés/közlemény: KT és az itteni felhasználóneved
+</p>
+<p>Előre is köszönjük a támogatást!</p>
+<p class="small_text">
+    * Ha külföldről utalsz, akkor a nemzetközi számlaszám:<br />
+    IBAN: HU64-12010154-00562473-00100006<br />
+    SWIFT: UBRT HU HB
+</p>

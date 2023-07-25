@@ -12,37 +12,38 @@
 {% block main %}
 <div class="row">
     <div class="central-column">
-
-    <p>A Kritikus Tömeg éves szerverköltsége 100 ezer forint. Ha csak {{ number_of_donators }} ember dönt úgy, hogy rászán évi {{ amount_of_donation }} forintot, akkor a szerver fennmarad. Itt láthatod, mennyi van a kasszában (illetve mennyi hiányzik belőle), és ha úgy érzed, belefér a büdzsédbe, kérjük, támogass minket:</p>
-    <div class="finance_container">
-        <div class="finance_outer">
-            <div class="finance_inner">
-                <div class="finance_innermost">
-                    <div class="finance_marker" style="width: {{ finance_status }}%"></div>
-                    <div class="finance_label">{{ finance_amount|intcomma }} Ft</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <p>Ha szeretnél hozzájárulni az oldal fennmaradásához, erre a számlaszámra utalhatsz:</p>
-    <p class="finance_target">
-        Németh András<br />
-        12010154-00562473-00100006 (Raiffeisen Bank)*<br />
-        megjegyzés/közlemény: az itteni felhasználóneved
-    </p>
-    <p>Előre is köszönjük a támogatást!</p>
-    <p class="small_text">
-        *Ha külföldről utalsz, akkor a nemzetközi számlaszám:<br />
-        IBAN: HU64-12010154-00562473-00100006<br />
-        SWIFT: UBRT HU HB
-    </p>
-    <p><br /></p>
+    {% include 'ktapp/blocks/finance_block.html' %}
+    <h2>Eddigi támogatóink</h2>
     <p>
-        Eddigi támogatóink:
-        {% for user in donators %}
+        {% for user in donors %}
             <a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a>{% if not forloop.last %},{% endif %}
         {% endfor %}
     </p>
+    <h2>Korábbi évek elszámolása</h2>
+    <table class="fullsize">
+        <thead>
+            <tr class="header_tr">
+                <th>Év**</th>
+                <th>Nyitó</th>
+                <th>Támogatások</th>
+                <th>Szerver költség</th>
+                <th>Záró</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for finance in finance_per_year %}
+            <tr class="{% cycle '' 'odd' %}">
+                <td class="center">{{ finance.0 }}</td>
+                <td class="right">{{ finance.1|intcomma }}</td>
+                <td class="right">{{ finance.2|intcomma }}</td>
+                <td class="right">{{ finance.3|intcomma }}{% if finance.5 %}*{% endif %}</td>
+                <td class="right">{{ finance.4|intcomma }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p class="small_text">* Becsült összeg</p>
+    <p class="small_text">** 2003-tól 2008-ig nem gyűjtöttünk pénzt, és nincsenek is rendes adatok (a látogatottsággal párhuzamosan nőtt a szerver költség), ezek az évek ezért nem szerepelnek a fenti táblázatban.</p>
 
     </div>
 </div>

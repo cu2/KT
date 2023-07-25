@@ -26,29 +26,7 @@
         <div class="banner">
 
             {% if banner.what == 'fundraiser' %}
-                <p>A Kritikus Tömeg éves szerverköltsége 100 ezer forint. Ha csak {{ number_of_donators }} ember dönt úgy, hogy rászán évi {{ amount_of_donation }} forintot, akkor a szerver fennmarad. Itt láthatod, mennyi van a kasszában (illetve mennyi hiányzik belőle), és ha úgy érzed, belefér a büdzsédbe, kérjük, támogass minket:</p>
-                <div class="finance_container">
-                    <div class="finance_outer">
-                        <div class="finance_inner">
-                            <div class="finance_innermost">
-                                <div class="finance_marker" style="width: {{ finance_status }}%"></div>
-                                <div class="finance_label">{{ finance_amount|intcomma }} Ft</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <p>Ha szeretnél hozzájárulni az oldal fennmaradásához, erre a számlaszámra utalhatsz:</p>
-                <p class="finance_target">
-                    Németh András<br />
-                    12010154-00562473-00100006 (Raiffeisen Bank)*<br />
-                    megjegyzés/közlemény: az itteni felhasználóneved
-                </p>
-                <p>Előre is köszönjük a támogatást!</p>
-                <p class="small_text last">
-                    *Ha külföldről utalsz, akkor a nemzetközi számlaszám:<br />
-                    IBAN: HU64-12010154-00562473-00100006<br />
-                    SWIFT: UBRT HU HB
-                </p>
+                {% include 'ktapp/blocks/finance_block.html' %}
             {% elif banner.what == 'new_design' %}
                 <p>Hé! Hol vagyok? Mi ez a kék izé itt? Hát, ez a Kritikus Tömeg új dizájnja. Nem tetszik? <a href="{% url 'user_settings' %}">Kattints ide</a>, állítsd be a régit, és minden újra a megszokott barna. De ha netalántán, esetleg merésznek érzed magad, akkor próbáld ki mondjuk egy hétre. Hátha csak a megszokás köt az eddigihez.</p>
                 <hr />

@@ -139,8 +139,10 @@ def index(request):
             banner.first_viewed_at = datetime.datetime.now()
         banner.viewed += 1
         banner.save()
-    finance_status, finance_missing = kt_utils.get_finance(models.Donation)
-    number_of_donators, amount_of_donation = kt_utils.get_banner_version(request.user.id)
+    if banners:
+        current_finance = kt_utils.get_current_finance()
+    else:
+        current_finance = None
     #
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
@@ -171,10 +173,7 @@ def index(request):
         'before_game': before_game,
         'during_game': during_game,
         'banners': banners,
-        'finance_status': finance_status,
-        'finance_amount': finance_missing,
-        'number_of_donators': number_of_donators,
-        'amount_of_donation': amount_of_donation,
+        'current_finance': current_finance,
     })
 
 
@@ -1716,19 +1715,39 @@ def blacklist(request):
 
 
 def finance(request):
-    finance_status, finance_missing = kt_utils.get_finance(models.Donation)
-    number_of_donators, amount_of_donation = kt_utils.get_banner_version(request.user.id)
+    current_finance = kt_utils.get_current_finance()
+
+    donations_per_year = defaultdict(int)
+    with connection.cursor() as cursor:
+        cursor.execute('SELECT CAST(LEFT(given_at, 4) AS YEAR) AS y, SUM(money) as total_huf FROM ktapp_donation GROUP BY y ORDER BY y')
+        for row in cursor.fetchall():
+            year = row[0]
+            donations = row[1]
+            donations_per_year[year] = donations
+
+    finance_per_year = []
+    for server_cost in models.ServerCost.objects.all().order_by('year'):
+        if server_cost.actual_cost is not None:
+            finance_per_year.append([
+                server_cost.year,
+                server_cost.opening_balance,
+                donations_per_year[server_cost.year],
+                server_cost.actual_cost,
+                server_cost.opening_balance + donations_per_year[server_cost.year] - server_cost.actual_cost,
+                server_cost.actual_cost_estimated,
+            ])
+
+    donors = models.KTUser.objects.raw('''
+    SELECT DISTINCT u.*
+    FROM ktapp_ktuser u
+    INNER JOIN ktapp_donation d ON d.given_by_id = u.id
+    ORDER BY u.username, u.id
+    ''')
+
     return render(request, 'ktapp/finance.html', {
-        'finance_status': finance_status,
-        'finance_amount': finance_missing,
-        'number_of_donators': number_of_donators,
-        'amount_of_donation': amount_of_donation,
-        'donators': models.KTUser.objects.raw('''
-        SELECT DISTINCT u.*
-        FROM ktapp_ktuser u
-        INNER JOIN ktapp_donation d ON d.given_by_id = u.id
-        ORDER BY u.username, u.id
-        '''),
+        'current_finance': current_finance,
+        'donors': donors,
+        'finance_per_year': finance_per_year,
     })
 
 
