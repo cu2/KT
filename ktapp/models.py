@@ -1645,6 +1645,14 @@ class Donation(models.Model):
     comment = models.CharField(max_length=250, blank=True)
 
 
+class ServerCost(models.Model):
+    year = models.PositiveIntegerField()
+    actual_cost = models.PositiveIntegerField(blank=True, null=True)
+    planned_cost = models.PositiveIntegerField(blank=True, null=True)
+    opening_balance = models.IntegerField(blank=True, null=True)
+    actual_cost_estimated = models.BooleanField(default=False)
+
+
 class Follow(models.Model):
     who = models.ForeignKey(KTUser, related_name='follows')
     whom = models.ForeignKey(KTUser, related_name='followed_by')
