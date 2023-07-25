@@ -11,6 +11,11 @@ RUN apt-get update && apt-get install -y \
 # https://stackoverflow.com/a/69382475
 RUN ln -s /usr/include/mysql/mysql.h /usr/include/mysql/my_config.h
 
+# Bracketed paste is annoying for Python
+# Cannot disable it only for Python 2.7
+# Disabling it for Bash (as well) doesn't really hurt in a dev container
+RUN echo 'set enable-bracketed-paste off' >> /etc/inputrc
+
 COPY requirements.txt /tmp/
 RUN python2 -m pip install -r /tmp/requirements.txt
 
