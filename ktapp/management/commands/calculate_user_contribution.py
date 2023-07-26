@@ -41,13 +41,14 @@ class Command(BaseCommand):
         ))
         self.cursor.execute('''
         UPDATE ktapp_usercontribution uc, (
-            SELECT {max_str}
+            SELECT ktuser_ptr_id, {rank_str}
             FROM ktapp_usercontribution
         ) t
         SET {set_str}
+        WHERE uc.ktuser_ptr_id = t.ktuser_ptr_id
         '''.format(
-            max_str=bulk_interpolate('MAX(count_{item}) AS max_{item}', ', '),
-            set_str=bulk_interpolate('rank_{item} = 1000 - IF(max_{item} > 0, count_{item} / max_{item} * 1000, 0)', ', '),
+            rank_str=bulk_interpolate('RANK() OVER (ORDER BY count_{item} DESC) AS rank_{item}', ', '),
+            set_str=bulk_interpolate('uc.rank_{item} = t.rank_{item}', ', '),
         ))
         self.stdout.write('User contribution calculated.')
 
