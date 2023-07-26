@@ -53,7 +53,7 @@ class Command(BaseCommand):
         SET {set_str}
         WHERE uc.ktuser_ptr_id = t.ktuser_ptr_id
         '''.format(
-            rank_str=bulk_interpolate('RANK() OVER (ORDER BY count_{item} DESC, ktuser_ptr_id) AS rank_{item}', ', '),
+            rank_str=bulk_interpolate('RANK() OVER (ORDER BY count_{item} DESC) AS rank_{item}', ', '),
             max_str=bulk_interpolate('MAX(rank_{item}) AS max_rank_{item}', ', '),
             set_str=bulk_interpolate('uc.rank_{item} = (t.rank_{item} - 1) / (tmax.max_rank_{item} - 1) * 999 + 1', ', '),
         ))
