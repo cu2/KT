@@ -47,7 +47,7 @@ class Command(BaseCommand):
         SET {set_str}
         WHERE uc.ktuser_ptr_id = t.ktuser_ptr_id
         '''.format(
-            rank_str=bulk_interpolate('RANK() OVER (ORDER BY count_{item} DESC) AS rank_{item}', ', '),
+            rank_str=bulk_interpolate('ROW_NUMBER() OVER (ORDER BY count_{item} DESC, ktuser_ptr_id) AS rank_{item}', ', '),
             set_str=bulk_interpolate('uc.rank_{item} = t.rank_{item}', ', '),
         ))
         self.stdout.write('User contribution calculated.')
