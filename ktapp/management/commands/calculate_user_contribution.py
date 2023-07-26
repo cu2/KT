@@ -1,4 +1,3 @@
-import datetime
 from django.core.management.base import BaseCommand
 from django.db import connection
 
@@ -9,25 +8,20 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.cursor = connection.cursor()
         self.stdout.write('Calculating user contribution...')
-        self.year_ago = (datetime.datetime.now() - datetime.timedelta(days=365)).strftime('%Y-%m-%d %H:%M:%S')
-        self.cursor.execute('''
-        SELECT COUNT(1) FROM ktapp_ktuser
-        ''')
-        number_of_users = int(self.cursor.fetchone()[0])
         self.cursor.execute('''
         TRUNCATE ktapp_usercontribution
         ''')
         self.cursor.execute('''
         INSERT INTO ktapp_usercontribution
-        (ktuser_ptr_id,
-        count_film, count_role, count_keyword, count_picture, count_trivia, count_quote, count_review, count_link, count_biography, count_poll, count_usertoplist,
-        rank_film, rank_role, rank_keyword, rank_picture, rank_trivia, rank_quote, rank_review, rank_link, rank_biography, rank_poll, rank_usertoplist)
-        SELECT id,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        {number_of_users}, {number_of_users}, {number_of_users}, {number_of_users}, {number_of_users}, {number_of_users}, {number_of_users}, {number_of_users}, {number_of_users}, {number_of_users}, {number_of_users}
+        (ktuser_ptr_id, {count_str}, {rank_str})
+        SELECT id, {zero_str}, {zero_str}
         FROM ktapp_ktuser
         ORDER BY id
-        '''.format(number_of_users=number_of_users))
+        '''.format(
+            count_str=bulk_interpolate('count_{item}', ', '),
+            rank_str=bulk_interpolate('rank_{item}', ', '),
+            zero_str=bulk_interpolate('0', ', '),
+        ))
         self.calculate_metric('film')
         self.calculate_metric('role', 'filmartistrelationship')
         self.calculate_metric('keyword', 'filmkeywordrelationship')
@@ -41,8 +35,20 @@ class Command(BaseCommand):
         self.calculate_metric('usertoplist')
         self.cursor.execute('''
         DELETE FROM ktapp_usercontribution
-        WHERE count_film + count_role + count_keyword + count_picture + count_trivia + count_quote + count_review + count_link + count_biography + count_poll + count_usertoplist = 0
-        ''')
+        WHERE {count_str} = 0
+        '''.format(
+            count_str=bulk_interpolate('count_{item}', ' + ')
+        ))
+        self.cursor.execute('''
+        UPDATE ktapp_usercontribution uc, (
+            SELECT {max_str}
+            FROM ktapp_usercontribution
+        ) t
+        SET {set_str}
+        '''.format(
+            max_str=bulk_interpolate('MAX(count_{item}) AS max_{item}', ', '),
+            set_str=bulk_interpolate('rank_{item} = 1000 - IF(max_{item} > 0, count_{item} / max_{item} * 1000, 0)', ', '),
+        ))
         self.stdout.write('User contribution calculated.')
 
     def calculate_metric(self, metric_name, table_name=None):
@@ -50,20 +56,20 @@ class Command(BaseCommand):
             table_name = metric_name
         self.cursor.execute('''
         UPDATE ktapp_usercontribution uc, (
-            SELECT user_id, cnt, @rank := @rank + 1 as user_rank
-            FROM (
-                SELECT created_by_id AS user_id, COUNT(1) AS cnt
-                FROM ktapp_{table_name}
-                WHERE created_at >= '{year_ago}'
-                GROUP BY created_by_id
-                ORDER BY COUNT(1) DESC, created_by_id DESC
-            ) ttt,
-            (SELECT @rank := 0) r
+            SELECT created_by_id AS user_id, COUNT(1) AS cnt
+            FROM ktapp_{table_name}
+            GROUP BY created_by_id
         ) t
-        SET uc.count_{metric_name} = t.cnt, uc.rank_{metric_name} = t.user_rank
+        SET uc.count_{metric_name} = t.cnt
         WHERE uc.ktuser_ptr_id = t.user_id
         '''.format(
             metric_name=metric_name,
             table_name=table_name,
-            year_ago=self.year_ago,
         ))
+
+
+def bulk_interpolate(template, separator):
+    return separator.join([
+        template.format(item=item)
+        for item in ['film', 'role', 'keyword', 'picture', 'trivia', 'quote', 'review', 'link', 'biography', 'poll', 'usertoplist']
+    ])

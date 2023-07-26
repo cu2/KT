@@ -9,7 +9,7 @@
 {% block main %}
 <div class="row">
     <div class="central-column-max">
-        <p>Felhasználók, akik az elmúlt egy évben a legtöbb tartalmat adták az oldalhoz.</p>
+        <p>Felhasználók, akik a legtöbb tartalmat adták az oldalhoz.</p>
         <table class="fullsize sortable">
             <thead>
                 <tr class="header_tr">
@@ -33,17 +33,17 @@
                 <tr class="{% cycle '' 'odd' %}">
                     <td class="center">{{ forloop.counter }}</td>
                     <td><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></td>
-                    <td data-sort-value="{{ user.rank_film }}" class="center{% if user.rank_film == 1 %} bold{% endif %}">{{ user.count_film }}</td>
-                    <td data-sort-value="{{ user.rank_role }}" class="center{% if user.rank_role == 1 %} bold{% endif %}">{{ user.count_role }}</td>
-                    <td data-sort-value="{{ user.rank_keyword }}" class="center{% if user.rank_keyword == 1 %} bold{% endif %}">{{ user.count_keyword }}</td>
-                    <td data-sort-value="{{ user.rank_picture }}" class="center{% if user.rank_picture == 1 %} bold{% endif %}">{{ user.count_picture }}</td>
-                    <td data-sort-value="{{ user.rank_quote }}" class="center{% if user.rank_quote == 1 %} bold{% endif %}">{{ user.count_quote }}</td>
-                    <td data-sort-value="{{ user.rank_trivia }}" class="center{% if user.rank_trivia == 1 %} bold{% endif %}">{{ user.count_trivia }}</td>
-                    <td data-sort-value="{{ user.rank_link }}" class="center{% if user.rank_link == 1 %} bold{% endif %}">{{ user.count_link }}</td>
-                    <td data-sort-value="{{ user.rank_review }}" class="center{% if user.rank_review == 1 %} bold{% endif %}">{{ user.count_review }}</td>
-                    <td data-sort-value="{{ user.rank_biography }}" class="center{% if user.rank_biography == 1 %} bold{% endif %}">{{ user.count_biography }}</td>
-                    <td data-sort-value="{{ user.rank_usertoplist }}" class="center{% if user.rank_usertoplist == 1 %} bold{% endif %}">{{ user.count_usertoplist }}</td>
-                    <td data-sort-value="{{ user.rank_poll }}" class="center{% if user.rank_poll == 1 %} bold{% endif %}">{{ user.count_poll }}</td>
+                    <td data-sort-value="{{ user.rank_film }}" class="center{% if user.rank_film == 0 %} bold{% endif %}">{{ user.count_film }}</td>
+                    <td data-sort-value="{{ user.rank_role }}" class="center{% if user.rank_role == 0 %} bold{% endif %}">{{ user.count_role }}</td>
+                    <td data-sort-value="{{ user.rank_keyword }}" class="center{% if user.rank_keyword == 0 %} bold{% endif %}">{{ user.count_keyword }}</td>
+                    <td data-sort-value="{{ user.rank_picture }}" class="center{% if user.rank_picture == 0 %} bold{% endif %}">{{ user.count_picture }}</td>
+                    <td data-sort-value="{{ user.rank_quote }}" class="center{% if user.rank_quote == 0 %} bold{% endif %}">{{ user.count_quote }}</td>
+                    <td data-sort-value="{{ user.rank_trivia }}" class="center{% if user.rank_trivia == 0 %} bold{% endif %}">{{ user.count_trivia }}</td>
+                    <td data-sort-value="{{ user.rank_link }}" class="center{% if user.rank_link == 0 %} bold{% endif %}">{{ user.count_link }}</td>
+                    <td data-sort-value="{{ user.rank_review }}" class="center{% if user.rank_review == 0 %} bold{% endif %}">{{ user.count_review }}</td>
+                    <td data-sort-value="{{ user.rank_biography }}" class="center{% if user.rank_biography == 0 %} bold{% endif %}">{{ user.count_biography }}</td>
+                    <td data-sort-value="{{ user.rank_usertoplist }}" class="center{% if user.rank_usertoplist == 0 %} bold{% endif %}">{{ user.count_usertoplist }}</td>
+                    <td data-sort-value="{{ user.rank_poll }}" class="center{% if user.rank_poll == 0 %} bold{% endif %}">{{ user.count_poll }}</td>
                 </tr>
             {% endfor %}
             </tbody>
