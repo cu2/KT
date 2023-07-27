@@ -24,15 +24,15 @@ class Command(BaseCommand):
         ))
         self.calculate_metric('film')
         self.calculate_metric('role', 'filmartistrelationship')
-        self.calculate_metric('keyword', 'filmkeywordrelationship')
         self.calculate_metric('picture')
-        self.calculate_metric('trivia')
-        self.calculate_metric('quote')
-        self.calculate_metric('review')
+        self.calculate_metric('keyword', 'filmkeywordrelationship')
         self.calculate_metric('link')
+        self.calculate_metric('quote')
+        self.calculate_metric('trivia')
+        self.calculate_metric('review')
         self.calculate_metric('biography')
-        self.calculate_metric('poll')
         self.calculate_metric('usertoplist')
+        self.calculate_metric('poll')
         self.cursor.execute('''
         DELETE FROM ktapp_usercontribution
         WHERE {count_str} = 0
@@ -40,23 +40,20 @@ class Command(BaseCommand):
             count_str=bulk_interpolate('count_{item}', ' + ')
         ))
         self.cursor.execute('''
-        UPDATE ktapp_usercontribution uc, (
-            SELECT ktuser_ptr_id, {rank_str}
-            FROM ktapp_usercontribution
-        ) t, (
-            SELECT {max_str}
-            FROM (
-                SELECT {rank_str}
-                FROM ktapp_usercontribution
-            ) t2
-        ) tmax
-        SET {set_str}
-        WHERE uc.ktuser_ptr_id = t.ktuser_ptr_id
-        '''.format(
-            rank_str=bulk_interpolate('RANK() OVER (ORDER BY count_{item} DESC) AS rank_{item}', ', '),
-            max_str=bulk_interpolate('MAX(rank_{item}) AS max_rank_{item}', ', '),
-            set_str=bulk_interpolate('uc.rank_{item} = (t.rank_{item} - 1) / (tmax.max_rank_{item} - 1) * 999 + 1', ', '),
-        ))
+        UPDATE ktapp_usercontribution
+        SET
+            rank_film = 10 * count_film,
+            rank_role = 1 * count_role,
+            rank_picture = 1 * count_picture,
+            rank_keyword = 1 * count_keyword,
+            rank_link = 1 * count_link,
+            rank_quote = 4 * count_quote,
+            rank_trivia = 4 * count_trivia,
+            rank_review = 50 * count_review,
+            rank_biography = 50 * count_biography,
+            rank_usertoplist = 10 * count_usertoplist,
+            rank_poll = 10 * count_poll
+        ''')
         self.stdout.write('User contribution calculated.')
 
     def calculate_metric(self, metric_name, table_name=None):
@@ -79,5 +76,5 @@ class Command(BaseCommand):
 def bulk_interpolate(template, separator):
     return separator.join([
         template.format(item=item)
-        for item in ['film', 'role', 'keyword', 'picture', 'trivia', 'quote', 'review', 'link', 'biography', 'poll', 'usertoplist']
+        for item in ['film', 'role', 'picture', 'keyword', 'link', 'quote', 'trivia', 'review', 'biography', 'usertoplist', 'poll']
     ])

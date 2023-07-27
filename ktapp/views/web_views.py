@@ -2078,7 +2078,7 @@ def vapiti_silver_winners(request, gender):
 
 def contributors(request):
     return render(request, 'ktapp/contributors.html', {
-        'users': models.UserContribution.objects.extra(select={'full_rank': 'rank_film + rank_role + rank_keyword + rank_picture + rank_trivia + rank_quote + rank_review + rank_link + rank_biography + rank_poll + rank_usertoplist'}).order_by('full_rank'),
+        'users': models.UserContribution.objects.extra(select={'full_rank': 'rank_film + rank_role + rank_picture + rank_keyword + rank_link + rank_quote + rank_trivia + rank_review + rank_biography + rank_usertoplist + rank_poll'}).order_by('-full_rank'),
     })
 
 
