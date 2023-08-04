@@ -1,4 +1,5 @@
 import datetime
+import math
 import random
 
 from django.core.management.base import BaseCommand
@@ -37,7 +38,7 @@ class Command(BaseCommand):
             self.stdout.write('Skip publishing fundraiser banner.')
             return
         current_balance = current_finance['opening_balance'] + current_finance['donations']
-        plan_fulfillment = 100.0 * current_balance / current_finance['planned_cost']
+        plan_fulfillment = math.floor(100.0 * current_balance / current_finance['planned_cost'])
         if plan_fulfillment < 0:
             plan_fulfillment = 0
         if plan_fulfillment > 100:
