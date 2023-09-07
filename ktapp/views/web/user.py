@@ -235,7 +235,6 @@ def reset_password(request, token):
             'page_type': 'ask',
             'error_type': error_type,
             'username': username_or_email,
-            'email': email,
         })
     new_password1 = request.POST.get('new_password1', '')
     new_password2 = request.POST.get('new_password2', '')

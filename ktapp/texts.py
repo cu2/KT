@@ -84,7 +84,8 @@ a szerk
 
 PASSWORD_RESET_EMAIL_SUBJECT = u'[Kritikus Tömeg] jelszó'
 PASSWORD_RESET_EMAIL_BODY = u'''<p>A Kritikus Tömegen jelezted, hogy nem emlékszel a jelszavadra. Erre a linkre kattintva megadhatsz egy új jelszót:</p>
-<p><a href="{reset_password_url}" style="text-decoration: none; color: rgb(27,117,174)">{reset_password_url}</a></p>'''
+<p><a href="{reset_password_url}" style="text-decoration: none; color: rgb(27,117,174)">{reset_password_url}</a></p>
+<p>(Ha nem kértél jelszó emlékeztetőt, nyugodtan hagyd figyelmen kívül ezt az emailt.)</p>'''
 
 
 CHANGE_EMAIL_EMAIL_SUBJECT = u'[Kritikus Tömeg] email cím módosítás'

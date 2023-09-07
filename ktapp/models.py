@@ -171,14 +171,14 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
         )
         email.attach_alternative(html_content, 'text/html')
         if settings.LOCAL_MAIL or settings.ENV == 'local':
-            print '[SUBJECT] %s' % email.subject
-            print '[FROM] %s' % email.from_email
-            print '[TO] %s' % to_email
+            print '[SUBJECT] {}'.format(email.subject.encode('utf-8'))
+            print '[FROM] {}'.format(email.from_email)
+            print '[TO] {}'.format(to_email)
             print '[BODY]'
-            print email.body
+            print email.body.encode('utf-8')
             print '[/BODY]'
             print '[HTML]'
-            print html_content
+            print html_content.encode('utf-8')
             print '[/HTML]'
         else:
             success = email.send()
