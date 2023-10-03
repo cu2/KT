@@ -422,11 +422,15 @@ def user_wishlist(request, id, name_slug):
     else:
         wishlist_type = 'Y'
 
+    if request.user.is_authenticated() and request.user.id == selected_user.id:
+        ordering = ('other_wish_when', 'DESC')
+    else:
+        ordering = ('average_rating', 'DESC')
     filters = [('wished_by_id', '%s:%s' % (wishlist_type, selected_user.id))] + filmlist.get_filters_from_request(request)
     films, nice_filters = filmlist.filmlist(
         user_id=request.user.id,
         filters=filters,
-        ordering=('average_rating', 'DESC'),
+        ordering=ordering,
         films_per_page=None,
     )
     querystring = {}

@@ -74,7 +74,11 @@
                                 Szerinted<span class="arrow_holder"></span><br />
                                 <input type="text" class="full_input" name="my_rating" value="{{ querystring.my_rating }}" />
                             </th>
-                            {% if selected_user.id != user.id %}
+                            {% if selected_user.id == user.id %}
+                                <th data-sort="string" data-sort-default="desc">
+                                    Kívántad<span class="arrow_holder"></span>
+                                </th>
+                            {% else %}
                                 <th data-sort="int" data-sort-default="desc">
                                     &#9733;<span class="arrow_holder"></span><br />
                                     <select name="my_wish">
@@ -99,7 +103,9 @@
                         {% if request.user.is_authenticated %}
                             <td class="center" data-sort-value="{{ film|film_fav_rating_sort_value }}">{{ film|film_fav_rating_html }}</td>
                             <td class="center" data-sort-value="{% if film.my_rating %}{{ film.my_rating }}{% else %}0{% endif %}">{% if film.my_rating %}{{ film.my_rating }}{% endif %}</td>
-                            {% if selected_user.id != user.id %}
+                            {% if selected_user.id == user.id %}
+                                <td class="center">{{ film.other_wish_when|date:"Y-m-d" }}</td>
+                            {% else %}
                                 <td class="center wish{% if film.my_wish == 1 %}_active{% endif %}" data-sort-value="{% if film.my_wish %}{{ film.my_wish }}{% else %}0{% endif %}"><span data-id="{{ film.id }}">{% if film.my_wish == 1 %}&#9733;{% else %}&#9734;{% endif %}</span></td>
                             {% endif %}
                         {% endif %}

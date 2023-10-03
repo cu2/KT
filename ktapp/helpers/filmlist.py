@@ -344,6 +344,11 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
                     wished_by = None
                 if wished_by:
                     table_alias_idx += 1
+                    additional_select.append('''
+                        {table_name}.wished_at AS other_wish_when,
+                    '''.format(
+                        table_name='wish_%s' % table_alias_idx,
+                    ))
                     additional_inner_joins.append('''
                         INNER JOIN ktapp_wishlist {table_name}
                         ON {table_name}.film_id = f.id
@@ -502,6 +507,8 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
             order_fields = ['other_rating', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'other_rating_when':
             order_fields = ['other_rating_when', 'other_rating_id', 'f.orig_title', 'f.year', 'f.id']
+        if order_field == 'other_wish_when':
+            order_fields = ['other_wish_when', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'number_of_comments':
             order_fields = ['f.number_of_comments', 'f.orig_title', 'f.year', 'f.id']
         if order_field == 'serial_number':
@@ -558,10 +565,8 @@ def filmlist(user_id, filters=None, ordering=None, page=None, films_per_page=20,
             {additional_where}
         '''.format(
             distinct='DISTINCT' if distinct_needed else '',
-            additional_select='\n'.join(additional_select) if additional_select else '',
             additional_inner_joins='\n'.join(additional_inner_joins),
             additional_left_joins='\n'.join(additional_left_joins),
-            sql_user_select=sql_user_select,
             sql_user=sql_user,
             additional_where='WHERE %s' % '\nAND\n'.join(additional_where) if additional_where else '',
         )
