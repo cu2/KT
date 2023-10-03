@@ -11,10 +11,12 @@ class Command(BaseCommand):
     help = 'Calculate Vapiti: eligible films, user weights'
 
     def handle(self, *args, **options):
-        this_year = datetime.date.today().year
+        today = datetime.date.today()
         vapiti_year = settings.VAPITI_YEAR
+        is_it_standard_period = today.year == vapiti_year
+        is_it_extended_period = today.year == vapiti_year + 1 and today.month == 1 and today.day <= 31
 
-        if this_year == vapiti_year:
+        if is_it_standard_period or is_it_extended_period:
             self.mark_eligible_films(vapiti_year)
             self.calculate_vapiti_weights(vapiti_year)
 
