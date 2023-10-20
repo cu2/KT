@@ -5,6 +5,7 @@ import datetime
 import hashlib
 import imghdr
 import json
+import logging
 import os
 import random
 import re
@@ -565,3 +566,24 @@ def get_random_item(queryset):
         return None
     idx = random.randint(0, cnt - 1)
     return queryset.all()[idx]
+
+
+class Profiler:
+    def __init__(self, file_name, view_name):
+        self.logger = logging.getLogger('kt_profiler')
+        self.file_name = file_name
+        self.view_name = view_name
+        self.now = datetime.datetime.now()
+
+    def log(self, phase):
+        payload = {
+            'file_name': self.file_name,
+            'view_name': self.view_name,
+            'phase': phase,
+            'duration_ms': 1000.0 * (datetime.datetime.now()-self.now).total_seconds()
+        }
+        self.logger.log(
+            logging.INFO,
+            json.dumps(payload, sort_keys=True)
+        )
+        self.now = datetime.datetime.now()  # reset

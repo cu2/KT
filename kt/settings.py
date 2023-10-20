@@ -221,6 +221,10 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'INFO',
         },
+        'kt_profiler': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
     }
 }
 
