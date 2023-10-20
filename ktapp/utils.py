@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.db import migrations
-from django.db.models import Sum
+from django.db.models import Sum, Min, Max
 
 from ktapp import texts
 
@@ -561,11 +561,11 @@ def get_premiers_for_today():
 
 
 def get_random_item(queryset):
-    cnt = queryset.count()
-    if cnt == 0:
-        return None
-    idx = random.randint(0, cnt - 1)
-    return queryset.all()[idx]
+    min_and_max_id = queryset.aggregate(Min('id'), Max('id'))
+    min_id = min_and_max_id['id__min']
+    max_id = min_and_max_id['id__max']
+    random_id = random.randint(min_id, max_id)
+    return queryset.filter(id__gte=random_id).first()
 
 
 class Profiler:
