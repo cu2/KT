@@ -35,13 +35,16 @@ MINIMUM_YEAR = 1920
 
 
 def index(request):
+    profiler = kt_utils.Profiler('ktapp/views/web_views.py', 'index')
     now = datetime.datetime.now()
     hash_of_the_day = int(hashlib.md5(now.strftime('%Y-%m-%d')).hexdigest(), 16)
+    profiler.log('hash-of-the-day')
     # film of the day
     try:
         film_of_the_day = models.OfTheDay.objects.filter(domain='F', public=True).order_by('-day')[0].film
     except Exception:
         film_of_the_day = None
+    profiler.log('film-of-the-day')
     # premiers
     premier_film_list = kt_utils.get_premiers_for_today()
     try:
@@ -50,12 +53,14 @@ def index(request):
         cookie_kt_carousel_premiers_index = 0
     if cookie_kt_carousel_premiers_index > len(premier_film_list) - 1:
         cookie_kt_carousel_premiers_index = 0
+    profiler.log('premiers')
     # latest_content
     latest_content = []
     for item in models.Review.objects.select_related('film', 'created_by').filter(approved=True).order_by('-created_at')[:10]:
         latest_content.append((item.created_at, 'review', item))
     for item in models.Link.objects.filter(featured=True).exclude(lead='').select_related('author', 'created_by', 'film', 'artist').order_by('-created_at')[:10]:
         latest_content.append((item.created_at, 'link', item))
+    profiler.log('latest-content')
     # toplist of the day
     number_of_toplists = models.UserToplist.objects.filter(quality=True).count()
     if number_of_toplists:
@@ -66,6 +71,7 @@ def index(request):
             toplist_of_the_day = None
     else:
         toplist_of_the_day = None
+    profiler.log('toplist-of-the-day')
     # buzz
     buzz_comment_domains = {}
     for comment in models.Comment.objects.exclude(topic_id=87)[:1000]:  # skip OFF topic
@@ -77,10 +83,12 @@ def index(request):
                 buzz_comment_domains[key] = (comment.id, comment.created_at)
     buzz_comment_ids = [id for id, _ in sorted(buzz_comment_domains.values(), key=lambda x: x[1], reverse=True)[:20]]
     buzz_comments = models.Comment.objects.select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by').filter(id__in=buzz_comment_ids)
+    profiler.log('buzz')
     # random poll, quote and trivia
     random_poll = kt_utils.get_random_item(models.Poll.objects.filter(state=models.Poll.STATE_OPEN))
     random_quote = kt_utils.get_random_item(models.Quote.objects)
     random_trivia = kt_utils.get_random_item(models.Trivia.objects)
+    profiler.log('random')
 
     # vapiti
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
@@ -119,6 +127,7 @@ def index(request):
         cookie_kt_carousel_vapiti_index = 0
     if cookie_kt_carousel_vapiti_index > len(vapiti_film_list) - 1:
         cookie_kt_carousel_vapiti_index = 0
+    profiler.log('vapiti')
 
     # game
     # before_game = (now.weekday() == 5 or now.weekday() == 6 and now.hour < 20)
@@ -143,6 +152,7 @@ def index(request):
         current_finance = kt_utils.get_current_finance()
     else:
         current_finance = None
+    profiler.log('banners')
     #
     return render(request, 'ktapp/index.html', {
         'film': film_of_the_day,
