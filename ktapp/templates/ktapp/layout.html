@@ -30,13 +30,13 @@
         <script src="{% static 'ktapp/js/kt.js' %}?jshash=abd77c8cd98cc2b689c29e9554f6ff55" defer></script>
         <script src="{% static 'ktapp/js/bootstrap.min.js' %}" defer></script>
 
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-5WBE9R6JYP"></script>
         <script>
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-                        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-            })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-            ga('create', 'UA-1291633-1', 'auto');
-            ga('send', 'pageview');
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-5WBE9R6JYP');
         </script>
     </head>
     <body>
