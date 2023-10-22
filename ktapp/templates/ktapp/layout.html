@@ -29,6 +29,7 @@
         <script src="{% static 'ktapp/js/stupidtable.min.js' %}" defer></script>
         <script src="{% static 'ktapp/js/kt.js' %}?jshash=abd77c8cd98cc2b689c29e9554f6ff55" defer></script>
         <script src="{% static 'ktapp/js/bootstrap.min.js' %}" defer></script>
+        {% block extra_js %}{% endblock %}
 
         <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-5WBE9R6JYP"></script>
@@ -371,7 +372,5 @@
         </div>
 
         {% block jsonld %}{% endblock %}
-
-        {% block extra_js %}{% endblock %}
     </body>
 </html>
