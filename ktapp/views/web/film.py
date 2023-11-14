@@ -72,17 +72,11 @@ def _generic_film_view(view_function):
 
 @_generic_film_view
 def film_main(request, id, film_slug, film, base_context):
-    rating = 0
     special_users = set()
     if request.user.is_authenticated():
         special_users.add(request.user.id)
         for friend in request.user.get_follows():
             special_users.add(friend.id)
-        try:
-            vote = models.Vote.objects.get(film=film, user=request.user)
-            rating = vote.rating
-        except models.Vote.DoesNotExist:
-            pass
     leader_users = set()
     for u in film.vote_set.select_related('user').filter(user__opinion_leader=True).order_by('-user__number_of_followers'):
         if u.user.id not in special_users:
@@ -138,8 +132,6 @@ def film_main(request, id, film_slug, film, base_context):
         })
     return render(request, 'ktapp/film_subpages/film_main.html', dict(base_context, **{
         'active_tab': 'main',
-        'rating': rating,
-        'ratings': range(1, 6),
         'roles': film.filmartistrelationship_set.filter(role_type=models.FilmArtistRelationship.ROLE_TYPE_ACTOR).select_related('artist').order_by('-is_main_role', 'artist__name'),
         'votes': zip(
             [film.num_specific_rating(r) for r in range(5, 0, -1)],
