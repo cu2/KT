@@ -564,6 +564,8 @@ def get_random_item(queryset):
     min_and_max_id = queryset.aggregate(Min('id'), Max('id'))
     min_id = min_and_max_id['id__min']
     max_id = min_and_max_id['id__max']
+    if min_id is None or max_id is None:
+        return None
     random_id = random.randint(min_id, max_id)
     return queryset.filter(id__gte=random_id).first()
 

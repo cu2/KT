@@ -249,12 +249,16 @@
             <h2>Szavazz: <a href="{% url 'poll' random_poll.id random_poll.slug_cache %}">{{ random_poll.title }}</a></h2>
             <p><a href="{% url 'polls' %}">További szavazások...</a></p>
         {% endif %}
-        <h2>Random idézet</h2>
-        {% include 'ktapp/blocks/film_addon_block.html' with addon=random_quote show_addon_source=True addon_type='quote' %}
-        <p><a href="{% url 'latest_quotes' %}">További idézetek...</a></p>
-        <h2>Random érdekesség</h2>
-        {% include 'ktapp/blocks/film_addon_block.html' with addon=random_trivia show_addon_source=True addon_type='trivia' %}
-        <p><a href="{% url 'latest_trivias' %}">További érdekességek...</a></p>
+        {% if random_quote %}
+            <h2>Random idézet</h2>
+            {% include 'ktapp/blocks/film_addon_block.html' with addon=random_quote show_addon_source=True addon_type='quote' %}
+            <p><a href="{% url 'latest_quotes' %}">További idézetek...</a></p>
+        {% endif %}
+        {% if random_trivia %}
+            <h2>Random érdekesség</h2>
+            {% include 'ktapp/blocks/film_addon_block.html' with addon=random_trivia show_addon_source=True addon_type='trivia' %}
+            <p><a href="{% url 'latest_trivias' %}">További érdekességek...</a></p>
+        {% endif %}
         <h2>A nap toplistája</h2>
         {% if toplist %}
         <p><b><a href="{% url 'usertoplist' toplist.id toplist.slug_cache %}">{{ toplist.title }}</a></b>{% if toplist.created_by %} (<a href="{% url 'user_profile' toplist.created_by.id toplist.created_by.slug_cache %}">{{ toplist.created_by.username }}</a>){% endif %}</p>
