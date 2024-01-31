@@ -6,7 +6,7 @@ from ktapp import models
 TEST_USER_IDS = [1]
 
 
-PM_TEMPLATE = """Kedves {username}!
+PM_TEMPLATE = u"""Kedves {username}!
 
 {text_message}
 
