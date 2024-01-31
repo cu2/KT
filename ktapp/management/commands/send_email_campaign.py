@@ -28,7 +28,7 @@ class Command(BaseCommand):
         self.target = options["target"]
         self.campaign = models.EmailCampaign.objects.get(id=campaign_id)
         self.stdout.write(
-            'Sending email campaign title="{title}" ID={id} to {target}...'.format(
+            u'Sending email campaign title="{title}" ID={id} to {target}...'.format(
                 title=self.campaign.title, id=self.campaign.id, target=self.target
             )
         )
@@ -47,7 +47,7 @@ class Command(BaseCommand):
         return filtered_users.order_by("id")
 
     def _reach_user(self, user):
-        self.stdout.write("[{id}] {name}".format(id=user.id, name=user.username))
+        self.stdout.write(u"[{id}] {name}".format(id=user.id, name=user.username))
         models.Message.send_message(
             sent_by=None,
             content=PM_TEMPLATE.format(
