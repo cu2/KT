@@ -34,7 +34,6 @@ class KTUserAdmin(UserAdmin):
         "is_staff",
         "is_reliable",
         "is_game_master",
-        "core_member",
     ]
     list_display_links = ["username"]
     list_filter = [
@@ -43,7 +42,6 @@ class KTUserAdmin(UserAdmin):
         "is_staff",
         "is_reliable",
         "is_game_master",
-        "core_member",
     ]
     search_fields = ["username", "email"]
     ordering = ["id"]
@@ -60,7 +58,6 @@ class KTUserAdmin(UserAdmin):
                     "is_staff",
                     "is_reliable",
                     "is_game_master",
-                    "core_member",
                 ]
             },
         ),
