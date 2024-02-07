@@ -1,112 +1,94 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
-from django.core.urlresolvers import reverse
 
 from ktapp import models
 from ktapp import forms as kt_forms
 
 
-class FilmAdmin(admin.ModelAdmin):
-    def view_link(self):
-        return '<a href="%s">%s</a>' % (reverse("film_main", args=(self.pk, self.orig_title)), self.orig_title)
-    view_link.allow_tags = True
-    list_display = ['orig_title', 'second_title', 'year', 'average_rating', 'number_of_ratings', view_link]
-    search_fields = ['orig_title', 'second_title', 'year']
-    fields = ['orig_title', 'second_title', 'third_title', 'year', 'plot_summary',
-              'main_premier', 'main_premier_year',
-              'imdb_link', 'porthu_link', 'wikipedia_link_en', 'wikipedia_link_hu']
-
-
-class CommentAdmin(admin.ModelAdmin):
-    list_display = ['content', 'created_by', 'created_at', 'domain', 'film', 'topic', 'poll']
-    fields = ['content', 'domain']
-
-
-class FilmUserTextContentAdmin(admin.ModelAdmin):
-    list_display = ['content', 'created_by', 'created_at', 'film']
-
-
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = ['__unicode__', 'created_by', 'created_at', 'film']
-
-
-class AwardAdmin(admin.ModelAdmin):
-    list_display = ['name', 'year', 'category', 'film', 'artist']
-    fields = ['name', 'year', 'category']
-
-
-class LinkAdmin(admin.ModelAdmin):
-    list_display = ['name', 'url', 'film']
-
-
-class PictureAdmin(admin.ModelAdmin):
-    list_display = ['img', 'width', 'height', 'film', 'picture_type']
-
-
-class PollChoiceAdmin(admin.ModelAdmin):
-    list_display = ['poll', 'serial_number', 'choice', 'number_of_votes']
-
-
-class KTUserAdmin(UserAdmin):
-    form = kt_forms.UserChangeForm
-    add_form = kt_forms.UserCreationForm
-
-    list_display = ('username', 'email', 'gender', 'location', 'year_of_birth', 'is_staff')
-    list_filter = ('is_staff',)
-    fieldsets = (
-        (None, {'fields': ('username', 'email', 'password')}),
-        ('Personal info', {'fields': ('gender', 'location', 'year_of_birth')}),
-        ('Permissions', {'fields': ('is_staff',)}),
-        ('Important dates', {'fields': ('last_login',)}),
-    )
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('username', 'email', 'gender', 'location', 'year_of_birth', 'password1', 'password2')
-        }),
-    )
-    search_fields = ('username', 'email')
-    ordering = ('username',)
-    filter_horizontal = ()
-
-
-class EmailCampaignAdmin(admin.ModelAdmin):
-    list_display = ['title', 'subject', 'recipients', 'sent_at']
-    ordering = ['-id']
-
-
-class EmailBounceAdmin(admin.ModelAdmin):
-    list_display = ['email', 'bounced_at']
-    ordering = ['email', 'bounced_at']
-
-
-admin.site.register(models.Film, FilmAdmin)
-admin.site.register(models.Comment, CommentAdmin)
-admin.site.register(models.Topic)
-admin.site.register(models.Poll)
-admin.site.register(models.PollChoice, PollChoiceAdmin)
-admin.site.register(models.PollVote)
-admin.site.register(models.Quote, FilmUserTextContentAdmin)
-admin.site.register(models.Trivia, FilmUserTextContentAdmin)
-admin.site.register(models.Review, ReviewAdmin)
-admin.site.register(models.Artist)
-admin.site.register(models.Keyword)
-admin.site.register(models.Award, AwardAdmin)
-admin.site.register(models.Link, LinkAdmin)
-admin.site.register(models.Sequel)
-admin.site.register(models.Premier)
-admin.site.register(models.PremierType)
-admin.site.register(models.Picture, PictureAdmin)
-admin.site.register(models.Wishlist)
-admin.site.register(models.UserToplist)
-admin.site.register(models.UserToplistItem)
-admin.site.register(models.EmailCampaign, EmailCampaignAdmin)
-admin.site.register(models.EmailBounce, EmailBounceAdmin)
-
-admin.site.register(models.KTUser, KTUserAdmin)
 admin.site.unregister(Group)
 
-# these probably shouldn't be in admin:
-# admin.site.register(models.Message)
-# admin.site.register(models.Vote)
+
+@admin.register(models.Donation)
+class DonationAdmin(admin.ModelAdmin):
+    list_display = ["given_at", "money", "given_by", "comment", "tshirt"]
+    fields = ["given_at", "money", "given_by", "comment", "tshirt"]
+    raw_id_fields = ["given_by"]
+
+
+@admin.register(models.EmailCampaign)
+class EmailCampaignAdmin(admin.ModelAdmin):
+    list_display = ["sent_at", "title", "subject", "recipients"]
+    list_display_links = ["title"]
+    fields = ["sent_at", "title", "subject", "recipients", "pm_message"]
+
+
+@admin.register(models.KTUser)
+class KTUserAdmin(UserAdmin):
+    list_display = [
+        "id",
+        "username",
+        "email",
+        "is_superuser",
+        "is_inner_staff",
+        "is_staff",
+        "is_reliable",
+        "is_game_master",
+        "core_member",
+    ]
+    list_display_links = ["username"]
+    list_filter = [
+        "is_superuser",
+        "is_inner_staff",
+        "is_staff",
+        "is_reliable",
+        "is_game_master",
+        "core_member",
+    ]
+    search_fields = ["username", "email"]
+    ordering = ["id"]
+
+    form = kt_forms.UserChangeForm
+    fieldsets = [
+        (None, {"fields": ["username", "email"]}),
+        (
+            "Permissions",
+            {
+                "fields": [
+                    "is_superuser",
+                    "is_inner_staff",
+                    "is_staff",
+                    "is_reliable",
+                    "is_game_master",
+                    "core_member",
+                ]
+            },
+        ),
+    ]
+
+    # disable add, delete, bulk delete
+    actions = None
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(models.ServerCost)
+class ServerCostAdmin(admin.ModelAdmin):
+    list_display = [
+        "year",
+        "actual_cost",
+        "planned_cost",
+        "opening_balance",
+        "actual_cost_estimated",
+    ]
+    fields = [
+        "year",
+        "actual_cost",
+        "planned_cost",
+        "opening_balance",
+        "actual_cost_estimated",
+    ]

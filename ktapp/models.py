@@ -1626,6 +1626,9 @@ class Donation(models.Model):
     tshirt = models.BooleanField(default=False)
     comment = models.CharField(max_length=250, blank=True)
 
+    def __unicode__(self):
+        return '{}HUF @ {}'.format(self.money, self.given_at)
+
 
 class ServerCost(models.Model):
     year = models.PositiveIntegerField()
@@ -1633,6 +1636,13 @@ class ServerCost(models.Model):
     planned_cost = models.PositiveIntegerField(blank=True, null=True)
     opening_balance = models.IntegerField(blank=True, null=True)
     actual_cost_estimated = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        if self.actual_cost:
+            cost = '{}HUF'.format(self.actual_cost)
+        else:
+            cost = '{}HUF*'.format(self.planned_cost)
+        return '{} @ {}'.format(cost, self.year)
 
 
 class Follow(models.Model):
@@ -1772,6 +1782,9 @@ class EmailCampaign(models.Model):
     text_message = models.TextField(blank=True)
     pm_message = models.TextField(blank=True)
     sent_at = models.DateField()
+
+    def __unicode__(self):
+        return '{} @ {}'.format(self.title, self.sent_at)
 
 
 class EmailSend(models.Model):
