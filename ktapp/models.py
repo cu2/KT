@@ -1771,7 +1771,7 @@ class EmailCampaign(models.Model):
     html_message = models.TextField(blank=True)
     text_message = models.TextField(blank=True)
     pm_message = models.TextField(blank=True)
-    sent_at = models.DateTimeField()
+    sent_at = models.DateField()
 
 
 class EmailSend(models.Model):
