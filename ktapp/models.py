@@ -1621,7 +1621,7 @@ class UserToplistItem(models.Model):
 
 class Donation(models.Model):
     given_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
-    given_at = models.DateTimeField(auto_now_add=True)
+    given_at = models.DateField()
     money = models.PositiveIntegerField()
     tshirt = models.BooleanField(default=False)
     comment = models.CharField(max_length=250, blank=True)
