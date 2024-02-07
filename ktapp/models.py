@@ -56,7 +56,6 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     added_role = models.PositiveIntegerField(default=0)
     added_artist = models.PositiveIntegerField(default=0)
     added_film = models.PositiveIntegerField(default=0)
-    added_tvfilm = models.PositiveIntegerField(default=0)
     added_trivia = models.PositiveIntegerField(default=0)
     REASON_BANNED = 'B'
     REASON_TEMPORARILY_BANNED = 'T'
@@ -75,7 +74,6 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     ip_at_last_login = models.CharField(max_length=250, blank=True, null=True)
     last_message_at = models.DateTimeField(blank=True, null=True)
     last_message_checking_at = models.DateTimeField(blank=True, null=True)
-    old_tv_settings = models.CharField(max_length=250, blank=True, null=True)
     last_activity_at = models.DateTimeField(blank=True, null=True)
     latest_votes = models.TextField(blank=True)
     latest_comments = models.TextField(blank=True)
@@ -1576,22 +1574,6 @@ def delete_wish(sender, instance, **kwargs):
     else:
         instance.wished_by.number_of_wishes_get = Wishlist.objects.filter(wished_by=instance.wished_by, wish_type=Wishlist.WISH_TYPE_GET).count()
         instance.wished_by.save(update_fields=['number_of_wishes_get'])
-
-
-class TVChannel(models.Model):
-    name = models.CharField(max_length=250)
-    active = models.BooleanField(default=True)
-
-    def __unicode__(self):
-        return self.name
-
-
-class TVFilm(models.Model):
-    film = models.ForeignKey(Film)
-    channel = models.ForeignKey(TVChannel)
-    when = models.DateTimeField()
-    created_by = models.ForeignKey(KTUser, blank=True, null=True, on_delete=models.SET_NULL)
-    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class UserToplist(models.Model):
