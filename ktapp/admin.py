@@ -29,7 +29,10 @@ class KTUserAdmin(UserAdmin):
         "id",
         "username",
         "email",
-        "is_superuser",
+        "is_editor",
+        "is_ex_editor",
+        "is_moderator",
+        "is_ex_moderator",
         "is_inner_staff",
         "is_staff",
         "is_reliable",
@@ -37,7 +40,10 @@ class KTUserAdmin(UserAdmin):
     ]
     list_display_links = ["username"]
     list_filter = [
-        "is_superuser",
+        "is_editor",
+        "is_ex_editor",
+        "is_moderator",
+        "is_ex_moderator",
         "is_inner_staff",
         "is_staff",
         "is_reliable",
@@ -53,7 +59,10 @@ class KTUserAdmin(UserAdmin):
             "Permissions",
             {
                 "fields": [
-                    "is_superuser",
+                    "is_editor",
+                    "is_ex_editor",
+                    "is_moderator",
+                    "is_ex_moderator",
                     "is_inner_staff",
                     "is_staff",
                     "is_reliable",

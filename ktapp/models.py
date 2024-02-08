@@ -27,8 +27,17 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=64, unique=True)
     email = models.EmailField(blank=True, unique=True)
     future_email = models.EmailField(blank=True)
+
     is_staff = models.BooleanField(default=False)  # admin
     is_inner_staff = models.BooleanField(default=False)  # active admin
+    is_editor = models.BooleanField(default=False)
+    is_ex_editor = models.BooleanField(default=False)
+    is_moderator = models.BooleanField(default=False)
+    is_ex_moderator = models.BooleanField(default=False)
+    is_reliable = models.BooleanField(default=False)
+    is_game_master = models.BooleanField(default=False)
+    core_member = models.BooleanField(default=False)
+
     is_active = models.BooleanField(default=True)  # delete
     date_joined = models.DateTimeField(auto_now_add=True)
     GENDER_TYPE_MALE = 'M'
@@ -49,7 +58,6 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     slug_cache = models.CharField(max_length=250, blank=True)
     validated_email = models.BooleanField(default=False)
     validated_email_at = models.DateTimeField(blank=True, null=True)
-    core_member = models.BooleanField(default=False)
     i_county_id = models.SmallIntegerField(default=-1)
     email_notification = models.BooleanField(default=False)
     facebook_rating_share = models.BooleanField(default=True)
@@ -87,12 +95,10 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     number_of_reviews = models.PositiveIntegerField(default=0)
     number_of_bios = models.PositiveIntegerField(default=0)
     number_of_links = models.PositiveIntegerField(default=0)
-    is_reliable = models.BooleanField(default=False)
     bio = models.TextField(blank=True)
     bio_html = models.TextField(blank=True)
     bio_snippet = models.TextField(blank=True)
     fav_period = models.CharField(max_length=250, blank=True, null=True)
-    is_game_master = models.BooleanField(default=False)
     number_of_ratings_1 = models.PositiveIntegerField(default=0)
     number_of_ratings_2 = models.PositiveIntegerField(default=0)
     number_of_ratings_3 = models.PositiveIntegerField(default=0)
