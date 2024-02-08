@@ -162,7 +162,6 @@ def user_profile(request, id, name_slug):
         'similarity_per_genre': similarity_per_genre,
         'permission_ban_user': kt_utils.check_permission('ban_user', request.user),
         'permission_see_core': kt_utils.check_permission('see_core', request.user),
-        'permission_set_game_master': kt_utils.check_permission('set_game_master', request.user),
         'list_of_bans': [
             (
                 ban.created_at,

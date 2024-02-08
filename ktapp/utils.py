@@ -149,7 +149,6 @@ def check_permission(perm, user, silent=True):
             'ban_user': 'inner_staff',
             'see_core': 'inner_staff',
             'edit_iszdb': 'iszdb',
-            'set_game_master': 'game_admin',
         }.get(perm, perm)
         if grp == 'superuser' and user.is_superuser:
             return True
@@ -162,8 +161,6 @@ def check_permission(perm, user, silent=True):
         if grp == 'core' and (user.core_member or user.is_reliable or user.is_staff):
             return True
         if grp == 'iszdb' and (user.id in {1, 4256, 16515} or user.is_inner_staff):
-            return True
-        if grp == 'game_admin' and user.id in {1, 13114}:
             return True
         if grp == 'all':
             return True
