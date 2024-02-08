@@ -28,8 +28,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(blank=True, unique=True)
     future_email = models.EmailField(blank=True)
 
-    is_staff = models.BooleanField(default=False)  # admin
-    is_inner_staff = models.BooleanField(default=False)  # active admin
+    is_staff = models.BooleanField(default=False)
     is_editor = models.BooleanField(default=False)
     is_ex_editor = models.BooleanField(default=False)
     is_moderator = models.BooleanField(default=False)
