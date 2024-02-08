@@ -63,7 +63,16 @@
             <tr class="{% cycle '' 'odd' %}"{% if request.user.id == user.id %} style="font-weight: bold"{% endif %}>
                 <td class="">
                     <a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a>
-                    {% if user.is_staff %}[szerk]{% endif %}
+                    {% if user.is_editor %}
+                        {% if user.is_moderator %}
+                            [szerk, mod]
+                        {% else %}
+                            [szerk]
+                        {% endif %}
+                    {% elif user.is_moderator %}
+                        [mod]
+                    {% endif %}
+
                     {% if not user.is_active %}
                         {% if user.reason_of_inactivity == 'B' or user.reason_of_inactivity == 'T' %}
                             [kitiltva]

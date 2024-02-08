@@ -221,7 +221,7 @@
                                 {{ content.content_html|striptags|truncatechars:400|linebreaks }}
                             {% endautoescape %}
                             <p style="text-align: right"><a href="{% url 'film_article' content.film.id content.film.slug_cache content.id %}">Tovább...</a></p>
-                            {% if user.is_authenticated and user.is_staff %}<p>(Mióta van kint? {{ content.created_at|timesince }})</p>{% endif %}
+                            {% if user.is_authenticated and user.is_editor %}<p>(Mióta van kint? {{ content.created_at|timesince }})</p>{% endif %}
                         </div>
                         {% if content.created_by %}
                             <div class="film_addon_author">
@@ -233,7 +233,7 @@
                             <p>[{{ content.link_domain }}] <b>{{ content.name }}</b></p>
                             <p>{{ content.lead|linebreaksbr }}</p>
                             <p style="text-align: right"><a href="{% if user.is_authenticated %}{% url 'link_click' %}?url={{ content.url|urlencode }}&t=l&l={{ content.id }}{% else %}{{ content.url }}{% endif %}" target="_blank">Tovább...</a></p>
-                            {% if user.is_authenticated and user.is_staff %}<p>(Mióta van kint? {{ content.created_at|timesince }})</p>{% endif %}
+                            {% if user.is_authenticated and user.is_editor %}<p>(Mióta van kint? {{ content.created_at|timesince }})</p>{% endif %}
                         </div>
                         {% if content.author %}
                             <div class="film_addon_author">

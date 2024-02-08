@@ -1653,8 +1653,8 @@ def link_click(request):
 
 def impressum(request):
     return render(request, 'ktapp/impressum.html', {
-        'inner_staff': models.KTUser.objects.filter(is_inner_staff=True).order_by('username', 'id'),
-        'outer_staff': models.KTUser.objects.filter(is_staff=True).exclude(is_inner_staff=True).order_by('username', 'id'),
+        'editors': models.KTUser.objects.filter(is_editor=True).order_by('username', 'id'),
+        'ex_editors': models.KTUser.objects.filter(is_ex_editor=True).order_by('username', 'id'),
     })
 
 

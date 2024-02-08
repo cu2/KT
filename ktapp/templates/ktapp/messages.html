@@ -10,7 +10,7 @@
     <div class="central-column">
 
     <p><a href="{% url 'new_message' %}">Új üzenet küldése</a></p>
-    {% if user.is_inner_staff %}
+    {% if user.is_editor %}
         <p><a href="{% url 'new_message' %}?u={{ staff_ids }}">Szerkesztőségi üzenet küldése</a></p>
     {% endif %}
 

@@ -399,8 +399,8 @@ def messages(request):
         return HttpResponseRedirect(reverse('messages') + '?p=' + str(max_pages))
     request.user.last_message_checking_at = datetime.datetime.now()
     request.user.save()
-    if request.user.is_inner_staff:
-        staff_ids = ','.join([str(u.id) for u in models.KTUser.objects.filter(is_inner_staff=True).order_by('id')])
+    if request.user.is_editor:
+        staff_ids = ','.join([str(u.id) for u in models.KTUser.objects.filter(is_editor=True).order_by('id')])
     else:
         staff_ids = ''
     return render(request, 'ktapp/messages.html', {

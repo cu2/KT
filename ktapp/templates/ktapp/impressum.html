@@ -25,7 +25,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for user in inner_staff %}
+        {% for user in editors %}
             <tr class="{% cycle '' 'odd' %}">
                 <td class="nowrap"><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></td>
                 <td>{{ user.bio_html|striptags|truncatechars:400|linebreaksbr }}</td>
@@ -45,7 +45,7 @@
         </tr>
         </thead>
         <tbody>
-        {% for user in outer_staff %}
+        {% for user in ex_editors %}
             <tr class="{% cycle '' 'odd' %}">
                 <td class="nowrap"><a href="{% url 'user_profile' user.id user.slug_cache %}">{{ user.username }}</a></td>
                 <td>{{ user.bio_html|striptags|truncatechars:400|linebreaksbr }}</td>

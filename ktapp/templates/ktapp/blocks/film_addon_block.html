@@ -18,7 +18,7 @@
     </div>
     {% if request.user.is_authenticated  %}
         {% if permission_edit_quote and addon_type == 'quote' or permission_edit_trivia and addon_type == 'trivia' %}
-            {% if request.user.is_staff or addon.created_by.id == request.user.id %}
+            {% if request.user.is_editor or request.user.is_ex_editor or addon.created_by.id == request.user.id %}
                 <div class="addon_edit_form addon_block_content" style="display: none">
                     {% if addon_type == 'quote' %}
                         <form action="{% url 'edit_quote' %}" method="post" class="inline">
@@ -46,7 +46,7 @@
             <a href="{% url 'user_profile' addon.created_by.id addon.created_by.slug_cache %}">{{ addon.created_by }}</a>
         {% endif %}
         {% if request.user.is_authenticated  %}
-            {% if request.user.is_staff or addon.created_by.id == request.user.id %}
+            {% if request.user.is_editor or request.user.is_ex_editor or addon.created_by.id == request.user.id %}
                 {% if permission_edit_quote and addon_type == 'quote' %}
                     &nbsp;
                     (<span class="action_text show_addon_edit_form" title="idézet szerkesztése">szerk</span>)

@@ -105,7 +105,7 @@
         </div>
     {% endif %}
 
-    {% if request.user.is_authenticated and request.user.is_inner_staff and topic.id != 87 %}
+    {% if request.user.is_authenticated and request.user.is_editor and topic.id != 87 %}
         <p>
             <span class="button move_to_off" title="kijelölt kommentek OFF-ba mozgatása">OFF-ba</span>
             <span class="move_to_off_loader"><img src="{% static 'ktapp/images/ajax-loader.gif' %}" alt="" /></span>

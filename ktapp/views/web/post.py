@@ -279,7 +279,7 @@ def new_comment(request):
 def edit_comment(request):
     next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
     comment = get_object_or_404(models.Comment, id=request.POST.get('comment_id', 0))
-    if request.user.is_inner_staff or (comment.created_by.id == request.user.id and comment.editable()):
+    if request.user.is_editor or (comment.created_by.id == request.user.id and comment.editable()):
         if comment.domain == models.Comment.DOMAIN_TOPIC and comment.topic_id == 38 and not request.user.is_game_master:
             return HttpResponseForbidden()
         content = request.POST.get('content', '').strip()
@@ -319,7 +319,7 @@ def new_quote(request):
 @kt_utils.kt_permission_required('edit_quote')
 def edit_quote(request):
     quote = get_object_or_404(models.Quote, id=request.POST.get('id', 0))
-    if request.user.is_staff or quote.created_by_id == request.user.id:
+    if request.user.is_editor or request.user.is_ex_editor or quote.created_by_id == request.user.id:
         content = request.POST.get('content', '').strip()
         if content != '':
             quote.content = content
@@ -332,7 +332,7 @@ def edit_quote(request):
 @kt_utils.kt_permission_required('delete_quote')
 def delete_quote(request):
     quote = get_object_or_404(models.Quote, id=request.POST.get('id', 0))
-    if request.user.is_staff or quote.created_by_id == request.user.id:
+    if request.user.is_editor or request.user.is_ex_editor or quote.created_by_id == request.user.id:
         quote.delete()
     return HttpResponseRedirect(reverse('film_quotes', args=(quote.film.id, quote.film.slug_cache)))
 
@@ -355,7 +355,7 @@ def new_trivia(request):
 @kt_utils.kt_permission_required('edit_trivia')
 def edit_trivia(request):
     trivia = get_object_or_404(models.Trivia, id=request.POST.get('id', 0))
-    if request.user.is_staff or trivia.created_by_id == request.user.id:
+    if request.user.is_editor or request.user.is_ex_editor or trivia.created_by_id == request.user.id:
         content = request.POST.get('content', '').strip()
         if content != '':
             trivia.content = content
@@ -368,7 +368,7 @@ def edit_trivia(request):
 @kt_utils.kt_permission_required('delete_trivia')
 def delete_trivia(request):
     trivia = get_object_or_404(models.Trivia, id=request.POST.get('id', 0))
-    if request.user.is_staff or trivia.created_by_id == request.user.id:
+    if request.user.is_editor or request.user.is_ex_editor or trivia.created_by_id == request.user.id:
         trivia.delete()
     return HttpResponseRedirect(reverse('film_trivias', args=(trivia.film.id, trivia.film.slug_cache)))
 

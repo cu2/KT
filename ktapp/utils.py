@@ -108,13 +108,13 @@ def check_permission(perm, user, silent=True):
             raise PermissionDenied
         grp = {
             'new_quote': 'core',
-            'edit_quote': 'core',
-            'delete_quote': 'core',
-            'new_trivia': 'core',
-            'edit_trivia': 'core',
+            'edit_quote': 'core',  # core: own; (ex)editor: all
+            'delete_quote': 'core',  # core: own; (ex)editor: all
+            'new_trivia': 'core',  # core: own; (ex)editor: all
+            'edit_trivia': 'core',  # core: own; (ex)editor: all
             'delete_trivia': 'core',
             'new_review': 'core',
-            'approve_review': 'admin',
+            'approve_review': 'reliable',
             'new_picture': 'core',
             'edit_picture': 'core',
             'delete_picture': 'reliable',
@@ -122,18 +122,18 @@ def check_permission(perm, user, silent=True):
             'suggest_film': 'core',
             'new_film': 'reliable',
             'edit_film': 'reliable',
-            'delete_award': 'admin',
-            'edit_premiers': 'admin',
+            'delete_award': 'editor',
+            'edit_premiers': 'editor',
             'edit_artist': 'core',
-            'merge_artist': 'admin',
-            'approve_bio': 'admin',
+            'merge_artist': 'editor',
+            'approve_bio': 'reliable',
             'edit_role': 'core',
             'new_role': 'core',
             'delete_role': 'core',
             'new_topic': 'core',
             'check_changes': 'reliable',
             'check_missing_data': 'core',
-            'poll_admin': 'admin',
+            'poll_admin': 'editor',
             'new_poll': 'core',
             'suggest_link': 'core',
             'new_link': 'reliable',
@@ -145,22 +145,22 @@ def check_permission(perm, user, silent=True):
             'delete_usertoplist': 'all',
             'analytics': 'superuser',
             'logs': 'superuser',
-            'move_to_off': 'inner_staff',
-            'ban_user': 'inner_staff',
-            'see_core': 'inner_staff',
+            'move_to_off': 'editor',
+            'ban_user': 'moderator',
+            'see_core': 'editor',
             'edit_iszdb': 'iszdb',
         }.get(perm, perm)
         if grp == 'superuser' and user.is_superuser:
             return True
-        if grp == 'inner_staff' and user.is_inner_staff:
+        if grp == 'editor' and user.is_editor:
             return True
-        if grp == 'admin' and user.is_staff:
+        if grp == 'moderator' and user.is_moderator:
             return True
-        if grp == 'reliable' and (user.is_reliable or user.is_staff):
+        if grp == 'reliable' and user.is_at_least_reliable:
             return True
         if grp == 'core' and user.core_member:
             return True
-        if grp == 'iszdb' and (user.id in {1, 4256, 16515} or user.is_inner_staff):
+        if grp == 'iszdb' and (user.id in {1, 4256, 16515} or user.is_editor):
             return True
         if grp == 'all':
             return True

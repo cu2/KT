@@ -38,6 +38,10 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
     is_game_master = models.BooleanField(default=False)
     core_member = models.BooleanField(default=False)
 
+    @property
+    def is_at_least_reliable(self):
+        return self.is_editor or self.is_ex_editor or self.is_reliable
+
     is_active = models.BooleanField(default=True)  # delete
     date_joined = models.DateTimeField(auto_now_add=True)
     GENDER_TYPE_MALE = 'M'

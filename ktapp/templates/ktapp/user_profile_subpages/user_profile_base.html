@@ -5,6 +5,9 @@
 
 {% block header %}
     <h1>{{ selected_user.username }}</h1>
+    {% if selected_user.is_editor or selected_user.is_moderator %}
+        <p style="margin-top: -15px">({% if selected_user.is_editor %}szerkesztő{% endif %}{% if selected_user.is_editor and selected_user.is_moderator %}, {% endif %}{% if selected_user.is_moderator %}moderátor{% endif %})</p>
+    {% endif %}
     {% if not selected_user.is_active %}
         <p style="margin-top: -15px">
             {% if selected_user.reason_of_inactivity == 'B' %}
