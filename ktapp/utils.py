@@ -158,7 +158,7 @@ def check_permission(perm, user, silent=True):
             return True
         if grp == 'reliable' and (user.is_reliable or user.is_staff):
             return True
-        if grp == 'core' and (user.core_member or user.is_reliable or user.is_staff):
+        if grp == 'core' and user.core_member:
             return True
         if grp == 'iszdb' and (user.id in {1, 4256, 16515} or user.is_inner_staff):
             return True
