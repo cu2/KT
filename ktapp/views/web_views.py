@@ -1687,6 +1687,7 @@ def blacklist(request):
             ban.created_at,
             user_id,
             ban.action,
+            ban.created_by,
         ))
     banned_users = {}
     for user in models.KTUser.objects.filter(id__in=set_of_user_ids):
@@ -1701,6 +1702,7 @@ def blacklist(request):
                 ban[0],
                 banned_users.get(ban[1]),
                 texts.BAN_TYPES.get(ban[2]),
+                ban[3],
             )
             for ban in list_of_bans
         ] + [
@@ -1708,6 +1710,7 @@ def blacklist(request):
                 '?',
                 u,
                 texts.BAN_TYPES['ban'],
+                None,
             )
             for u in old_banned_users
         ],

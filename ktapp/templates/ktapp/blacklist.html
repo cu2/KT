@@ -18,6 +18,7 @@
                 <th>Mikor</th>
                 <th>Ki</th>
                 <th>Szankció</th>
+                <th>Ki adta</th>
             </tr>
         </thead>
         <tbody>
@@ -30,8 +31,15 @@
                         {{ ban.0|date:"Y-m-d H:i" }}
                     {% endif %}
                 </td>
-                <td class="nowrap"><a href="{% url 'user_profile' ban.1.id ban.1.slug_cache %}">{{ ban.1.username }}</a></td>
+                <td class="nowrap">
+                    {% if ban.1 %}
+                        <a href="{% url 'user_profile' ban.1.id ban.1.slug_cache %}">{{ ban.1.username }}</a>
+                    {% else %}
+                        ?
+                    {% endif%}
+                </td>
                 <td>{{ ban.2 }}</td>
+                <td>{{ ban.3 }}</td>
             </tr>
         {% endfor %}
         </tbody>
