@@ -39,7 +39,13 @@
                     {% endif%}
                 </td>
                 <td>{{ ban.2 }}</td>
-                <td>{{ ban.3 }}</td>
+                <td>
+                    {% if ban.3 %}
+                        {{ ban.3 }}
+                    {% else %}
+                        ?
+                    {% endif%}
+                </td>
             </tr>
         {% endfor %}
         </tbody>
