@@ -676,7 +676,7 @@ def user_activity(request, id, name_slug):
 def user_messages(request, id, name_slug):
     selected_user = get_object_or_404(models.KTUser, pk=id)
     number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
-    messages_qs = models.Message.objects.filter(private=True).filter(owned_by=request.user).filter(
+    messages_qs = models.OldMessage.objects.filter(private=True).filter(owned_by=request.user).filter(
         Q(sent_by=selected_user)
         | Q(sent_to=selected_user)
     ).select_related('sent_by')

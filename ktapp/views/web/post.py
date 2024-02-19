@@ -1428,8 +1428,8 @@ def ignore_user(request):
 def delete_message(request):
     next_url = request.GET.get('next', request.POST.get('next', request.META.get('HTTP_REFERER')))
     try:
-        message = models.Message.objects.get(id=request.POST.get('message_id', 0), owned_by=request.user)
-    except models.Message.DoesNotExist:
+        message = models.OldMessage.objects.get(id=request.POST.get('message_id', 0), owned_by=request.user)
+    except models.OldMessage.DoesNotExist:
         return HttpResponseRedirect(next_url)
     is_private = message.private
     owned_by = message.owned_by
@@ -1888,7 +1888,7 @@ def ban_user(request):
             },
         )
     elif action == 'warning':
-        models.Message.send_message(
+        models.OldMessage.send_message(
             sent_by=None,
             content=texts.WARNING_PM_BODY.format(
                 username=target_user.username,

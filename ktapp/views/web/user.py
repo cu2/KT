@@ -85,7 +85,7 @@ def registration(request):
                 email_type='reg',
             )
             login(request, kt_utils.custom_authenticate(models.KTUser, username, password))
-            models.Message.send_message(
+            models.OldMessage.send_message(
                 sent_by=None,
                 content=texts.WELCOME_PM_BODY.format(
                     username=user.username,
@@ -382,7 +382,7 @@ def verify_new_email(request, token):
 
 @login_required
 def messages(request):
-    messages_qs = models.Message.objects.filter(owned_by=request.user).select_related('sent_by')
+    messages_qs = models.OldMessage.objects.filter(owned_by=request.user).select_related('sent_by')
     number_of_messages = messages_qs.count()
     try:
         p = int(request.GET.get('p', 0))
@@ -430,7 +430,7 @@ def new_message(request):
             recipients.discard(request.user)
         if len(recipients) == 0:
             return HttpResponseRedirect(next_url)
-        models.Message.send_message(
+        models.OldMessage.send_message(
             sent_by=request.user,
             content=content,
             recipients=recipients,
@@ -447,8 +447,8 @@ def new_message(request):
         #     )
         return HttpResponseRedirect(next_url)
     try:
-        message_to_reply_to = models.Message.objects.get(id=request.GET.get('r', 0), owned_by=request.user)
-    except models.Message.DoesNotExist:
+        message_to_reply_to = models.OldMessage.objects.get(id=request.GET.get('r', 0), owned_by=request.user)
+    except models.OldMessage.DoesNotExist:
         message_to_reply_to = None
     users = set()
     if message_to_reply_to:

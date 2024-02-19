@@ -1439,7 +1439,7 @@ def delete_picture(sender, instance, **kwargs):
         kt_utils.delete_file_from_s3(s3_key)
 
 
-class Message(models.Model):
+class OldMessage(models.Model):
     sent_by = models.ForeignKey(KTUser, blank=True, null=True, related_name='sent_message', on_delete=models.SET_NULL)
     sent_at = models.DateTimeField(auto_now_add=True)
     content = models.TextField()  # original w bbcode
@@ -1460,7 +1460,7 @@ class Message(models.Model):
     def save(self, *args, **kwargs):
         self.content = strip_tags(self.content)
         self.content_html = kt_utils.bbcode_to_html(self.content)
-        super(Message, self).save(*args, **kwargs)
+        super(OldMessage, self).save(*args, **kwargs)
 
     @classmethod
     def send_message(cls, sent_by, content, recipients):
@@ -1476,7 +1476,7 @@ class Message(models.Model):
             owners = recipients | {sent_by}
         message_times = []
         for owner in owners - excluded_recipients:
-            message = Message.objects.create(
+            message = OldMessage.objects.create(
                 sent_by=sent_by,
                 content=content,
                 owned_by=owner,
@@ -1487,10 +1487,10 @@ class Message(models.Model):
             for recipient in recipients:
                 message.sent_to.add(recipient)
             message.save()
-            owner.number_of_messages = Message.objects.filter(owned_by=owner).count()
+            owner.number_of_messages = OldMessage.objects.filter(owned_by=owner).count()
             owner.save(update_fields=['number_of_messages'])
         for recipient, message_sent_at in message_times:
-            recipient.number_of_messages = Message.objects.filter(owned_by=recipient).count()
+            recipient.number_of_messages = OldMessage.objects.filter(owned_by=recipient).count()
             if recipient.last_message_at is None or recipient.last_message_at < message_sent_at:
                 recipient.last_message_at = message_sent_at
             recipient.save(update_fields=['number_of_messages', 'last_message_at'])
@@ -1501,11 +1501,11 @@ class Message(models.Model):
                 MessageCountCache.update_cache(owned_by=other, partner=sent_by)
 
 
-@receiver(post_delete, sender=Message)
+@receiver(post_delete, sender=OldMessage)
 def delete_message(sender, instance, **kwargs):
-    instance.owned_by.number_of_messages = Message.objects.filter(owned_by=instance.owned_by).count()
-    if Message.objects.filter(owned_by=instance.owned_by).exclude(sent_by=instance.owned_by).count() > 0:
-        instance.owned_by.last_message_at = Message.objects.filter(owned_by=instance.owned_by).exclude(sent_by=instance.owned_by).latest('sent_at').sent_at
+    instance.owned_by.number_of_messages = OldMessage.objects.filter(owned_by=instance.owned_by).count()
+    if OldMessage.objects.filter(owned_by=instance.owned_by).exclude(sent_by=instance.owned_by).count() > 0:
+        instance.owned_by.last_message_at = OldMessage.objects.filter(owned_by=instance.owned_by).exclude(sent_by=instance.owned_by).latest('sent_at').sent_at
     else:
         instance.owned_by.last_message_at = None
     instance.owned_by.save(update_fields=['number_of_messages', 'last_message_at'])
@@ -1534,7 +1534,7 @@ class MessageCountCache(models.Model):
     def update_cache(cls, owned_by, partner):
         if owned_by == partner:
             return 0
-        number_of_messages = Message.objects.filter(private=True).filter(owned_by=owned_by).filter(Q(sent_by=partner) | Q(sent_to=partner)).count()
+        number_of_messages = OldMessage.objects.filter(private=True).filter(owned_by=owned_by).filter(Q(sent_by=partner) | Q(sent_to=partner)).count()
         item, created = cls.objects.get_or_create(owned_by=owned_by, partner=partner)
         item.number_of_messages = number_of_messages
         item.save()

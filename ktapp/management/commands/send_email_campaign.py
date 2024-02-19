@@ -48,7 +48,7 @@ class Command(BaseCommand):
 
     def _reach_user(self, user):
         self.stdout.write(u"[{id}] {name}".format(id=user.id, name=user.username))
-        models.Message.send_message(
+        models.OldMessage.send_message(
             sent_by=None,
             content=PM_TEMPLATE.format(
                 username=user.username,

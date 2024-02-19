@@ -25,12 +25,12 @@ class MessageSendingTestCase(TestCase):
     def test_send_message(self):
         u1 = models.KTUser.objects.get(id=1)
         u2 = models.KTUser.objects.get(id=2)
-        models.Message.send_message(
+        models.OldMessage.send_message(
             sent_by=u1,
             content='Test message',
             recipients={u2},
         )
-        messages = models.Message.objects.all()
+        messages = models.OldMessage.objects.all()
         self.assertEqual(messages.count(), 2)
         message1, message2 = tuple(messages)
         self.assertEqual(message1.sent_by, u1)
@@ -58,12 +58,12 @@ class MessageSendingTestCase(TestCase):
             whom=u1,
             ignore_pm=True,
         )
-        models.Message.send_message(
+        models.OldMessage.send_message(
             sent_by=u1,
             content='Test message',
             recipients={u2},
         )
-        messages = models.Message.objects.all()
+        messages = models.OldMessage.objects.all()
         self.assertEqual(messages.count(), 1)
         message1 = messages[0]
         self.assertEqual(message1.sent_by, u1)
@@ -82,12 +82,12 @@ class MessageSendingTestCase(TestCase):
         u1 = models.KTUser.objects.get(id=1)
         u2 = models.KTUser.objects.get(id=2)
         u3 = models.KTUser.objects.get(id=3)
-        models.Message.send_message(
+        models.OldMessage.send_message(
             sent_by=u1,
             content='Test message',
             recipients={u2, u3},
         )
-        messages = models.Message.objects.all()
+        messages = models.OldMessage.objects.all()
         self.assertEqual(messages.count(), 3)
         message1, message2, message3 = tuple(messages)
         self.assertEqual(message1.sent_by, u1)
@@ -127,12 +127,12 @@ class MessageSendingTestCase(TestCase):
             whom=u1,
             ignore_pm=True,
         )
-        models.Message.send_message(
+        models.OldMessage.send_message(
             sent_by=u1,
             content='Test message',
             recipients={u2, u3},
         )
-        messages = models.Message.objects.all()
+        messages = models.OldMessage.objects.all()
         self.assertEqual(messages.count(), 2)
         message1, message3 = tuple(messages)
         self.assertEqual(message1.sent_by, u1)
@@ -158,12 +158,12 @@ class MessageSendingTestCase(TestCase):
 
     def test_send_system_message(self):
         u2 = models.KTUser.objects.get(id=2)
-        models.Message.send_message(
+        models.OldMessage.send_message(
             sent_by=None,
             content='Test message',
             recipients={u2},
         )
-        messages = models.Message.objects.all()
+        messages = models.OldMessage.objects.all()
         self.assertEqual(messages.count(), 1)
         message2 = messages[0]
         self.assertEqual(message2.sent_by, None)
@@ -177,12 +177,12 @@ class MessageSendingTestCase(TestCase):
     def test_send_system_message_2_recipients(self):
         u2 = models.KTUser.objects.get(id=2)
         u3 = models.KTUser.objects.get(id=3)
-        models.Message.send_message(
+        models.OldMessage.send_message(
             sent_by=None,
             content='Test message',
             recipients={u2, u3},
         )
-        messages = models.Message.objects.all()
+        messages = models.OldMessage.objects.all()
         self.assertEqual(messages.count(), 2)
         message2, message3 = tuple(messages)
         self.assertEqual(message2.sent_by, None)
