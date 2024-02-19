@@ -12,4 +12,11 @@ function dc {
 
 KT_CONTAINER_ID=$(dc ps -q kt)
 
+if [[ -z "${KT_CONTAINER_ID}" ]]; then
+  echo 'Error: dev env is not running.'
+  echo 'Please run:'
+  echo './scripts/start-dev.sh'
+  exit 1
+fi
+
 exec docker exec -it "${KT_CONTAINER_ID}" python2 manage.py shell

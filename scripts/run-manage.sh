@@ -10,13 +10,13 @@ function dc {
   docker compose -f "${DC_FILE}" -p "${PROJECT_NAME}" "$@"
 }
 
-DB_CONTAINER_ID=$(dc ps -q db)
+KT_CONTAINER_ID=$(dc ps -q kt)
 
-if [[ -z "${DB_CONTAINER_ID}" ]]; then
+if [[ -z "${KT_CONTAINER_ID}" ]]; then
   echo 'Error: dev env is not running.'
   echo 'Please run:'
   echo './scripts/start-dev.sh'
   exit 1
 fi
 
-exec docker exec -it "${DB_CONTAINER_ID}" mysql -u ktadmin --password=password ktdb_dev
+exec docker exec -it "${KT_CONTAINER_ID}" python2 manage.py "$@"
