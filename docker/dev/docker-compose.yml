@@ -2,6 +2,8 @@ services:
 
   kt:
     image: kt-dev:0.0
+    environment:
+      LC_ALL: 'C.UTF-8'
     volumes:
       - type: bind
         source: ../..
@@ -16,6 +18,7 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+      LC_ALL: 'C.UTF-8'
     volumes:
       - type: volume
         source: db-data
