@@ -67,50 +67,108 @@ LIMIT 10
 '''
 
 
+VAPITI_NOMINEES_GOLD = '''
+SELECT * FROM (
+  SELECT f.id, IF(NULLIF(f.second_title, '') IS NULL, f.orig_title, CONCAT(f.orig_title, ' - ', f.second_title)) AS title
+  FROM ktapp_vapitivote v
+  INNER JOIN ktapp_ktuser u ON u.id = v.user_id
+  INNER JOIN ktapp_film f ON f.id = v.film_id
+  WHERE u.core_member = 1
+  AND v.year = %s
+  AND v.vapiti_round = 1
+  AND v.vapiti_type = 'G'
+  GROUP BY f.id
+  ORDER BY SUM(u.vapiti_weight) DESC, COUNT(DISTINCT u.id) DESC, f.number_of_ratings DESC
+  LIMIT 10
+) t
+ORDER BY title
+'''
+
+
+VAPITI_NOMINEES_SILVER_FEMALE = '''
+SELECT * FROM (
+  SELECT r.id, CONCAT(a.name, ' - ', f.orig_title) as name
+  FROM ktapp_vapitivote v
+  INNER JOIN ktapp_ktuser u ON u.id = v.user_id
+  INNER JOIN ktapp_film f ON f.id = v.film_id
+  INNER JOIN ktapp_artist a ON a.id = v.artist_id
+  INNER JOIN ktapp_filmartistrelationship r ON r.film_id = v.film_id AND r.artist_id = v.artist_id AND r.role_type = 'A'
+  WHERE u.core_member = 1
+  AND v.year = %s
+  AND v.vapiti_round = 1
+  AND v.vapiti_type = 'F'
+  GROUP BY r.id
+  ORDER BY SUM(u.vapiti_weight) DESC, COUNT(DISTINCT u.id) DESC, f.number_of_ratings DESC
+  LIMIT 10
+) t
+ORDER BY name
+'''
+
+
+VAPITI_NOMINEES_SILVER_MALE = '''
+SELECT * FROM (
+  SELECT r.id, CONCAT(a.name, ' - ', f.orig_title) as name
+  FROM ktapp_vapitivote v
+  INNER JOIN ktapp_ktuser u ON u.id = v.user_id
+  INNER JOIN ktapp_film f ON f.id = v.film_id
+  INNER JOIN ktapp_artist a ON a.id = v.artist_id
+  INNER JOIN ktapp_filmartistrelationship r ON r.film_id = v.film_id AND r.artist_id = v.artist_id AND r.role_type = 'A'
+  WHERE u.core_member = 1
+  AND v.year = %s
+  AND v.vapiti_round = 1
+  AND v.vapiti_type = 'M'
+  GROUP BY r.id
+  ORDER BY SUM(u.vapiti_weight) DESC, COUNT(DISTINCT u.id) DESC, f.number_of_ratings DESC
+  LIMIT 10
+) t
+ORDER BY name
+'''
+
+
 VAPITI_WINNER_GOLD = '''
-SELECT v.film_id, f.orig_title, SUM(u.vapiti_weight) AS sum_vapiti_weight, COUNT(distinct u.id) AS user_count, f.number_of_ratings, f.average_rating
+SELECT f.id, f.orig_title
 FROM ktapp_vapitivote v
 INNER JOIN ktapp_ktuser u ON u.id = v.user_id
 INNER JOIN ktapp_film f ON f.id = v.film_id
-WHERE u.core_member=1
+WHERE u.core_member = 1
 AND v.year = %s
 AND v.vapiti_round = 2
 AND v.vapiti_type = 'G'
-GROUP BY v.film_id
-ORDER BY user_count DESC, sum_vapiti_weight DESC
+GROUP BY f.id
+ORDER BY COUNT(DISTINCT u.id) DESC, SUM(u.vapiti_weight) DESC, f.number_of_ratings DESC
 LIMIT 1
 '''
 
 
 VAPITI_WINNER_SILVER_FEMALE = '''
-SELECT r.id, a.name, f.orig_title, SUM(u.vapiti_weight) AS sum_vapiti_weight, COUNT(distinct u.id) AS user_count, f.number_of_ratings, f.average_rating
+SELECT r.id, a.name, f.orig_title
 FROM ktapp_vapitivote v
 INNER JOIN ktapp_ktuser u ON u.id = v.user_id
 INNER JOIN ktapp_film f ON f.id = v.film_id
 INNER JOIN ktapp_artist a ON a.id = v.artist_id
-INNER JOIN ktapp_filmartistrelationship r ON r.film_id = v.film_id AND r.artist_id = v.artist_id
-WHERE u.core_member=1
+INNER JOIN ktapp_filmartistrelationship r ON r.film_id = v.film_id AND r.artist_id = v.artist_id AND r.role_type = 'A'
+WHERE u.core_member = 1
 AND v.year = %s
 AND v.vapiti_round = 2
 AND v.vapiti_type = 'F'
-GROUP BY f.id, a.id
-ORDER BY user_count DESC, sum_vapiti_weight DESC
+GROUP BY r.id
+ORDER BY COUNT(DISTINCT u.id) DESC, SUM(u.vapiti_weight) DESC, f.number_of_ratings DESC
 LIMIT 1
 '''
 
 
 VAPITI_WINNER_SILVER_MALE = '''
-SELECT r.id, a.name, f.orig_title, SUM(u.vapiti_weight) AS sum_vapiti_weight, COUNT(distinct u.id) AS user_count, f.number_of_ratings, f.average_rating
+SELECT r.id, a.name, f.orig_title
 FROM ktapp_vapitivote v
 INNER JOIN ktapp_ktuser u ON u.id = v.user_id
 INNER JOIN ktapp_film f ON f.id = v.film_id
 INNER JOIN ktapp_artist a ON a.id = v.artist_id
-INNER JOIN ktapp_filmartistrelationship r ON r.film_id = v.film_id AND r.artist_id = v.artist_id
-WHERE u.core_member=1
+INNER JOIN ktapp_filmartistrelationship r ON r.film_id = v.film_id AND r.artist_id = v.artist_id AND r.role_type = 'A'
+WHERE u.core_member = 1
 AND v.year = %s
 AND v.vapiti_round = 2
 AND v.vapiti_type = 'M'
-GROUP BY f.id, a.id
-ORDER BY user_count DESC, sum_vapiti_weight DESC
+GROUP BY r.id
+ORDER BY COUNT(DISTINCT u.id) DESC, SUM(u.vapiti_weight) DESC, f.number_of_ratings DESC
 LIMIT 1
 '''

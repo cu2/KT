@@ -1,0 +1,85 @@
+{% extends "ktapp/layout.html" %}
+{% load staticfiles %}
+{% load kt_extras %}
+
+{% block title %}Vapiti admin {{ vapiti_year }} - Kritikus Tömeg{% endblock %}
+
+{% block header %}
+    <h1>Vapiti admin {{ vapiti_year }}</h1>
+{% endblock %}
+
+{% block main %}
+
+    <p>Ezt az oldalt csak szerkesztők láthatják. Itt lehet az első forduló után látni a jelölteket, bejelenteni őket a fórumon illetve felvenni a jelöléseket a díjak közé. A második forduló után pedig a győzteseket, ami alapján eredményt lehet hirdetni a díjátadón.</p>
+
+    <p><br /></p>
+    <h2>Első forduló: jelöltek</h2>
+
+    {% if nominees %}
+
+        <p>Ellenőrizd le az alábbi jelölteket.</p>
+
+        <pre>És a várva várt pillanat: megérkeztek a jelöltek!
+
+Szigorúan ABC-sorrendben:
+
+[b]az Arany Vapitire:[/b]
+{{ nominees.g.titles }}
+
+[b]a Női Ezüst Vapitire:[/b]
+{{ nominees.f.names }}
+
+[b]és a Férfi Ezüst Vapitire:[/b]
+{{ nominees.m.names }}
+</pre>
+
+        <p>Ha van bármi gyanús (pl ugyanaz a film kétszer szerepel), akkor jelezd az IT-nak.</p>
+        <p>Ha minden stimmel, akkor posztold az idei Vapiti topikba. És a lenti gombra kattintva vedd fel a jelölteket a díjak közé.</p>
+        {% if have_official_nominees %}
+            <p>(Már fel vannak véve a jelölések a díjak közé, ezért nem látszik a gomb.)</p>
+        {% else %}
+            <form action="" method="post">
+                {% csrf_token %}
+                <p>
+                    <input type="submit" value="Jelölések felvétele a díjak közé" />
+                </p>
+            </form>
+        {% endif %}
+
+    {% else %}
+
+        <p>Ezt csak a második forduló első két napján lehet látni ({{ nominee_days.0 }} és {{ nominee_days.1 }}). A mai dátum: {{ today_str }}</p>
+
+    {% endif %}
+
+    <p><br /></p>
+    <h2>Második forduló: győztesek</h2>
+
+    {% if winners %}
+
+        <table class="fullsize">
+            <tr class="header_tr">
+                <th>Arany</th>
+                <th>Női Ezüst</th>
+                <th>Férfi Ezüst</th>
+            </tr>
+            <tr>
+                <td style="width: 33%">{{ winners.g|film_url_html_w_year }}</td>
+                <td style="width: 33%">
+                    <a href="{% url 'artist' winners.f.artist.id winners.f.artist.slug_cache %}">{{ winners.f.artist.name }}</a><br />
+                    <span class="td_sub"><a href="{% url 'film_main' winners.f.film.id winners.f.film.slug_cache %}">{{ winners.f.film.orig_title }}</a> ({{ winners.f.film.year }})</span>
+                </td>
+                <td style="width: 33%">
+                    <a href="{% url 'artist' winners.m.artist.id winners.m.artist.slug_cache %}">{{ winners.m.artist.name }}</a><br />
+                    <span class="td_sub"><a href="{% url 'film_main' winners.m.film.id winners.m.film.slug_cache %}">{{ winners.m.film.orig_title }}</a> ({{ winners.m.film.year }})</span>
+                </td>
+            </tr>
+        </table>
+
+    {% else %}
+
+        <p>Ezt csak az eredményhirdetés napján ({{ result_day }}) lehet látni. A mai dátum: {{ today_str }}</p>
+
+    {% endif %}
+
+{% endblock %}

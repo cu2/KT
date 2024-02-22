@@ -27,30 +27,6 @@
 
     <p>Az Ezüst Vapiti szintén egy díj, csak ezt nem a legjobb film, hanem a legjobb női illetve férfi alakítást nyújtó színész kapja. Hogy fő- vagy mellékszerep, az mindegy, a lényeg, hogy az adott évi filmek közül valamelyikben játsszon. A szavazási rendszer és minden más megegyezik az Arany Vapitiéval.</p>
 
-    {% if future_winners %}
-        <h2>Jövőbeli győztesek</h2>
-        <table class="fullsize">
-            <tr class="header_tr">
-                <th>Év</th>
-                <th>Arany</th>
-                <th>Női Ezüst</th>
-                <th>Férfi Ezüst</th>
-            </tr>
-            <tr>
-                <td class="center" style="width: 4%">{{ future_winners.year }}</td>
-                <td style="width: 32%">{{ future_winners.g|film_url_html_w_year }}</td>
-                <td style="width: 32%">
-                    <a href="{% url 'artist' future_winners.f.artist.id future_winners.f.artist.slug_cache %}">{{ future_winners.f.artist.name }}</a><br />
-                    <span class="td_sub"><a href="{% url 'film_main' future_winners.f.film.id future_winners.f.film.slug_cache %}">{{ future_winners.f.film.orig_title }}</a> ({{ future_winners.f.film.year }})</span>
-                </td>
-                <td style="width: 32%">
-                    <a href="{% url 'artist' future_winners.m.artist.id future_winners.m.artist.slug_cache %}">{{ future_winners.m.artist.name }}</a><br />
-                    <span class="td_sub"><a href="{% url 'film_main' future_winners.m.film.id future_winners.m.film.slug_cache %}">{{ future_winners.m.film.orig_title }}</a> ({{ future_winners.m.film.year }})</span>
-                </td>
-            </tr>
-        </table>
-    {% endif %}
-
 
     <h2>Az eddigi győztesek</h2>
 
@@ -84,6 +60,7 @@
             </tr>
         {% endfor %}
     </table>
+
 
     <h2>Részvételi statisztikák</h2>
     <div class="row">
@@ -191,6 +168,5 @@
             chart2.draw(data2, options);
         }
     </script>
-
 
 {% endblock %}

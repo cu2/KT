@@ -10,6 +10,7 @@ from ktapp.views.web import user_profile as user_profile_views
 from ktapp.views.web import post as post_views
 from ktapp.views.web import film as film_views
 from ktapp.views.web import user as user_views
+from ktapp.views.web import vapiti as vapiti_views
 
 
 # API urls
@@ -216,14 +217,15 @@ urlpatterns += [
     url(r'^bezar_banner$', post_views.close_banner, name='close_banner'),
     url(r'^url/$', web_views.link_click, name='link_click'),
 
-    url(r'^vapiti/$', web_views.vapiti_general, name='vapiti_general'),
-    url(r'^arany_vapiti/$', web_views.vapiti_gold, name='vapiti_gold'),
-    url(r'^arany_vapiti/masodik_fordulo/$', web_views.vapiti_gold_2, name='vapiti_gold_2'),
-    url(r'^arany_vapiti/gyoztesek/$', web_views.vapiti_gold_winners, name='vapiti_gold_winners'),
-    url(r'^ezust_vapiti/(?P<gender>ferfi|noi)/$', web_views.vapiti_silver, name='vapiti_silver'),
-    url(r'^ezust_vapiti/masodik_fordulo/(?P<gender>ferfi|noi)/$', web_views.vapiti_silver_2, name='vapiti_silver_2'),
-    url(r'^ezust_vapiti/gyoztesek/(?P<gender>ferfi|noi)/$', web_views.vapiti_silver_winners, name='vapiti_silver_winners'),
-    url(r'^jelol_vapiti$', post_views.vote_vapiti, name='vote_vapiti'),
+    url(r'^vapiti/$', vapiti_views.vapiti_general, name='vapiti_general'),
+    url(r'^arany_vapiti/$', vapiti_views.vapiti_gold, name='vapiti_gold'),
+    url(r'^arany_vapiti/masodik_fordulo/$', vapiti_views.vapiti_gold_2, name='vapiti_gold_2'),
+    url(r'^arany_vapiti/gyoztesek/$', vapiti_views.vapiti_gold_winners, name='vapiti_gold_winners'),
+    url(r'^ezust_vapiti/(?P<gender>ferfi|noi)/$', vapiti_views.vapiti_silver, name='vapiti_silver'),
+    url(r'^ezust_vapiti/masodik_fordulo/(?P<gender>ferfi|noi)/$', vapiti_views.vapiti_silver_2, name='vapiti_silver_2'),
+    url(r'^ezust_vapiti/gyoztesek/(?P<gender>ferfi|noi)/$', vapiti_views.vapiti_silver_winners, name='vapiti_silver_winners'),
+    url(r'^jelol_vapiti$', vapiti_views.vote_vapiti, name='vote_vapiti'),
+    url(r'^vapiti_admin/$', vapiti_views.vapiti_admin, name='vapiti_admin'),
 
     # legacy redirects:
     url(r'^[^.]*.php$', web_views.old_url, name='old_url'),  # old php urls

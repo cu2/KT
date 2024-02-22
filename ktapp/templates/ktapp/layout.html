@@ -121,6 +121,9 @@
                                         {% if user.is_at_least_reliable %}
                                             <li><a href="{% url 'changes' %}">Változások</a></li>
                                         {% endif %}
+                                        {% if user.is_editor %}
+                                            <li><a href="{% url 'vapiti_admin' %}">Vapiti admin</a></li>
+                                        {% endif %}
                                     {% endif %}
                                     <li role="separator" class="divider"></li>
                                     <li>
@@ -327,6 +330,9 @@
                     <li><a href="{% url 'artists_with_missing_data' %}">Hiányos színészek</a></li>
                     {% if user.is_at_least_reliable %}
                         <li><a href="{% url 'changes' %}">Változások</a></li>
+                    {% endif %}
+                    {% if user.is_editor %}
+                        <li><a href="{% url 'vapiti_admin' %}">Vapiti admin</a></li>
                     {% endif %}
                 {% endif %}
 

@@ -139,6 +139,7 @@ def check_permission(perm, user, silent=True):
             'new_link': 'reliable',
             'edit_link': 'reliable',
             'delete_link': 'reliable',
+            'vapiti_admin': 'editor',
             'vote_vapiti': 'core',
             'new_usertoplist': 'all',
             'edit_usertoplist': 'all',
@@ -303,6 +304,11 @@ def get_vapiti_round():
         round_2_dates,
         result_day,
     )
+
+
+def reset_vapiti_nominees_cache(vapiti_type):
+    cache_name = 'get_vapiti_nominees_{}'.format(vapiti_type)
+    cache.delete(cache_name)
 
 
 def get_vapiti_nominees(award_model, vapiti_type):
