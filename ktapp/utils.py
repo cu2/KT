@@ -317,6 +317,12 @@ def get_vapiti_nominees(award_model, vapiti_type):
     if cached_value is not None:
         return cached_value
 
+    vapiti_round, round_1_dates, round_2_dates, result_day = get_vapiti_round()
+
+    if vapiti_round != 2:
+        cache.set(cache_name, [], timeout=3600)
+        return []
+
     vapiti_year = settings.VAPITI_YEAR
     if vapiti_type == 'G':
         nominee_awards = award_model.objects.filter(
@@ -333,7 +339,12 @@ def get_vapiti_nominees(award_model, vapiti_type):
         )
         nominee_list = [(nominee_award.film_id, nominee_award.artist_id) for nominee_award in nominee_awards]
 
-    cache.set(cache_name, nominee_list, timeout=3600)
+    if nominee_list:
+        timeout = 3600
+    else:
+        timeout = 300
+
+    cache.set(cache_name, nominee_list, timeout=timeout)
     return nominee_list
 
 
