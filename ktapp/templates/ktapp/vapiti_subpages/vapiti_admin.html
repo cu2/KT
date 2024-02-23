@@ -24,13 +24,13 @@
 Szigorúan ABC-sorrendben:
 
 [b]az Arany Vapitire:[/b]
-{{ nominees.g.titles }}
+{{ nominees.G.titles }}
 
 [b]a Női Ezüst Vapitire:[/b]
-{{ nominees.f.names }}
+{{ nominees.F.names }}
 
 [b]és a Férfi Ezüst Vapitire:[/b]
-{{ nominees.m.names }}
+{{ nominees.M.names }}
 </pre>
 
         <p>Ha van bármi gyanús (pl ugyanaz a film kétszer szerepel), akkor jelezd az IT-nak.</p>
@@ -64,14 +64,14 @@ Szigorúan ABC-sorrendben:
                 <th>Férfi Ezüst</th>
             </tr>
             <tr>
-                <td style="width: 33%">{{ winners.g|film_url_html_w_year }}</td>
+                <td style="width: 33%">{{ winners.G|film_url_html_w_year }}</td>
                 <td style="width: 33%">
-                    <a href="{% url 'artist' winners.f.artist.id winners.f.artist.slug_cache %}">{{ winners.f.artist.name }}</a><br />
-                    <span class="td_sub"><a href="{% url 'film_main' winners.f.film.id winners.f.film.slug_cache %}">{{ winners.f.film.orig_title }}</a> ({{ winners.f.film.year }})</span>
+                    <a href="{% url 'artist' winners.F.artist.id winners.F.artist.slug_cache %}">{{ winners.F.artist.name }}</a><br />
+                    <span class="td_sub"><a href="{% url 'film_main' winners.F.film.id winners.F.film.slug_cache %}">{{ winners.F.film.orig_title }}</a> ({{ winners.F.film.year }})</span>
                 </td>
                 <td style="width: 33%">
-                    <a href="{% url 'artist' winners.m.artist.id winners.m.artist.slug_cache %}">{{ winners.m.artist.name }}</a><br />
-                    <span class="td_sub"><a href="{% url 'film_main' winners.m.film.id winners.m.film.slug_cache %}">{{ winners.m.film.orig_title }}</a> ({{ winners.m.film.year }})</span>
+                    <a href="{% url 'artist' winners.M.artist.id winners.M.artist.slug_cache %}">{{ winners.M.artist.name }}</a><br />
+                    <span class="td_sub"><a href="{% url 'film_main' winners.M.film.id winners.M.film.slug_cache %}">{{ winners.M.film.orig_title }}</a> ({{ winners.M.film.year }})</span>
                 </td>
             </tr>
         </table>

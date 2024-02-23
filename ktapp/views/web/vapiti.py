@@ -527,52 +527,38 @@ def vapiti_admin(request):
     if today_str == nominee_days[0] or today_str == nominee_days[1]:
         nominees = get_nominees()
         if request.POST:
-            models.Award.objects.filter(name='Vapiti', year=settings.VAPITI_YEAR, category=texts.VAPITI_NOMINEE_CATEGORIES['G']).delete()
-            for film_id in nominees['g']['ids']:
+            models.Award.objects.filter(name='Vapiti', year=settings.VAPITI_YEAR, category=texts.VAPITI_NOMINEE_CATEGORIES[models.VapitiVote.VAPITI_TYPE_GOLD]).delete()
+            for film_id in nominees[models.VapitiVote.VAPITI_TYPE_GOLD]['ids']:
                 film = models.Film.objects.get(id=film_id)
                 models.Award.objects.get_or_create(
                     film=film,
                     name='Vapiti',
                     year=settings.VAPITI_YEAR,
-                    category=texts.VAPITI_NOMINEE_CATEGORIES['G'],
+                    category=texts.VAPITI_NOMINEE_CATEGORIES[models.VapitiVote.VAPITI_TYPE_GOLD],
                     artist=None,
                     created_by_id=None,
                 )
             kt_utils.reset_vapiti_nominees_cache(models.VapitiVote.VAPITI_TYPE_GOLD)
 
-            models.Award.objects.filter(name='Vapiti', year=settings.VAPITI_YEAR, category=texts.VAPITI_NOMINEE_CATEGORIES['F']).delete()
-            for role_id in nominees['f']['ids']:
-                role = models.FilmArtistRelationship.objects.get(id=role_id)
-                film = models.Film.objects.get(id=role.film_id)
-                artist = models.Artist.objects.get(id=role.artist_id)
-                models.Award.objects.get_or_create(
-                    film=film,
-                    name='Vapiti',
-                    year=settings.VAPITI_YEAR,
-                    category=texts.VAPITI_NOMINEE_CATEGORIES['F'],
-                    artist=artist,
-                    created_by_id=None,
-                )
-            kt_utils.reset_vapiti_nominees_cache(models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE)
-
-            models.Award.objects.filter(name='Vapiti', year=settings.VAPITI_YEAR, category=texts.VAPITI_NOMINEE_CATEGORIES['M']).delete()
-            for role_id in nominees['m']['ids']:
-                role = models.FilmArtistRelationship.objects.get(id=role_id)
-                film = models.Film.objects.get(id=role.film_id)
-                artist = models.Artist.objects.get(id=role.artist_id)
-                models.Award.objects.get_or_create(
-                    film=film,
-                    name='Vapiti',
-                    year=settings.VAPITI_YEAR,
-                    category=texts.VAPITI_NOMINEE_CATEGORIES['M'],
-                    artist=artist,
-                    created_by_id=None,
-                )
-            kt_utils.reset_vapiti_nominees_cache(models.VapitiVote.VAPITI_TYPE_SILVER_MALE)
+            for vapiti_type in [models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE, models.VapitiVote.VAPITI_TYPE_SILVER_MALE]:
+                models.Award.objects.filter(name='Vapiti', year=settings.VAPITI_YEAR, category=texts.VAPITI_NOMINEE_CATEGORIES[vapiti_type]).delete()
+                for role_id in nominees[vapiti_type]['ids']:
+                    role = models.FilmArtistRelationship.objects.get(id=role_id)
+                    film = models.Film.objects.get(id=role.film_id)
+                    artist = models.Artist.objects.get(id=role.artist_id)
+                    models.Award.objects.get_or_create(
+                        film=film,
+                        name='Vapiti',
+                        year=settings.VAPITI_YEAR,
+                        category=texts.VAPITI_NOMINEE_CATEGORIES[vapiti_type],
+                        artist=artist,
+                        created_by_id=None,
+                    )
+                kt_utils.reset_vapiti_nominees_cache(vapiti_type)
 
             return HttpResponseRedirect(reverse('vapiti_admin'))
 
-    have_official_nominees = models.Award.objects.filter(name='Vapiti', year=settings.VAPITI_YEAR, category=texts.VAPITI_NOMINEE_CATEGORIES['G']).count() > 0
+    have_official_nominees = models.Award.objects.filter(name='Vapiti', year=settings.VAPITI_YEAR, category=texts.VAPITI_NOMINEE_CATEGORIES[models.VapitiVote.VAPITI_TYPE_GOLD]).count() > 0
 
     winners = None
     if today_str == result_day:
@@ -591,39 +577,21 @@ def vapiti_admin(request):
 
 def get_nominees():
     cursor = connection.cursor()
-
-    nominees = {
-        'g': {
+    nominees = {}
+    for vapiti_type, names_or_titles, sql in [
+        (models.VapitiVote.VAPITI_TYPE_GOLD, 'titles', kt_sqls.VAPITI_NOMINEES_GOLD),
+        (models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE, 'names', kt_sqls.VAPITI_NOMINEES_SILVER_FEMALE),
+        (models.VapitiVote.VAPITI_TYPE_SILVER_MALE, 'names', kt_sqls.VAPITI_NOMINEES_SILVER_MALE)
+    ]:
+        nominees[vapiti_type] = {
             'ids': [],
-            'titles': [],
-        },
-        'f': {
-            'ids': [],
-            'names': [],
-        },
-        'm': {
-            'ids': [],
-            'names': [],
-        },
-    }
-
-    cursor.execute(kt_sqls.VAPITI_NOMINEES_GOLD, (settings.VAPITI_YEAR,))
-    for row in cursor.fetchall():
-        nominees['g']['ids'].append(int(row[0]))
-        nominees['g']['titles'].append(row[1])
-    nominees['g']['titles'] = '\n'.join(nominees['g']['titles'])
-
-    cursor.execute(kt_sqls.VAPITI_NOMINEES_SILVER_FEMALE, (settings.VAPITI_YEAR,))
-    for row in cursor.fetchall():
-        nominees['f']['ids'].append(int(row[0]))
-        nominees['f']['names'].append(row[1])
-    nominees['f']['names'] = '\n'.join(nominees['f']['names'])
-
-    cursor.execute(kt_sqls.VAPITI_NOMINEES_SILVER_MALE, (settings.VAPITI_YEAR,))
-    for row in cursor.fetchall():
-        nominees['m']['ids'].append(int(row[0]))
-        nominees['m']['names'].append(row[1])
-    nominees['m']['names'] = '\n'.join(nominees['m']['names'])
+            names_or_titles: [],
+        }
+        cursor.execute(sql, (settings.VAPITI_YEAR,))
+        for row in cursor.fetchall():
+            nominees[vapiti_type]['ids'].append(int(row[0]))
+            nominees[vapiti_type][names_or_titles].append(row[1])
+        nominees[vapiti_type][names_or_titles] = '\n'.join(nominees[vapiti_type][names_or_titles])
 
     return nominees
 
@@ -638,12 +606,12 @@ def get_winners():
         cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_MALE, (settings.VAPITI_YEAR,))
         winner_male_role = models.FilmArtistRelationship.objects.get(id=cursor.fetchone()[0])
         return {
-            'g': winner_film,
-            'f': {
+            models.VapitiVote.VAPITI_TYPE_GOLD: winner_film,
+            models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE: {
                 'artist': models.Artist.objects.get(id=winner_female_role.artist_id),
                 'film': models.Film.objects.get(id=winner_female_role.film_id),
             },
-            'm': {
+            models.VapitiVote.VAPITI_TYPE_SILVER_MALE: {
                 'artist': models.Artist.objects.get(id=winner_male_role.artist_id),
                 'film': models.Film.objects.get(id=winner_male_role.film_id),
             },
