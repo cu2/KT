@@ -567,10 +567,12 @@ def vapiti_admin(request):
     return render(request, 'ktapp/vapiti_subpages/vapiti_admin.html', {
         'today_str': today_str,
         'vapiti_year': settings.VAPITI_YEAR,
+        'end_of_round_2_day': round_2_dates[1][-2:],
         'nominee_days': nominee_days,
+        'result_day': result_day,
+        'result_day_day': result_day[-2:],
         'nominees': nominees,
         'have_official_nominees': have_official_nominees,
-        'result_day': result_day,
         'winners': winners,
     })
 

@@ -89,9 +89,11 @@ def index(request):
     if vapiti_round == 2:
         if kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_GOLD):
             vapiti_round_2_has_nominees = True
+    vapiti_topic = None
     vapiti_comment = None
     if vapiti_round == 1 or vapiti_round == 2:
         if settings.VAPITI_TOPIC_ID:
+            vapiti_topic = models.Topic.objects.get(id=settings.VAPITI_TOPIC_ID)
             vapiti_in_buzz = False
             for c in buzz_comments:
                 if c.topic_id == settings.VAPITI_TOPIC_ID:
@@ -166,6 +168,7 @@ def index(request):
         'vapiti_result_day': result_day[-2:],
         'vapiti_event_url': settings.VAPITI_EVENT_URL,
         'vapiti_event_location': settings.VAPITI_EVENT_LOCATION,
+        'vapiti_topic': vapiti_topic,
         'vapiti_comment': vapiti_comment,
         'vapiti_film_list': vapiti_film_list,
         'cookie_kt_carousel_vapiti_index': cookie_kt_carousel_vapiti_index,
