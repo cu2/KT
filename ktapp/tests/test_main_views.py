@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import reverse
 
 from ktapp import models
@@ -10,6 +11,8 @@ class IndexTestCase(test_utils.SimpleViewTestCase):
         cls.user2 = test_utils.create_test_user("user2")
         cls.film = models.Film.objects.create(orig_title="film", year=1999)
         cls.topic = models.Topic.objects.create(title="topic")
+        if settings.VAPITI_TOPIC_ID:
+            models.Topic.objects.create(id=settings.VAPITI_TOPIC_ID, title="Vapiti-topic")
         cls.comment1 = test_utils.create_test_comment(1, cls.test_user, film=cls.film)
         cls.comment2 = test_utils.create_test_comment(2, cls.user2, film=cls.film)
         cls.comment3 = test_utils.create_test_comment(3, cls.test_user, film=cls.film)
