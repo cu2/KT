@@ -122,7 +122,7 @@ class KTUser(AbstractBaseUser, PermissionsMixin):
         return self.username
 
     def email_user(self, subject, html_message, text_message=None, to_email=None, email_type='', campaign_id=0, html_ps='', text_ps='', from_email=settings.DEFAULT_FROM_EMAIL, **kwargs):
-        from .misc import EmailCampaign, EmailSend
+        from .communication import EmailCampaign, EmailSend
         if to_email is None:
             to_email = self.email
         if text_message is None:
