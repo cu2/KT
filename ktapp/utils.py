@@ -146,9 +146,10 @@ def check_permission(perm, user, silent=True):
             'delete_usertoplist': 'all',
             'analytics': 'superuser',
             'logs': 'superuser',
-            'move_to_off': 'editor',
+            'move_to_off': 'editor_or_moderator',
             'ban_user': 'moderator',
-            'see_core': 'editor',
+            'check_user_mod': 'moderator',
+            'check_user_permissions': 'editor_or_moderator',
             'edit_iszdb': 'iszdb',
         }.get(perm, perm)
         if grp == 'superuser' and user.is_superuser:
@@ -156,6 +157,8 @@ def check_permission(perm, user, silent=True):
         if grp == 'editor' and user.is_editor:
             return True
         if grp == 'moderator' and user.is_moderator:
+            return True
+        if grp == 'editor_or_moderator' and (user.is_editor or user.is_moderator):
             return True
         if grp == 'reliable' and user.is_at_least_reliable:
             return True

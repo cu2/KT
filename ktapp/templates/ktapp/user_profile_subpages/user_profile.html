@@ -30,21 +30,6 @@
             Regisztráció{% if selected_user.id == user.id %}d{% endif %}: {{ selected_user.date_joined|date:"Y. F j." }} ({{ selected_user.date_joined|timesince }})
 
             {% if selected_user.id == user.id %}
-                {% if selected_user.core_member %}
-                    <br />
-                    Törzstag vagy.
-                {% endif %}
-            {% elif permission_see_core %}
-                {% if selected_user.core_member %}
-                    <br />
-                    Törzstag.
-                {% else %}
-                    <br />
-                    Nem törzstag.
-                {% endif %}
-            {% endif %}
-
-            {% if selected_user.id == user.id %}
                 {% if fav_count %}
                     <br />
                     Kedvencnek jelölt: {{ fav_count }} user
@@ -60,6 +45,23 @@
                 {% endif %}
             {% endif %}
 
+        </p>
+
+        <p>
+            {% if selected_user.id == user.id or permission_check_user_permissions %}
+                <h2>Jogosultságok</h2>
+                <ul>
+                    <li>
+                        {% if not selected_user.core_member %}nem {% endif %}törzstag
+                    </li>
+                    {% if selected_user.is_editor %}<li>szerkesztő</li>{% endif %}
+                    {% if selected_user.is_ex_editor %}<li>ex-szerkesztő</li>{% endif %}
+                    {% if selected_user.is_moderator %}<li>moderátor</li>{% endif %}
+                    {% if selected_user.is_ex_moderator %}<li>ex-moderátor</li>{% endif %}
+                    {% if selected_user.is_reliable %}<li>megbízható</li>{% endif %}
+                    {% if selected_user.is_game_master %}<li>játék mester</li>{% endif %}
+                </ul>
+            {% endif %}
         </p>
 
         {% if selected_user.bio_html %}
@@ -199,83 +201,6 @@
                         {% endif %}
                     </p>
                 </form>
-            {% endif %}
-
-            {% if list_of_bans %}
-                {% if selected_user.id == user.id or permission_ban_user %}
-                    <h2>Korábbi kitiltások</h2>
-                    {% for ban in list_of_bans %}
-                        <p>{{ ban.0|date:"Y-m-d H:i" }} {{ ban.1 }} [<a href="{% url 'user_profile' ban.2.id ban.2.slug_cache %}">{{ ban.2.username }}</a>]</p>
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
-
-            {% if selected_user.id != user.id and permission_ban_user %}
-                <h2>Kitiltás</h2>
-                {% if selected_user.is_active %}
-                    <form action="{% url 'ban_user' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
-                        <input type="hidden" name="action" value="warning" />
-                        <p><input type="submit" value="Figyelmeztetés" class="small_button confirm_required" /></p>
-                    </form>
-                    <form action="{% url 'ban_user' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
-                        <input type="hidden" name="action" value="temp_ban_1d" />
-                        <p><input type="submit" value="Ideiglenes kitiltás 1 napig" class="small_button confirm_required" /></p>
-                    </form>
-                    <form action="{% url 'ban_user' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
-                        <input type="hidden" name="action" value="temp_ban_3d" />
-                        <p><input type="submit" value="Ideiglenes kitiltás 3 napig" class="small_button confirm_required" /></p>
-                    </form>
-                    <form action="{% url 'ban_user' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
-                        <input type="hidden" name="action" value="temp_ban_7d" />
-                        <p><input type="submit" value="Ideiglenes kitiltás 7 napig" class="small_button confirm_required" /></p>
-                    </form>
-                {% endif %}
-                {% if not selected_user.is_active and selected_user.reason_of_inactivity == 'T' %}
-                    <form action="{% url 'ban_user' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
-                        <input type="hidden" name="action" value="temp_ban_1d" />
-                        <p><input type="submit" value="Ideiglenes kitiltás meghosszabbítása 1 nappal" class="small_button confirm_required" /></p>
-                    </form>
-                    <form action="{% url 'ban_user' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
-                        <input type="hidden" name="action" value="temp_ban_3d" />
-                        <p><input type="submit" value="Ideiglenes kitiltás meghosszabbítása 3 nappal" class="small_button confirm_required" /></p>
-                    </form>
-                    <form action="{% url 'ban_user' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
-                        <input type="hidden" name="action" value="temp_ban_7d" />
-                        <p><input type="submit" value="Ideiglenes kitiltás meghosszabbítása 7 nappal" class="small_button confirm_required" /></p>
-                    </form>
-                {% endif %}
-                {% if selected_user.is_active or not selected_user.is_active and selected_user.reason_of_inactivity == 'T' %}
-                    <form action="{% url 'ban_user' %}" method="post">
-                        {% csrf_token %}
-                        <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
-                        <input type="hidden" name="action" value="ban" />
-                        <p><input type="submit" value="Végleges kitiltás" class="small_button confirm_required" /></p>
-                    </form>
-                {% endif %}
-                {% if not selected_user.is_active %}
-                    {% if selected_user.reason_of_inactivity == 'B' or selected_user.reason_of_inactivity == 'T' %}
-                        <form action="{% url 'ban_user' %}" method="post">
-                            {% csrf_token %}
-                            <input type="hidden" name="target_user_id" value="{{ selected_user.id }}" />
-                            <input type="hidden" name="action" value="unban" />
-                            <p><input type="submit" value="Kitiltás megszüntetése" class="small_button confirm_required" /></p>
-                        </form>
-                    {% endif %}
-                {% endif %}
             {% endif %}
 
             {% if selected_user.id == user.id %}

@@ -181,6 +181,7 @@ urlpatterns += [
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/irasok/$', user_profile_views.user_articles, name='user_articles'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/aktivitas/$', user_profile_views.user_activity, name='user_activity'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/uzenetek/$', user_profile_views.user_messages, name='user_messages'),
+    url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)/mod/$', user_profile_views.user_mod, name='user_mod'),
     url(r'^user/(?P<id>\d+)/(?P<name_slug>[^/]*)$', user_profile_views.user_profile, name='user_profile'),
     url(r'^szerk_profil/$', user_profile_views.edit_profile, name='edit_profile'),
     url(r'^egyeni_beallitasok/$', user_views.user_settings, name='user_settings'),

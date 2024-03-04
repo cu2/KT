@@ -24,11 +24,6 @@ FILMS_PER_PAGE = 100
 
 MINIMUM_YEAR = 1920
 
-USER_PROFILE_TAB_WIDTH = {
-    True: '11',  # 1/9
-    False: '12.3',  # 1/8
-}
-
 
 def _get_user_profile_numbers(request, selected_user):
     if request.user.is_authenticated() and request.user.id != selected_user.id:
@@ -45,9 +40,43 @@ def _get_user_profile_numbers(request, selected_user):
     )
 
 
-def user_profile(request, id, name_slug):
-    selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+def _get_tab_width(request, selected_user):
+    tab_count = 8
+    if request.user.is_authenticated():
+        if request.user.id != selected_user.id:
+            tab_count += 1  # messages
+        if kt_utils.check_permission('check_user_mod', request.user):
+            tab_count += 1  # mod
+    return {
+        8: '12.5',  # 100/8
+        9: '11.1',  # 100/9
+        10: '10',  # 100/10
+    }[tab_count]
+
+
+def _generic_user_view(view_function):
+
+    def extended_view_function(request, id, name_slug, *args, **kwargs):
+        selected_user = get_object_or_404(models.KTUser, pk=id)
+        number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+        base_context = {
+            'selected_user': selected_user,
+            'number_of_votes': number_of_votes,
+            'number_of_comments': number_of_comments,
+            'number_of_wishes': number_of_wishes,
+            'number_of_toplists': number_of_toplists,
+            'number_of_messages': number_of_messages,
+            'number_of_articles': number_of_articles,
+            'tab_width': _get_tab_width(request, selected_user),
+            'permission_check_user_mod': kt_utils.check_permission('check_user_mod', request.user),
+        }
+        return view_function(request, id, name_slug, selected_user, base_context, *args, **kwargs)
+
+    return extended_view_function
+
+
+@_generic_user_view
+def user_profile(request, id, name_slug, selected_user, base_context):
     number_of_vapiti_votes = selected_user.vote_set.filter(film__vapiti_year=settings.VAPITI_YEAR).count()
     latest_votes = [int(v) for v in selected_user.latest_votes.split(',') if v != ''][:10]
     latest_comments = [int(c) for c in selected_user.latest_comments.split(',') if c != ''][:10]
@@ -111,18 +140,10 @@ def user_profile(request, id, name_slug):
     ignore_pm, ignore_comment = False, False
     if request.user.is_authenticated():
         ignore_pm, ignore_comment = models.IgnoreUser.get(who=request.user, whom=selected_user)
-    return render(request, 'ktapp/user_profile_subpages/user_profile.html', {
+    return render(request, 'ktapp/user_profile_subpages/user_profile.html', dict(base_context, **{
         'active_tab': 'profile',
-        'selected_user': selected_user,
-        'number_of_votes': number_of_votes,
-        'number_of_comments': number_of_comments,
-        'number_of_wishes': number_of_wishes,
-        'number_of_toplists': number_of_toplists,
-        'number_of_messages': number_of_messages,
-        'number_of_articles': number_of_articles,
         'number_of_vapiti_votes': number_of_vapiti_votes,
-        'vapiti_weight': number_of_votes + 25 * number_of_vapiti_votes,
-        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
+        'vapiti_weight': base_context['number_of_votes'] + 25 * number_of_vapiti_votes,
         'latest_votes': selected_user.vote_set.filter(id__in=latest_votes).select_related('film').order_by('-when', '-id'),
         'latest_comments': models.Comment.objects.filter(id__in=latest_comments).select_related('film', 'topic', 'poll', 'created_by', 'reply_to', 'reply_to__created_by'),
         'myfav': models.Follow.objects.filter(who=request.user, whom=selected_user).count() if request.user.is_authenticated() else 0,
@@ -160,30 +181,17 @@ def user_profile(request, id, name_slug):
         ''', [selected_user.id, models.UserFavourite.DOMAIN_COUNTRY, models.Keyword.KEYWORD_TYPE_COUNTRY])),
         'similarity': similarity,
         'similarity_per_genre': similarity_per_genre,
-        'permission_ban_user': kt_utils.check_permission('ban_user', request.user),
-        'permission_see_core': kt_utils.check_permission('see_core', request.user),
-        'list_of_bans': [
-            (
-                ban.created_at,
-                texts.BAN_TYPES.get(ban.action),
-                ban.created_by,
-            )
-            for ban in models.Change.objects.filter(
-                action__in=['ban', 'unban', 'warning', 'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'],
-                object='user:%d' % selected_user.id,
-            ).order_by('-created_at')
-        ],
-    })
+        'permission_check_user_permissions': kt_utils.check_permission('check_user_permissions', request.user),
+    }))
 
 
-def user_taste(request, id, name_slug, domain):
+@_generic_user_view
+def user_taste(request, id, name_slug, selected_user, base_context, domain):
 
     def dictfetchall(cursor):
         columns = [col[0] for col in cursor.description]
         return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
-    selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
     cursor = connection.cursor()
     if domain == 'rendezok':
         active_subtab = 'directors'
@@ -282,26 +290,16 @@ ORDER BY average_rating DESC, number_of_ratings DESC, period
     else:
         raise Http404
     list_of_items = dictfetchall(cursor)
-    return render(request, 'ktapp/user_profile_subpages/user_taste.html', {
+    return render(request, 'ktapp/user_profile_subpages/user_taste.html', dict(base_context, **{
         'active_tab': 'taste',
         'active_subtab': active_subtab,
-        'selected_user': selected_user,
-        'number_of_votes': number_of_votes,
-        'number_of_comments': number_of_comments,
-        'number_of_wishes': number_of_wishes,
-        'number_of_toplists': number_of_toplists,
-        'number_of_messages': number_of_messages,
-        'number_of_articles': number_of_articles,
-        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'list_of_items': list_of_items,
         'years_as': [1920, 1930, 1960, 1980, 2020, 2030],
-    })
+    }))
 
 
-def user_films(request, id, name_slug):
-    selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
-
+@_generic_user_view
+def user_films(request, id, name_slug, selected_user, base_context):
     ordering_str = kt_utils.strip_whitespace(request.GET.get('o', ''))
     if ordering_str == '':
         ordering_str = '-other_rating_when'
@@ -354,16 +352,8 @@ def user_films(request, id, name_slug):
 
     films = films[(p-1) * FILMS_PER_PAGE:p * FILMS_PER_PAGE]
 
-    return render(request, 'ktapp/user_profile_subpages/user_films.html', {
+    return render(request, 'ktapp/user_profile_subpages/user_films.html', dict(base_context, **{
         'active_tab': 'films',
-        'selected_user': selected_user,
-        'number_of_votes': number_of_votes,
-        'number_of_comments': number_of_comments,
-        'number_of_wishes': number_of_wishes,
-        'number_of_toplists': number_of_toplists,
-        'number_of_messages': number_of_messages,
-        'number_of_articles': number_of_articles,
-        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'result_count': result_count,
         'querystring': querystring,
         'qs_combined': qs_combined,
@@ -371,12 +361,11 @@ def user_films(request, id, name_slug):
         'p': p,
         'max_pages': max_pages,
         'films': films,
-    })
+    }))
 
 
-def user_comments(request, id, name_slug):
-    selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+@_generic_user_view
+def user_comments(request, id, name_slug, selected_user, base_context):
     p = int(request.GET.get('p', 0))
     if p == 1:
         return HttpResponseRedirect(reverse('user_comments', args=(selected_user.id, selected_user.slug_cache)))
@@ -394,25 +383,16 @@ def user_comments(request, id, name_slug):
         comments = comments_qs.filter(serial_number_by_user__lte=last_comment, serial_number_by_user__gte=first_comment)
     else:
         comments = comments_qs.all()
-    return render(request, 'ktapp/user_profile_subpages/user_comments.html', {
+    return render(request, 'ktapp/user_profile_subpages/user_comments.html', dict(base_context, **{
         'active_tab': 'comments',
-        'selected_user': selected_user,
-        'number_of_votes': number_of_votes,
-        'number_of_comments': number_of_comments,
-        'number_of_wishes': number_of_wishes,
-        'number_of_toplists': number_of_toplists,
-        'number_of_messages': number_of_messages,
-        'number_of_articles': number_of_articles,
-        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'comments': comments.order_by('-created_at'),
         'p': p,
         'max_pages': max_pages,
-    })
+    }))
 
 
-def user_wishlist(request, id, name_slug):
-    selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+@_generic_user_view
+def user_wishlist(request, id, name_slug, selected_user, base_context):
     wishlist_type = request.GET.get('t', 'igen')
     if wishlist_type == 'nem':
         wishlist_type = 'N'
@@ -460,16 +440,8 @@ def user_wishlist(request, id, name_slug):
     films = list(films)
     result_count = len(films)
 
-    return render(request, 'ktapp/user_profile_subpages/user_wishlist.html', {
+    return render(request, 'ktapp/user_profile_subpages/user_wishlist.html', dict(base_context, **{
         'active_tab': 'wishlist',
-        'selected_user': selected_user,
-        'number_of_votes': number_of_votes,
-        'number_of_comments': number_of_comments,
-        'number_of_wishes': number_of_wishes,
-        'number_of_toplists': number_of_toplists,
-        'number_of_messages': number_of_messages,
-        'number_of_articles': number_of_articles,
-        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'result_count': result_count,
         'querystring': querystring,
         'qs_combined': qs_combined,
@@ -478,12 +450,11 @@ def user_wishlist(request, id, name_slug):
         'number_of_wishes_yes': selected_user.number_of_wishes_yes,
         'number_of_wishes_no': selected_user.number_of_wishes_no,
         'number_of_wishes_get': selected_user.number_of_wishes_get,
-    })
+    }))
 
 
-def user_toplists(request, id, name_slug):
-    selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+@_generic_user_view
+def user_toplists(request, id, name_slug, selected_user, base_context):
     toplists = models.UserToplist.objects.filter(created_by=selected_user).order_by('-created_at')
     toplist_details = []
     for toplist in toplists:
@@ -512,23 +483,14 @@ def user_toplists(request, id, name_slug):
             toplist_list,
             with_comments,
         ))
-    return render(request, 'ktapp/user_profile_subpages/user_toplists.html', {
+    return render(request, 'ktapp/user_profile_subpages/user_toplists.html', dict(base_context, **{
         'active_tab': 'toplists',
-        'selected_user': selected_user,
-        'number_of_votes': number_of_votes,
-        'number_of_comments': number_of_comments,
-        'number_of_wishes': number_of_wishes,
-        'number_of_toplists': number_of_toplists,
-        'number_of_messages': number_of_messages,
-        'number_of_articles': number_of_articles,
-        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'toplist_details': toplist_details,
-    })
+    }))
 
 
-def user_articles(request, id, name_slug):
-    selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+@_generic_user_view
+def user_articles(request, id, name_slug, selected_user, base_context):
     articles = []
     for review in models.Review.objects.filter(created_by=selected_user).select_related('film'):
         articles.append((
@@ -559,23 +521,14 @@ def user_articles(request, id, name_slug):
             article.id,
         ))
     articles.sort(key=lambda item: item[0], reverse=True)
-    return render(request, 'ktapp/user_profile_subpages/user_articles.html', {
+    return render(request, 'ktapp/user_profile_subpages/user_articles.html', dict(base_context, **{
         'active_tab': 'articles',
-        'selected_user': selected_user,
-        'number_of_votes': number_of_votes,
-        'number_of_comments': number_of_comments,
-        'number_of_wishes': number_of_wishes,
-        'number_of_toplists': number_of_toplists,
-        'number_of_articles': number_of_articles,
-        'number_of_messages': number_of_messages,
-        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'articles': articles,
-    })
+    }))
 
 
-def user_activity(request, id, name_slug):
-    selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+@_generic_user_view
+def user_activity(request, id, name_slug, selected_user, base_context):
     cursor = connection.cursor()
     max_max_vote = models.KTUser.objects.all().aggregate(Max('number_of_ratings'))['number_of_ratings__max']
     max_max_comment = models.KTUser.objects.all().aggregate(Max('number_of_comments'))['number_of_comments__max']
@@ -657,25 +610,16 @@ def user_activity(request, id, name_slug):
             int(100.0 * scale_comment * comment_data['y'].get(year, 0) / max_comment['y']) if max_comment['y'] > 0 else 0,
         ))
 
-    return render(request, 'ktapp/user_profile_subpages/user_activity.html', {
+    return render(request, 'ktapp/user_profile_subpages/user_activity.html', dict(base_context, **{
         'active_tab': 'activity',
-        'selected_user': selected_user,
-        'number_of_votes': number_of_votes,
-        'number_of_comments': number_of_comments,
-        'number_of_wishes': number_of_wishes,
-        'number_of_toplists': number_of_toplists,
-        'number_of_messages': number_of_messages,
-        'number_of_articles': number_of_articles,
-        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'data_month': data_month,
         'data_year': data_year,
-    })
+    }))
 
 
 @login_required()
-def user_messages(request, id, name_slug):
-    selected_user = get_object_or_404(models.KTUser, pk=id)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, selected_user)
+@_generic_user_view
+def user_messages(request, id, name_slug, selected_user, base_context):
     messages_qs = models.OldMessage.objects.filter(private=True).filter(owned_by=request.user).filter(
         Q(sent_by=selected_user)
         | Q(sent_to=selected_user)
@@ -686,27 +630,19 @@ def user_messages(request, id, name_slug):
         p = 0
     if p == 1:
         return HttpResponseRedirect(reverse('user_messages', args=(selected_user.id, selected_user.slug_cache)))
-    max_pages = int(math.ceil(1.0 * number_of_messages / MESSAGES_PER_PAGE))
+    max_pages = int(math.ceil(1.0 * base_context['number_of_messages'] / MESSAGES_PER_PAGE))
     if max_pages == 0:
         max_pages = 1
     if p == 0:
         p = 1
     if p > max_pages:
         return HttpResponseRedirect(reverse('user_messages', args=(selected_user.id, selected_user.slug_cache)) + '?p=' + str(max_pages))
-    return render(request, 'ktapp/user_profile_subpages/user_messages.html', {
+    return render(request, 'ktapp/user_profile_subpages/user_messages.html', dict(base_context, **{
         'active_tab': 'messages',
-        'selected_user': selected_user,
-        'number_of_votes': number_of_votes,
-        'number_of_comments': number_of_comments,
-        'number_of_wishes': number_of_wishes,
-        'number_of_toplists': number_of_toplists,
-        'number_of_messages': number_of_messages,
-        'number_of_articles': number_of_articles,
-        'tab_width': USER_PROFILE_TAB_WIDTH[request.user.is_authenticated() and request.user.id != selected_user.id],
         'messages': messages_qs.order_by('-sent_at')[(p-1) * MESSAGES_PER_PAGE:p * MESSAGES_PER_PAGE],
         'p': p,
         'max_pages': max_pages,
-    })
+    }))
 
 
 @login_required()
@@ -781,17 +717,9 @@ def edit_profile(request):
             event_type=models.Event.EVENT_TYPE_EDIT_PROFILE,
         )
         return HttpResponseRedirect(next_url)
-    number_of_votes, number_of_comments, number_of_wishes, number_of_toplists, number_of_messages, number_of_articles = _get_user_profile_numbers(request, request.user)
+
     return render(request, 'ktapp/user_profile_subpages/edit_profile.html', {
-        'active_tab': 'profile',
         'selected_user': request.user,
-        'number_of_votes': number_of_votes,
-        'number_of_comments': number_of_comments,
-        'number_of_wishes': number_of_wishes,
-        'number_of_toplists': number_of_toplists,
-        'number_of_messages': number_of_messages,
-        'number_of_articles': number_of_articles,
-        'tab_width': USER_PROFILE_TAB_WIDTH[False],
         'fav_directors': models.Artist.objects.raw('''
             SELECT a.*
             FROM ktapp_artist a
@@ -822,3 +750,25 @@ def edit_profile(request):
         ''', [request.user.id, models.UserFavourite.DOMAIN_COUNTRY, models.Keyword.KEYWORD_TYPE_COUNTRY]),
         'topic': request.GET.get('t', ''),
     })
+
+
+@login_required
+@kt_utils.kt_permission_required('check_user_mod')
+@_generic_user_view
+def user_mod(request, id, name_slug, selected_user, base_context):
+    off_topic = models.Topic.objects.get(id=87)
+    return render(request, 'ktapp/user_profile_subpages/user_mod.html', dict(base_context, **{
+        'active_tab': 'mod',
+        'list_of_bans': [
+            (
+                ban.created_at,
+                texts.BAN_TYPES.get(ban.action),
+                ban.created_by,
+            )
+            for ban in models.Change.objects.filter(
+                action__in=['ban', 'unban', 'warning', 'temp_ban_1d', 'temp_ban_3d', 'temp_ban_7d'],
+                object='user:%d' % selected_user.id,
+            ).order_by('-created_at')
+        ],
+        'latest_off_comments': models.Comment.objects.filter(created_by=selected_user, domain=models.Comment.DOMAIN_TOPIC, topic=off_topic).select_related('topic', 'created_by', 'reply_to', 'reply_to__created_by').order_by('-id')[:10],
+    }))
