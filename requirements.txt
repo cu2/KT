@@ -9,3 +9,4 @@ sqlparse==0.3.0
 Pillow==5.0.0
 boto3==1.5.22
 pylint==1.9.5
+pycryptodomex==3.20.0
