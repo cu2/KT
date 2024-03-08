@@ -135,11 +135,16 @@ def index(request):
             status__in=[models.Banner.BANNER_STATUS_PUBLISHED, models.Banner.BANNER_STATUS_VIEWED],
         )
     for banner in banners:
+        banner_changed = False
         if banner.status == models.Banner.BANNER_STATUS_PUBLISHED:
             banner.status = models.Banner.BANNER_STATUS_VIEWED
             banner.first_viewed_at = datetime.datetime.now()
-        banner.viewed += 1
-        banner.save()
+            banner_changed = True
+        if banner.viewed < 65535:
+            banner.viewed += 1
+            banner_changed = True
+        if banner_changed:
+            banner.save(update_fields=['status', 'first_viewed_at', 'viewed'])
     if banners:
         current_finance = kt_utils.get_current_finance()
     else:
