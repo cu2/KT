@@ -598,6 +598,14 @@ def vapiti_admin(request):
     if today_str == result_day:
         winners = get_winners()
 
+    stats_1 = None
+    if today_str == nominee_days[0] or today_str == nominee_days[1]:
+        stats_1 = kt_utils.get_vapiti_stats(1)
+
+    stats_2 = None
+    if today_str == result_day:
+        stats_2 = kt_utils.get_vapiti_stats(2)
+
     return render(request, 'ktapp/vapiti_subpages/vapiti_admin.html', {
         'today_str': today_str,
         'vapiti_year': settings.VAPITI_YEAR,
@@ -608,6 +616,8 @@ def vapiti_admin(request):
         'nominees': nominees,
         'have_official_nominees': have_official_nominees,
         'winners': winners,
+        'stats_1': stats_1,
+        'stats_2': stats_2,
     })
 
 

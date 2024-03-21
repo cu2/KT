@@ -172,3 +172,17 @@ GROUP BY r.id
 ORDER BY COUNT(DISTINCT u.id) DESC, SUM(u.vapiti_weight) DESC, f.number_of_ratings DESC
 LIMIT 1
 '''
+
+
+VAPITI_STATS = '''
+SELECT
+  vapiti_type,
+  COUNT(DISTINCT user_id) AS user_count,
+  COUNT(DISTINCT film_id) AS film_count,
+  COUNT(DISTINCT artist_id) AS artist_count
+FROM ktapp_vapitivote
+WHERE year = %s
+AND vapiti_round = %s
+GROUP BY vapiti_type
+ORDER BY vapiti_type
+'''

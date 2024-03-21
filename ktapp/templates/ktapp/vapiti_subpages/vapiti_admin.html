@@ -59,6 +59,14 @@ Eredményhirdetéssel egybekötött Vapiti-találkozó: március {{ result_day_d
     {% endif %}
 
     <p><br /></p>
+    <h2>Első forduló: statisztikák</h2>
+    {% if stats_1 %}
+        <p>{{ stats_1.G.user_count }} ember jelölt az Aranyra ({{ stats_1.G.film_count }} filmet), {{ stats_1.F.user_count }} a Női Ezüstre ({{ stats_1.F.artist_count }} színésznőt), {{ stats_1.M.user_count }} a Férfi Ezüstre ({{ stats_1.M.artist_count }} színészt).</p>
+    {% else %}
+        <p>Ezt csak a második forduló első két napján lehet látni ({{ nominee_days.0 }} és {{ nominee_days.1 }}). A mai dátum: {{ today_str }}</p>
+    {% endif %}
+
+    <p><br /></p>
     <h2>Második forduló: győztesek</h2>
 
     {% if winners %}
@@ -86,6 +94,14 @@ Eredményhirdetéssel egybekötött Vapiti-találkozó: március {{ result_day_d
 
         <p>Ezt csak az eredményhirdetés napján ({{ result_day }}) lehet látni. A mai dátum: {{ today_str }}</p>
 
+    {% endif %}
+
+    <p><br /></p>
+    <h2>Második forduló: statisztikák</h2>
+    {% if stats_2 %}
+        <p>{{ stats_2.G.user_count }} ember jelölt az Aranyra ({{ stats_2.G.film_count }} filmet), {{ stats_2.F.user_count }} a Női Ezüstre ({{ stats_2.F.artist_count }} színésznőt), {{ stats_2.M.user_count }} a Férfi Ezüstre ({{ stats_2.M.artist_count }} színészt).</p>
+    {% else %}
+        <p>Ezt csak az eredményhirdetés napján ({{ result_day }}) lehet látni. A mai dátum: {{ today_str }}</p>
     {% endif %}
 
 {% endblock %}

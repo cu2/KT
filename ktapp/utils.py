@@ -15,10 +15,11 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import user_passes_test
 from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
-from django.db import migrations
+from django.db import connection, migrations
 from django.db.models import Sum, Min, Max
 
 from ktapp import texts
+from ktapp import sqls as kt_sqls
 
 
 def bbcode_to_html(value):
@@ -349,6 +350,23 @@ def get_vapiti_nominees(award_model, vapiti_type):
 
     cache.set(cache_name, nominee_list, timeout=timeout)
     return nominee_list
+
+
+def get_vapiti_stats(vapiti_round):
+    from models import VapitiVote
+    stats = {
+        vapiti_type: {}
+        for vapiti_type, _ in VapitiVote.VAPITI_TYPES
+    }
+    cursor = connection.cursor()
+    cursor.execute(kt_sqls.VAPITI_STATS, [settings.VAPITI_YEAR, vapiti_round])
+    for row in cursor.fetchall():
+        stats[row[0]] = {
+            'user_count': row[1],
+            'film_count': row[2],
+            'artist_count': row[3],
+        }
+    return stats
 
 
 def get_local_md5(fname):
