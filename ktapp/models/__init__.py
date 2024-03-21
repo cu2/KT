@@ -8,3 +8,4 @@ from .stat import *
 from .user import *
 from .user_action import *
 from .user_content import *
+from .vapiti import *

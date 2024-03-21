@@ -218,28 +218,6 @@ def delete_wish(sender, instance, **kwargs):
         instance.wished_by.save(update_fields=['number_of_wishes_get'])
 
 
-class VapitiVote(models.Model):
-    user = models.ForeignKey('KTUser')
-    year = models.PositiveIntegerField(default=0, blank=True, null=True)
-    vapiti_round = models.PositiveSmallIntegerField(default=0, blank=True, null=True)
-    VAPITI_TYPE_GOLD = 'G'
-    VAPITI_TYPE_SILVER_MALE = 'M'
-    VAPITI_TYPE_SILVER_FEMALE = 'F'
-    VAPITI_TYPES = [
-        (VAPITI_TYPE_GOLD, 'Gold'),
-        (VAPITI_TYPE_SILVER_MALE, 'Silver Male'),
-        (VAPITI_TYPE_SILVER_FEMALE, 'Silver Female'),
-    ]
-    vapiti_type = models.CharField(max_length=1, choices=VAPITI_TYPES, default=VAPITI_TYPE_GOLD)
-    serial_number = models.PositiveSmallIntegerField(default=0, blank=True, null=True)
-    film = models.ForeignKey('Film')
-    artist = models.ForeignKey('Artist', blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
-
-    class Meta:
-        unique_together = ['user', 'year', 'vapiti_round', 'vapiti_type', 'serial_number']
-
-
 class IgnoreUser(models.Model):
     who = models.ForeignKey('KTUser', related_name='+', on_delete=models.CASCADE)
     whom = models.ForeignKey('KTUser', related_name='+', on_delete=models.CASCADE)

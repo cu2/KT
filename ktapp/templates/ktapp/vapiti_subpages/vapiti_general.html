@@ -61,54 +61,69 @@
         {% endfor %}
     </table>
 
-
-    <h2>Részvételi statisztikák</h2>
-    <div class="row">
-        <div class="col-sm-6">
-            <h3>Szavazók száma</h3>
-            <div id="ch1"></div>
-        </div>
-        <div class="col-sm-6">
-            <h3>Szavazók súlyozott aránya</h3>
-            <div id="ch2"></div>
-        </div>
-    </div>
-    <p style="font-size: 8pt"><br />* 2007 előtt és 2012-13-ban hiányos</p>
+    <h2>Statisztikák</h2>
+    <h3>Szavazók száma</h3>
+    <div id="chart1"></div>
+    <p style="font-size: 8pt">
+        Jelmagyarázat: <span style="color: #FF9900">Arany</span>, <span style="color: #DD4477">Női Ezüst</span>, <span style="color: #0099C6">Férfi Ezüst</span><br />
+        Vastaggal a második forduló (2012 előtt: egyetlen forduló), vékonnyal az első forduló.<br />
+        2003-tól 2006-ig és 2013-ban egyáltalán nincsenek adatok, 2012-ben csak az első fordulóról.
+    </p>
+    <h3>Jelölt filmek illetve színészek száma (az első fordulóban)</h3>
+    <div id="chart2"></div>
+    <p style="font-size: 8pt">
+        Jelmagyarázat: <span style="color: #FF9900">Arany</span>, <span style="color: #DD4477">Női Ezüst</span>, <span style="color: #0099C6">Férfi Ezüst</span><br />
+        Az Arany Vapiti esetében a jelölést kapott filmek száma látható, az Ezüstnél pedig a jelölést kapott színészek száma.<br />
+        2003-tól 2014-ig nincsenek adatok.
+    </p>
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        google.charts.load('current', {packages: ['corechart', 'line']});
+        google.charts.load('current', {packages: ['corechart']});
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
             var data1 = new google.visualization.DataTable();
             data1.addColumn('string', 'Év');
-            data1.addColumn('number', 'Arany');
-            data1.addColumn('number', 'Női Ezüst');
-            data1.addColumn('number', 'Férfi Ezüst');
+            data1.addColumn('number', 'Arany (1)');
+            data1.addColumn('number', 'Női Ezüst (1)');
+            data1.addColumn('number', 'Férfi Ezüst (1)');
+            data1.addColumn('number', 'Arany (2)');
+            data1.addColumn('number', 'Női Ezüst (2)');
+            data1.addColumn('number', 'Férfi Ezüst (2)');
             data1.addRows([
-                ['2007', 189, 137, 141],
-                ['2008', 356, 221, 267],
-                ['2009', 598, 314, 342],
-                ['2010', 524, 344, 352],
-                ['2011', 531, 372, 391],
-                ['2014/1', 400, 281, 288],
-                ['2014/2', 508, 431, 441],
-                ['2015/1', 386, 273, 292],
-                ['2015/2', 400, 342, 371],
-                ['2016/1', 278, 187, 185],
-                ['2016/2', 329, 290, 286],
-                ['2017/1', 331, 237, 233],
-                ['2017/2', 332, 274, 272],
-                ['2018/1', 249, 181, 184],
-                ['2018/2', 338, 286, 289],
-                ['2019/1', 273, 176, 208],
-                ['2019/2', 298, 239, 287],
-                ['2020/1', 212, 156, 152],
-                ['2020/2', 240, 183, 192],
-                ['2021/1', 222, 158, 160],
-                ['2021/2', 246, 201, 214]
+                {% for user_count in user_counts %}
+                    ['{{ user_count.0 }}', {{ user_count.1 }}, {{ user_count.2 }}, {{ user_count.3 }}, {{ user_count.4 }}, {{ user_count.5 }}, {{ user_count.6 }}],
+                {% endfor %}
             ]);
+
+            var options1 = {
+                height: 400,
+                chartArea: {
+                    width: '93%',
+                    left: '5%',
+                    height: '85%',
+                    top: '5%'
+                },
+                legend: {
+                    position: 'none'
+                },
+                fontName: 'verdana',
+                series: {
+                    0: { lineWidth: 1, pointSize: 3 },
+                    1: { lineWidth: 1, pointSize: 3 },
+                    2: { lineWidth: 1, pointSize: 3 },
+                    3: { lineWidth: 3, pointSize: 5 },
+                    4: { lineWidth: 3, pointSize: 5 },
+                    5: { lineWidth: 3, pointSize: 5 },
+                },
+                colors: ['FF9900', 'DD4477', '0099C6'],
+                vAxis: {
+                    minValue: 0
+                },
+                axisTitlesPosition: 'none',
+                interpolateNulls: true,
+            };
 
             var data2 = new google.visualization.DataTable();
             data2.addColumn('string', 'Év');
@@ -116,56 +131,40 @@
             data2.addColumn('number', 'Női Ezüst');
             data2.addColumn('number', 'Férfi Ezüst');
             data2.addRows([
-                ['2007', 53, 43, 44],
-                ['2008', 57, 43, 48],
-                ['2009', 64, 42, 44],
-                ['2010', 51, 36, 36],
-                ['2011', 51, 40, 41],
-                ['2014/1', 35, 27, 27],
-                ['2014/2', 41, 37, 37],
-                ['2015/1', 33, 25, 27],
-                ['2015/2', 33, 30, 31],
-                ['2016/1', 25, 18, 18],
-                ['2016/2', 28, 26, 25],
-                ['2017/1', 28, 22, 22],
-                ['2017/2', 29, 25, 25],
-                ['2018/1', 24, 18, 19],
-                ['2018/2', 30, 27, 27],
-                ['2019/1', 25, 18, 21],
-                ['2019/2', 27, 23, 26],
-                ['2020/1', 21, 17, 16],
-                ['2020/2', 22, 19, 19],
-                ['2021/1', 21, 17, 17],
-                ['2021/2', 23, 20, 21]
+            {% for film_and_artist_count in film_and_artist_counts %}
+                    ['{{ film_and_artist_count.0 }}', {{ film_and_artist_count.1 }}, {{ film_and_artist_count.2 }}, {{ film_and_artist_count.3 }}],
+                {% endfor %}
             ]);
 
-            var options = {
+            var options2 = {
                 height: 400,
                 chartArea: {
-                    width: '90%',
-                    left: '8%',
-                    height: '80%',
-                    top: '6%'
+                    width: '93%',
+                    left: '5%',
+                    height: '85%',
+                    top: '5%'
+                },
+                legend: {
+                    position: 'none'
                 },
                 fontName: 'verdana',
-                colors: ['FF9900', 'DD4477', '0099C6'],
-                hAxis: {
-                    slantedText: true
+                series: {
+                    0: { lineWidth: 2, pointSize: 4 },
+                    1: { lineWidth: 2, pointSize: 4 },
+                    2: { lineWidth: 2, pointSize: 4 },
                 },
+                colors: ['FF9900', 'DD4477', '0099C6'],
                 vAxis: {
                     minValue: 0
                 },
-                legend: {
-                    position: 'in'
-                },
-                axisTitlesPosition: 'none'
+                axisTitlesPosition: 'none',
+                interpolateNulls: true,
             };
 
-            var chart1 = new google.visualization.LineChart(document.getElementById('ch1'));
-            chart1.draw(data1, options);
-
-            var chart2 = new google.visualization.LineChart(document.getElementById('ch2'));
-            chart2.draw(data2, options);
+            var chart1 = new google.visualization.LineChart(document.getElementById('chart1'));
+            chart1.draw(data1, options1);
+            var chart2 = new google.visualization.LineChart(document.getElementById('chart2'));
+            chart2.draw(data2, options2);
         }
     </script>
 

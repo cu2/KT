@@ -38,6 +38,7 @@ def vapiti_general(request):
         films_per_page=None,
     )
     raw_films = {film.id: film for film in films}
+
     awards = defaultdict(list)
     for award, film_id, artist in raw_awards:
         film = copy.deepcopy(raw_films[film_id])
@@ -53,6 +54,7 @@ def vapiti_general(request):
         else:
             film.role = None
         awards[(award.year, film.award_type)].append(film)
+
     final_awards = []
     current_year = 0
     for (year, category), film_list in sorted(awards.iteritems(), key=lambda item: item[0][0], reverse=True):
@@ -61,9 +63,41 @@ def vapiti_general(request):
             current_year = year
         for film in sorted(film_list, key=lambda film: film.award.id):
             final_awards[-1][category].append(film)
+
+    user_counts = []
+    film_and_artist_counts = []
+    current_year = 0
+    for vapitistat in models.VapitiStat.objects.all().order_by('year', 'vapiti_round', 'vapiti_type'):
+        if vapitistat.year != current_year:
+            user_counts.append([str(vapitistat.year), 'null', 'null', 'null', 'null', 'null', 'null'])
+            if vapitistat.year >= 2015:
+                film_and_artist_counts.append([str(vapitistat.year), 'null', 'null', 'null'])
+        current_year = vapitistat.year
+
+        col = {
+            'G': 1,
+            'F': 2,
+            'M': 3,
+        }[vapitistat.vapiti_type]
+        if vapitistat.vapiti_round is None or vapitistat.vapiti_round == 2:
+            col += 3
+
+        if vapitistat.user_count:
+            user_counts[-1][col] = vapitistat.user_count
+
+        if vapitistat.year >= 2015 and vapitistat.vapiti_round == 1:
+            if vapitistat.vapiti_type == 'G':
+                if vapitistat.film_count:
+                    film_and_artist_counts[-1][col] = vapitistat.film_count
+            else:
+                if vapitistat.artist_count:
+                    film_and_artist_counts[-1][col] = vapitistat.artist_count
+
     return render(request, 'ktapp/vapiti_subpages/vapiti_general.html', {
         'vapiti_year': settings.VAPITI_YEAR,
         'awards': final_awards,
+        'user_counts': user_counts,
+        'film_and_artist_counts': film_and_artist_counts,
     })
 
 
