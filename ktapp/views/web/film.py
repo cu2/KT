@@ -50,7 +50,7 @@ def _generic_film_view(view_function):
             'film_directors': list(film.directors()),
             'countries': list(film.countries()),
             'genres': film.genres_cache,
-            'vapiti_year': settings.VAPITI_YEAR,
+            'vapiti_year': kt_utils.get_app_config('vapiti_year'),
             'film_link_imdb': 'https://www.imdb.com/title/%s/' % film.imdb_link if film.imdb_link else '',
             'film_link_porthu': 'https://www.port.hu/pls/fi/films.film_page?i_where=2&i_film_id=%s&i_city_id=-1&i_county_id=1' % film.porthu_link if film.porthu_link else '',
             'film_link_rt': 'https://www.rottentomatoes.com/search/?search=' + urlquote(film.orig_title),

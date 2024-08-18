@@ -77,7 +77,7 @@ def _generic_user_view(view_function):
 
 @_generic_user_view
 def user_profile(request, id, name_slug, selected_user, base_context):
-    number_of_vapiti_votes = selected_user.vote_set.filter(film__vapiti_year=settings.VAPITI_YEAR).count()
+    number_of_vapiti_votes = selected_user.vote_set.filter(film__vapiti_year=kt_utils.get_app_config('vapiti_year')).count()
     latest_votes = [int(v) for v in selected_user.latest_votes.split(',') if v != ''][:10]
     latest_comments = [int(c) for c in selected_user.latest_comments.split(',') if c != ''][:10]
     # profile

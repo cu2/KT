@@ -281,19 +281,20 @@ def get_selected_picture_details(model, film, picture, next_picture):
 
 
 def get_vapiti_round():
+    vapiti_year = get_app_config('vapiti_year')
     today = datetime.date.today()
     today_str = today.strftime('%Y-%m-%d')
     round_1_dates = (
-        '%s-02-01' % (settings.VAPITI_YEAR + 1),
-        '%s-02-21' % (settings.VAPITI_YEAR + 1),
+        '%s-02-01' % (vapiti_year + 1),
+        '%s-02-21' % (vapiti_year + 1),
     )
-    last_day_of_round_2 = [22, 21, 20, 19, 25, 24, 23][datetime.date(settings.VAPITI_YEAR + 1, 3, 19).weekday()]
-    result_day = [23, 22, 21, 20, 26, 25, 24][datetime.date(settings.VAPITI_YEAR + 1, 3, 19).weekday()]
+    last_day_of_round_2 = [22, 21, 20, 19, 25, 24, 23][datetime.date(vapiti_year + 1, 3, 19).weekday()]
+    result_day = [23, 22, 21, 20, 26, 25, 24][datetime.date(vapiti_year + 1, 3, 19).weekday()]
     round_2_dates = (
-        '%s-02-22' % (settings.VAPITI_YEAR + 1),
-        '%s-03-%s' % (settings.VAPITI_YEAR + 1, last_day_of_round_2),
+        '%s-02-22' % (vapiti_year + 1),
+        '%s-03-%s' % (vapiti_year + 1, last_day_of_round_2),
     )
-    result_day = '%s-03-%s' % (settings.VAPITI_YEAR + 1, result_day)
+    result_day = '%s-03-%s' % (vapiti_year + 1, result_day)
     if today_str >= round_1_dates[0] and today_str <= round_1_dates[1]:
         vapiti_round = 1
     elif today_str >= round_2_dates[0] and today_str <= round_2_dates[1]:
@@ -327,7 +328,7 @@ def get_vapiti_nominees(award_model, vapiti_type):
         cache.set(cache_name, [], timeout=3600)
         return []
 
-    vapiti_year = settings.VAPITI_YEAR
+    vapiti_year = get_app_config('vapiti_year')
     if vapiti_type == 'G':
         nominee_awards = award_model.objects.filter(
             name=u'Vapiti',
@@ -353,13 +354,14 @@ def get_vapiti_nominees(award_model, vapiti_type):
 
 
 def get_vapiti_stats(vapiti_round):
+    vapiti_year = get_app_config('vapiti_year')
     from models import VapitiVote
     stats = {
         vapiti_type: {}
         for vapiti_type, _ in VapitiVote.VAPITI_TYPES
     }
     cursor = connection.cursor()
-    cursor.execute(kt_sqls.VAPITI_STATS, [settings.VAPITI_YEAR, vapiti_round])
+    cursor.execute(kt_sqls.VAPITI_STATS, [vapiti_year, vapiti_round])
     for row in cursor.fetchall():
         stats[row[0]] = {
             'user_count': row[1],
@@ -626,12 +628,19 @@ class Profiler:
         self.now = datetime.datetime.now()  # reset
 
 
-def get_app_config():
-    cached_value = cache.get('get_app_config')
+def get_app_config(key=None):
+    full_app_config = get_full_app_config()
+    if key:
+        return full_app_config[key]
+    return full_app_config
+
+
+def get_full_app_config():
+    cached_value = cache.get('get_full_app_config')
     if cached_value is not None:
         return cached_value
 
     from models import AppConfig
     app_config = AppConfig.get()
-    cache.set('get_app_config', app_config, timeout=300)
+    cache.set('get_full_app_config', app_config, timeout=300)
     return app_config

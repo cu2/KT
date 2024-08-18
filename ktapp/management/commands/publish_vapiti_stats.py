@@ -32,10 +32,11 @@ class Command(BaseCommand):
             "Publishing Vapiti stats for round {}...".format(vapiti_round)
         )
         stats = kt_utils.get_vapiti_stats(vapiti_round)
+        vapiti_year = kt_utils.get_app_config('vapiti_year')
         for vapiti_type, stat in stats.items():
             for key, value in stat.items():
                 models.VapitiStat.objects.update_or_create(
-                    year=settings.VAPITI_YEAR,
+                    year=vapiti_year,
                     vapiti_round=vapiti_round,
                     vapiti_type=vapiti_type,
                     defaults={key: value},

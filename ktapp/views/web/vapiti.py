@@ -94,7 +94,7 @@ def vapiti_general(request):
                     film_and_artist_counts[-1][col] = vapitistat.artist_count
 
     return render(request, 'ktapp/vapiti_subpages/vapiti_general.html', {
-        'vapiti_year': settings.VAPITI_YEAR,
+        'vapiti_year': kt_utils.get_app_config('vapiti_year'),
         'awards': final_awards,
         'user_counts': user_counts,
         'film_and_artist_counts': film_and_artist_counts,
@@ -102,19 +102,20 @@ def vapiti_general(request):
 
 
 def vapiti_gold(request):
+    vapiti_year = kt_utils.get_app_config('vapiti_year')
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     my_vapiti_votes = {}
     if request.user.is_authenticated():
         for vv in models.VapitiVote.objects.filter(
             user=request.user,
-            year=settings.VAPITI_YEAR,
+            year=vapiti_year,
             vapiti_round=vapiti_round,
             vapiti_type=models.VapitiVote.VAPITI_TYPE_GOLD,
         ).select_related('film'):
             my_vapiti_votes[vv.serial_number] = ('%s / %s' % (vv.film.orig_title, vv.film.second_title)) if vv.film.second_title else vv.film.orig_title
     films, _ = filmlist.filmlist(
         user_id=request.user.id,
-        filters=[('vapiti_year', settings.VAPITI_YEAR)],
+        filters=[('vapiti_year', vapiti_year)],
         ordering='title',
         films_per_page=None,
     )
@@ -130,7 +131,7 @@ def vapiti_gold(request):
             films_no.append(film)
     films_yes.sort(key=lambda film: (film.my_rating, film.average_rating, film.number_of_ratings), reverse=True)
     return render(request, 'ktapp/vapiti_subpages/vapiti_gold.html', {
-        'vapiti_year': settings.VAPITI_YEAR,
+        'vapiti_year': vapiti_year,
         'active_tab': '',
         'films_yes': films_yes,
         'films_no': films_no,
@@ -143,6 +144,7 @@ def vapiti_gold(request):
 
 
 def vapiti_gold_2(request):
+    vapiti_year = kt_utils.get_app_config('vapiti_year')
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     nominee_ids = kt_utils.get_vapiti_nominees(models.Award, models.VapitiVote.VAPITI_TYPE_GOLD)
     if request.user.is_authenticated():
@@ -157,13 +159,13 @@ def vapiti_gold_2(request):
     if request.user.is_authenticated():
         for vv in models.VapitiVote.objects.filter(
                 user=request.user,
-                year=settings.VAPITI_YEAR,
+                year=vapiti_year,
                 vapiti_round=vapiti_round,
                 vapiti_type=models.VapitiVote.VAPITI_TYPE_GOLD,
         ):
             my_vapiti_vote = vv.film_id
     return render(request, 'ktapp/vapiti_subpages/vapiti_gold_2.html', {
-        'vapiti_year': settings.VAPITI_YEAR,
+        'vapiti_year': vapiti_year,
         'active_tab': '2',
         'vapiti_round': vapiti_round,
         'round_1_dates': round_1_dates,
@@ -191,7 +193,7 @@ def vapiti_gold_winners(request):
         film.award_year = year
         awards.append(film)
     return render(request, 'ktapp/vapiti_subpages/vapiti_gold_winners.html', {
-        'vapiti_year': settings.VAPITI_YEAR,
+        'vapiti_year': kt_utils.get_app_config('vapiti_year'),
         'active_tab': 'winners',
         'awards': awards,
     })
@@ -199,12 +201,13 @@ def vapiti_gold_winners(request):
 
 def vapiti_silver(request, gender):
     vapiti_type = models.VapitiVote.VAPITI_TYPE_SILVER_MALE if gender == 'ferfi' else models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE
+    vapiti_year = kt_utils.get_app_config('vapiti_year')
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     my_vapiti_votes = {}
     if request.user.is_authenticated():
         for vv in models.VapitiVote.objects.filter(
                 user=request.user,
-                year=settings.VAPITI_YEAR,
+                year=vapiti_year,
                 vapiti_round=vapiti_round,
                 vapiti_type=vapiti_type,
         ).select_related('film', 'artist'):
@@ -248,7 +251,7 @@ def vapiti_silver(request, gender):
     '''.format(
         my_rating_select=my_rating_select,
         my_rating_join=my_rating_join,
-        vapiti_year=settings.VAPITI_YEAR,
+        vapiti_year=vapiti_year,
         gender='M' if gender == 'ferfi' else 'F',
     )):
         if role.my_rating:
@@ -259,7 +262,7 @@ def vapiti_silver(request, gender):
             artist_ids_no.add(role.artist_id)
     # roles_yes.sort(key=lambda role: (-role.my_rating, role.artist_name, role.artist_id, role.role_name, role.id))
     return render(request, 'ktapp/vapiti_subpages/vapiti_silver.html', {
-        'vapiti_year': settings.VAPITI_YEAR,
+        'vapiti_year': vapiti_year,
         'gender': gender,
         'active_tab': '',
         'roles_yes': roles_yes,
@@ -276,6 +279,7 @@ def vapiti_silver(request, gender):
 
 def vapiti_silver_2(request, gender):
     vapiti_type = models.VapitiVote.VAPITI_TYPE_SILVER_MALE if gender == 'ferfi' else models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE
+    vapiti_year = kt_utils.get_app_config('vapiti_year')
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     nominee_ids = kt_utils.get_vapiti_nominees(models.Award, vapiti_type)
     if request.user.is_authenticated():
@@ -296,14 +300,14 @@ def vapiti_silver_2(request, gender):
     if request.user.is_authenticated():
         for vv in models.VapitiVote.objects.filter(
                 user=request.user,
-                year=settings.VAPITI_YEAR,
+                year=vapiti_year,
                 vapiti_round=vapiti_round,
                 vapiti_type=vapiti_type,
         ):
             my_vapiti_vote_film_id = vv.film_id
             my_vapiti_vote_artist_id = vv.artist_id
     return render(request, 'ktapp/vapiti_subpages/vapiti_silver_2.html', {
-        'vapiti_year': settings.VAPITI_YEAR,
+        'vapiti_year': vapiti_year,
         'gender': gender,
         'active_tab': '2',
         'vapiti_round': vapiti_round,
@@ -344,7 +348,7 @@ def vapiti_silver_winners(request, gender):
         film.role = raw_roles[(film_id, artist.id)]
         awards.append(film)
     return render(request, 'ktapp/vapiti_subpages/vapiti_silver_winners.html', {
-        'vapiti_year': settings.VAPITI_YEAR,
+        'vapiti_year': kt_utils.get_app_config('vapiti_year'),
         'gender': gender,
         'active_tab': 'winners',
         'awards': awards,
@@ -358,17 +362,18 @@ def vote_vapiti(request):
     vapiti_type = request.POST.get('vapiti_type', '')
     if vapiti_type not in {'G', 'M', 'F'}:
         vapiti_type = 'G'
+    vapiti_year = kt_utils.get_app_config('vapiti_year')
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     if vapiti_round == 1:
         if vapiti_type == 'G':
             models.VapitiVote.objects.filter(
                 user=request.user,
-                year=settings.VAPITI_YEAR,
+                year=vapiti_year,
                 vapiti_round=vapiti_round,
                 vapiti_type=vapiti_type,
             ).delete()
             film_ids = set()
-            for serial_number in xrange(1, 4):
+            for serial_number in range(1, 4):
                 film_title = request.POST.get('film_%d' % serial_number, '')
                 if '/' in film_title:
                     orig_title, second_title = film_title.split('/', 1)
@@ -381,7 +386,7 @@ def vote_vapiti(request):
                 films, _ = filmlist.filmlist(
                     user_id=request.user.id,
                     filters=[
-                        ('vapiti_year', settings.VAPITI_YEAR),
+                        ('vapiti_year', vapiti_year),
                         ('title', '%s %s' % (orig_title, second_title)),
                         ('seen_it', '1'),
                     ],
@@ -401,7 +406,7 @@ def vote_vapiti(request):
                     film_ids.add(film.id)
                     models.VapitiVote.objects.create(
                         user=request.user,
-                        year=settings.VAPITI_YEAR,
+                        year=vapiti_year,
                         vapiti_round=vapiti_round,
                         vapiti_type=vapiti_type,
                         serial_number=serial_number,
@@ -415,12 +420,12 @@ def vote_vapiti(request):
         elif vapiti_type in {'M', 'F'}:
             models.VapitiVote.objects.filter(
                 user=request.user,
-                year=settings.VAPITI_YEAR,
+                year=vapiti_year,
                 vapiti_round=vapiti_round,
                 vapiti_type=vapiti_type,
             ).delete()
             role_ids = set()
-            for serial_number in xrange(1, 4):
+            for serial_number in range(1, 4):
                 film_artist_title = request.POST.get('artist_%d' % serial_number, '').strip()[:-1]
                 if '[' not in film_artist_title:
                     continue
@@ -452,7 +457,7 @@ def vote_vapiti(request):
                 LIMIT 1
                 '''.format(
                     user_id=request.user.id,
-                    vapiti_year=settings.VAPITI_YEAR,
+                    vapiti_year=vapiti_year,
                     gender=vapiti_type,
                 ), [artist_name, orig_title])
                 if roles:
@@ -463,7 +468,7 @@ def vote_vapiti(request):
                     role_ids.add(role.id)
                     models.VapitiVote.objects.create(
                         user=request.user,
-                        year=settings.VAPITI_YEAR,
+                        year=vapiti_year,
                         vapiti_round=vapiti_round,
                         vapiti_type=vapiti_type,
                         serial_number=serial_number,
@@ -493,14 +498,14 @@ def vote_vapiti(request):
                         if models.Vote.objects.filter(film=film, user=request.user):
                             models.VapitiVote.objects.filter(
                                 user=request.user,
-                                year=settings.VAPITI_YEAR,
+                                year=vapiti_year,
                                 vapiti_round=vapiti_round,
                                 vapiti_type=vapiti_type,
                             ).delete()
                             if vapiti_yes:
                                 models.VapitiVote.objects.create(
                                     user=request.user,
-                                    year=settings.VAPITI_YEAR,
+                                    year=vapiti_year,
                                     vapiti_round=vapiti_round,
                                     vapiti_type=vapiti_type,
                                     serial_number=1,
@@ -525,14 +530,14 @@ def vote_vapiti(request):
                     if models.Vote.objects.filter(film=selected_nominee.film, user=request.user):
                         models.VapitiVote.objects.filter(
                             user=request.user,
-                            year=settings.VAPITI_YEAR,
+                            year=vapiti_year,
                             vapiti_round=vapiti_round,
                             vapiti_type=vapiti_type,
                         ).delete()
                         if vapiti_yes:
                             models.VapitiVote.objects.create(
                                 user=request.user,
-                                year=settings.VAPITI_YEAR,
+                                year=vapiti_year,
                                 vapiti_round=vapiti_round,
                                 vapiti_type=vapiti_type,
                                 serial_number=1,
@@ -551,6 +556,7 @@ def vote_vapiti(request):
 @kt_utils.kt_permission_required('vapiti_admin')
 def vapiti_admin(request):
     today_str = datetime.date.today().strftime('%Y-%m-%d')
+    vapiti_year = kt_utils.get_app_config('vapiti_year')
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     nominee_days = [
         round_2_dates[0],
@@ -561,13 +567,13 @@ def vapiti_admin(request):
     if today_str == nominee_days[0] or today_str == nominee_days[1]:
         nominees = get_nominees()
         if request.POST:
-            models.Award.objects.filter(name='Vapiti', year=settings.VAPITI_YEAR, category=texts.VAPITI_NOMINEE_CATEGORIES[models.VapitiVote.VAPITI_TYPE_GOLD]).delete()
+            models.Award.objects.filter(name='Vapiti', year=vapiti_year, category=texts.VAPITI_NOMINEE_CATEGORIES[models.VapitiVote.VAPITI_TYPE_GOLD]).delete()
             for film_id in nominees[models.VapitiVote.VAPITI_TYPE_GOLD]['ids']:
                 film = models.Film.objects.get(id=film_id)
                 models.Award.objects.get_or_create(
                     film=film,
                     name='Vapiti',
-                    year=settings.VAPITI_YEAR,
+                    year=vapiti_year,
                     category=texts.VAPITI_NOMINEE_CATEGORIES[models.VapitiVote.VAPITI_TYPE_GOLD],
                     artist=None,
                     created_by_id=None,
@@ -575,7 +581,7 @@ def vapiti_admin(request):
             kt_utils.reset_vapiti_nominees_cache(models.VapitiVote.VAPITI_TYPE_GOLD)
 
             for vapiti_type in [models.VapitiVote.VAPITI_TYPE_SILVER_FEMALE, models.VapitiVote.VAPITI_TYPE_SILVER_MALE]:
-                models.Award.objects.filter(name='Vapiti', year=settings.VAPITI_YEAR, category=texts.VAPITI_NOMINEE_CATEGORIES[vapiti_type]).delete()
+                models.Award.objects.filter(name='Vapiti', year=vapiti_year, category=texts.VAPITI_NOMINEE_CATEGORIES[vapiti_type]).delete()
                 for role_id in nominees[vapiti_type]['ids']:
                     role = models.FilmArtistRelationship.objects.get(id=role_id)
                     film = models.Film.objects.get(id=role.film_id)
@@ -583,7 +589,7 @@ def vapiti_admin(request):
                     models.Award.objects.get_or_create(
                         film=film,
                         name='Vapiti',
-                        year=settings.VAPITI_YEAR,
+                        year=vapiti_year,
                         category=texts.VAPITI_NOMINEE_CATEGORIES[vapiti_type],
                         artist=artist,
                         created_by_id=None,
@@ -592,7 +598,7 @@ def vapiti_admin(request):
 
             return HttpResponseRedirect(reverse('vapiti_admin'))
 
-    have_official_nominees = models.Award.objects.filter(name='Vapiti', year=settings.VAPITI_YEAR, category=texts.VAPITI_NOMINEE_CATEGORIES[models.VapitiVote.VAPITI_TYPE_GOLD]).count() > 0
+    have_official_nominees = models.Award.objects.filter(name='Vapiti', year=vapiti_year, category=texts.VAPITI_NOMINEE_CATEGORIES[models.VapitiVote.VAPITI_TYPE_GOLD]).count() > 0
 
     winners = None
     if today_str == result_day:
@@ -608,7 +614,7 @@ def vapiti_admin(request):
 
     return render(request, 'ktapp/vapiti_subpages/vapiti_admin.html', {
         'today_str': today_str,
-        'vapiti_year': settings.VAPITI_YEAR,
+        'vapiti_year': vapiti_year,
         'end_of_round_2_day': round_2_dates[1][-2:],
         'nominee_days': nominee_days,
         'result_day': result_day,
@@ -633,7 +639,7 @@ def get_nominees():
             'ids': [],
             names_or_titles: [],
         }
-        cursor.execute(sql, (settings.VAPITI_YEAR,))
+        cursor.execute(sql, (kt_utils.get_app_config('vapiti_year'),))
         for row in cursor.fetchall():
             nominees[vapiti_type]['ids'].append(int(row[0]))
             nominees[vapiti_type][names_or_titles].append(row[1])
@@ -643,13 +649,14 @@ def get_nominees():
 
 
 def get_winners():
+    vapiti_year = kt_utils.get_app_config('vapiti_year')
     cursor = connection.cursor()
     try:
-        cursor.execute(kt_sqls.VAPITI_WINNER_GOLD, (settings.VAPITI_YEAR,))
+        cursor.execute(kt_sqls.VAPITI_WINNER_GOLD, (vapiti_year,))
         winner_film = models.Film.objects.get(id=cursor.fetchone()[0])
-        cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_FEMALE, (settings.VAPITI_YEAR,))
+        cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_FEMALE, (vapiti_year,))
         winner_female_role = models.FilmArtistRelationship.objects.get(id=cursor.fetchone()[0])
-        cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_MALE, (settings.VAPITI_YEAR,))
+        cursor.execute(kt_sqls.VAPITI_WINNER_SILVER_MALE, (vapiti_year,))
         winner_male_role = models.FilmArtistRelationship.objects.get(id=cursor.fetchone()[0])
         return {
             models.VapitiVote.VAPITI_TYPE_GOLD: winner_film,

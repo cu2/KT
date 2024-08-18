@@ -92,15 +92,16 @@ def index(request):
     vapiti_topic = None
     vapiti_comment = None
     if vapiti_round == 1 or vapiti_round == 2:
-        if settings.VAPITI_TOPIC_ID:
-            vapiti_topic = models.Topic.objects.get(id=settings.VAPITI_TOPIC_ID)
+        vapiti_topic_id = kt_utils.get_app_config('vapiti_topic_id')
+        if vapiti_topic_id:
+            vapiti_topic = models.Topic.objects.get(id=vapiti_topic_id)
             vapiti_in_buzz = False
             for c in buzz_comments:
-                if c.topic_id == settings.VAPITI_TOPIC_ID:
+                if c.topic_id == vapiti_topic_id:
                     vapiti_in_buzz = True
             if not vapiti_in_buzz:
                 try:
-                    vapiti_comment = models.Comment.objects.select_related('topic', 'created_by', 'reply_to', 'reply_to__created_by').filter(topic_id=settings.VAPITI_TOPIC_ID)[0]
+                    vapiti_comment = models.Comment.objects.select_related('topic', 'created_by', 'reply_to', 'reply_to__created_by').filter(topic_id=vapiti_topic_id)[0]
                 except Exception:
                     pass
 
@@ -164,7 +165,7 @@ def index(request):
         'random_poll': random_poll,
         'random_quote': random_quote,
         'random_trivia': random_trivia,
-        'vapiti_year': settings.VAPITI_YEAR,
+        'vapiti_year': kt_utils.get_app_config('vapiti_year'),
         'vapiti_round': vapiti_round,
         'vapiti_round_1_end_datetime': vapiti_round_1_end_datetime,
         'vapiti_round_2_end_datetime': vapiti_round_2_end_datetime,

@@ -2,9 +2,9 @@ import datetime
 
 from django.core.management.base import BaseCommand
 from django.db import connection
-from django.conf import settings
 
 from ktapp import models
+from ktapp import utils as kt_utils
 
 
 class Command(BaseCommand):
@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         today = datetime.date.today()
-        vapiti_year = settings.VAPITI_YEAR
+        vapiti_year = kt_utils.get_app_config('vapiti_year')
         is_it_standard_period = today.year == vapiti_year
         is_it_extended_period = today.year == vapiti_year + 1 and today.month == 1 and today.day <= 31
 

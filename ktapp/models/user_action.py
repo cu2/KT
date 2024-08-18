@@ -19,6 +19,8 @@ class Vote(models.Model):
 
     def save(self, *args, **kwargs):
         from .recommendation import Recommendation
+        from ..utils import get_app_config
+        vapiti_year = get_app_config('vapiti_year')
         super(Vote, self).save(*args, **kwargs)
         self.film.comment_set.filter(created_by=self.user).update(rating=self.rating)
         Wishlist.objects.filter(film=self.film, wished_by=self.user, wish_type=Wishlist.WISH_TYPE_YES).delete()
@@ -29,7 +31,7 @@ class Vote(models.Model):
         self.user.number_of_ratings_3 = self.user.vote_set.filter(rating=3).count()
         self.user.number_of_ratings_4 = self.user.vote_set.filter(rating=4).count()
         self.user.number_of_ratings_5 = self.user.vote_set.filter(rating=5).count()
-        self.user.number_of_vapiti_votes = self.user.vote_set.filter(film__vapiti_year=settings.VAPITI_YEAR).count()
+        self.user.number_of_vapiti_votes = self.user.vote_set.filter(film__vapiti_year=vapiti_year).count()
         self.user.vapiti_weight = self.user.number_of_ratings + 25 * self.user.number_of_vapiti_votes
         if self.user.number_of_ratings < 10:
             self.user.average_rating = None
@@ -53,6 +55,8 @@ class Vote(models.Model):
 def delete_vote(sender, instance, **kwargs):
     from .content import Film
     from .recommendation import Recommendation
+    from ..utils import get_app_config
+    vapiti_year = get_app_config('vapiti_year')
     try:
         instance.film.comment_set.filter(created_by=instance.user).update(rating=None)
     except Film.DoesNotExist:
@@ -64,7 +68,7 @@ def delete_vote(sender, instance, **kwargs):
     instance.user.number_of_ratings_3 = instance.user.vote_set.filter(rating=3).count()
     instance.user.number_of_ratings_4 = instance.user.vote_set.filter(rating=4).count()
     instance.user.number_of_ratings_5 = instance.user.vote_set.filter(rating=5).count()
-    instance.user.number_of_vapiti_votes = instance.user.vote_set.filter(film__vapiti_year=settings.VAPITI_YEAR).count()
+    instance.user.number_of_vapiti_votes = instance.user.vote_set.filter(film__vapiti_year=vapiti_year).count()
     instance.user.vapiti_weight = instance.user.number_of_ratings + 25 * instance.user.number_of_vapiti_votes
     if instance.user.number_of_ratings < 10:
         instance.user.average_rating = None

@@ -442,7 +442,7 @@ def get_vapiti_films(request):
     films, _ = filmlist.filmlist(
         user_id=request.user.id,
         filters=[
-            ('vapiti_year', settings.VAPITI_YEAR),
+            ('vapiti_year', kt_utils.get_app_config('vapiti_year')),
             ('title', q),
             ('seen_it', '1'),
         ],
@@ -481,7 +481,7 @@ def get_vapiti_artists(request):
     LIMIT 10
     '''.format(
             user_id=request.user.id,
-            vapiti_year=settings.VAPITI_YEAR,
+            vapiti_year=kt_utils.get_app_config('vapiti_year'),
             gender=gender,
     ), [u'%{name}%'.format(name=q)])
     return HttpResponse(json.dumps([

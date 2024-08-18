@@ -241,10 +241,6 @@ TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 MAX_SEARCH_RESULTS = 10
 FIRST_PREMIER_YEAR = 1970
 
-VAPITI_YEAR = 2023
-VAPITI_TOPIC_ID = 242
-# VAPITI_TOPIC_ID = 0
-
 
 # if True (or ENV=='local'), KTUser.email_user() will print the email instead of sending it
 LOCAL_MAIL = False
