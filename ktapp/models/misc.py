@@ -130,3 +130,25 @@ class LinkClick(models.Model):
     def save(self, *args, **kwargs):
         self.url_domain = urlparse(self.url).netloc
         super(LinkClick, self).save(*args, **kwargs)
+
+
+class AppConfig(models.Model):
+    vapiti_year = models.PositiveIntegerField()
+    vapiti_topic_id = models.PositiveIntegerField()
+
+    @classmethod
+    def get(cls):
+        fields = [
+            "vapiti_year",
+            "vapiti_topic_id",
+        ]
+        raw_app_config = cls.objects.first()
+        if raw_app_config:
+            return {
+                field: getattr(raw_app_config, field)
+                for field in fields
+            }
+        return {
+            field: None
+            for field in fields
+        }

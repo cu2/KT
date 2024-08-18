@@ -9,6 +9,20 @@ from ktapp import forms as kt_forms
 admin.site.unregister(Group)
 
 
+@admin.register(models.AppConfig)
+class AppConfigAdmin(admin.ModelAdmin):
+    list_display = ["vapiti_year", "vapiti_topic_id"]
+
+    # disable add, delete, bulk delete
+    actions = None
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(models.Donation)
 class DonationAdmin(admin.ModelAdmin):
     list_display = ["given_at", "money", "given_by", "comment", "tshirt"]

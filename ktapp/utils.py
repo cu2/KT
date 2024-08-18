@@ -624,3 +624,14 @@ class Profiler:
             json.dumps(payload, sort_keys=True)
         )
         self.now = datetime.datetime.now()  # reset
+
+
+def get_app_config():
+    cached_value = cache.get('get_app_config')
+    if cached_value is not None:
+        return cached_value
+
+    from models import AppConfig
+    app_config = AppConfig.get()
+    cache.set('get_app_config', app_config, timeout=300)
+    return app_config
