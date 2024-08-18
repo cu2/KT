@@ -10,6 +10,7 @@ except:
         'database_password': 'password',
         'database_host': 'db',
         'secret_key': 'secret',
+        'aes_key': 'secret1234567890',
     }
 else:
     VARIABLES = overrides.variables.VARIABLES
@@ -110,6 +111,8 @@ STATICFILES_FINDERS = (
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = VARIABLES['secret_key']
+
+AES_KEY = VARIABLES['aes_key']
 
 
 TEMPLATES = [
