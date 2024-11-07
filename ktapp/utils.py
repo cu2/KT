@@ -628,11 +628,24 @@ class Profiler:
         self.now = datetime.datetime.now()  # reset
 
 
-def get_app_config(key=None):
+def get_birthday_party_status():
+    return get_partial_app_config([
+        "birthday_party_announced",
+        "birthday_party_announcement_until",
+        "birthday_party_announcement_text",
+    ])
+
+
+def get_app_config(key):
+    return get_full_app_config()[key]
+
+
+def get_partial_app_config(keys=[]):
     full_app_config = get_full_app_config()
-    if key:
-        return full_app_config[key]
-    return full_app_config
+    return {
+        key: full_app_config[key]
+        for key in keys
+    }
 
 
 def get_full_app_config():

@@ -11,7 +11,7 @@ admin.site.unregister(Group)
 
 @admin.register(models.AppConfig)
 class AppConfigAdmin(admin.ModelAdmin):
-    list_display = ["vapiti_year", "vapiti_topic_id"]
+    list_display = models.AppConfig.get_config_fields()
 
     # disable add, delete, bulk delete
     actions = None

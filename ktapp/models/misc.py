@@ -135,13 +135,13 @@ class LinkClick(models.Model):
 class AppConfig(models.Model):
     vapiti_year = models.PositiveIntegerField()
     vapiti_topic_id = models.PositiveIntegerField()
+    birthday_party_announced = models.BooleanField(default=False)
+    birthday_party_announcement_until = models.DateField(blank=True, null=True)
+    birthday_party_announcement_text = models.TextField(blank=True)
 
     @classmethod
     def get(cls):
-        fields = [
-            "vapiti_year",
-            "vapiti_topic_id",
-        ]
+        fields = cls.get_config_fields()
         raw_app_config = cls.objects.first()
         if raw_app_config:
             return {
@@ -152,3 +152,11 @@ class AppConfig(models.Model):
             field: None
             for field in fields
         }
+
+    @classmethod
+    def get_config_fields(cls):
+        return [
+            f.name
+            for f in cls._meta.get_fields()
+            if f.name != "id"
+        ]

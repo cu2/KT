@@ -81,6 +81,19 @@ def index(request):
     random_quote = kt_utils.get_random_item(models.Quote.objects)
     random_trivia = kt_utils.get_random_item(models.Trivia.objects)
 
+    # birthday party
+    today = datetime.date.today()
+    this_year = today.year
+    birthday_party_status = kt_utils.get_birthday_party_status()
+    birthday_party_announcement_visible = (
+        birthday_party_status["birthday_party_announced"]
+        and birthday_party_status["birthday_party_announcement_until"]
+        and today <= birthday_party_status["birthday_party_announcement_until"]
+        and birthday_party_status["birthday_party_announcement_text"]
+    )
+    birthday_party_announcement_html = kt_utils.bbcode_to_html(birthday_party_status['birthday_party_announcement_text'])
+    birthday_age = this_year - 2003
+
     # vapiti
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     vapiti_round_1_end_datetime = datetime.datetime.strptime(round_2_dates[0], '%Y-%m-%d')
@@ -165,6 +178,9 @@ def index(request):
         'random_poll': random_poll,
         'random_quote': random_quote,
         'random_trivia': random_trivia,
+        'birthday_party_announcement_visible': birthday_party_announcement_visible,
+        'birthday_party_announcement_html': birthday_party_announcement_html,
+        'birthday_age': birthday_age,
         'vapiti_year': kt_utils.get_app_config('vapiti_year'),
         'vapiti_round': vapiti_round,
         'vapiti_round_1_end_datetime': vapiti_round_1_end_datetime,
