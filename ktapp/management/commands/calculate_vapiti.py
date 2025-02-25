@@ -29,6 +29,7 @@ class Command(BaseCommand):
         for film in models.Film.objects.filter(
             vapiti_year=None,
             main_premier_year=vapiti_year,
+            year__gte=vapiti_year - 2,
         ):
             film_ids.add(film.id)
 
