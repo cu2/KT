@@ -3,10 +3,6 @@
 
 {% block premier_main %}
 
-<p>A szavazás ideiglenesen felfüggesztve. Hamarosan visszatérünk.</p>
-
-{% if false %}
-
     {% if vapiti_round == 1 %}
         <p>A második forduló {{ round_2_dates.0|str2date|date:"Y. F j" }}-én kezdődik, most még tart az első.</p>
     {% elif vapiti_round == 2 %}
@@ -42,7 +38,5 @@
     {% else %}
         <p>Az első forduló {{ round_1_dates.0|str2date|date:"Y. F j" }}-jén kezdődik, a második {{ round_2_dates.0|str2date|date:"F j" }}-én.</p>
     {% endif %}
-
-{% endif %}
 
 {% endblock %}

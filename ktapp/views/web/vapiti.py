@@ -359,7 +359,6 @@ def vapiti_silver_winners(request, gender):
 @login_required
 @kt_utils.kt_permission_required('vote_vapiti')
 def vote_vapiti(request):
-    return HttpResponseForbidden()
     vapiti_type = request.POST.get('vapiti_type', '')
     if vapiti_type not in {'G', 'M', 'F'}:
         vapiti_type = 'G'
