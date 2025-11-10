@@ -560,8 +560,7 @@ def vapiti_admin(request):
     vapiti_round, round_1_dates, round_2_dates, result_day = kt_utils.get_vapiti_round()
     nominee_days = [
         round_2_dates[0],
-        '2025-02-25',
-        # (datetime.datetime.strptime(round_2_dates[0], '%Y-%m-%d') + datetime.timedelta(days=1)).strftime('%Y-%m-%d'),
+        (datetime.datetime.strptime(round_2_dates[0], '%Y-%m-%d') + datetime.timedelta(days=1)).strftime('%Y-%m-%d'),
     ]
 
     nominees = None
