@@ -10,12 +10,8 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from rest_framework import viewsets
-from rest_framework.decorators import detail_route
-from rest_framework.response import Response
 
 from ktapp import models
-from ktapp import serializers
 from ktapp import utils as kt_utils
 from ktapp.helpers import filmlist, search as kt_search
 
@@ -26,40 +22,6 @@ HUNGARIAN_MONTHS = [
     u'júl', u'aug', u'szept',
     u'okt', u'nov', u'dec',
 ]
-
-
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.KTUser.objects.all()
-    serializer_class = serializers.UserSerializer
-
-    @detail_route(methods=['get'])
-    def votes(self, request, pk=None):
-        user = self.get_object()
-        serializer = serializers.UserWithVotesSerializer(
-            instance=user,
-            context={'request': request}
-        )
-        return Response(serializer.data)
-
-
-class FilmViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Film.objects.all()
-    serializer_class = serializers.FilmSerializer
-
-
-class KeywordViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Keyword.objects.all()
-    serializer_class = serializers.ShortKeywordSerializer
-
-
-class ArtistViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Artist.objects.all()
-    serializer_class = serializers.ArtistSerializer
-
-
-class SequelViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = models.Sequel.objects.all()
-    serializer_class = serializers.SequelSerializer
 
 
 def search(request):

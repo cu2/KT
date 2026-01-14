@@ -3,7 +3,6 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib.auth.views import logout
 from django.views.generic.base import RedirectView
-from rest_framework import routers
 
 from ktapp.views import web_views, api_views
 from ktapp.views.web import user_profile as user_profile_views
@@ -15,17 +14,7 @@ from ktapp.views.web import vapiti as vapiti_views
 
 # API urls
 
-router = routers.DefaultRouter()
-router.register(r'users', api_views.UserViewSet)
-router.register(r'films', api_views.FilmViewSet)
-router.register(r'keywords', api_views.KeywordViewSet)
-router.register(r'artists', api_views.ArtistViewSet)
-router.register(r'sequels', api_views.SequelViewSet)
-
 urlpatterns = [
-    url(r'^api/', include(router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # custom api endpoints:
     url(r'^api/autocomplete/search/$', api_views.search, name='api_search'),
     url(r'^api/autocomplete/users/$', api_views.get_users, name='get_users'),
     url(r'^api/autocomplete/artists/$', api_views.get_artists, name='get_artists'),

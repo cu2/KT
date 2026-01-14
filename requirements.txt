@@ -1,6 +1,5 @@
 Django==1.11.28
 django-ipware==2.0.1
-djangorestframework==3.9.1
 django-compressor==2.2
 django-test-without-migrations==0.6
 django-appconf==1.0.2  # pin it, so Python 2 is still supported

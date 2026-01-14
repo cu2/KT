@@ -168,16 +168,10 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'compressor',
-    'rest_framework',
     'test_without_migrations',
     'ktapp',
     # 'mobileapp',
 )
-
-REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGINATE_BY': 10,
-}
 
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
